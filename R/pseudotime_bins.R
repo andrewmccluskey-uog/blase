@@ -16,7 +16,7 @@
 #'
 #'
 #' @examples
-#' library(SingleCellExperiment)
+#' library(SingleCellExperiment, quiet=TRUE)
 #' library(atgnat)
 #' counts <- matrix(rpois(100, lambda = 10), ncol=10, nrow=10)
 #' sce <- SingleCellExperiment::SingleCellExperiment(counts)
@@ -27,25 +27,25 @@
 ## -----------------------------------------------------------------------------
 create_pseudotime_bins <- function(pseudotime_sce, number_of_bins=20, pseudotime_slot="slingPseudotime_1", split_by="pseudotime_range") {
 
-  if (match(split_by, c("pseudotime_range", "cells")) ) {
+  if (is.na(match(split_by, c("pseudotime_range", "cells")))) {
     stop("split_by must be 'pseudotime_range' or 'cells'")
   }
 
-  if (split_by == "cells") {
-    pseudotime_sce = PRIVATE_apply_pseudotime_even_cells(pseudotime_sce, number_of_bins, slingshot_slot)
-  } else {
-    pseudotime_sce = PRIVATE_apply_pseudotime_even_pseudotime_range(pseudotime_sce, number_of_bins, slingshot_slot)
-  }
-
   ## Remove NA pseudotimes
-  pseudotime_sce = subset(pseudotime_sce, , !is.na(pseudotime_sce@colData[slingshot_slot]))
+  pseudotime_sce = subset(pseudotime_sce, , !is.na(pseudotime_sce@colData[pseudotime_slot]))
+
+  pseudotime = pseudotime_sce@colData[[pseudotime_slot]]
+
+  if (split_by == "cells") {
+    pseudotime_sce = PRIVATE_apply_pseudotime_even_cells(pseudotime_sce, number_of_bins, pseudotime)
+  } else {
+    pseudotime_sce = PRIVATE_apply_pseudotime_even_pseudotime_range(pseudotime_sce, number_of_bins, pseudotime)
+  }
 
   return(pseudotime_sce)
 }
 
-PRIVATE_apply_pseudotime_even_pseudotime_range <- function(pseudotime_sce, number_of_bins, slingshot_slot) {
-
-  pseudotime = pseudotime_sce@colData[[slingshot_slot]]
+PRIVATE_apply_pseudotime_even_pseudotime_range <- function(pseudotime_sce, number_of_bins, pseudotime) {
 
   min_pdt = 0
   max_pdt = ceiling(max(pseudotime[!is.na(pseudotime)]))
@@ -63,8 +63,7 @@ PRIVATE_apply_pseudotime_even_pseudotime_range <- function(pseudotime_sce, numbe
 }
 
 
-PRIVATE_apply_pseudotime_even_cells = function(pseudotime_sce, number_of_bins, slingshot_slot) {
-  pseudotime = pseudotime_sce@colData[[slingshot_slot]]
+PRIVATE_apply_pseudotime_even_cells = function(pseudotime_sce, number_of_bins, pseudotime) {
   pseudotime_order = order(pseudotime, decreasing = FALSE)
 
   ncells = ncol(SingleCellExperiment::counts(pseudotime_sce))
