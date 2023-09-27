@@ -24,3 +24,13 @@ test_that("generates pseudotime bins by cells", {
 
   expect_equal(result, expected_output)
 })
+
+test_that("throws error for invalid split_by parameter", {
+  sce = generate_test_sce(cells=500, genes=100)
+  sce$pseudotime = sqrt(seq_len(500))
+
+  tmp1 <- function() create_pseudotime_bins(sce, 10, "pseudotime", split_by="blah")
+  expect_error(tmp1(), "split_by must be 'pseudotime_range' or 'cells'", fixed=TRUE)
+})
+
+
