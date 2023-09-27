@@ -71,8 +71,9 @@ PRIVATE_apply_pseudotime_even_cells = function(pseudotime_sce, number_of_bins, p
   pseudotime_ordered_cells = rownames(pseudotime_sce@colData)[pseudotime_order]
 
   pseudotime_sce$pseudotime_bin = number_of_bins
+
   for (i in seq_len(number_of_bins)) {
-    cells_for_bin = pseudotime_ordered_cells[(i*cells_per_bin-cells_per_bin+1) : (i*cells_per_bin+1)]
+    cells_for_bin = pseudotime_ordered_cells[(i*cells_per_bin-cells_per_bin+1) : (i*cells_per_bin)]
     pseudotime_sce[,cells_for_bin]$pseudotime_bin = i
   }
 
