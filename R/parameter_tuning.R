@@ -28,8 +28,6 @@ find_best_params <- function(sce, associationTestResult, lineage=1, bins_count_r
     create_pseudotime_bins(sce, bin_count, lineage, split_by = split_by)
 
     for (genes_count in gene_count_range) {
-      # TODO update this to reflect new functions names
-
       gene_list = get_top_n_genes(associationTestResult, n_genes=genes_count, lineage=lineage)
       pseudotime_bins_ratios_of_top_n_genes_df = get_pseudotime_gene_ratios(sce, gene_list)
       res = evaluate_parameters(sce, pseudotime_bins_ratios_of_top_n_genes_df, make_plot=FALSE)
