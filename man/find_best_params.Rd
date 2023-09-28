@@ -7,7 +7,7 @@
 find_best_params(
   sce,
   associationTestResult,
-  lineage = 1,
+  lineage = NA,
   bins_count_range = c(5, 10, 15, 20, 25, 30, 35),
   gene_count_range = c(20, 30, 40, 45, 50, 55, 60, 70, 80),
   split_by = "pseudotime_range"

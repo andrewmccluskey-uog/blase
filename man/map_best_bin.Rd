@@ -7,6 +7,7 @@
 map_best_bin(
   pseudotime_sce,
   pseudotime_gene_ratios,
+  bulk_id,
   bulk_data,
   make_plot = FALSE
 )
@@ -16,7 +17,9 @@ map_best_bin(
 
 \item{pseudotime_gene_ratios}{The dataframe of gene ratios per bin.}
 
-\item{bulk_data}{The bulk sample (one column, each row is a gene).}
+\item{bulk_id}{The sample id of the bulk to analyse}
+
+\item{bulk_data}{The whole bulk read matrix}
 
 \item{make_plot}{Whether or not to draw a plot of the results.}
 }

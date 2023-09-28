@@ -18,14 +18,18 @@
 # TODO: consider allowing this to take just a list of genes not an association test
 #   result to make it a bit more reusable. If we ask it to be ordered, we can
 #   just take the top n.
-find_best_params <- function(sce, associationTestResult, lineage=1, bins_count_range=c(5,10,15,20,25,30,35), gene_count_range=c(20,30,40,45,50,55,60,70,80), split_by="pseudotime_range") {
+find_best_params <- function(sce, associationTestResult, lineage=NA, bins_count_range=c(5,10,15,20,25,30,35), gene_count_range=c(20,30,40,45,50,55,60,70,80), split_by="pseudotime_range") {
+
+  slingshot_pseudotime_slot = "slingPseudotime_1"
+
+  if (!is.na(lineage)) {
+    slingshot_pseudotime_slot = paste0("slingPseudotime_", lineage)
+  }
 
   results = data.frame(gene_count=c(), bin_count=c(), worst_specificity=c(), mean_specificity=c())
   # TODO consider parallelising this
   for (bin_count in bins_count_range) {
-    print(paste0("bins=",bin_count))
-
-    create_pseudotime_bins(sce, bin_count, lineage, split_by = split_by)
+    sce = create_pseudotime_bins(sce, bin_count, pseudotime_slot = slingshot_pseudotime_slot,  split_by = split_by)
 
     for (genes_count in gene_count_range) {
       gene_list = get_top_n_genes(associationTestResult, n_genes=genes_count, lineage=lineage)
@@ -77,7 +81,7 @@ plot_find_best_params_results <- function(find_best_params_results, bin_count_co
 #' @examples
 evaluate_parameters <- function(sce, pseudotime_bins_top_n_genes_df, bins_slot="pseudotime_bin", make_plot=FALSE, plot_columns=4) {
 
-  bin_ids = as.numeric(names(table(sce@colData[bins_slot])))
+  bin_ids = as.numeric(names(table(sce@colData[[bins_slot]])))
 
   pseudobulks = PRIVATE_get_raw_pseudobulks(sce, bin_ids)
 
@@ -87,14 +91,11 @@ evaluate_parameters <- function(sce, pseudotime_bins_top_n_genes_df, bins_slot="
   results.specificity = c()
 
   for (i in bin_ids) {
-    res = map_best_bin(sce, pseudotime_bins_top_n_genes_df, pseudobulks[,i], make_plot=FALSE)
-    data.frame(bin=c(res[[1]]), correlation=c(res[[2]]), history=c(res[3:4]))
-
-    results.best_bin = append(results.best_bin, c(res[[1]]))
-    results.best_corr = append(results.best_corr, c(res[[2]]))
-    results.history = append(results.history, c(res[3:4]))
-    top2 = utils::head(sort(res[3:4][["correlation"]], decreasing=TRUE),n=2)
-    results.specificity = append(results.specificity, c(top2[1]-top2[2]))
+    res = map_best_bin(sce, pseudotime_bins_top_n_genes_df, i, pseudobulks, make_plot=FALSE)
+    results.best_bin = append(results.best_bin, c(res[[1,1]]))
+    results.best_corr = append(results.best_corr, c(res[[1,2]]))
+    results.specificity = append(results.specificity, c(res[[1,3]]))
+    results.history = append(results.history, c(res[,3:4]))
   }
 
   worst_specificity = min(results.specificity)
@@ -153,10 +154,10 @@ evaluate_top_n_genes <- function(sce, pseudotime_bins_top_n_genes_df, bins_slot=
 }
 
 PRIVATE_get_raw_pseudobulks = function(sce, bin_ids) {
-  pseudobulks = as.data.frame(rowSums(SingleCellExperiment::logcounts(sce)))
+  pseudobulks = as.data.frame(Matrix::rowSums(SingleCellExperiment::logcounts(sce)))
   for (i in bin_ids) {
 
-    pb = as.data.frame(rowSums(SingleCellExperiment::logcounts(subset(sce, , sce@colData[["pseudotime_bin"]] == i))))
+    pb = as.data.frame(Matrix::rowSums(SingleCellExperiment::logcounts(subset(sce, , sce@colData[["pseudotime_bin"]] == i))))
     colnames(pb) = i
     pseudobulks = cbind(pseudobulks, pb)
   }

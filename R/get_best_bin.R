@@ -2,7 +2,8 @@
 #'
 #' @param pseudotime_sce The SingleCellObject holding the bins.
 #' @param pseudotime_gene_ratios The dataframe of gene ratios per bin.
-#' @param bulk_data The bulk sample (one column, each row is a gene).
+#' @param bulk_id The sample id of the bulk to analyse
+#' @param bulk_data The whole bulk read matrix
 #' @param make_plot Whether or not to draw a plot of the results.
 #'
 #' @return A dataframe with one row, containing results from the mapping process.
@@ -13,9 +14,9 @@
 #' @export
 #'
 #' @examples
-map_best_bin <- function(pseudotime_sce, pseudotime_gene_ratios, bulk_data, make_plot=FALSE) {
+map_best_bin <- function(pseudotime_sce, pseudotime_gene_ratios, bulk_id, bulk_data, make_plot=FALSE) {
 
-  sum_for_top_genes = bulk_data[colnames(pseudotime_gene_ratios),]
+  sum_for_top_genes = bulk_data[colnames(pseudotime_gene_ratios),bulk_id]
   best_cor = -1
   best_i = 0
   correlations_history = data.frame()

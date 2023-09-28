@@ -15,7 +15,8 @@ Imports:
   SingleCellExperiment,
   ggplot2,
   gridExtra,
-  viridis
+  viridis,
+  Matrix
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
