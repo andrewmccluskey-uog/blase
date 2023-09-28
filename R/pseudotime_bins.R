@@ -16,7 +16,7 @@
 #'
 #'
 #' @examples
-#' library(SingleCellExperiment, quiet=TRUE)
+#' library(SingleCellExperiment, quietly=TRUE)
 #' library(atgnat)
 #' counts <- matrix(rpois(100, lambda = 10), ncol=10, nrow=10)
 #' sce <- SingleCellExperiment::SingleCellExperiment(counts)

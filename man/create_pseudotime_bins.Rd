@@ -29,7 +29,7 @@ The SCE object with the bins metadata created in the "pseudotime_bins" slot.
 Creates the pseudotime bins that will be used to characterise pseudobulked pseudotime.
 }
 \examples{
-library(SingleCellExperiment, quiet=TRUE)
+library(SingleCellExperiment, quietly=TRUE)
 library(atgnat)
 counts <- matrix(rpois(100, lambda = 10), ncol=10, nrow=10)
 sce <- SingleCellExperiment::SingleCellExperiment(counts)
