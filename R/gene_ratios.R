@@ -46,18 +46,18 @@ get_pseudotime_gene_ratios = function(pseudotime_sce, gene_list) {
 
   bin_ids = as.numeric(names(table(pseudotime_sce@colData["pseudotime_bin"])))
 
-  pseudotime_bins_ratios_of_top_n_genes_df = data.frame()
+  pseudotime_bins_top_n_genes_df = data.frame()
   for (i in bin_ids) {
-    sce_of_bin_n = subset(pseudotime_sce, , pseudotime_bin==i)
+    sce_of_bin_n = subset(pseudotime_sce, , pseudotime_sce@colData[["pseudotime_bin"]]==i)
 
     ## Get the mean of the expression of each gene at this pseudotime bin
     mean_for_bin_top_genes = rowSums(SingleCellExperiment::logcounts(sce_of_bin_n[gene_list,]))
 
     ## get expression of genes for cells in each bin
     proportion_for_bin_top_genes = rowSums(SingleCellExperiment::logcounts(sce_of_bin_n[gene_list,]))
-    pseudotime_bins_ratios_of_top_n_genes_df = rbind(pseudotime_bins_ratios_of_top_n_genes_df, proportion_for_bin_top_genes)
+    pseudotime_bins_top_n_genes_df = rbind(pseudotime_bins_top_n_genes_df, proportion_for_bin_top_genes)
   }
-  colnames(pseudotime_bins_ratios_of_top_n_genes_df) = gene_list
-  return(pseudotime_bins_ratios_of_top_n_genes_df)
+  colnames(pseudotime_bins_top_n_genes_df) = gene_list
+  return(pseudotime_bins_top_n_genes_df)
 
 }

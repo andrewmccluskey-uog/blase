@@ -22,7 +22,7 @@
 #' sce <- SingleCellExperiment::SingleCellExperiment(counts)
 #' sce$pseudotime = seq_len(10)
 #' sce = create_pseudotime_bins(sce, 5, pseudotime_slot="pseudotime")
-#' sce$pseudotime_bins
+#' sce$pseudotime_bin
 
 ## -----------------------------------------------------------------------------
 create_pseudotime_bins <- function(pseudotime_sce, number_of_bins=20, pseudotime_slot="slingPseudotime_1", split_by="pseudotime_range") {

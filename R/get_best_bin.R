@@ -30,12 +30,13 @@ map_best_bin <- function(pseudotime_sce, pseudotime_gene_ratios, bulk_data, make
     i=i+1
   }
   colnames(correlations_history) = c('bin', 'correlation')
-  best_bin_population_data = as.data.frame(table(subset(pseudotime_sce, , pseudotime_bin==best_i)$Stages))
+  best_bin_population_data = as.data.frame(table(subset(pseudotime_sce, , pseudotime_sce@colData[["pseudotime_bin"]]==best_i)$Stages))
 
   top2 = utils::head(sort(correlations_history$correlation, decreasing=TRUE),n=2)
-  # round this to 4 decimal places not significant figures
+  # TODO round this to 4 decimal places not significant figures
   distance_between_top_2_corrs = signif(top2[1]-top2[2],2)
 
+  # TODO resolve build issues with scater
   #if (make_plot == TRUE) {
   #  gridExtra::grid.arrange(
   #    scater::plotUMAP(pseudotime_sce, text_by="pseudotime_bin", colour_by="pseudotime_bin"),
@@ -52,6 +53,6 @@ map_best_bin <- function(pseudotime_sce, pseudotime_gene_ratios, bulk_data, make
   #  )
   #}
 
-  result = data.frame(bin=best_i, correlation=best_ibest_cor, top_2_distance=distance_between_top_2_corrs, history=correlations_history)
+  result = data.frame(bin=best_i, correlation=best_cor, top_2_distance=distance_between_top_2_corrs, history=correlations_history)
   return(result)
 }

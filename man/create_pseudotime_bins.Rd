@@ -35,5 +35,5 @@ counts <- matrix(rpois(100, lambda = 10), ncol=10, nrow=10)
 sce <- SingleCellExperiment::SingleCellExperiment(counts)
 sce$pseudotime = seq_len(10)
 sce = create_pseudotime_bins(sce, 5, pseudotime_slot="pseudotime")
-sce$pseudotime_bins
+sce$pseudotime_bin
 }
