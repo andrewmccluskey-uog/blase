@@ -60,12 +60,23 @@ find_best_params <- function(sce, associationTestResult, lineage=NA, bins_count_
 #' @export
 #'
 #' @examples
+#' best_param_results = data.frame(
+#'   gene_count=c(10,10,20,20),
+#'   bin_count=c(15,25,15,25),
+#'   worst_specificity=c(0.01,0.02,0.015,0.025),
+#'   mean_specificity=c(0.2,0.1,0.11,0.23))
+#' plot_find_best_params_results(best_param_results)
 plot_find_best_params_results <- function(find_best_params_results, bin_count_colors=viridis::scale_color_viridis(option="viridis"), gene_count_colors=viridis::scale_color_viridis(option="magma")) {
+  gene_count = ggplot2::sym("gene_count")
+  bin_count = ggplot2::sym("bin_count")
+  worst_specificity = ggplot2::sym("worst_specificity")
+  mean_specificity = ggplot2::sym("mean_specificity")
+
   gridExtra::grid.arrange(
-    ggplot2::ggplot(find_best_params_results, ggplot2::aes_string(x="gene_count", y="worst_specificity", color="bin_count")) + ggplot2::geom_point() + bin_count_colors,
-    ggplot2::ggplot(find_best_params_results, ggplot2::aes_string(x="bin_count", y="worst_specificity", color="gene_count")) + ggplot2::geom_point() + gene_count_colors,
-    ggplot2::ggplot(find_best_params_results, ggplot2::aes_string(x="gene_count", y="mean_specificity", color="bin_count")) + ggplot2::geom_point() + bin_count_colors,
-    ggplot2::ggplot(find_best_params_results, ggplot2::aes_string(x="bin_count", y="mean_specificity", color="gene_count")) + ggplot2::geom_point() + gene_count_colors,
+    ggplot2::ggplot(find_best_params_results, ggplot2::aes(x={{gene_count}}, y={{worst_specificity}}, color={{bin_count}})) + ggplot2::geom_point() + bin_count_colors,
+    ggplot2::ggplot(find_best_params_results, ggplot2::aes(x={{bin_count}}, y={{worst_specificity}}, color={{gene_count}})) + ggplot2::geom_point() + gene_count_colors,
+    ggplot2::ggplot(find_best_params_results, ggplot2::aes(x={{gene_count}}, y={{mean_specificity}}, color={{bin_count}})) + ggplot2::geom_point() + bin_count_colors,
+    ggplot2::ggplot(find_best_params_results, ggplot2::aes(x={{bin_count}}, y={{mean_specificity}}, color={{gene_count}})) + ggplot2::geom_point() + gene_count_colors,
     ncol=2)
 }
 
@@ -178,7 +189,7 @@ PRIVATE_get_raw_pseudobulks = function(sce, bin_ids) {
 }
 
 PRIVATE_plot_history = function(i, bin, corr, history, specificity){
-  return(ggplot2::ggplot(as.data.frame(history[(i*2-1):(i*2)]), ggplot2::aes_string(x="bin", y="correlation")) +
+  return(ggplot2::ggplot(as.data.frame(history[(i*2-1):(i*2)]), ggplot2::aes(x={{ggplot2::sym("bin")}}, y={{ggplot2::sym("correlation")}})) +
            ggplot2::ylim(-1,1) +
            ggplot2::ggtitle(paste0(bin[i], " (", signif(corr[i], 2) ,",",signif(specificity[i], 2),")")) +
            ggplot2::geom_line() +
@@ -193,7 +204,7 @@ PRIVATE_plot_gene_over_bins = function(pseudobulks, gene){
   colnames(expression) = "expr"
   expression$bin = seq_len(nrow(expression))
 
-  return(ggplot2::ggplot(expression, ggplot2::aes_string(x="bin", y="expr")) +
+  return(ggplot2::ggplot(expression, ggplot2::aes(x={{ggplot2::sym("bin")}}, y={{ggplot2::sym("expr")}})) +
            ggplot2::ggtitle(gene) +
            ggplot2::geom_line())
 

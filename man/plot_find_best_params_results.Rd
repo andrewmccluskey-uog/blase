@@ -20,6 +20,14 @@ plot_find_best_params_results(
 \description{
 Plot the results of the search for good parameters
 }
+\examples{
+best_param_results = data.frame(
+  gene_count=c(10,10,20,20),
+  bin_count=c(15,25,15,25),
+  worst_specificity=c(0.01,0.02,0.015,0.025),
+  mean_specificity=c(0.2,0.1,0.11,0.23))
+plot_find_best_params_results(best_param_results)
+}
 \seealso{
 \code{\link[=find_best_params]{find_best_params()}}
 }

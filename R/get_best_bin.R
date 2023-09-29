@@ -45,11 +45,11 @@ map_best_bin <- function(pseudotime_sce, pseudotime_gene_ratios, bulk_id, bulk_d
   #    scater::plotUMAP(pseudotime_sce, colour_by="Stages"),
   #    scater::plotUMAP(pseudotime_sce[,pseudotime_sce$pseudotime_bin==best_i], colour_by="pseudotime_bin"),
   #    scater::plotUMAP(pseudotime_sce[,pseudotime_sce$pseudotime_bin==best_i], colour_by="Stages"),
-  #    ggplot2::ggplot(correlations_history, aes_string(x="bin", y="correlation")) +
+  #    ggplot2::ggplot(correlations_history, aes(x={{ggplot2::sym("bin")}}, y={{ggplot2::sym("correlation")}})) +
   #      ggplot2::geom_line() +
   #      ggplot2::geom_hline(yintercept=best_cor, linetype="dashed") +
   #      ggplot2::geom_vline(xintercept=best_i, linetype="dashed"),
-  #    ggplot2::ggplot(best_bin_population_data[best_bin_population_data$Freq>0,], aes_string(x="Var1", y="Freq")) + geom_bar(stat="identity"),
+  #    ggplot2::ggplot(best_bin_population_data[best_bin_population_data$Freq>0,], aes(x={{ggplot2::sym("Var1")}}, y={{ggplot2::sym("Freq")}})) + geom_bar(stat="identity"),
   #    ncol=2,
   #    top = gridExtra::textGrob(paste(bulk_sample, "( Bin", best_i, ", Cor", signif(best_cor, 2),", distance", distance_between_top_2_corrs, ")"), gp=gpar(fontsize=20,font=3))
   #  )
