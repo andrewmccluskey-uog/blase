@@ -12,6 +12,9 @@
 #' * gene_count: The top n genes to use for this attempt
 #' * worst_specificity: The worst specificity for these parameters
 #' * mean_specificity: The mean specificity for these parameters
+#'
+#' @seealso [plot_find_best_params_results()]
+#'
 #' @export
 #'
 #' @examples
@@ -28,7 +31,10 @@ find_best_params <- function(sce, associationTestResult, lineage=NA, bins_count_
 
   results = data.frame(gene_count=c(), bin_count=c(), worst_specificity=c(), mean_specificity=c())
   # TODO consider parallelising this
+  # https://www.bioconductor.org/packages/devel/bioc/vignettes/BiocParallel/inst/doc/Introduction_To_BiocParallel.html#parallel-looping-vectorized-and-aggregate-operations
+  # https://cran.r-project.org/web/packages/foreach/index.html
   for (bin_count in bins_count_range) {
+    print(bin_count)
     sce = create_pseudotime_bins(sce, bin_count, pseudotime_slot = slingshot_pseudotime_slot,  split_by = split_by)
 
     for (genes_count in gene_count_range) {
@@ -49,19 +55,25 @@ find_best_params <- function(sce, associationTestResult, lineage=NA, bins_count_
 #' @param bin_count_colors Optional, custom bin count color scheme.
 #' @param gene_count_colors Optional, custom gene count color scheme.
 #'
+#' @seealso [find_best_params()]
+#'
 #' @export
 #'
 #' @examples
 plot_find_best_params_results <- function(find_best_params_results, bin_count_colors=viridis::scale_color_viridis(option="viridis"), gene_count_colors=viridis::scale_color_viridis(option="magma")) {
   gridExtra::grid.arrange(
-    ggplot2::ggplot(find_best_params_results, ggplot2::aes(x="gene_count", y="worst_specificity", color="bin_count")) + ggplot2::geom_point() + bin_count_colors,
-    ggplot2::ggplot(find_best_params_results, ggplot2::aes(x="bin_count", y="worst_specificity", color="gene_count")) + ggplot2::geom_point() + gene_count_colors,
-    ggplot2::ggplot(find_best_params_results, ggplot2::aes(x="gene_count", y="mean_specificity", color="bin_count")) + ggplot2::geom_point() + bin_count_colors,
-    ggplot2::ggplot(find_best_params_results, ggplot2::aes(x="bin_count", y="mean_specificity", color="gene_count")) + ggplot2::geom_point() + gene_count_colors,
+    ggplot2::ggplot(find_best_params_results, ggplot2::aes_string(x="gene_count", y="worst_specificity", color="bin_count")) + ggplot2::geom_point() + bin_count_colors,
+    ggplot2::ggplot(find_best_params_results, ggplot2::aes_string(x="bin_count", y="worst_specificity", color="gene_count")) + ggplot2::geom_point() + gene_count_colors,
+    ggplot2::ggplot(find_best_params_results, ggplot2::aes_string(x="gene_count", y="mean_specificity", color="bin_count")) + ggplot2::geom_point() + bin_count_colors,
+    ggplot2::ggplot(find_best_params_results, ggplot2::aes_string(x="bin_count", y="mean_specificity", color="gene_count")) + ggplot2::geom_point() + gene_count_colors,
     ncol=2)
 }
 
 #' Evaluate n_bins and n_genes for bin mapping
+#'
+#' @description Will use the n_bins and n_genes implied by the `sce` and
+#' `pseudotime_bins_top_n_genes_df` parameters and return quality metrics and
+#' an optional chart.
 #'
 #' @param sce The Single Cell Experiment object to use.
 #' @param pseudotime_bins_top_n_genes_df The dataframe with the expression for
@@ -166,7 +178,7 @@ PRIVATE_get_raw_pseudobulks = function(sce, bin_ids) {
 }
 
 PRIVATE_plot_history = function(i, bin, corr, history, specificity){
-  return(ggplot2::ggplot(as.data.frame(history[(i*2-1):(i*2)]), ggplot2::aes(x="bin", y="correlation")) +
+  return(ggplot2::ggplot(as.data.frame(history[(i*2-1):(i*2)]), ggplot2::aes_string(x="bin", y="correlation")) +
            ggplot2::ylim(-1,1) +
            ggplot2::ggtitle(paste0(bin[i], " (", signif(corr[i], 2) ,",",signif(specificity[i], 2),")")) +
            ggplot2::geom_line() +
@@ -181,7 +193,7 @@ PRIVATE_plot_gene_over_bins = function(pseudobulks, gene){
   colnames(expression) = "expr"
   expression$bin = seq_len(nrow(expression))
 
-  return(ggplot2::ggplot(expression, ggplot2::aes(x="bin", y="expr")) +
+  return(ggplot2::ggplot(expression, ggplot2::aes_string(x="bin", y="expr")) +
            ggplot2::ggtitle(gene) +
            ggplot2::geom_line())
 

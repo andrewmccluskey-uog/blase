@@ -20,3 +20,6 @@ plot_find_best_params_results(
 \description{
 Plot the results of the search for good parameters
 }
+\seealso{
+\code{\link[=find_best_params]{find_best_params()}}
+}

@@ -38,3 +38,6 @@ A dataframe of the results.
 \description{
 Identify the Best Parameters For Your Dataset
 }
+\seealso{
+\code{\link[=plot_find_best_params_results]{plot_find_best_params_results()}}
+}
