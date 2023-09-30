@@ -4,7 +4,7 @@
 #' @slot bins list. A list of bin names for each timepoint.
 #' @slot genes list. A list of the genes selected for discriminating timepoints.
 #'
-#' @return
+#' @return An AtgnatData object
 #' @export
 #'
 #' @examples
@@ -109,3 +109,122 @@ setMethod(
     return(methods::new("AtgnatData", pseudobulks = pseudobulks, bins = bin_ids))
   }
 )
+
+#' Map the best matching SC bin for a bulk sample
+#'
+#' @param atgnat_data The `AtgnatData` holding the bins.
+#' @param bulk_id The sample id of the bulk to analyse
+#' @param bulk_data The whole bulk read matrix
+#' @param make_plot Whether or not to draw a plot of the results.
+#'
+#' @return A dataframe with one row, containing results from the mapping process.
+#' * Bin: the bin that best matched the bulk sample.
+#' * Corr: the spearman's rho that the test geneset had between the winning bin and the bulk.
+#' * top_2_distance: the absolute difference between the best and second best mapping buckets. Higher indicates a less doubtful mapping.
+#' * history: a dataframe of the correlation score for each bin.
+#' @export
+#'
+#' @examples
+map_best_bin_2 <- function(atgnat_data, bulk_id, bulk_data, make_plot=FALSE) {
+
+  # TODO throw error if no genes
+
+  sum_for_top_genes = bulk_data[atgnat_data@genes,bulk_id]
+
+  best_cor = -1
+  best_i = 0
+  correlations_history = data.frame()
+  for (i in atgnat_data@bins ) {
+    bin_ratios = atgnat_data@pseudobulks[atgnat_data@genes,i]
+    corr <- stats::cor.test(bin_ratios, sum_for_top_genes, method = 'spearman')
+    if (corr$estimate > best_cor) {
+      best_cor = unname(corr$estimate)
+      best_i = i
+    }
+    correlations_history <- rbind(correlations_history, c(i, unname(corr$estimate)))
+    i=i+1
+  }
+  colnames(correlations_history) = c('bin', 'correlation')
+
+  top2 = utils::head(sort(correlations_history$correlation, decreasing=TRUE),n=2)
+  # TODO round this to 4 decimal places not significant figures
+  distance_between_top_2_corrs = signif(top2[1]-top2[2],2)
+
+  # TODO resolve build issues with scater
+  # TODO split out into different function
+  #if (make_plot == TRUE) {
+  #  gridExtra::grid.arrange(
+  #    scater::plotUMAP(pseudotime_sce, text_by="pseudotime_bin", colour_by="pseudotime_bin"),
+  #    scater::plotUMAP(pseudotime_sce, colour_by="Stages"),
+  #    scater::plotUMAP(pseudotime_sce[,pseudotime_sce$pseudotime_bin==best_i], colour_by="pseudotime_bin"),
+  #    scater::plotUMAP(pseudotime_sce[,pseudotime_sce$pseudotime_bin==best_i], colour_by="Stages"),
+  #    ggplot2::ggplot(correlations_history, aes(x={{ggplot2::sym("bin")}}, y={{ggplot2::sym("correlation")}})) +
+  #      ggplot2::geom_line() +
+  #      ggplot2::geom_hline(yintercept=best_cor, linetype="dashed") +
+  #      ggplot2::geom_vline(xintercept=best_i, linetype="dashed"),
+  #    ggplot2::ggplot(best_bin_population_data[best_bin_population_data$Freq>0,], aes(x={{ggplot2::sym("Var1")}}, y={{ggplot2::sym("Freq")}})) + geom_bar(stat="identity"),
+  #    ncol=2,
+  #    top = gridExtra::textGrob(paste(bulk_sample, "( Bin", best_i, ", Cor", signif(best_cor, 2),", distance", distance_between_top_2_corrs, ")"), gp=gpar(fontsize=20,font=3))
+  #  )
+  #}
+
+  result = data.frame(bin=best_i, correlation=best_cor, top_2_distance=distance_between_top_2_corrs, history=correlations_history)
+  return(result)
+}
+
+#' Evaluate n_bins and n_genes for bin mapping
+#'
+#' @description Will use the n_bins and n_genes implied by the `sce` and
+#' `pseudotime_bins_top_n_genes_df` parameters and return quality metrics and
+#' an optional chart.
+#'
+#' @param atgnat_data The `AtgnatData` object to use.
+#' @param make_plot Whether or not to render the plot showing the correlations
+#' for each pseudobulk bin when we try to map the given bin.
+#' @param plot_columns How many columns to use in the plot.
+#'
+#' @return A vector of length 2:
+#' * "worst top 2 distance" containing the lowest difference between the absolute values of the
+#'  top 2 most correlated bins for each bin. Higher is better for differentiating.
+#' * "mean top 2 distance" containing the mean top 2 distance across the entire set of genes and bins.
+#'  Higher is better for differentiation, but it should matter less than the worst value.
+#' @export
+#'
+#' @examples
+evaluate_parameters_2 <- function(atgnat_data, make_plot=FALSE, plot_columns=4) {
+
+  bin_ids = atgnat_data@bins
+
+  results.best_bin = c()
+  results.best_corr = c()
+  results.history = c()
+  results.specificity = c()
+
+  for (i in bin_ids) {
+    res = map_best_bin_2(atgnat_data, i, atgnat_data@pseudobulks, make_plot=FALSE)
+    results.best_bin = append(results.best_bin, c(res[[1,1]]))
+    results.best_corr = append(results.best_corr, c(res[[1,2]]))
+    results.specificity = append(results.specificity, c(res[[1,3]]))
+    results.history = append(results.history, c(res[,3:4]))
+  }
+
+  worst_specificity = min(results.specificity)
+  mean_specificity = mean(results.specificity)
+
+  if (make_plot == TRUE) {
+    plots=list()
+
+    for (i in bin_ids) {
+      plots[[i]] = PRIVATE_plot_history(i, results.best_bin, results.best_corr, results.history, results.specificity)
+    }
+
+    gridExtra::grid.arrange(
+      top=grid::textGrob(paste(length(atgnat_data@genes), "genes and worst specificity:", signif(worst_specificity, 2)),gp=grid::gpar(fontsize=20,font=3)),
+      grobs=plots,
+      ncol=plot_columns
+    )
+  }
+
+  return(c(worst_specificity, mean_specificity))
+
+}
