@@ -1,3 +1,5 @@
+# TODO split methods into a) conversion.R b) mapping.R c) plotting.R d) tuning.R
+
 #' Atgnat Data Object
 #'
 #' @slot pseudobulks data.frame. Each column is a timepoint sample and each row is a gene.
@@ -8,6 +10,7 @@
 #' @export
 #'
 #' @examples
+# TODO make bins and genes hidden with . and then add setters/getters?
 setClass(
   Class = "AtgnatData",
   slots = list(
@@ -69,7 +72,7 @@ setMethod(
     pseudotime_sce = subset(x, , !is.na(x@colData[pseudotime_slot]))
     pseudotime = pseudotime_sce@colData[[pseudotime_slot]]
 
-    c = SingleCellExperiment::logcounts(pseudotime_sce)
+    c = SingleCellExperiment::normcounts(pseudotime_sce)
 
     if (split_by == "pseudotime_range") {
       min_pdt = 0
@@ -97,10 +100,10 @@ setMethod(
       }
     }
 
-    bin_ids = unique(pseudotime_sce$pseudotime_bin)
-    pseudobulks = as.data.frame(Matrix::rowSums(SingleCellExperiment::logcounts(pseudotime_sce)))
+    bin_ids = sort(unique(pseudotime_sce$pseudotime_bin))
+    pseudobulks = as.data.frame(Matrix::rowSums(SingleCellExperiment::normcounts(pseudotime_sce)))
     for (i in bin_ids) {
-      pb = as.data.frame(Matrix::rowSums(SingleCellExperiment::logcounts(subset(pseudotime_sce, , pseudotime_sce@colData[["pseudotime_bin"]] == i))))
+      pb = as.data.frame(Matrix::rowSums(SingleCellExperiment::normcounts(subset(pseudotime_sce, , pseudotime_sce@colData[["pseudotime_bin"]] == i))))
       colnames(pb) = i
       pseudobulks = cbind(pseudobulks, pb)
     }
@@ -115,7 +118,6 @@ setMethod(
 #' @param atgnat_data The `AtgnatData` holding the bins.
 #' @param bulk_id The sample id of the bulk to analyse
 #' @param bulk_data The whole bulk read matrix
-#' @param make_plot Whether or not to draw a plot of the results.
 #'
 #' @return A dataframe with one row, containing results from the mapping process.
 #' * Bin: the bin that best matched the bulk sample.
@@ -125,7 +127,7 @@ setMethod(
 #' @export
 #'
 #' @examples
-map_best_bin_2 <- function(atgnat_data, bulk_id, bulk_data, make_plot=FALSE) {
+map_best_bin_2 <- function(atgnat_data, bulk_id, bulk_data) {
 
   # TODO throw error if no genes
 
@@ -149,24 +151,6 @@ map_best_bin_2 <- function(atgnat_data, bulk_id, bulk_data, make_plot=FALSE) {
   top2 = utils::head(sort(correlations_history$correlation, decreasing=TRUE),n=2)
   # TODO round this to 4 decimal places not significant figures
   distance_between_top_2_corrs = signif(top2[1]-top2[2],2)
-
-  # TODO resolve build issues with scater
-  # TODO split out into different function
-  #if (make_plot == TRUE) {
-  #  gridExtra::grid.arrange(
-  #    scater::plotUMAP(pseudotime_sce, text_by="pseudotime_bin", colour_by="pseudotime_bin"),
-  #    scater::plotUMAP(pseudotime_sce, colour_by="Stages"),
-  #    scater::plotUMAP(pseudotime_sce[,pseudotime_sce$pseudotime_bin==best_i], colour_by="pseudotime_bin"),
-  #    scater::plotUMAP(pseudotime_sce[,pseudotime_sce$pseudotime_bin==best_i], colour_by="Stages"),
-  #    ggplot2::ggplot(correlations_history, aes(x={{ggplot2::sym("bin")}}, y={{ggplot2::sym("correlation")}})) +
-  #      ggplot2::geom_line() +
-  #      ggplot2::geom_hline(yintercept=best_cor, linetype="dashed") +
-  #      ggplot2::geom_vline(xintercept=best_i, linetype="dashed"),
-  #    ggplot2::ggplot(best_bin_population_data[best_bin_population_data$Freq>0,], aes(x={{ggplot2::sym("Var1")}}, y={{ggplot2::sym("Freq")}})) + geom_bar(stat="identity"),
-  #    ncol=2,
-  #    top = gridExtra::textGrob(paste(bulk_sample, "( Bin", best_i, ", Cor", signif(best_cor, 2),", distance", distance_between_top_2_corrs, ")"), gp=gpar(fontsize=20,font=3))
-  #  )
-  #}
 
   result = data.frame(bin=best_i, correlation=best_cor, top_2_distance=distance_between_top_2_corrs, history=correlations_history)
   return(result)
@@ -201,11 +185,11 @@ evaluate_parameters_2 <- function(atgnat_data, make_plot=FALSE, plot_columns=4) 
   results.specificity = c()
 
   for (i in bin_ids) {
-    res = map_best_bin_2(atgnat_data, i, atgnat_data@pseudobulks, make_plot=FALSE)
+    res = map_best_bin_2(atgnat_data, i, atgnat_data@pseudobulks)
     results.best_bin = append(results.best_bin, c(res[[1,1]]))
     results.best_corr = append(results.best_corr, c(res[[1,2]]))
     results.specificity = append(results.specificity, c(res[[1,3]]))
-    results.history = append(results.history, c(res[,3:4]))
+    results.history = append(results.history, c(res[,4:5]))
   }
 
   worst_specificity = min(results.specificity)
@@ -226,5 +210,81 @@ evaluate_parameters_2 <- function(atgnat_data, make_plot=FALSE, plot_columns=4) 
   }
 
   return(c(worst_specificity, mean_specificity))
+
+}
+
+
+#' Identify the Best Parameters For Your Dataset
+#'
+#' @param x The object to create `AtgnatData`` from
+#' @param genelist The list of genes to use (ordered by descending goodness)
+#' @param bins_count_range The n_bins list to try out
+#' @param gene_count_range The n_genes list to try out
+#' @param split_by How to do the pseudotime bucket creation
+#' @param ... params to be passed to child functions, see \code{\link{as.atgnatData}}
+#'
+#' @return A dataframe of the results.
+#' * bin_count: The bin count for this attempt
+#' * gene_count: The top n genes to use for this attempt
+#' * worst_specificity: The worst specificity for these parameters
+#' * mean_specificity: The mean specificity for these parameters
+#'
+#' @seealso [plot_find_best_params_results()]
+#'
+#' @export
+#'
+#' @examples
+# TODO: consider allowing this to take just a list of genes not an association test
+#   result to make it a bit more reusable. If we ask it to be ordered, we can
+#   just take the top n.
+find_best_params_2 <- function(x, genelist, bins_count_range=c(5,10,15,20,25,30,35), gene_count_range=c(20,30,40,45,50,55,60,70,80), ...) {
+
+  results = data.frame(gene_count=c(), bin_count=c(), worst_specificity=c(), mean_specificity=c())
+  # TODO consider parallelising this
+  # https://www.bioconductor.org/packages/devel/bioc/vignettes/BiocParallel/inst/doc/Introduction_To_BiocParallel.html#parallel-looping-vectorized-and-aggregate-operations
+  # https://cran.r-project.org/web/packages/foreach/index.html
+  for (bin_count in bins_count_range) {
+    print(bin_count)
+    atgnat_data = as.AtgnatData(x=x, n_bins=bin_count, ...)
+
+    for (genes_count in gene_count_range) {
+      atgnat_data@genes = genelist[1:genes_count]
+      res = evaluate_parameters_2(atgnat_data, make_plot=FALSE)
+      results = rbind(results, data.frame(bin_count=c(bin_count), gene_count=c(genes_count), worst_specificity=c(res[1]), mean_specificity=c(res[2])))
+    }
+  }
+
+  return(results)
+
+}
+
+#' Evaluate Top Genes
+#'
+#' Shows plots over bins of expression of the top n genes. This is designed to help
+#' identify if you have selected genes that vary over the pseudotime you have chosen
+#' bins to exist over. Uses the normcounts of the SCE.
+#'
+#' @param atgnat_data The `AtgnatData` to get bins and expression from.
+#' @param n_genes_to_plot The number of genes to plot.
+#' @param plot_columns The number of columns to plot the grid with. Best as a
+#' divisor of `n_genes_to_plot`.
+#'
+#' @export
+#'
+#' @examples
+evaluate_top_n_genes_2 <- function(atgnat_data, n_genes_to_plot=16, plot_columns=4) {
+
+  # TODO check genes exist
+
+  plots = list()
+  for (i in seq_len(n_genes_to_plot)) {
+    plots[[i]] = PRIVATE_plot_gene_over_bins(atgnat_data@pseudobulks, atgnat_data@genes[i])
+  }
+
+  gridExtra::grid.arrange(
+    top=grid::textGrob(paste(length(atgnat_data@genes), "genes"),gp=grid::gpar(fontsize=20,font=3)),
+    grobs=plots,
+    ncol=plot_columns
+  )
 
 }

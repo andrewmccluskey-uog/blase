@@ -51,7 +51,7 @@ get_pseudotime_gene_ratios = function(pseudotime_sce, gene_list) {
     sce_of_bin_n = subset(pseudotime_sce, , pseudotime_sce@colData[["pseudotime_bin"]]==i)
 
     ## get expression of genes for cells in each bin
-    sum_for_bin_top_genes = Matrix::rowSums(SingleCellExperiment::logcounts(sce_of_bin_n[gene_list,]))
+    sum_for_bin_top_genes = Matrix::rowSums(SingleCellExperiment::normcounts(sce_of_bin_n[gene_list,]))
 
     pseudotime_bins_top_n_genes_df = rbind(pseudotime_bins_top_n_genes_df, sum_for_bin_top_genes)
   }

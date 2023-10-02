@@ -189,7 +189,11 @@ PRIVATE_get_raw_pseudobulks = function(sce, bin_ids) {
 }
 
 PRIVATE_plot_history = function(i, bin, corr, history, specificity){
-  return(ggplot2::ggplot(as.data.frame(history[(i*2-1):(i*2)]), ggplot2::aes(x={{ggplot2::sym("bin")}}, y={{ggplot2::sym("correlation")}})) +
+
+  bin_sym = ggplot2::sym("history.bin")
+  corr_sym = ggplot2::sym("history.correlation")
+
+  return(ggplot2::ggplot(as.data.frame(history[(i*2-1):(i*2)]), ggplot2::aes(x={{bin_sym}}, y={{corr_sym}})) +
            ggplot2::ylim(-1,1) +
            ggplot2::ggtitle(paste0(bin[i], " (", signif(corr[i], 2) ,",",signif(specificity[i], 2),")")) +
            ggplot2::geom_line() +
@@ -200,11 +204,14 @@ PRIVATE_plot_history = function(i, bin, corr, history, specificity){
 
 PRIVATE_plot_gene_over_bins = function(pseudobulks, gene){
 
+  bin_sym = ggplot2::sym("bin")
+  expr_sym = ggplot2::sym("expr")
+
   expression =as.data.frame(t(pseudobulks[gene,]))
   colnames(expression) = "expr"
   expression$bin = seq_len(nrow(expression))
 
-  return(ggplot2::ggplot(expression, ggplot2::aes(x={{ggplot2::sym("bin")}}, y={{ggplot2::sym("expr")}})) +
+  return(ggplot2::ggplot(expression, ggplot2::aes(x={{bin_sym}}, y={{expr_sym}})) +
            ggplot2::ggtitle(gene) +
            ggplot2::geom_line())
 
