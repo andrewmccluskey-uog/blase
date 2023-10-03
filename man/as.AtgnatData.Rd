@@ -2,10 +2,13 @@
 % Please edit documentation in R/atgnat_data_class.R
 \name{as.AtgnatData}
 \alias{as.AtgnatData}
+\alias{as.AtgnatData,data.frame-method}
 \alias{as.AtgnatData,SingleCellExperiment-method}
 \title{Conversion to AtgnatData}
 \usage{
 as.AtgnatData(x, ...)
+
+\S4method{as.AtgnatData}{data.frame}(x)
 
 \S4method{as.AtgnatData}{SingleCellExperiment}(
   x,
@@ -19,16 +22,16 @@ as.AtgnatData(x, ...)
 
 \item{...}{additional arguments passed to object-specific methods.}
 
-\item{pseudotime_slot}{The SingleCellExperiment slot containing the pseudotime values for each cell}
+\item{pseudotime_slot}{The \link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment::SingleCellExperiment} slot containing the pseudotime values for each cell}
 
 \item{n_bins}{The number of bins to create.}
 
-\item{split_by}{The technique used to split the bins. The default "pseudotime_range" picks the
-bin for a cell based on a constant range of pseudotime. "cells" picks the bin for a cell based on
+\item{split_by}{The technique used to split the bins. The default \code{pseudotime_range} picks the
+bin for a cell based on a constant range of pseudotime. \code{cells} picks the bin for a cell based on
 an even number of cells per bin.}
 }
 \value{
-An \code{AtgnatData} object
+An \link{AtgnatData} object
 }
 \description{
 Conversion to AtgnatData

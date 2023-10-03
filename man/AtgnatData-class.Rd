@@ -3,7 +3,11 @@
 \docType{class}
 \name{AtgnatData-class}
 \alias{AtgnatData-class}
+\alias{AtgnatData}
 \title{Atgnat Data Object}
+\value{
+An \link{AtgnatData} object
+}
 \description{
 Atgnat Data Object
 }
@@ -17,3 +21,11 @@ Atgnat Data Object
 \item{\code{genes}}{list. A list of the genes selected for discriminating timepoints.}
 }}
 
+\examples{
+library(SingleCellExperiment, quietly=TRUE)
+library(atgnat)
+counts <- matrix(rpois(100, lambda = 10), ncol=10, nrow=10)
+sce <- SingleCellExperiment::SingleCellExperiment(assays = list(normcounts = counts))
+sce$pseudotime = seq_len(10)
+as.AtgnatData(sce, pseudotime_slot="pseudotime", n_bins=3)
+}

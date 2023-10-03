@@ -7,7 +7,7 @@
 evaluate_parameters_2(atgnat_data, make_plot = FALSE, plot_columns = 4)
 }
 \arguments{
-\item{atgnat_data}{The \code{AtgnatData} object to use.}
+\item{atgnat_data}{The \link{AtgnatData} object to use.}
 
 \item{make_plot}{Whether or not to render the plot showing the correlations
 for each pseudobulk bin when we try to map the given bin.}

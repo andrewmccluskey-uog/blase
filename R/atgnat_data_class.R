@@ -6,12 +6,18 @@
 #' @slot bins list. A list of bin names for each timepoint.
 #' @slot genes list. A list of the genes selected for discriminating timepoints.
 #'
-#' @return An AtgnatData object
+#' @return An [AtgnatData] object
 #' @export
 #'
 #' @examples
+#' library(SingleCellExperiment, quietly=TRUE)
+#' library(atgnat)
+#' counts <- matrix(rpois(100, lambda = 10), ncol=10, nrow=10)
+#' sce <- SingleCellExperiment::SingleCellExperiment(assays = list(normcounts = counts))
+#' sce$pseudotime = seq_len(10)
+#' as.AtgnatData(sce, pseudotime_slot="pseudotime", n_bins=3)
 # TODO make bins and genes hidden with . and then add setters/getters?
-setClass(
+AtgnatData = setClass(
   Class = "AtgnatData",
   slots = list(
     pseudobulks = "data.frame",
@@ -21,7 +27,7 @@ setClass(
 )
 
 #' @title Show an AtgnatData object
-#' @param object an AtgnatData object
+#' @param object an [AtgnatData] object
 #' @export
 setMethod(f = "show",
           signature = "AtgnatData",
@@ -43,7 +49,7 @@ setMethod(f = "show",
 #' @param x An object to take counts from
 #' @param ... additional arguments passed to object-specific methods.
 #'
-#' @return An `AtgnatData` object
+#' @return An [AtgnatData] object
 #'
 #' @export
 setGeneric(name = "as.AtgnatData",
@@ -51,11 +57,27 @@ setGeneric(name = "as.AtgnatData",
            def = function(x, ...) standardGeneric("as.AtgnatData"))
 
 #' @rdname as.AtgnatData
-#' @param pseudotime_slot The SingleCellExperiment slot containing the pseudotime values for each cell
+#'
+#' @import methods
+#'
+#' @export
+setMethod(
+  f = "as.AtgnatData",
+  signature = c(x="data.frame"),
+  definition = function(x){
+    return(methods::new("AtgnatData", pseudobulks = x, bins = colnames(x)))
+  }
+)
+
+
+#' @rdname as.AtgnatData
+#' @param pseudotime_slot The [SingleCellExperiment::SingleCellExperiment] slot containing the pseudotime values for each cell
 #' @param n_bins The number of bins to create.
-#' @param split_by The technique used to split the bins. The default "pseudotime_range" picks the
-#' bin for a cell based on a constant range of pseudotime. "cells" picks the bin for a cell based on
+#' @param split_by The technique used to split the bins. The default `pseudotime_range` picks the
+#' bin for a cell based on a constant range of pseudotime. `cells` picks the bin for a cell based on
 #' an even number of cells per bin.
+#'
+#' @import methods
 #'
 #' @export
 setMethod(
@@ -115,7 +137,7 @@ setMethod(
 
 #' Map the best matching SC bin for a bulk sample
 #'
-#' @param atgnat_data The `AtgnatData` holding the bins.
+#' @param atgnat_data The [AtgnatData] holding the bins.
 #' @param bulk_id The sample id of the bulk to analyse
 #' @param bulk_data The whole bulk read matrix
 #'
@@ -138,6 +160,7 @@ map_best_bin_2 <- function(atgnat_data, bulk_id, bulk_data) {
   correlations_history = data.frame()
   for (i in atgnat_data@bins ) {
     bin_ratios = atgnat_data@pseudobulks[atgnat_data@genes,i]
+
     corr <- stats::cor.test(bin_ratios, sum_for_top_genes, method = 'spearman')
     if (corr$estimate > best_cor) {
       best_cor = unname(corr$estimate)
@@ -162,7 +185,7 @@ map_best_bin_2 <- function(atgnat_data, bulk_id, bulk_data) {
 #' `pseudotime_bins_top_n_genes_df` parameters and return quality metrics and
 #' an optional chart.
 #'
-#' @param atgnat_data The `AtgnatData` object to use.
+#' @param atgnat_data The [AtgnatData] object to use.
 #' @param make_plot Whether or not to render the plot showing the correlations
 #' for each pseudobulk bin when we try to map the given bin.
 #' @param plot_columns How many columns to use in the plot.
@@ -220,8 +243,7 @@ evaluate_parameters_2 <- function(atgnat_data, make_plot=FALSE, plot_columns=4) 
 #' @param genelist The list of genes to use (ordered by descending goodness)
 #' @param bins_count_range The n_bins list to try out
 #' @param gene_count_range The n_genes list to try out
-#' @param split_by How to do the pseudotime bucket creation
-#' @param ... params to be passed to child functions, see \code{\link{as.atgnatData}}
+#' @param ... params to be passed to child functions, see [as.AtgnatData()]
 #'
 #' @return A dataframe of the results.
 #' * bin_count: The bin count for this attempt
@@ -229,7 +251,7 @@ evaluate_parameters_2 <- function(atgnat_data, make_plot=FALSE, plot_columns=4) 
 #' * worst_specificity: The worst specificity for these parameters
 #' * mean_specificity: The mean specificity for these parameters
 #'
-#' @seealso [plot_find_best_params_results()]
+#' @seealso [plot_find_best_params_results()] for plotting the results of this function.
 #'
 #' @export
 #'
@@ -264,7 +286,7 @@ find_best_params_2 <- function(x, genelist, bins_count_range=c(5,10,15,20,25,30,
 #' identify if you have selected genes that vary over the pseudotime you have chosen
 #' bins to exist over. Uses the normcounts of the SCE.
 #'
-#' @param atgnat_data The `AtgnatData` to get bins and expression from.
+#' @param atgnat_data The [AtgnatData] to get bins and expression from.
 #' @param n_genes_to_plot The number of genes to plot.
 #' @param plot_columns The number of columns to plot the grid with. Best as a
 #' divisor of `n_genes_to_plot`.

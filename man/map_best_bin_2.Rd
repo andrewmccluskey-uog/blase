@@ -4,16 +4,14 @@
 \alias{map_best_bin_2}
 \title{Map the best matching SC bin for a bulk sample}
 \usage{
-map_best_bin_2(atgnat_data, bulk_id, bulk_data, make_plot = FALSE)
+map_best_bin_2(atgnat_data, bulk_id, bulk_data)
 }
 \arguments{
-\item{atgnat_data}{The \code{AtgnatData} holding the bins.}
+\item{atgnat_data}{The \link{AtgnatData} holding the bins.}
 
 \item{bulk_id}{The sample id of the bulk to analyse}
 
 \item{bulk_data}{The whole bulk read matrix}
-
-\item{make_plot}{Whether or not to draw a plot of the results.}
 }
 \value{
 A dataframe with one row, containing results from the mapping process.

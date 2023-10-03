@@ -7,7 +7,7 @@
 \S4method{show}{AtgnatData}(object)
 }
 \arguments{
-\item{object}{an AtgnatData object}
+\item{object}{an \link{AtgnatData} object}
 }
 \description{
 Show an AtgnatData object
