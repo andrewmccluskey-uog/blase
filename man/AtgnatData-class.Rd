@@ -9,7 +9,7 @@
 An \link{AtgnatData} object
 }
 \description{
-Atgnat Data Object
+For creation details, see \code{\link[=as.AtgnatData]{as.AtgnatData()}}
 }
 \section{Slots}{
 

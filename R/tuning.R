@@ -85,7 +85,6 @@ find_best_params <- function(x, genelist, bins_count_range=c(5,10,15,20,25,30,35
   # https://www.bioconductor.org/packages/devel/bioc/vignettes/BiocParallel/inst/doc/Introduction_To_BiocParallel.html#parallel-looping-vectorized-and-aggregate-operations
   # https://cran.r-project.org/web/packages/foreach/index.html
   for (bin_count in bins_count_range) {
-    print(bin_count)
     atgnat_data = as.AtgnatData(x=x, n_bins=bin_count, ...)
 
     for (genes_count in gene_count_range) {

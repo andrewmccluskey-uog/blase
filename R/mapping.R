@@ -15,7 +15,7 @@
 # TODO make this return an object, and generics to it to let it plot on an SCE (and one day a seurat object)
 map_best_bin <- function(atgnat_data, bulk_id, bulk_data) {
 
-  if (atgnat_data@genes == NA || length(atgnat_data@genes) == 0) {
+  if (any(is.na(atgnat_data@genes)) || length(atgnat_data@genes) == 0) {
     stop("No genes to map with. Please add something to the atgnat_data@genes slot.")
   }
 
@@ -27,7 +27,7 @@ map_best_bin <- function(atgnat_data, bulk_id, bulk_data) {
   for (i in atgnat_data@bins ) {
     bin_ratios = atgnat_data@pseudobulks[atgnat_data@genes,i]
 
-    corr <- stats::cor.test(bin_ratios, sum_for_top_genes, method = 'spearman')
+    corr <- stats::cor.test(bin_ratios, sum_for_top_genes, method = 'spearman',exact=FALSE)
     if (corr$estimate > best_cor) {
       best_cor = unname(corr$estimate)
       best_i = i
