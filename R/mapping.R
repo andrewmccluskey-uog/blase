@@ -4,15 +4,12 @@
 #' @param bulk_id The sample id of the bulk to analyse
 #' @param bulk_data The whole bulk read matrix
 #'
-#' @return A dataframe with one row, containing results from the mapping process.
-#' * Bin: the bin that best matched the bulk sample.
-#' * Corr: the spearman's rho that the test geneset had between the winning bin and the bulk.
-#' * top_2_distance: the absolute difference between the best and second best mapping buckets. Higher indicates a less doubtful mapping.
-#' * history: a dataframe of the correlation score for each bin.
+#' @import methods
+#'
+#' @return A [MappingResult] object.
 #' @export
 #'
 #' @examples
-# TODO make this return an object, and generics to it to let it plot on an SCE (and one day a seurat object)
 map_best_bin <- function(atgnat_data, bulk_id, bulk_data) {
 
   if (any(is.na(atgnat_data@genes)) || length(atgnat_data@genes) == 0) {
@@ -27,6 +24,7 @@ map_best_bin <- function(atgnat_data, bulk_id, bulk_data) {
   for (i in atgnat_data@bins ) {
     bin_ratios = atgnat_data@pseudobulks[atgnat_data@genes,i]
 
+    # TODO we probably only want to use exact=FALSE when doing the tuning calls as the lists will be identical
     corr <- stats::cor.test(bin_ratios, sum_for_top_genes, method = 'spearman',exact=FALSE)
     if (corr$estimate > best_cor) {
       best_cor = unname(corr$estimate)
@@ -40,6 +38,12 @@ map_best_bin <- function(atgnat_data, bulk_id, bulk_data) {
   top2 = utils::head(sort(correlations_history$correlation, decreasing=TRUE),n=2)
   distance_between_top_2_corrs = round(top2[1]-top2[2], 4)
 
-  result = data.frame(bin=best_i, correlation=best_cor, top_2_distance=distance_between_top_2_corrs, history=correlations_history)
-  return(result)
+  return(methods::new("MappingResult",
+                      best_bin=best_i,
+                      best_correlation=best_cor,
+                      top_2_distance=distance_between_top_2_corrs,
+                      history=correlations_history)
+         )
+
 }
+

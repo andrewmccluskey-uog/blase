@@ -28,10 +28,10 @@ evaluate_parameters <- function(atgnat_data, make_plot=FALSE, plot_columns=4) {
 
   for (i in bin_ids) {
     res = map_best_bin(atgnat_data, i, atgnat_data@pseudobulks)
-    results.best_bin = append(results.best_bin, c(res[[1,1]]))
-    results.best_corr = append(results.best_corr, c(res[[1,2]]))
-    results.specificity = append(results.specificity, c(res[[1,3]]))
-    results.history = append(results.history, c(res[,4:5]))
+    results.best_bin = append(results.best_bin, c(res@best_bin))
+    results.best_corr = append(results.best_corr, c(res@best_correlation))
+    results.specificity = append(results.specificity, c(res@top_2_distance))
+    results.history = append(results.history, c(res@history))
   }
 
   worst_specificity = min(results.specificity)
@@ -162,8 +162,8 @@ evaluate_top_n_genes <- function(atgnat_data, n_genes_to_plot=16, plot_columns=4
 
 PRIVATE_plot_history = function(i, bin, corr, history, specificity){
 
-  bin_sym = ggplot2::sym("history.bin")
-  corr_sym = ggplot2::sym("history.correlation")
+  bin_sym = ggplot2::sym("bin")
+  corr_sym = ggplot2::sym("correlation")
 
   return(ggplot2::ggplot(as.data.frame(history[(i*2-1):(i*2)]), ggplot2::aes(x={{bin_sym}}, y={{corr_sym}})) +
            ggplot2::ylim(-1,1) +

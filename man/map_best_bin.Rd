@@ -14,13 +14,7 @@ map_best_bin(atgnat_data, bulk_id, bulk_data)
 \item{bulk_data}{The whole bulk read matrix}
 }
 \value{
-A dataframe with one row, containing results from the mapping process.
-\itemize{
-\item Bin: the bin that best matched the bulk sample.
-\item Corr: the spearman's rho that the test geneset had between the winning bin and the bulk.
-\item top_2_distance: the absolute difference between the best and second best mapping buckets. Higher indicates a less doubtful mapping.
-\item history: a dataframe of the correlation score for each bin.
-}
+A \link{MappingResult} object.
 }
 \description{
 Map the best matching SC bin for a bulk sample
