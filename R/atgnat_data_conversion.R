@@ -40,42 +40,8 @@ setMethod(
   signature = c(x="SingleCellExperiment"),
   definition = function(x, pseudotime_slot="slingPseudotime_1", n_bins=20, split_by="pseudotime_range"){
 
-    if (is.na(match(split_by, c("pseudotime_range", "cells")))) {
-      stop("split_by must be 'pseudotime_range' or 'cells'")
-    }
-
-    # TODO add check for pseudotime_slot existing
-
-    pseudotime_sce = subset(x, , !is.na(x@colData[pseudotime_slot]))
-    pseudotime = pseudotime_sce@colData[[pseudotime_slot]]
-
+    pseudotime_sce = assign_pseduotime_bins(x, split_by="pseudotime_range", n_bins=n_bins, pseudotime_slot=pseudotime_slot)
     c = SingleCellExperiment::normcounts(pseudotime_sce)
-
-    if (split_by == "pseudotime_range") {
-      min_pdt = 0
-      max_pdt = ceiling(max(pseudotime))
-
-      bin_size = max_pdt/n_bins
-      bin_upper_limits = seq(bin_size, max_pdt, by=bin_size)
-
-      ## Put cells into the right bins
-      pseudotime_sce$pseudotime_bin = ceiling(pseudotime / bin_size)
-
-      pseudotime_sce$pseudotime_bin[pseudotime_sce$pseudotime_bin==0] = 1
-    } else {
-      pseudotime_order = order(pseudotime, decreasing = FALSE)
-
-      ncells = ncol(SingleCellExperiment::normcounts(pseudotime_sce))
-      cells_per_bin = floor(ncells/n_bins)
-      pseudotime_ordered_cells = rownames(pseudotime_sce@colData)[pseudotime_order]
-
-      pseudotime_sce$pseudotime_bin = n_bins
-
-      for (i in seq_len(n_bins)) {
-        cells_for_bin = pseudotime_ordered_cells[(i*cells_per_bin-cells_per_bin+1) : (i*cells_per_bin)]
-        pseudotime_sce[,cells_for_bin]$pseudotime_bin = i
-      }
-    }
 
     bin_ids = sort(unique(pseudotime_sce$pseudotime_bin))
     pseudobulks = as.data.frame(Matrix::rowSums(SingleCellExperiment::normcounts(pseudotime_sce)))
@@ -89,3 +55,4 @@ setMethod(
     return(methods::new("AtgnatData", pseudobulks = pseudobulks, bins = bin_ids))
   }
 )
+

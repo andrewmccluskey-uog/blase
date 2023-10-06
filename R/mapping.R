@@ -24,7 +24,8 @@ map_best_bin <- function(atgnat_data, bulk_id, bulk_data) {
   for (i in atgnat_data@bins ) {
     bin_ratios = atgnat_data@pseudobulks[atgnat_data@genes,i]
 
-    # TODO we probably only want to use exact=FALSE when doing the tuning calls as the lists will be identical
+    # TODO we probably only want to use exact=FALSE when doing the tuning calls as the lists will be identical,
+    # consider reporting confidence too
     corr <- stats::cor.test(bin_ratios, sum_for_top_genes, method = 'spearman',exact=FALSE)
     if (corr$estimate > best_cor) {
       best_cor = unname(corr$estimate)

@@ -17,6 +17,7 @@ Imports:
   gridExtra,
   viridis,
   Matrix,
+  scater
   methods
 Suggests: 
     knitr,
