@@ -48,14 +48,20 @@ sce$celltype = celltype
 sce <- computeSumFactors(sce, clusters=quickCluster(sce))
 sce <- logNormCounts(sce)
 normcounts(sce) <- exp(logcounts(sce))
+sce = runUMAP(sce)
 
-# Use consecutive for genes that change over time
-assoRes = associationTest(sce, lineages=T, global=F, contrastType="consecutive")
+gridExtra::grid.arrange(
+      plotUMAP(sce, text_by="celltype", colour_by="celltype"),
+      plotUMAP(sce, colour_by="pseudotime"),
+      ncol=1
+    )
 ```
 
-Collect some genes:
+Now we'll find the genes we want to use. We select the top 100 so that we can do some parameter tuning below.
 
 ```{r}
+# Use consecutive for genes that change over time
+assoRes = associationTest(sce, lineages=T, global=F, contrastType="consecutive")
 genelist = atgnat::get_top_n_genes(assoRes, n_genes = 100, lineage = 1)
 ```
 
@@ -66,7 +72,7 @@ res = atgnat::find_best_params(sce, genelist, split_by="pseudotime_range", pseud
 atgnat::plot_find_best_params_results(res)
 ```
 
-It looks like 80 genes and 10 bins will give us good specificity, but let's double check. In a non trivial dataset, this may take some repetition. We ignore the 5 bin result because this might not be enough resolution - this depends on your dataset. In general, more bins will reduce specificity because each bin will have a more similar cell composition.
+It looks like 80 genes and 10 bins will give us good specificity, but let's double check. In a non trivial dataset, this may take some repetition. We ignore the 5 bin result because this might not be enough resolution - this depends on your dataset. In general, more bins will reduce specificity because each bin will have a more similar cell composition. In general, aim for about as many bins as you have clusters.
 
 ```{r}
 atgnat_data = as.AtgnatData(sce, pseudotime_slot="pseudotime", n_bins=10)
@@ -96,8 +102,6 @@ Now we can do some plotting, if we add the pseudotime bins to the metadata of th
 
 ```{r}
 binned_sce = assign_pseduotime_bins(sce, split_by="pseudotime_range", n_bins=10, pseudotime_slot="pseudotime")
-
-binned_sce = runUMAP(binned_sce)
 
 plot_mapping_result(binned_sce, erythrocyte_result, group_by_slot="celltype")
 plot_mapping_result(binned_sce, GMP_result, group_by_slot="celltype")
