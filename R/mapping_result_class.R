@@ -32,7 +32,7 @@ setMethod(f = "show",
               paste0("MappingResult with best_bin=", object@best_bin,
                      " correlation=", object@best_correlation,
                      " top_2_distance=", object@top_2_distance),
-              paste("\t with history for scores against", nrow(object@history), " bins")
+              paste("\t with history for scores against", nrow(object@history), " bins\n")
             )
 
             cat(paste(output, collapse = '\n'))

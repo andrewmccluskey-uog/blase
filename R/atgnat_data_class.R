@@ -38,7 +38,7 @@ setMethod(f = "show",
               paste("\tpseudobulks count:", ncol(object@pseudobulks)),
               paste("\ttotal genes:", nrow(object@pseudobulks)),
               paste("\tbins:", list(object@bins)),
-              paste("\tselected genes:", object@genes)
+              paste("\tselected genes:", object@genes, "\n")
             )
 
             cat(paste(output, collapse = '\n'))
