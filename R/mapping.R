@@ -40,6 +40,7 @@ map_best_bin <- function(atgnat_data, bulk_id, bulk_data) {
   distance_between_top_2_corrs = round(top2[1]-top2[2], 4)
 
   return(methods::new("MappingResult",
+                      bulk_name=bulk_id,
                       best_bin=best_i,
                       best_correlation=best_cor,
                       top_2_distance=distance_between_top_2_corrs,

@@ -14,6 +14,7 @@
 MappingResult = setClass(
   Class = "MappingResult",
   slots = list(
+    bulk_name = "ANY",
     best_bin = "numeric",
     best_correlation = "numeric",
     top_2_distance = "numeric",
@@ -29,7 +30,8 @@ setMethod(f = "show",
           definition = function(object){
 
             output = c(
-              paste0("MappingResult with best_bin=", object@best_bin,
+              paste0("MappingResult for '", object@bulk_name, "':",
+                    " best_bin=", object@best_bin,
                      " correlation=", object@best_correlation,
                      " top_2_distance=", object@top_2_distance),
               paste("\t with history for scores against", nrow(object@history), " bins\n")

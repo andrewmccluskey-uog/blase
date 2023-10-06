@@ -20,6 +20,7 @@ library(SingleCellExperiment, quietly=TRUE)
 library(tradeSeq, quietly=TRUE)
 library(slingshot, quietly=TRUE)
 library(scran, quietly=TRUE)
+library(scater, quietly=TRUE)
 RNGversion("3.5.0")
 set.seed(7)
 ```
@@ -83,9 +84,10 @@ for (type in unique(sce$celltype)) {
 }
 colnames(bulks_df) = unique(sce$celltype)
 
-progenitors_result = map_best_bin(atgnat_data, "Multipotent progenitors", bulks_df)
-progenitors_result
-
+erythrocyte_result = map_best_bin(atgnat_data, "Erythrocyte", bulks_df)
+erythrocyte_result
+GMP_result = map_best_bin(atgnat_data, "GMP", bulks_df)
+GMP_result
 neutrophils_result = map_best_bin(atgnat_data, "Neutrophils", bulks_df)
 neutrophils_result
 ```
@@ -95,7 +97,10 @@ Now we can do some plotting, if we add the pseudotime bins to the metadata of th
 ```{r}
 binned_sce = assign_pseduotime_bins(sce, split_by="pseudotime_range", n_bins=10, pseudotime_slot="pseudotime")
 
-plot_mapping_result(binned_sce, progenitors_result, group_by_slot="celltype")
+binned_sce = runUMAP(binned_sce)
+
+plot_mapping_result(binned_sce, erythrocyte_result, group_by_slot="celltype")
+plot_mapping_result(binned_sce, GMP_result, group_by_slot="celltype")
 plot_mapping_result(binned_sce, neutrophils_result, group_by_slot="celltype")
 
 ```
