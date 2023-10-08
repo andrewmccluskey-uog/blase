@@ -12,3 +12,4 @@
 \description{
 Show an AtgnatData object
 }
+\concept{atgnat-object}

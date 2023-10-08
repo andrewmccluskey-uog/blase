@@ -36,3 +36,4 @@ An \link{AtgnatData} object
 \description{
 Conversion to AtgnatData
 }
+\concept{atgnat-object}

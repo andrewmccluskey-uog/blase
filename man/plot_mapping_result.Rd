@@ -19,3 +19,4 @@ plot_mapping_result(x, y, ...)
 \description{
 Plot a mapping result
 }
+\concept{mapping}

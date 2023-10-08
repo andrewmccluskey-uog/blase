@@ -19,3 +19,4 @@ Shows plots over bins of expression of the top n genes. This is designed to help
 identify if you have selected genes that vary over the pseudotime you have chosen
 bins to exist over. Uses the normcounts of the SCE.
 }
+\concept{tuning}

@@ -31,3 +31,4 @@ plot_find_best_params_results(best_param_results)
 \seealso{
 \code{\link[=find_best_params]{find_best_params()}}
 }
+\concept{tuning}

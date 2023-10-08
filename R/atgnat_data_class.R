@@ -2,6 +2,8 @@
 #'
 #' For creation details, see [as.AtgnatData()]
 #'
+#' @concept atgnat-object
+#'
 #' @slot pseudobulks data.frame. Each column is a timepoint sample and each row is a gene.
 #' @slot bins list. A list of bin names for each timepoint.
 #' @slot genes list. A list of the genes selected for discriminating timepoints.
@@ -27,6 +29,9 @@ AtgnatData = setClass(
 )
 
 #' @title Show an AtgnatData object
+#'
+#' @concept atgnat-object
+#'
 #' @param object an [AtgnatData] object
 #' @export
 setMethod(f = "show",

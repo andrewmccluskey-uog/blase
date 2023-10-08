@@ -28,3 +28,4 @@ Will use the n_bins and n_genes implied by the \code{sce} and
 \code{pseudotime_bins_top_n_genes_df} parameters and return quality metrics and
 an optional chart.
 }
+\concept{tuning}

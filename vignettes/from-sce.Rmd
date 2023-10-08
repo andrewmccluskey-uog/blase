@@ -1,5 +1,5 @@
 ---
-title: "from-sce"
+title: "Atgnat from SingleCellExperiment"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{from-sce}
@@ -62,6 +62,7 @@ Now we'll find the genes we want to use. We select the top 100 so that we can do
 ```{r}
 # Use consecutive for genes that change over time
 assoRes = associationTest(sce, lineages=T, global=F, contrastType="consecutive")
+assoRes
 genelist = atgnat::get_top_n_genes(assoRes, n_genes = 100, lineage = 1)
 ```
 

@@ -25,3 +25,4 @@ assign_pseduotime_bins(x, split_by = "pseudotime_range", n_bins = 20, ...)
 \description{
 Assign Pseudotime Bins to a source object's metadata
 }
+\concept{atgnat-object}

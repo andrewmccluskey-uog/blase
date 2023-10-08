@@ -1,6 +1,9 @@
 #' Get Top Genes From An AssociationTestResult
 #'
 #' Pulls the genes with the highest wald statistic from an association test result, with a p value cutoff.
+#'
+#' @concept util
+#'
 #' @param association_test_results The association test results data frame to take the genes from.
 #' @param n_genes The number of genes to return. Defaults to 40.
 #' @param lineage The Lineage to use. The Defaults to NA, which assumes the test was run with Lineages=False.
@@ -10,6 +13,8 @@
 #' @export
 #'
 #' @examples
+#' assoRes = data.frame(row.names=c("A", "B", "C", "D"), waldStat=c(25, 50, 100, 10), pvalue=c(0.01, 0.5, 0.005, 0.13))
+#' get_top_n_genes(assoRes, n_genes=2)
 get_top_n_genes = function(association_test_results, n_genes=40, lineage=NA, p_cutoff=0.05) {
 
   pvalue_slot_for_lineage = "pvalue"
@@ -38,6 +43,8 @@ get_top_n_genes = function(association_test_results, n_genes=40, lineage=NA, p_c
 #' When a replicate has too few cells, it is discounted. If only one exists,
 #' then we sample from it twice to create the pseudobulks.
 #'
+#' @concept util
+#'
 #' @param pseudotime_sce The Single Cell Experiment object to get the bins from
 #' @param min_cells_for_bulk The minimum cells to look for per replicate and bin.
 #' @param replicate_slot The slot in the Single Cell Experiment that contains replicate information
@@ -46,15 +53,15 @@ get_top_n_genes = function(association_test_results, n_genes=40, lineage=NA, p_c
 #' @export
 #'
 #' @examples
-# library(SingleCellExperiment, quietly=TRUE)
-# library(atgnat)
-# counts <- matrix(rpois(100, lambda = 10), ncol=10, nrow=10)
-# sce <- SingleCellExperiment::SingleCellExperiment(counts)
-# sce$pseudotime = seq_len(10)
-# sce = create_pseudotime_bins(sce, 5, pseudotime_slot="pseudotime")
-# sce$replicate=rep(c(1,2), 5)
-# result = get_bins_as_bulk(sce, min_cells_for_bulk=1, replicate_slot="replicate")
-# result
+#' library(SingleCellExperiment, quietly=TRUE)
+#' library(atgnat)
+#' counts <- matrix(rpois(100, lambda = 10), ncol=10, nrow=10)
+#' sce <- SingleCellExperiment::SingleCellExperiment(counts)
+#' sce$pseudotime = seq_len(10)
+#' sce = create_pseudotime_bins(sce, 5, pseudotime_slot="pseudotime")
+#' sce$replicate=rep(c(1,2), 5)
+#' result = get_bins_as_bulk(sce, min_cells_for_bulk=1, replicate_slot="replicate")
+#' result
 get_bins_as_bulk <- function(pseudotime_sce, min_cells_for_bulk=50, replicate_slot="replicate") {
 
   # TODO Generalize so we don't rely on subsetting with subset on a magic field (i.e. replicate, which is even listed as a param but isn't really)

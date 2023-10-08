@@ -2,6 +2,8 @@
 #'
 #' Created by [map_best_bin()]
 #'
+#' @concept mapping
+#'
 #' @slot best_bin The bin that best matched the bulk sample.
 #' @slot best_correlation The spearman's rho that the test geneset had between the winning bin and the bulk.
 #' @slot top_2_distance The absolute difference between the best and second best mapping buckets. Higher indicates a less doubtful mapping.
@@ -23,6 +25,9 @@ MappingResult = setClass(
 )
 
 #' @title Show an MappingResult object
+#'
+#' @concept mapping
+#'
 #' @param object an [MappingResult] object
 #' @export
 setMethod(f = "show",

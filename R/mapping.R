@@ -1,5 +1,7 @@
 #' Map the best matching SC bin for a bulk sample
 #'
+#' @concept mapping
+#'
 #' @param atgnat_data The [AtgnatData] holding the bins.
 #' @param bulk_id The sample id of the bulk to analyse
 #' @param bulk_data The whole bulk read matrix

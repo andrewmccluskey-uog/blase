@@ -4,6 +4,8 @@
 #' `pseudotime_bins_top_n_genes_df` parameters and return quality metrics and
 #' an optional chart.
 #'
+#' @concept tuning
+#'
 #' @param atgnat_data The [AtgnatData] object to use.
 #' @param make_plot Whether or not to render the plot showing the correlations
 #' for each pseudobulk bin when we try to map the given bin.
@@ -58,6 +60,8 @@ evaluate_parameters <- function(atgnat_data, make_plot=FALSE, plot_columns=4) {
 
 #' Identify the Best Parameters For Your Dataset
 #'
+#' @concept tuning
+#'
 #' @param x The object to create `AtgnatData`` from
 #' @param genelist The list of genes to use (ordered by descending goodness)
 #' @param bins_count_range The n_bins list to try out
@@ -100,6 +104,8 @@ find_best_params <- function(x, genelist, bins_count_range=c(5,10,15,20,25,30,35
 
 #' Plot the results of the search for good parameters
 #'
+#' @concept tuning
+#'
 #' @param find_best_params_results Results dataframe from [find_best_params()]
 #' @param bin_count_colors Optional, custom bin count color scheme.
 #' @param gene_count_colors Optional, custom gene count color scheme.
@@ -134,6 +140,8 @@ plot_find_best_params_results <- function(find_best_params_results, bin_count_co
 #' Shows plots over bins of expression of the top n genes. This is designed to help
 #' identify if you have selected genes that vary over the pseudotime you have chosen
 #' bins to exist over. Uses the normcounts of the SCE.
+#'
+#' @concept tuning
 #'
 #' @param atgnat_data The [AtgnatData] to get bins and expression from.
 #' @param n_genes_to_plot The number of genes to plot.

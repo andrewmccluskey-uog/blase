@@ -19,3 +19,4 @@ A \link{MappingResult} object.
 \description{
 Map the best matching SC bin for a bulk sample
 }
+\concept{mapping}

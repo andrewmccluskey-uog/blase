@@ -12,3 +12,4 @@
 \description{
 Show an MappingResult object
 }
+\concept{mapping}

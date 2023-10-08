@@ -1,4 +1,7 @@
 #' @title Conversion to AtgnatData
+#'
+#' @concept atgnat-object
+#'
 #' @rdname as.AtgnatData
 #' @param x An object to take counts from
 #' @param ... additional arguments passed to object-specific methods.

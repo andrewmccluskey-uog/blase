@@ -25,3 +25,15 @@ This function will try to create a pseudobulked count matrix for the bins.
 When a replicate has too few cells, it is discounted. If only one exists,
 then we sample from it twice to create the pseudobulks.
 }
+\examples{
+library(SingleCellExperiment, quietly=TRUE)
+library(atgnat)
+counts <- matrix(rpois(100, lambda = 10), ncol=10, nrow=10)
+sce <- SingleCellExperiment::SingleCellExperiment(counts)
+sce$pseudotime = seq_len(10)
+sce = create_pseudotime_bins(sce, 5, pseudotime_slot="pseudotime")
+sce$replicate=rep(c(1,2), 5)
+result = get_bins_as_bulk(sce, min_cells_for_bulk=1, replicate_slot="replicate")
+result
+}
+\concept{util}

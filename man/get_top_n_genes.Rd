@@ -26,3 +26,8 @@ A vector of the names of the genes that best describe a lineage's trajectory.
 \description{
 Pulls the genes with the highest wald statistic from an association test result, with a p value cutoff.
 }
+\examples{
+assoRes = data.frame(row.names=c("A", "B", "C", "D"), waldStat=c(25, 50, 100, 10), pvalue=c(0.01, 0.5, 0.005, 0.13))
+get_top_n_genes(assoRes, n_genes=2)
+}
+\concept{util}

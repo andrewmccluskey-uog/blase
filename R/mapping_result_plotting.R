@@ -1,4 +1,7 @@
 #' @title Plot a mapping result
+#'
+#' @concept mapping
+#'
 #' @rdname plot_mapping_result
 #' @param x An object to plot on.
 #' @param y The [MappingResult] object to plot
