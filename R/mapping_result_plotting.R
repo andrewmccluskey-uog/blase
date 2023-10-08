@@ -24,7 +24,7 @@ setMethod(
 
     # TODO offer this with more than just umaps
     gridExtra::grid.arrange(
-      scater::plotUMAP(x, text_by="pseudotime_bin", colour_by="pseudotime_bin"),
+      scater::plotUMAP(x, colour_by="pseudotime_bin"),
       scater::plotUMAP(x, colour_by=group_by_slot),
       scater::plotUMAP(x[,x$pseudotime_bin==y@best_bin], colour_by="pseudotime_bin"),
       scater::plotUMAP(x[,x$pseudotime_bin==y@best_bin], colour_by=group_by_slot),

@@ -79,7 +79,6 @@ evaluate_parameters <- function(atgnat_data, make_plot=FALSE, plot_columns=4) {
 #' @export
 #'
 #' @examples
-#
 find_best_params <- function(x, genelist, bins_count_range=c(5,10,15,20,25,30,35), gene_count_range=c(20,30,40,45,50,55,60,70,80), ...) {
 
   results = data.frame(gene_count=c(), bin_count=c(), worst_specificity=c(), mean_specificity=c())
