@@ -23,4 +23,7 @@ Created by \code{\link[=map_best_bin]{map_best_bin()}}
 \item{\code{history}}{A dataframe of the correlation score for each bin.}
 }}
 
+\seealso{
+\code{\link[=map_best_bin]{map_best_bin()}}
+}
 \concept{mapping}

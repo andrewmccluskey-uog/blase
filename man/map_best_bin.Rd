@@ -19,4 +19,17 @@ A \link{MappingResult} object.
 \description{
 Map the best matching SC bin for a bulk sample
 }
+\examples{
+counts_matrix <- matrix(rep(1, cells*genes), ncol=cells, nrow=genes)
+sce <- SingleCellExperiment::SingleCellExperiment(assays=list(normcounts=counts_matrix))
+colnames(sce) = seq_len(cells)
+
+atgnat_data = as.AtgnatData(sce)
+
+bulk_counts = matrix(rep(1, 3*genes), ncol=3, nrow=genes)
+colnames(bulk_counts) = c("A", "B", "C")
+result = map_best_bin(atgnat_data, "B", bulk_counts)
+result
+rdg
+}
 \concept{mapping}

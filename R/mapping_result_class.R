@@ -12,7 +12,10 @@
 #' @return A [MappingResult] object
 #' @export
 #'
+#' @seealso [map_best_bin()]
+#'
 #' @examples
+#'
 MappingResult = setClass(
   Class = "MappingResult",
   slots = list(

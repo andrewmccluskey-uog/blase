@@ -79,9 +79,7 @@ evaluate_parameters <- function(atgnat_data, make_plot=FALSE, plot_columns=4) {
 #' @export
 #'
 #' @examples
-# TODO: consider allowing this to take just a list of genes not an association test
-#   result to make it a bit more reusable. If we ask it to be ordered, we can
-#   just take the top n.
+#
 find_best_params <- function(x, genelist, bins_count_range=c(5,10,15,20,25,30,35), gene_count_range=c(20,30,40,45,50,55,60,70,80), ...) {
 
   results = data.frame(gene_count=c(), bin_count=c(), worst_specificity=c(), mean_specificity=c())
