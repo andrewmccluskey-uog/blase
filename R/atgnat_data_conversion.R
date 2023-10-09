@@ -29,11 +29,10 @@ setMethod(
 
 
 #' @rdname as.AtgnatData
-#' @param pseudotime_slot The [SingleCellExperiment::SingleCellExperiment] slot containing the pseudotime values for each cell
-#' @param n_bins The number of bins to create.
-#' @param split_by The technique used to split the bins. The default `pseudotime_range` picks the
-#' bin for a cell based on a constant range of pseudotime. `cells` picks the bin for a cell based on
-#' an even number of cells per bin.
+#' @param pseudotime_slot The [SingleCellExperiment::SingleCellExperiment] slot
+#' containing pseudotime values for each cell to be passed to [assign_pseudotime_bins()].
+#' @param n_bins The number of bins to create, passed to [assign_pseudotime_bins()].
+#' @param split_by The split_by method to be passed on to [assign_pseudotime_bins()].
 #'
 #' @import methods
 #'
@@ -43,7 +42,7 @@ setMethod(
   signature = c(x="SingleCellExperiment"),
   definition = function(x, pseudotime_slot="slingPseudotime_1", n_bins=20, split_by="pseudotime_range"){
 
-    pseudotime_sce = assign_pseduotime_bins(x, split_by="pseudotime_range", n_bins=n_bins, pseudotime_slot=pseudotime_slot)
+    pseudotime_sce = assign_pseudotime_bins(x, split_by, n_bins=n_bins, pseudotime_slot=pseudotime_slot)
     c = SingleCellExperiment::normcounts(pseudotime_sce)
 
     bin_ids = sort(unique(pseudotime_sce$pseudotime_bin))

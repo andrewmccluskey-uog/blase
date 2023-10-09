@@ -20,17 +20,30 @@ A \link{MappingResult} object.
 Map the best matching SC bin for a bulk sample
 }
 \examples{
-counts_matrix <- matrix(c(rep(1, 100), rep(2, 100)), ncol=50, nrow=4)
-sce <- SingleCellExperiment::SingleCellExperiment(assays=list(normcounts=counts_matrix))
-colnames(sce) = seq_len(cells)
-sce$cell_type = c(rep(1, "celltype_1"), rep(2, "celltype_2"))
+library(SingleCellExperiment, quietly=TRUE)
+library(atgnat)
+counts_matrix <- matrix(c(seq_len(120)/10, seq_len(120)/5), ncol=48, nrow=5)
+sce <- SingleCellExperiment::SingleCellExperiment(assays=list(
+  normcounts=counts_matrix, logcounts=log(counts_matrix)))
+colnames(sce) = seq_len(48)
+rownames(sce) = as.character(seq_len(5))
+sce$cell_type = c(rep("celltype_1", 24), rep("celltype_2", 24))
 
-atgnat_data = as.AtgnatData(sce)
+sce$pseudotime = seq_len(48)
+atgnat_data = as.AtgnatData(sce, pseudotime_slot="pseudotime", n_bins=4)
+atgnat_data@genes = as.character(seq_len(5))
 
-bulk_counts = matrix(rep(1, 3*genes), ncol=3, nrow=genes)
+bulk_counts = matrix(seq_len(15)*10, ncol=3, nrow=5)
 colnames(bulk_counts) = c("A", "B", "C")
+rownames(bulk_counts) = as.character(seq_len(5))
+
+# Map to bin
 result = map_best_bin(atgnat_data, "B", bulk_counts)
 result
+
+# Plot bin
+sce = scater::runUMAP(sce)
+sce = assign_pseudotime_bins(sce, pseudotime_slot="pseudotime", n_bins=4)
 plot_mapping_result(sce, result, group_by_slot="cell_type")
 }
 \concept{mapping}

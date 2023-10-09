@@ -22,13 +22,12 @@ as.AtgnatData(x, ...)
 
 \item{...}{additional arguments passed to object-specific methods.}
 
-\item{pseudotime_slot}{The \link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment::SingleCellExperiment} slot containing the pseudotime values for each cell}
+\item{pseudotime_slot}{The \link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment::SingleCellExperiment} slot
+containing pseudotime values for each cell to be passed to \code{\link[=assign_pseudotime_bins]{assign_pseudotime_bins()}}.}
 
-\item{n_bins}{The number of bins to create.}
+\item{n_bins}{The number of bins to create, passed to \code{\link[=assign_pseudotime_bins]{assign_pseudotime_bins()}}.}
 
-\item{split_by}{The technique used to split the bins. The default \code{pseudotime_range} picks the
-bin for a cell based on a constant range of pseudotime. \code{cells} picks the bin for a cell based on
-an even number of cells per bin.}
+\item{split_by}{The split_by method to be passed on to \code{\link[=assign_pseudotime_bins]{assign_pseudotime_bins()}}.}
 }
 \value{
 An \link{AtgnatData} object

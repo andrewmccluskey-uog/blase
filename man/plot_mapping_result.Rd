@@ -15,6 +15,11 @@ plot_mapping_result(x, y, ...)
 \item{y}{The \link{MappingResult} object to plot}
 
 \item{...}{additional arguments passed to object-specific methods.}
+
+\item{group_by_slot}{The slot in the \link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment::SingleCellExperiment}
+to be used as the coloring for the output plot. Passed to \code{\link[scater:plot_reddim]{scater::plotUMAP()}} as
+\code{colour_by}, and will be used to produce a bar chart of populations in the
+best mapped bin.}
 }
 \description{
 Plot a mapping result

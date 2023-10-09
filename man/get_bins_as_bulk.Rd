@@ -28,11 +28,16 @@ then we sample from it twice to create the pseudobulks.
 \examples{
 library(SingleCellExperiment, quietly=TRUE)
 library(atgnat)
-counts <- matrix(rpois(100, lambda = 10), ncol=10, nrow=10)
-sce <- SingleCellExperiment::SingleCellExperiment(counts)
-sce$pseudotime = seq_len(10)
-sce = create_pseudotime_bins(sce, 5, pseudotime_slot="pseudotime")
-sce$replicate=rep(c(1,2), 5)
+counts <- matrix(rpois(1000, lambda = 10), ncol=100, nrow=10)
+sce <- SingleCellExperiment::SingleCellExperiment(
+  assays = list(normcounts = counts, counts = counts/2)
+)
+sce$pseudotime = seq_len(100)
+colnames(sce) = seq_len(100)
+rownames(sce) = as.character(seq_len(10))
+sce = assign_pseudotime_bins(sce, n_bins=5,
+  pseudotime_slot="pseudotime", split_by="cells")
+sce$replicate=rep(c(1,2), 50)
 result = get_bins_as_bulk(sce, min_cells_for_bulk=1, replicate_slot="replicate")
 result
 }

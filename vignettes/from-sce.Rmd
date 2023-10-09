@@ -62,7 +62,6 @@ Now we'll find the genes we want to use. We select the top 100 so that we can do
 ```{r}
 # Use consecutive for genes that change over time
 assoRes = associationTest(sce, lineages=T, global=F, contrastType="consecutive")
-assoRes
 genelist = atgnat::get_top_n_genes(assoRes, n_genes = 100, lineage = 1)
 ```
 
@@ -102,7 +101,7 @@ neutrophils_result
 Now we can do some plotting, if we add the pseudotime bins to the metadata of the SCE:
 
 ```{r}
-binned_sce = assign_pseduotime_bins(sce, split_by="pseudotime_range", n_bins=10, pseudotime_slot="pseudotime")
+binned_sce = assign_pseudotime_bins(sce, split_by="pseudotime_range", n_bins=10, pseudotime_slot="pseudotime")
 
 plot_mapping_result(binned_sce, erythrocyte_result, group_by_slot="celltype")
 plot_mapping_result(binned_sce, GMP_result, group_by_slot="celltype")

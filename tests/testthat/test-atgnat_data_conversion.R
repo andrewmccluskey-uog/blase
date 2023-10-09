@@ -1,3 +1,4 @@
+# These tests also cover assign_pseudotime_bins
 test_that("generates correct number of bins", {
   sce = generate_test_sce(cells=150, genes=100)
   sce$pseudotime = sqrt(seq_len(150))
@@ -39,8 +40,16 @@ test_that("throws error for invalid split_by parameter", {
   sce = generate_test_sce(cells=150, genes=100)
   sce$pseudotime = sqrt(seq_len(150))
 
-  tmp1 <- function() atgnat_data = as.AtgnatData(sce, pseudotime_slot="pseudotime", n_bins=10, split_by="this_won't_work")
+  tmp1 <- function() atgnat_data = as.AtgnatData(sce, pseudotime_slot="pseudotime",
+                                                 n_bins=10, split_by="this_won't_work")
   expect_error(tmp1(), "split_by must be 'pseudotime_range' or 'cells'", fixed=TRUE)
 })
 
+test_that("throws error when pseudotime slot not available", {
+  sce = generate_test_sce(cells=150, genes=100)
+
+  tmp1 <- function() atgnat_data = as.AtgnatData(sce, pseudotime_slot="pseudotime_not_here",
+                                                 n_bins=10, split_by="pseudotime_range")
+  expect_error(tmp1(), "Pseudotime slot 'pseudotime_not_here' does not exist", fixed=TRUE)
+})
 
