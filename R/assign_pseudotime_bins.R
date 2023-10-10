@@ -7,7 +7,7 @@
 #' @param ... additional arguments passed to object-specific methods.
 #'
 #' @export
-#' @examples
+#' @inherit MappingResult-class examples
 setGeneric(name = "assign_pseudotime_bins",
            signature = c(x="x"),
            def = function(x, split_by="pseudotime_range", n_bins=20, ...) standardGeneric("assign_pseudotime_bins"))

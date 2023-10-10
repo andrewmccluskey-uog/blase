@@ -7,8 +7,8 @@
 #' @param y The [MappingResult] object to plot
 #' @param ... additional arguments passed to object-specific methods.
 #'
-#'
 #' @export
+#' @inherit MappingResult-class examples
 setGeneric(name = "plot_mapping_result",
            signature = c(x="x", y="y"),
            def = function(x, y, ...) standardGeneric("plot_mapping_result"))

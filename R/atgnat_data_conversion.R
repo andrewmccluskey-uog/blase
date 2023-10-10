@@ -9,6 +9,7 @@
 #' @return An [AtgnatData] object
 #'
 #' @export
+#' @inherit AtgnatData-class examples
 setGeneric(name = "as.AtgnatData",
            signature = c("x"),
            def = function(x, ...) standardGeneric("as.AtgnatData"))

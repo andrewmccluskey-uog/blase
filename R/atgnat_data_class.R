@@ -12,8 +12,6 @@
 #' @export
 #'
 #' @examples
-#' library(SingleCellExperiment, quietly=TRUE)
-#' library(atgnat)
 #' counts <- matrix(rpois(100, lambda = 10), ncol=10, nrow=10)
 #' sce <- SingleCellExperiment::SingleCellExperiment(assays = list(normcounts = counts))
 #' sce$pseudotime = seq_len(10)
@@ -34,6 +32,7 @@ AtgnatData = setClass(
 #'
 #' @param object an [AtgnatData] object
 #' @export
+#' @inherit AtgnatData-class examples
 setMethod(f = "show",
           signature = "AtgnatData",
           definition = function(object){

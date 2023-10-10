@@ -35,6 +35,33 @@ A dataframe of the results.
 \description{
 Identify the Best Parameters For Your Dataset
 }
+\examples{
+ncells = 70
+ngenes = 100
+counts_matrix <- matrix(c(seq_len(3500)/10, seq_len(3500)/5), ncol=ncells, nrow=ngenes)
+sce <- SingleCellExperiment::SingleCellExperiment(assays=list(
+  normcounts=counts_matrix, logcounts=log(counts_matrix)))
+colnames(sce) = seq_len(ncells)
+rownames(sce) = as.character(seq_len(ngenes))
+sce$cell_type = c(rep("celltype_1", ncells/2), rep("celltype_2", ncells/2))
+
+sce$pseudotime = seq_len(ncells)
+genelist = as.character(seq_len(ngenes))
+
+# Finding the best params for the AtgnatData
+best_params = find_best_params(sce, genelist, pseudotime_slot="pseudotime", split_by="cells")
+best_params
+plot_find_best_params_results(best_params)
+
+# Evaluating created AtgnatData
+atgnat_data = as.AtgnatData(sce, pseudotime_slot="pseudotime", n_bins=10)
+atgnat_data@genes = genelist[1:20]
+
+# Check specificity of parameters
+evaluate_parameters(atgnat_data, make_plot = TRUE)
+# Check gene expression over pseudotime
+evaluate_top_n_genes(atgnat_data)
+}
 \seealso{
 \code{\link[=plot_find_best_params_results]{plot_find_best_params_results()}} for plotting the results of this function.
 }

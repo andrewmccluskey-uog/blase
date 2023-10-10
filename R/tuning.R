@@ -18,7 +18,7 @@
 #'  Higher is better for differentiation, but it should matter less than the worst value.
 #' @export
 #'
-#' @examples
+#' @inherit find_best_params examples
 evaluate_parameters <- function(atgnat_data, make_plot=FALSE, plot_columns=4) {
 
   bin_ids = atgnat_data@bins
@@ -79,6 +79,31 @@ evaluate_parameters <- function(atgnat_data, make_plot=FALSE, plot_columns=4) {
 #' @export
 #'
 #' @examples
+#' ncells = 70
+#' ngenes = 100
+#' counts_matrix <- matrix(c(seq_len(3500)/10, seq_len(3500)/5), ncol=ncells, nrow=ngenes)
+#' sce <- SingleCellExperiment::SingleCellExperiment(assays=list(
+#'   normcounts=counts_matrix, logcounts=log(counts_matrix)))
+#' colnames(sce) = seq_len(ncells)
+#' rownames(sce) = as.character(seq_len(ngenes))
+#' sce$cell_type = c(rep("celltype_1", ncells/2), rep("celltype_2", ncells/2))
+#'
+#' sce$pseudotime = seq_len(ncells)
+#' genelist = as.character(seq_len(ngenes))
+#'
+#' # Finding the best params for the AtgnatData
+#' best_params = find_best_params(sce, genelist, pseudotime_slot="pseudotime", split_by="cells")
+#' best_params
+#' plot_find_best_params_results(best_params)
+#'
+#' # Evaluating created AtgnatData
+#' atgnat_data = as.AtgnatData(sce, pseudotime_slot="pseudotime", n_bins=10)
+#' atgnat_data@genes = genelist[1:20]
+#'
+#' # Check specificity of parameters
+#' evaluate_parameters(atgnat_data, make_plot = TRUE)
+#' # Check gene expression over pseudotime
+#' evaluate_top_n_genes(atgnat_data)
 find_best_params <- function(x, genelist, bins_count_range=c(5,10,15,20,25,30,35), gene_count_range=c(20,30,40,45,50,55,60,70,80), ...) {
 
   results = data.frame(gene_count=c(), bin_count=c(), worst_specificity=c(), mean_specificity=c())
@@ -111,13 +136,7 @@ find_best_params <- function(x, genelist, bins_count_range=c(5,10,15,20,25,30,35
 #'
 #' @export
 #'
-#' @examples
-#' best_param_results = data.frame(
-#'   gene_count=c(10,10,20,20),
-#'   bin_count=c(15,25,15,25),
-#'   worst_specificity=c(0.01,0.02,0.015,0.025),
-#'   mean_specificity=c(0.2,0.1,0.11,0.23))
-#' plot_find_best_params_results(best_param_results)
+#' @inherit find_best_params examples
 plot_find_best_params_results <- function(find_best_params_results, bin_count_colors=viridis::scale_color_viridis(option="viridis"), gene_count_colors=viridis::scale_color_viridis(option="magma")) {
   gene_count = ggplot2::sym("gene_count")
   bin_count = ggplot2::sym("bin_count")
@@ -147,7 +166,7 @@ plot_find_best_params_results <- function(find_best_params_results, bin_count_co
 #'
 #' @export
 #'
-#' @examples
+#' @inherit find_best_params examples
 evaluate_top_n_genes <- function(atgnat_data, n_genes_to_plot=16, plot_columns=4) {
 
   # TODO check genes exist

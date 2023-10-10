@@ -20,8 +20,6 @@ A \link{MappingResult} object.
 Map the best matching SC bin for a bulk sample
 }
 \examples{
-library(SingleCellExperiment, quietly=TRUE)
-library(atgnat)
 counts_matrix <- matrix(c(seq_len(120)/10, seq_len(120)/5), ncol=48, nrow=5)
 sce <- SingleCellExperiment::SingleCellExperiment(assays=list(
   normcounts=counts_matrix, logcounts=log(counts_matrix)))

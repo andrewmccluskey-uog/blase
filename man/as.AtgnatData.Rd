@@ -35,4 +35,10 @@ An \link{AtgnatData} object
 \description{
 Conversion to AtgnatData
 }
+\examples{
+counts <- matrix(rpois(100, lambda = 10), ncol=10, nrow=10)
+sce <- SingleCellExperiment::SingleCellExperiment(assays = list(normcounts = counts))
+sce$pseudotime = seq_len(10)
+as.AtgnatData(sce, pseudotime_slot="pseudotime", n_bins=3)
+}
 \concept{atgnat-object}
