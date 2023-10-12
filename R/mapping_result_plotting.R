@@ -51,3 +51,46 @@ setMethod(
     )
   }
 )
+
+#' @title Plot a mapping result heatmap
+#'
+#' @concept mapping
+#'
+#' @param mapping_result_list A list of [MappingResult] objects to include in the heatmap
+#' @param heatmap_fill_scale The ggplot2 compatible fill scale to apply to the heatmap
+#'
+#' @export
+#' @inherit MappingResult-class examples
+plot_mapping_result_heatmap = function(mapping_result_list, heatmap_fill_scale=viridis::scale_fill_viridis(option="viridis")){
+  if( ! all(lapply(mapping_result_list, class) == "MappingResult")) {
+    stop("You must provide a list of MappingResult objects only.")
+  }
+
+  bulk_results = data.frame(bulk_name=c(), pseudobin=c(), correlation=c())
+
+  for (mappingResult in mapping_result_list) {
+    history = mappingResult@history
+
+    this_bulk_results = data.frame(
+      bulk_name=rep(mappingResult@bulk_name, nrow(history)),
+      pseudobin=history[,"bin"],
+      correlation=history[,"correlation"]
+    )
+
+    bulk_results = rbind(bulk_results, this_bulk_results)
+  }
+
+  bulk_results$bulk_name = as.factor(bulk_results$bulk_name)
+  bulk_results$pseudobin = as.factor(bulk_results$pseudobin)
+
+  bulk_name_sym = ggplot2::sym("bulk_name")
+  pseudobin_sym = ggplot2::sym("pseudobin")
+  correlation_sym = ggplot2::sym("correlation")
+
+
+  ggplot2::ggplot(bulk_results, ggplot2::aes(
+    x={{pseudobin_sym}}, y={{bulk_name_sym}}, fill={{correlation_sym}})
+  ) + ggplot2::geom_tile() + heatmap_fill_scale
+
+
+}

@@ -93,6 +93,7 @@ test_that("get_bins_as_bulk will sample from replicates with small numbers of a 
 })
 
 test_that("get_bins_as_bulk will skip a bin if there aren't enough cells according to min_cells_for_bulk param", {
+  result = ""
   sce = generate_test_sce(cells=500, genes=50)
   sce$pseudotime = seq_len(500)
   sce = assign_pseudotime_bins(sce, 5, pseudotime_slot="pseudotime", split_by="cells")
@@ -101,7 +102,9 @@ test_that("get_bins_as_bulk will skip a bin if there aren't enough cells accordi
 
   SingleCellExperiment::counts(sce[,sce$replicate==2]) = SingleCellExperiment::counts(sce[,sce$replicate==2])*2
 
-  result = get_bins_as_bulk(sce, min_cells_for_bulk=30, replicate_slot="replicate")
+  tmp1 = function() return(get_bins_as_bulk(sce, min_cells_for_bulk=30, replicate_slot="replicate"))
+  expect_message(tmp1(), "Couldn't create pseudobulks due to too few cells in every replicate for bin 5")
+  suppressMessages(result <- tmp1())
 
   expected_result = data.frame(bin_1_rep_1=rep(150,50),
                                bin_1_rep_2=rep(300,50),

@@ -25,6 +25,8 @@ RNGversion("3.5.0")
 set.seed(7)
 ```
 
+## Setting up the Single Cell Experiment
+
 First, let's generate a Single Cell Experiment to use the tool with, based on the tradeSeq vignette [<https://bioconductor.org/packages/devel/bioc/vignettes/tradeSeq/inst/doc/tradeSeq.html>]. We need to have the following to use Atgnat:
 
 -   A Single Cell Experiment with pseudotime.
@@ -57,6 +59,7 @@ gridExtra::grid.arrange(
     )
 ```
 
+## Finding the most descriptive genes with tradeSeq
 Now we'll find the genes we want to use. We select the top 100 so that we can do some parameter tuning below.
 
 ```{r}
@@ -65,8 +68,8 @@ assoRes = associationTest(sce, lineages=T, global=F, contrastType="consecutive")
 genelist = atgnat::get_top_n_genes(assoRes, n_genes = 100, lineage = 1)
 ```
 
+## Parameter Tuning for Atgnat
 And see what parameters are best for Atgnat:
-
 ```{r}
 res = atgnat::find_best_params(sce, genelist, split_by="pseudotime_range", pseudotime_slot="pseudotime")
 atgnat::plot_find_best_params_results(res)
@@ -74,12 +77,20 @@ atgnat::plot_find_best_params_results(res)
 
 It looks like 80 genes and 10 bins will give us good specificity, but let's double check. In a non trivial dataset, this may take some repetition. We ignore the 5 bin result because this might not be enough resolution - this depends on your dataset. In general, more bins will reduce specificity because each bin will have a more similar cell composition. In general, aim for about as many bins as you have clusters.
 
+### Inspect Bin Choice
+
 ```{r}
 atgnat_data = as.AtgnatData(sce, pseudotime_slot="pseudotime", n_bins=10)
 atgnat_data@genes = genelist[1:80]
 evaluate_parameters(atgnat_data, make_plot = TRUE)
+```
+### Inspect Genes Choice
+
+```{r}
 evaluate_top_n_genes(atgnat_data)
 ```
+
+## Mapping Bulk Samples to SC with Atgnat
 
 If we're happy, now we can try to map a bulk sample onto the single cell. We'll do this by cell types in the SingleCellExperiment but in reality you should use a real bulk dataset.
 
@@ -97,8 +108,20 @@ GMP_result
 neutrophils_result = map_best_bin(atgnat_data, "Neutrophils", bulks_df)
 neutrophils_result
 ```
+### Plotting Heatmap of Mappings
 
-Now we can do some plotting, if we add the pseudotime bins to the metadata of the SCE:
+To see how well we plotted the differences between these cell types, we can plot a heatmap of all these results:
+
+```{r}
+plot_mapping_result_heatmap(list(
+  erythrocyte_result, 
+  GMP_result, 
+  neutrophils_result))
+```
+
+### Plotting Detailed Plots of Mappings
+
+Now we can do some more detailed plotting about where the bins mapped onto the Single Cell data, and the cell type proportions we expect , but we need to add the pseudotime bins to the metadata of the SCE:
 
 ```{r}
 binned_sce = assign_pseudotime_bins(sce, split_by="pseudotime_range", n_bins=10, pseudotime_slot="pseudotime")
