@@ -54,14 +54,18 @@ setMethod(
 
 #' @title Plot a mapping result heatmap
 #'
+#' @description
+#' Plots Spearman's Rho as the fill colour, and adds * if the pvalue is under the given threshold.
+#'
 #' @concept mapping
 #'
-#' @param mapping_result_list A list of [MappingResult] objects to include in the heatmap
-#' @param heatmap_fill_scale The ggplot2 compatible fill scale to apply to the heatmap
+#' @param mapping_result_list A list of [MappingResult] objects to include in the heatmap.
+#' @param pvalue_cutoff The adjusted p value below which results should be considered significant.
+#' @param heatmap_fill_scale The ggplot2 compatible fill scale to apply to the heatmap.
 #'
 #' @export
 #' @inherit MappingResult-class examples
-plot_mapping_result_heatmap = function(mapping_result_list, heatmap_fill_scale=viridis::scale_fill_viridis(option="viridis")){
+plot_mapping_result_heatmap = function(mapping_result_list, pvalue_cutoff=0.05, heatmap_fill_scale=viridis::scale_fill_viridis(option="viridis")){
   if( ! all(lapply(mapping_result_list, class) == "MappingResult")) {
     stop("You must provide a list of MappingResult objects only.")
   }
@@ -74,7 +78,8 @@ plot_mapping_result_heatmap = function(mapping_result_list, heatmap_fill_scale=v
     this_bulk_results = data.frame(
       bulk_name=rep(mappingResult@bulk_name, nrow(history)),
       pseudobin=history[,"bin"],
-      correlation=history[,"correlation"]
+      correlation=history[,"correlation"],
+      significant = ifelse(history[,"adj_pvalue"] < pvalue_cutoff, "*", "")
     )
 
     bulk_results = rbind(bulk_results, this_bulk_results)
@@ -86,11 +91,17 @@ plot_mapping_result_heatmap = function(mapping_result_list, heatmap_fill_scale=v
   bulk_name_sym = ggplot2::sym("bulk_name")
   pseudobin_sym = ggplot2::sym("pseudobin")
   correlation_sym = ggplot2::sym("correlation")
-
+  significant_sym = ggplot2::sym("significant")
 
   ggplot2::ggplot(bulk_results, ggplot2::aes(
-    x={{pseudobin_sym}}, y={{bulk_name_sym}}, fill={{correlation_sym}})
-  ) + ggplot2::geom_tile() + heatmap_fill_scale
+    x={{pseudobin_sym}},
+    y={{bulk_name_sym}},
+    fill={{correlation_sym}},
+    label={{significant_sym}})
+  ) +
+    ggplot2::geom_tile() +
+    heatmap_fill_scale +
+    ggplot2::geom_text(fontface = "bold")
 
 
 }

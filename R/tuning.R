@@ -29,7 +29,7 @@ evaluate_parameters <- function(atgnat_data, make_plot=FALSE, plot_columns=4) {
   results.specificity = c()
 
   for (i in bin_ids) {
-    res = map_best_bin(atgnat_data, i, atgnat_data@pseudobulks)
+    res = map_best_bin(atgnat_data, i, atgnat_data@pseudobulks, calculate_pvalues=FALSE)
     results.best_bin = append(results.best_bin, c(res@best_bin))
     results.best_corr = append(results.best_corr, c(res@best_correlation))
     results.specificity = append(results.specificity, c(res@top_2_distance))
@@ -189,7 +189,7 @@ PRIVATE_plot_history = function(i, bin, corr, history, specificity){
   bin_sym = ggplot2::sym("bin")
   corr_sym = ggplot2::sym("correlation")
 
-  return(ggplot2::ggplot(as.data.frame(history[(i*2-1):(i*2)]), ggplot2::aes(x={{bin_sym}}, y={{corr_sym}})) +
+  return(ggplot2::ggplot(as.data.frame(history[(i*4-3):(i*4)]), ggplot2::aes(x={{bin_sym}}, y={{corr_sym}})) +
            ggplot2::ylim(-1,1) +
            ggplot2::ggtitle(paste0(bin[i], " (", signif(corr[i], 2) ,",",signif(specificity[i], 2),")")) +
            ggplot2::geom_line() +

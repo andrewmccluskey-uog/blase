@@ -5,6 +5,7 @@
 #' @param atgnat_data The [AtgnatData] holding the bins.
 #' @param bulk_id The sample id of the bulk to analyse
 #' @param bulk_data The whole bulk read matrix
+#' @param calculate_pvalues Whether or not to calculate confidence values for the correlations
 #'
 #' @import methods
 #'
@@ -12,7 +13,7 @@
 #' @export
 #'
 #' @inherit MappingResult-class examples
-map_best_bin <- function(atgnat_data, bulk_id, bulk_data) {
+map_best_bin <- function(atgnat_data, bulk_id, bulk_data, calculate_pvalues=TRUE) {
 
   if (any(is.na(atgnat_data@genes)) || length(atgnat_data@genes) == 0) {
     stop("No genes to map with. Please add something to the atgnat_data@genes slot.")
@@ -26,17 +27,17 @@ map_best_bin <- function(atgnat_data, bulk_id, bulk_data) {
   for (i in atgnat_data@bins ) {
     bin_ratios = atgnat_data@pseudobulks[atgnat_data@genes,i]
 
-    # TODO we probably only want to use exact=FALSE when doing the tuning calls as the lists will be identical,
-    # consider reporting confidence too
-    corr <- stats::cor.test(bin_ratios, sum_for_top_genes, method = 'spearman',exact=FALSE)
+    corr <- stats::cor.test(bin_ratios, sum_for_top_genes, method = 'spearman',exact=calculate_pvalues)
     if (corr$estimate > best_cor) {
       best_cor = unname(corr$estimate)
       best_i = i
     }
-    correlations_history <- rbind(correlations_history, c(i, unname(corr$estimate)))
+    correlations_history <- rbind(correlations_history, c(i, unname(corr$estimate), corr$p.value))
     i=i+1
   }
-  colnames(correlations_history) = c('bin', 'correlation')
+
+  colnames(correlations_history) = c('bin', 'correlation', 'pvalue')
+  correlations_history$adj_pvalue = correlations_history$pvalue * nrow(correlations_history)
 
   top2 = utils::head(sort(correlations_history$correlation, decreasing=TRUE),n=2)
   distance_between_top_2_corrs = round(top2[1]-top2[2], 4)
@@ -45,6 +46,8 @@ map_best_bin <- function(atgnat_data, bulk_id, bulk_data) {
                       bulk_name=bulk_id,
                       best_bin=best_i,
                       best_correlation=best_cor,
+                      best_pvalue=correlations_history[best_i,"pvalue"],
+                      best_adj_pvalue=correlations_history[best_i,"adj_pvalue"],
                       top_2_distance=distance_between_top_2_corrs,
                       history=correlations_history)
          )

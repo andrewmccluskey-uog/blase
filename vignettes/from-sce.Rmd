@@ -110,13 +110,13 @@ neutrophils_result
 ```
 ### Plotting Heatmap of Mappings
 
-To see how well we plotted the differences between these cell types, we can plot a heatmap of all these results:
+To see how well we plotted the differences between these cell types, we can plot a heatmap of all these results. We can see that many of the results are significantly correlated - this makes sense, as these cell types exist on a trajectory between each other!
 
 ```{r}
 plot_mapping_result_heatmap(list(
   erythrocyte_result, 
   GMP_result, 
-  neutrophils_result))
+  neutrophils_result), pvalue_cutoff = 0.01)
 ```
 
 ### Plotting Detailed Plots of Mappings

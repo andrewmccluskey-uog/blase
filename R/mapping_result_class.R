@@ -7,8 +7,10 @@
 #' @slot bulk_name The name of the bulk sample being mapped.
 #' @slot best_bin The bin that best matched the bulk sample.
 #' @slot best_correlation The spearman's rho that the test geneset had between the winning bin and the bulk.
+#' @slot best_pvalue The pvalue of the highest correlation.
+#' @slot best_adj_pvalue The adjusted pvalue of the highest correlation.
 #' @slot top_2_distance The absolute difference between the best and second best mapping buckets. Higher indicates a less doubtful mapping.
-#' @slot history A dataframe of the correlation score for each bin.
+#' @slot history A dataframe of the correlation score and confidence for each bin.
 #'
 #' @return A [MappingResult] object
 #' @export
@@ -49,6 +51,8 @@ MappingResult = setClass(
     bulk_name = "ANY",
     best_bin = "numeric",
     best_correlation = "numeric",
+    best_pvalue = "numeric",
+    best_adj_pvalue= "numeric",
     top_2_distance = "numeric",
     history = "data.frame"
   )
@@ -69,6 +73,8 @@ setMethod(f = "show",
               paste0("MappingResult for '", object@bulk_name, "':",
                     " best_bin=", object@best_bin,
                      " correlation=", object@best_correlation,
+                     " pvalue=", object@best_pvalue,
+                     " adj_pvalue=", object@best_adj_pvalue,
                      " top_2_distance=", object@top_2_distance),
               paste("\t with history for scores against", nrow(object@history), " bins\n")
             )

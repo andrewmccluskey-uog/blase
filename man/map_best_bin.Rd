@@ -4,7 +4,7 @@
 \alias{map_best_bin}
 \title{Map the best matching SC bin for a bulk sample}
 \usage{
-map_best_bin(atgnat_data, bulk_id, bulk_data)
+map_best_bin(atgnat_data, bulk_id, bulk_data, calculate_pvalues = TRUE)
 }
 \arguments{
 \item{atgnat_data}{The \link{AtgnatData} holding the bins.}
@@ -12,6 +12,8 @@ map_best_bin(atgnat_data, bulk_id, bulk_data)
 \item{bulk_id}{The sample id of the bulk to analyse}
 
 \item{bulk_data}{The whole bulk read matrix}
+
+\item{calculate_pvalues}{Whether or not to calculate confidence values for the correlations}
 }
 \value{
 A \link{MappingResult} object.
