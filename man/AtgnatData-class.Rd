@@ -14,7 +14,8 @@ For creation details, see \code{\link[=as.AtgnatData]{as.AtgnatData()}}
 \section{Slots}{
 
 \describe{
-\item{\code{pseudobulks}}{data.frame. Each column is a timepoint sample and each row is a gene.}
+\item{\code{pseudobulk_bins}}{list of \link{data.frame}s. Each item is a normalised count
+matrix representing a bin, where a column is a cell in the bin and each row is a gene.}
 
 \item{\code{bins}}{list. A list of bin names for each timepoint.}
 

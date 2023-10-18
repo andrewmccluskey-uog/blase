@@ -6,19 +6,16 @@
 \usage{
 plot_mapping_result_heatmap(
   mapping_result_list,
-  pvalue_cutoff = 0.05,
   heatmap_fill_scale = viridis::scale_fill_viridis(option = "viridis")
 )
 }
 \arguments{
 \item{mapping_result_list}{A list of \link{MappingResult} objects to include in the heatmap.}
 
-\item{pvalue_cutoff}{The adjusted p value below which results should be considered significant.}
-
 \item{heatmap_fill_scale}{The ggplot2 compatible fill scale to apply to the heatmap.}
 }
 \description{
-Plots Spearman's Rho as the fill colour, and adds * if the pvalue is under the given threshold.
+Plots Spearman's Rho as the fill colour, and adds * if the \link{MappingResult} was confidently assigned.
 }
 \examples{
 counts_matrix <- matrix(c(seq_len(120)/10, seq_len(120)/5), ncol=48, nrow=5)

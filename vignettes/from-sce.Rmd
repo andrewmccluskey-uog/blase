@@ -110,24 +110,39 @@ neutrophils_result
 ```
 ### Plotting Heatmap of Mappings
 
-To see how well we plotted the differences between these cell types, we can plot a heatmap of all these results. We can see that many of the results are significantly correlated - this makes sense, as these cell types exist on a trajectory between each other!
+To see how well we plotted the differences between these cell types, we can plot a heatmap of all these results. The neutrophils and Erythrocytes are confidently mapped, but the GMP population doesn't map as well.
 
 ```{r}
 plot_mapping_result_heatmap(list(
   erythrocyte_result, 
   GMP_result, 
-  neutrophils_result), pvalue_cutoff = 0.01)
+  neutrophils_result))
 ```
 
-### Plotting Detailed Plots of Mappings
+### Plotting Detailed Correlation Maps
 
-Now we can do some more detailed plotting about where the bins mapped onto the Single Cell data, and the cell type proportions we expect , but we need to add the pseudotime bins to the metadata of the SCE:
+To look into the GMP mapping, we can plot the correlation over each bin. It's clear from this that bin 2 and 3 were both well correlated. As the lower bound of the best correlated bin (3) is not higher than the upper bound of the next best bin (2), Atgnat doesn't make a confident call on this.
+
+```{r}
+plot_mapping_result_corr(GMP_result)
+```
+
+
+### Plotting Summary Plots of Mappings
+
+Now we can do some more detailed plotting about where the bins mapped onto the Single Cell data, and the cell type proportions we expect , but we need to add the pseudotime bins to the metadata of the SCE. We can see that the true proportions of cell types in this bin is mostly Erythrocytes.
 
 ```{r}
 binned_sce = assign_pseudotime_bins(sce, split_by="pseudotime_range", n_bins=10, pseudotime_slot="pseudotime")
 
 plot_mapping_result(binned_sce, erythrocyte_result, group_by_slot="celltype")
-plot_mapping_result(binned_sce, GMP_result, group_by_slot="celltype")
-plot_mapping_result(binned_sce, neutrophils_result, group_by_slot="celltype")
-
 ```
+To further explore the GMP result, let's look at the true proportions in bin 2 and 3.
+
+```{r}
+gridExtra::grid.arrange(
+  plot_bin_population(binned_sce, 2, group_by_slot="celltype"),
+  plot_bin_population(binned_sce, 3, group_by_slot="celltype")
+)
+```
+We can see here that both of these bins have high proportions of the GMP cell type, which is why Atgnat could not make a convincing call on either of these being the true "best" mapping. In this case, since Bin 3 has a larger proportion and number of GMP cells, it is likely the best mapping, and this is reflected in Atgnat's correlation score.

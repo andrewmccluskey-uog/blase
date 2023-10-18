@@ -20,13 +20,13 @@ Created by \code{\link[=map_best_bin]{map_best_bin()}}
 
 \item{\code{best_correlation}}{The spearman's rho that the test geneset had between the winning bin and the bulk.}
 
-\item{\code{best_pvalue}}{The pvalue of the highest correlation.}
-
-\item{\code{best_adj_pvalue}}{The adjusted pvalue of the highest correlation.}
-
 \item{\code{top_2_distance}}{The absolute difference between the best and second best mapping buckets. Higher indicates a less doubtful mapping.}
 
-\item{\code{history}}{A dataframe of the correlation score and confidence for each bin.}
+\item{\code{confident_mapping}}{TRUE when the mapped bin's lower bound is higher than the maximum upper bound of the other bins.}
+
+\item{\code{history}}{A dataframe of the correlation score and confidence bounds for each bin.}
+
+\item{\code{bootstrap_iterations}}{The number of iterations used during the bootstrap.}
 }}
 
 \examples{
