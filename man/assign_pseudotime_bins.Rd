@@ -53,9 +53,13 @@ rownames(bulk_counts) = as.character(seq_len(5))
 result = map_best_bin(atgnat_data, "B", bulk_counts)
 result
 
+# Plot Heatmap
+plot_mapping_result_heatmap(list(result))
+
 # Plot bin
 sce = scater::runUMAP(sce)
 sce = assign_pseudotime_bins(sce, pseudotime_slot="pseudotime", n_bins=4)
 plot_mapping_result(sce, result, group_by_slot="cell_type")
+
 }
 \concept{atgnat-object}

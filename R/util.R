@@ -118,7 +118,7 @@ get_bins_as_bulk <- function(pseudotime_sce, min_cells_for_bulk=50, replicate_sl
       pseudobulks = pseudobulks[,c(-1)]
       colnames(pseudobulks) = c(paste0("bin_",bin_id, "_rep_", replicates_with_more_than_minimum[1], "_1"), paste0("bin_",bin_id, "_rep_", replicates_with_more_than_minimum[1], "_2"))
     } else {
-      print(paste("Couldn't create pseudobulks due to too few cells in every replicate ", bin_id))
+      message(paste("Couldn't create pseudobulks due to too few cells in every replicate for bin", bin_id) )
       next()
     }
 

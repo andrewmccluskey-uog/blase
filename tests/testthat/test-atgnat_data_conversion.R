@@ -5,7 +5,7 @@ test_that("generates correct number of bins", {
 
   atgnat_data = as.AtgnatData(sce, pseudotime_slot="pseudotime", n_bins=5, split_by="pseudotime_range")
   expect_equal(length(atgnat_data@bins), 5)
-  expect_equal(ncol(atgnat_data@pseudobulks), 5)
+  expect_equal(length(atgnat_data@pseudobulk_bins), 5)
 })
 
 
@@ -16,10 +16,9 @@ test_that("generates pseudotime bins by pseudotime_range", {
 
   atgnat_data = as.AtgnatData(sce, pseudotime_slot="pseudotime", n_bins=6, split_by="pseudotime_range")
 
-  # In tests, gene expression per cell == 1
-  cells_per_bin = colMeans(atgnat_data@pseudobulks)
-  expect_equal(n_cells, sum(colMeans(atgnat_data@pseudobulks)))
-  expected_output =  c("1"=4, "2"=14, "3"=24, "4"=33, "5"=42, "6"=33)
+  cells_per_bin = c(lapply(atgnat_data@pseudobulk_bins, ncol), recursive = TRUE)
+  expect_equal(sum(cells_per_bin), n_cells)
+  expected_output =  c(4, 14, 24, 33, 42, 33)
   expect_equal(cells_per_bin, expected_output)
 })
 
@@ -30,9 +29,9 @@ test_that("generates pseudotime bins by cells", {
 
   atgnat_data = as.AtgnatData(sce, pseudotime_slot="pseudotime", n_bins=6, split_by="cells")
 
-  cells_per_bin = colMeans(atgnat_data@pseudobulks) # In tests, gene expression per cell == 1
-  expect_equal(n_cells, sum(colMeans(atgnat_data@pseudobulks)))
-  expected_output = c("1"=25, "2"=25, "3"=25, "4"=25, "5"=25, "6"=25)
+  cells_per_bin = c(lapply(atgnat_data@pseudobulk_bins, ncol), recursive = TRUE)
+  expect_equal(sum(cells_per_bin), n_cells)
+  expected_output =  c(25, 25, 25, 25, 25, 25)
   expect_equal(cells_per_bin, expected_output)
 })
 

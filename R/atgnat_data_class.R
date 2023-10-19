@@ -4,7 +4,8 @@
 #'
 #' @concept atgnat-object
 #'
-#' @slot pseudobulks data.frame. Each column is a timepoint sample and each row is a gene.
+#' @slot pseudobulk_bins list of [data.frame]s. Each item is a normalised count
+#' matrix representing a bin, where a column is a cell in the bin and each row is a gene.
 #' @slot bins list. A list of bin names for each timepoint.
 #' @slot genes list. A list of the genes selected for discriminating timepoints.
 #'
@@ -20,11 +21,13 @@
 AtgnatData = setClass(
   Class = "AtgnatData",
   slots = list(
-    pseudobulks = "data.frame",
+    pseudobulk_bins = "list",
     bins = "numeric",
     genes = "character"
   )
 )
+
+# TODO validation of pseudobulk bins being a list of matrices
 
 #' @title Show an AtgnatData object
 #'
@@ -39,10 +42,8 @@ setMethod(f = "show",
 
             output = c(
               "Atgnat Data with:",
-              paste("\tpseudobulks count:", ncol(object@pseudobulks)),
-              paste("\ttotal genes:", nrow(object@pseudobulks)),
               paste("\tbins:", list(object@bins)),
-              paste("\tselected genes:", object@genes, "\n")
+              paste("\tselected genes:", list(object@genes), "\n")
             )
 
             cat(paste(output, collapse = '\n'))

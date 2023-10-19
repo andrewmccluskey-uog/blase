@@ -28,8 +28,14 @@ evaluate_parameters <- function(atgnat_data, make_plot=FALSE, plot_columns=4) {
   results.history = c()
   results.specificity = c()
 
+  pseudobulked_bins = data.frame(lapply(seq_len(length(atgnat_data@pseudobulk_bins)), function (i) {
+    x = atgnat_data@pseudobulk_bins[[i]]
+    return(Matrix::rowMeans(x))
+  }))
+  colnames(pseudobulked_bins) = atgnat_data@bins
+
   for (i in bin_ids) {
-    res = map_best_bin(atgnat_data, i, atgnat_data@pseudobulks)
+    res = map_best_bin(atgnat_data, i, pseudobulked_bins, bootstrap_iterations = 0)
     results.best_bin = append(results.best_bin, c(res@best_bin))
     results.best_corr = append(results.best_corr, c(res@best_correlation))
     results.specificity = append(results.specificity, c(res@top_2_distance))
@@ -169,11 +175,19 @@ plot_find_best_params_results <- function(find_best_params_results, bin_count_co
 #' @inherit find_best_params examples
 evaluate_top_n_genes <- function(atgnat_data, n_genes_to_plot=16, plot_columns=4) {
 
-  # TODO check genes exist
+  if (n_genes_to_plot > length(atgnat_data@genes)) {
+    n_genes_to_plot = length(atgnat_data@genes)
+  }
+
+  pseudobulked_bins = data.frame(lapply(seq_len(length(atgnat_data@pseudobulk_bins)), function (i) {
+    x = atgnat_data@pseudobulk_bins[[i]]
+    return(Matrix::rowMeans(x))
+  }))
+  colnames(pseudobulked_bins) = atgnat_data@bins
 
   plots = list()
   for (i in seq_len(n_genes_to_plot)) {
-    plots[[i]] = PRIVATE_plot_gene_over_bins(atgnat_data@pseudobulks, atgnat_data@genes[i])
+    plots[[i]] = PRIVATE_plot_gene_over_bins(pseudobulked_bins, atgnat_data@genes[i])
   }
 
   gridExtra::grid.arrange(
@@ -189,7 +203,7 @@ PRIVATE_plot_history = function(i, bin, corr, history, specificity){
   bin_sym = ggplot2::sym("bin")
   corr_sym = ggplot2::sym("correlation")
 
-  return(ggplot2::ggplot(as.data.frame(history[(i*2-1):(i*2)]), ggplot2::aes(x={{bin_sym}}, y={{corr_sym}})) +
+  return(ggplot2::ggplot(as.data.frame(history[(i*4-3):(i*4)]), ggplot2::aes(x={{bin_sym}}, y={{corr_sym}})) +
            ggplot2::ylim(-1,1) +
            ggplot2::ggtitle(paste0(bin[i], " (", signif(corr[i], 2) ,",",signif(specificity[i], 2),")")) +
            ggplot2::geom_line() +
