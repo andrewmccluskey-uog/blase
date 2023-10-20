@@ -31,3 +31,4 @@ Suggests:
     slingshot
 Config/testthat/edition: 3
 VignetteBuilder: knitr
+URL: https://andrewmccluskey-uog.github.io/atgnat/

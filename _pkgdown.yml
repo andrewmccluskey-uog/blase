@@ -1,16 +1,13 @@
-url: ~
+url: https://andrewmccluskey-uog.github.io/atgnat/
 template:
   bootstrap: 5
 reference:
-  - title: Atgnat Object
-  - contents:
-    - has_concept("atgnat-object")
-  - title: Mapping Bulks
-  - contents:
-    - has_concept("mapping")
-  - title: Parameter Tuning
-  - contents:
-    - has_concept("tuning")
-  - title: Utilities
-  - contents:
-    - has_concept("util")
+- title: Atgnat Object
+- contents: has_concept("atgnat-object")
+- title: Mapping Bulks
+- contents: has_concept("mapping")
+- title: Parameter Tuning
+- contents: has_concept("tuning")
+- title: Utilities
+- contents: has_concept("util")
+
