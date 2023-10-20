@@ -124,12 +124,14 @@ an even number of cells per bin.</p></dd>
 <span class="r-in"><span><span class="fu"><a href="plot_mapping_result_heatmap.html">plot_mapping_result_heatmap</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="assign_pseudotime_bins-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Plot bin</span></span></span>
-<span class="r-in"><span><span class="va">sce</span> <span class="op">=</span> <span class="fu">scater</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/runUMAP.html" class="external-link">runUMAP</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">sce</span> <span class="op">=</span> <span class="fu">assign_pseudotime_bins</span><span class="op">(</span><span class="va">sce</span>, pseudotime_slot<span class="op">=</span><span class="st">"pseudotime"</span>, n_bins<span class="op">=</span><span class="fl">4</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="plot_mapping_result.html">plot_mapping_result</a></span><span class="op">(</span><span class="va">sce</span>, <span class="va">result</span>, group_by_slot<span class="op">=</span><span class="st">"cell_type"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Plot Correlation</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="plot_mapping_result_corr.html">plot_mapping_result_corr</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="assign_pseudotime_bins-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Plot populations</span></span></span>
+<span class="r-in"><span><span class="va">sce</span> <span class="op">=</span> <span class="fu">assign_pseudotime_bins</span><span class="op">(</span><span class="va">sce</span>, pseudotime_slot<span class="op">=</span><span class="st">"pseudotime"</span>, n_bins<span class="op">=</span><span class="fl">4</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="plot_bin_population.html">plot_bin_population</a></span><span class="op">(</span><span class="va">sce</span>, <span class="va">result</span><span class="op">@</span><span class="va">best_bin</span>, group_by_slot<span class="op">=</span><span class="st">"cell_type"</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="assign_pseudotime_bins-3.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

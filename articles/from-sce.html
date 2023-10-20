@@ -72,72 +72,14 @@
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://andrewmccluskey-uog.github.io/atgnat/">atgnat</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: replacing previous import 'S4Arrays::makeNindexFromArrayViewport' by</span></span>
-<span><span class="co">#&gt; 'DelayedArray::makeNindexFromArrayViewport' when loading 'SummarizedExperiment'</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">SingleCellExperiment</span>, quietly<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'MatrixGenerics'</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:matrixStats':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     colAlls, colAnyNAs, colAnys, colAvgsPerRowSet, colCollapse,</span></span>
-<span><span class="co">#&gt;     colCounts, colCummaxs, colCummins, colCumprods, colCumsums,</span></span>
-<span><span class="co">#&gt;     colDiffs, colIQRDiffs, colIQRs, colLogSumExps, colMadDiffs,</span></span>
-<span><span class="co">#&gt;     colMads, colMaxs, colMeans2, colMedians, colMins, colOrderStats,</span></span>
-<span><span class="co">#&gt;     colProds, colQuantiles, colRanges, colRanks, colSdDiffs, colSds,</span></span>
-<span><span class="co">#&gt;     colSums2, colTabulates, colVarDiffs, colVars, colWeightedMads,</span></span>
-<span><span class="co">#&gt;     colWeightedMeans, colWeightedMedians, colWeightedSds,</span></span>
-<span><span class="co">#&gt;     colWeightedVars, rowAlls, rowAnyNAs, rowAnys, rowAvgsPerColSet,</span></span>
-<span><span class="co">#&gt;     rowCollapse, rowCounts, rowCummaxs, rowCummins, rowCumprods,</span></span>
-<span><span class="co">#&gt;     rowCumsums, rowDiffs, rowIQRDiffs, rowIQRs, rowLogSumExps,</span></span>
-<span><span class="co">#&gt;     rowMadDiffs, rowMads, rowMaxs, rowMeans2, rowMedians, rowMins,</span></span>
-<span><span class="co">#&gt;     rowOrderStats, rowProds, rowQuantiles, rowRanges, rowRanks,</span></span>
-<span><span class="co">#&gt;     rowSdDiffs, rowSds, rowSums2, rowTabulates, rowVarDiffs, rowVars,</span></span>
-<span><span class="co">#&gt;     rowWeightedMads, rowWeightedMeans, rowWeightedMedians,</span></span>
-<span><span class="co">#&gt;     rowWeightedSds, rowWeightedVars</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'BiocGenerics'</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     IQR, mad, sd, var, xtabs</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     anyDuplicated, aperm, append, as.data.frame, basename, cbind,</span></span>
-<span><span class="co">#&gt;     colnames, dirname, do.call, duplicated, eval, evalq, Filter, Find,</span></span>
-<span><span class="co">#&gt;     get, grep, grepl, intersect, is.unsorted, lapply, Map, mapply,</span></span>
-<span><span class="co">#&gt;     match, mget, order, paste, pmax, pmax.int, pmin, pmin.int,</span></span>
-<span><span class="co">#&gt;     Position, rank, rbind, Reduce, rownames, sapply, setdiff, sort,</span></span>
-<span><span class="co">#&gt;     table, tapply, union, unique, unsplit, which.max, which.min</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'S4Vectors'</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:utils':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     findMatches</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     expand.grid, I, unname</span></span>
-<span><span class="co">#&gt; Welcome to Bioconductor</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     Vignettes contain introductory material; view with</span></span>
-<span><span class="co">#&gt;     'browseVignettes()'. To cite Bioconductor, see</span></span>
-<span><span class="co">#&gt;     'citation("Biobase")', and for packages 'citation("pkgname")'.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'Biobase'</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:MatrixGenerics':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     rowMedians</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:matrixStats':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     anyMissing, rowMedians</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://statomics.github.io/tradeSeq/index.html" class="external-link">tradeSeq</a></span>, quietly<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">slingshot</span>, quietly<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">scran</span>, quietly<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'scran'</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:TrajectoryUtils':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     createClusterMST</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://bioconductor.org/packages/scater/" class="external-link">scater</a></span>, quietly<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">RNGversion</a></span><span class="op">(</span><span class="st">"3.5.0"</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">SingleCellExperiment</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://statomics.github.io/tradeSeq/index.html" class="external-link">tradeSeq</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">slingshot</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">scran</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://bioconductor.org/packages/scater/" class="external-link">scater</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/Bioconductor/BiocParallel" class="external-link">BiocParallel</a></span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">RNGversion</a></span><span class="op">(</span><span class="st">"3.5.0"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning in RNGkind("Mersenne-Twister", "Inversion", "Rounding"): non-uniform</span></span>
 <span><span class="co">#&gt; 'Rounding' sampler used</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">7</span><span class="op">)</span></span></code></pre></div>
@@ -152,7 +94,7 @@ We need to have the following to use Atgnat:</p>
 <li><p>A list of genes generated by <code>fitGAM</code> and
 <code>associationTest</code></p></li>
 </ul>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">countMatrix</span>, package <span class="op">=</span> <span class="st">"tradeSeq"</span><span class="op">)</span></span>
 <span><span class="va">counts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">countMatrix</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">countMatrix</span><span class="op">)</span></span>
@@ -162,7 +104,7 @@ We need to have the following to use Atgnat:</p>
 <span><span class="va">pseudotime</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/slingshot/man/slingPseudotime.html" class="external-link">slingPseudotime</a></span><span class="op">(</span><span class="va">crv</span>, na <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="va">cellWeights</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/slingshot/man/slingPseudotime.html" class="external-link">slingCurveWeights</a></span><span class="op">(</span><span class="va">crv</span><span class="op">)</span></span>
 <span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/tradeSeq/man/fitGAM.html" class="external-link">fitGAM</a></span><span class="op">(</span>counts <span class="op">=</span> <span class="va">counts</span>, pseudotime <span class="op">=</span> <span class="va">pseudotime</span>, cellWeights <span class="op">=</span> <span class="va">cellWeights</span>,</span>
-<span>                 nknots <span class="op">=</span> <span class="fl">6</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span>                 nknots <span class="op">=</span> <span class="fl">6</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span>, BPPARAM<span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/BiocParallel/man/MulticoreParam-class.html" class="external-link">MulticoreParam</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">sce</span><span class="op">$</span><span class="va">pseudotime</span> <span class="op">=</span> <span class="va">pseudotime</span><span class="op">[</span>,<span class="st">"curve1"</span><span class="op">]</span></span>
 <span><span class="va">sce</span><span class="op">$</span><span class="va">celltype</span> <span class="op">=</span> <span class="va">celltype</span></span>
@@ -183,16 +125,16 @@ We need to have the following to use Atgnat:</p>
 </h2>
 <p>Now we’ll find the genes we want to use. We select the top 100 so
 that we can do some parameter tuning below.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Use consecutive for genes that change over time</span></span>
 <span><span class="va">assoRes</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/tradeSeq/man/associationTest.html" class="external-link">associationTest</a></span><span class="op">(</span><span class="va">sce</span>, lineages<span class="op">=</span><span class="cn">T</span>, global<span class="op">=</span><span class="cn">F</span>, contrastType<span class="op">=</span><span class="st">"consecutive"</span><span class="op">)</span></span>
-<span><span class="va">genelist</span> <span class="op">=</span> <span class="fu">atgnat</span><span class="fu">::</span><span class="fu"><a href="../reference/get_top_n_genes.html">get_top_n_genes</a></span><span class="op">(</span><span class="va">assoRes</span>, n_genes <span class="op">=</span> <span class="fl">100</span>, lineage <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">genelist</span> <span class="op">=</span> <span class="fu">atgnat</span><span class="fu">::</span><span class="fu"><a href="../reference/get_top_n_genes.html">get_top_n_genes</a></span><span class="op">(</span><span class="va">assoRes</span>, n_genes <span class="op">=</span> <span class="fl">200</span>, lineage <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="parameter-tuning-for-atgnat">Parameter Tuning for Atgnat<a class="anchor" aria-label="anchor" href="#parameter-tuning-for-atgnat"></a>
 </h2>
 <p>And see what parameters are best for Atgnat:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">res</span> <span class="op">=</span> <span class="fu">atgnat</span><span class="fu">::</span><span class="fu"><a href="../reference/find_best_params.html">find_best_params</a></span><span class="op">(</span><span class="va">sce</span>, <span class="va">genelist</span>, split_by<span class="op">=</span><span class="st">"pseudotime_range"</span>, pseudotime_slot<span class="op">=</span><span class="st">"pseudotime"</span><span class="op">)</span></span>
 <span><span class="fu">atgnat</span><span class="fu">::</span><span class="fu"><a href="../reference/plot_find_best_params_results.html">plot_find_best_params_results</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span></code></pre></div>
 <p><img src="from-sce_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
@@ -206,7 +148,7 @@ clusters.</p>
 <div class="section level3">
 <h3 id="inspect-bin-choice">Inspect Bin Choice<a class="anchor" aria-label="anchor" href="#inspect-bin-choice"></a>
 </h3>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">atgnat_data</span> <span class="op">=</span> <span class="fu"><a href="../reference/as.AtgnatData.html">as.AtgnatData</a></span><span class="op">(</span><span class="va">sce</span>, pseudotime_slot<span class="op">=</span><span class="st">"pseudotime"</span>, n_bins<span class="op">=</span><span class="fl">10</span><span class="op">)</span></span>
 <span><span class="va">atgnat_data</span><span class="op">@</span><span class="va">genes</span> <span class="op">=</span> <span class="va">genelist</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">80</span><span class="op">]</span></span>
 <span><span class="fu"><a href="../reference/evaluate_parameters.html">evaluate_parameters</a></span><span class="op">(</span><span class="va">atgnat_data</span>, make_plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
@@ -216,7 +158,7 @@ clusters.</p>
 <div class="section level3">
 <h3 id="inspect-genes-choice">Inspect Genes Choice<a class="anchor" aria-label="anchor" href="#inspect-genes-choice"></a>
 </h3>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/evaluate_top_n_genes.html">evaluate_top_n_genes</a></span><span class="op">(</span><span class="va">atgnat_data</span><span class="op">)</span></span></code></pre></div>
 <p><img src="from-sce_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
 </div>
@@ -227,7 +169,7 @@ clusters.</p>
 <p>If we’re happy, now we can try to map a bulk sample onto the single
 cell. We’ll do this by cell types in the SingleCellExperiment but in
 reality you should use a real bulk dataset.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bulks_df</span> <span class="op">=</span> <span class="fu">DataFrame</span><span class="op">(</span>row.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/dge.html" class="external-link">counts</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">type</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">sce</span><span class="op">$</span><span class="va">celltype</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">bulks_df</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">bulks_df</span>, <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/SingleCellExperiment/man/assays.html" class="external-link">normcounts</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">sce</span>, , <span class="va">celltype</span><span class="op">==</span><span class="va">type</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
@@ -259,7 +201,7 @@ reality you should use a real bulk dataset.</p>
 we can plot a heatmap of all these results. The neutrophils and
 Erythrocytes are confidently mapped, but the GMP population doesn’t map
 as well.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_mapping_result_heatmap.html">plot_mapping_result_heatmap</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  <span class="va">erythrocyte_result</span>, </span>
 <span>  <span class="va">GMP_result</span>, </span>
@@ -274,7 +216,7 @@ bin. It’s clear from this that bin 2 and 3 were both well correlated. As
 the lower bound of the best correlated bin (3) is not higher than the
 upper bound of the next best bin (2), Atgnat doesn’t make a confident
 call on this.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_mapping_result_corr.html">plot_mapping_result_corr</a></span><span class="op">(</span><span class="va">GMP_result</span><span class="op">)</span></span></code></pre></div>
 <p><img src="from-sce_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
 </div>
@@ -286,14 +228,14 @@ onto the Single Cell data, and the cell type proportions we expect , but
 we need to add the pseudotime bins to the metadata of the SCE. We can
 see that the true proportions of cell types in this bin is mostly
 Erythrocytes.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">binned_sce</span> <span class="op">=</span> <span class="fu"><a href="../reference/assign_pseudotime_bins.html">assign_pseudotime_bins</a></span><span class="op">(</span><span class="va">sce</span>, split_by<span class="op">=</span><span class="st">"pseudotime_range"</span>, n_bins<span class="op">=</span><span class="fl">10</span>, pseudotime_slot<span class="op">=</span><span class="st">"pseudotime"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/plot_mapping_result.html">plot_mapping_result</a></span><span class="op">(</span><span class="va">binned_sce</span>, <span class="va">erythrocyte_result</span>, group_by_slot<span class="op">=</span><span class="st">"celltype"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="from-sce_files/figure-html/unnamed-chunk-10-1.png" width="700">
 To further explore the GMP result, let’s look at the true proportions in
 bin 2 and 3.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">gridExtra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gridExtra/man/arrangeGrob.html" class="external-link">grid.arrange</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/plot_bin_population.html">plot_bin_population</a></span><span class="op">(</span><span class="va">binned_sce</span>, <span class="fl">2</span>, group_by_slot<span class="op">=</span><span class="st">"celltype"</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="../reference/plot_bin_population.html">plot_bin_population</a></span><span class="op">(</span><span class="va">binned_sce</span>, <span class="fl">3</span>, group_by_slot<span class="op">=</span><span class="st">"celltype"</span><span class="op">)</span></span>
@@ -305,6 +247,97 @@ either of these being the true “best” mapping. In this case, since Bin 3
 has a larger proportion and number of GMP cells, it is likely the best
 mapping, and this is reflected in Atgnat’s correlation score.</p>
 </div>
+</div>
+<div class="section level2">
+<h2 id="session">Session<a class="anchor" aria-label="anchor" href="#session"></a>
+</h2>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; R version 4.3.1 (2023-06-16)</span></span>
+<span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu (64-bit)</span></span>
+<span><span class="co">#&gt; Running under: Ubuntu 22.04.3 LTS</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Matrix products: default</span></span>
+<span><span class="co">#&gt; BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 </span></span>
+<span><span class="co">#&gt; LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Random number generation:</span></span>
+<span><span class="co">#&gt;  RNG:     Mersenne-Twister </span></span>
+<span><span class="co">#&gt;  Normal:  Inversion </span></span>
+<span><span class="co">#&gt;  Sample:  Rounding </span></span>
+<span><span class="co">#&gt;  </span></span>
+<span><span class="co">#&gt; locale:</span></span>
+<span><span class="co">#&gt;  [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       </span></span>
+<span><span class="co">#&gt;  [4] LC_COLLATE=C.UTF-8     LC_MONETARY=C.UTF-8    LC_MESSAGES=C.UTF-8   </span></span>
+<span><span class="co">#&gt;  [7] LC_PAPER=C.UTF-8       LC_NAME=C              LC_ADDRESS=C          </span></span>
+<span><span class="co">#&gt; [10] LC_TELEPHONE=C         LC_MEASUREMENT=C.UTF-8 LC_IDENTIFICATION=C   </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; time zone: UTC</span></span>
+<span><span class="co">#&gt; tzcode source: system (glibc)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; attached base packages:</span></span>
+<span><span class="co">#&gt; [1] stats4    stats     graphics  grDevices utils     datasets  methods  </span></span>
+<span><span class="co">#&gt; [8] base     </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; other attached packages:</span></span>
+<span><span class="co">#&gt;  [1] BiocParallel_1.34.2         scater_1.28.0              </span></span>
+<span><span class="co">#&gt;  [3] ggplot2_3.4.4               scran_1.28.2               </span></span>
+<span><span class="co">#&gt;  [5] scuttle_1.10.3              slingshot_2.8.0            </span></span>
+<span><span class="co">#&gt;  [7] TrajectoryUtils_1.8.0       princurve_2.1.6            </span></span>
+<span><span class="co">#&gt;  [9] tradeSeq_1.14.0             SingleCellExperiment_1.22.0</span></span>
+<span><span class="co">#&gt; [11] SummarizedExperiment_1.30.2 Biobase_2.60.0             </span></span>
+<span><span class="co">#&gt; [13] GenomicRanges_1.52.1        GenomeInfoDb_1.36.4        </span></span>
+<span><span class="co">#&gt; [15] IRanges_2.34.1              S4Vectors_0.38.2           </span></span>
+<span><span class="co">#&gt; [17] BiocGenerics_0.46.0         MatrixGenerics_1.12.3      </span></span>
+<span><span class="co">#&gt; [19] matrixStats_1.0.0           atgnat_0.0.0.9000          </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
+<span><span class="co">#&gt;  [1] bitops_1.0-7              pbapply_1.7-2            </span></span>
+<span><span class="co">#&gt;  [3] gridExtra_2.3             rlang_1.1.1              </span></span>
+<span><span class="co">#&gt;  [5] magrittr_2.0.3            compiler_4.3.1           </span></span>
+<span><span class="co">#&gt;  [7] mgcv_1.8-42               DelayedMatrixStats_1.22.6</span></span>
+<span><span class="co">#&gt;  [9] systemfonts_1.0.5         vctrs_0.6.4              </span></span>
+<span><span class="co">#&gt; [11] stringr_1.5.0             pkgconfig_2.0.3          </span></span>
+<span><span class="co">#&gt; [13] crayon_1.5.2              fastmap_1.1.1            </span></span>
+<span><span class="co">#&gt; [15] XVector_0.40.0            labeling_0.4.3           </span></span>
+<span><span class="co">#&gt; [17] utf8_1.2.3                rmarkdown_2.25           </span></span>
+<span><span class="co">#&gt; [19] ggbeeswarm_0.7.2          ragg_1.2.6               </span></span>
+<span><span class="co">#&gt; [21] purrr_1.0.2               xfun_0.40                </span></span>
+<span><span class="co">#&gt; [23] bluster_1.10.0            zlibbioc_1.46.0          </span></span>
+<span><span class="co">#&gt; [25] cachem_1.0.8              beachmat_2.16.0          </span></span>
+<span><span class="co">#&gt; [27] jsonlite_1.8.7            DelayedArray_0.26.7      </span></span>
+<span><span class="co">#&gt; [29] irlba_2.3.5.1             parallel_4.3.1           </span></span>
+<span><span class="co">#&gt; [31] cluster_2.1.4             R6_2.5.1                 </span></span>
+<span><span class="co">#&gt; [33] bslib_0.5.1               stringi_1.7.12           </span></span>
+<span><span class="co">#&gt; [35] RColorBrewer_1.1-3        limma_3.56.2             </span></span>
+<span><span class="co">#&gt; [37] jquerylib_0.1.4           Rcpp_1.0.11              </span></span>
+<span><span class="co">#&gt; [39] knitr_1.44                FNN_1.1.3.2              </span></span>
+<span><span class="co">#&gt; [41] Matrix_1.5-4.1            splines_4.3.1            </span></span>
+<span><span class="co">#&gt; [43] igraph_1.5.1              abind_1.4-5              </span></span>
+<span><span class="co">#&gt; [45] yaml_2.3.7                viridis_0.6.4            </span></span>
+<span><span class="co">#&gt; [47] codetools_0.2-19          lattice_0.21-8           </span></span>
+<span><span class="co">#&gt; [49] tibble_3.2.1              withr_2.5.1              </span></span>
+<span><span class="co">#&gt; [51] evaluate_0.22             desc_1.4.2               </span></span>
+<span><span class="co">#&gt; [53] pillar_1.9.0              rprojroot_2.0.3          </span></span>
+<span><span class="co">#&gt; [55] RCurl_1.98-1.12           sparseMatrixStats_1.12.2 </span></span>
+<span><span class="co">#&gt; [57] munsell_0.5.0             scales_1.2.1             </span></span>
+<span><span class="co">#&gt; [59] glue_1.6.2                metapod_1.8.0            </span></span>
+<span><span class="co">#&gt; [61] tools_4.3.1               BiocNeighbors_1.18.0     </span></span>
+<span><span class="co">#&gt; [63] ScaledMatrix_1.8.1        locfit_1.5-9.8           </span></span>
+<span><span class="co">#&gt; [65] fs_1.6.3                  grid_4.3.1               </span></span>
+<span><span class="co">#&gt; [67] edgeR_3.42.4              colorspace_2.1-0         </span></span>
+<span><span class="co">#&gt; [69] nlme_3.1-162              GenomeInfoDbData_1.2.10  </span></span>
+<span><span class="co">#&gt; [71] beeswarm_0.4.0            BiocSingular_1.16.0      </span></span>
+<span><span class="co">#&gt; [73] vipor_0.4.5               cli_3.6.1                </span></span>
+<span><span class="co">#&gt; [75] rsvd_1.0.5                textshaping_0.3.7        </span></span>
+<span><span class="co">#&gt; [77] fansi_1.0.5               S4Arrays_1.0.6           </span></span>
+<span><span class="co">#&gt; [79] viridisLite_0.4.2         uwot_0.1.16              </span></span>
+<span><span class="co">#&gt; [81] gtable_0.3.4              sass_0.4.7               </span></span>
+<span><span class="co">#&gt; [83] digest_0.6.33             ggrepel_0.9.4            </span></span>
+<span><span class="co">#&gt; [85] dqrng_0.3.1               farver_2.1.1             </span></span>
+<span><span class="co">#&gt; [87] memoise_2.0.1             htmltools_0.5.6.1        </span></span>
+<span><span class="co">#&gt; [89] pkgdown_2.0.7             lifecycle_1.0.3          </span></span>
+<span><span class="co">#&gt; [91] statmod_1.5.0</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
