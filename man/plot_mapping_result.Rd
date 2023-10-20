@@ -3,7 +3,7 @@
 \name{plot_mapping_result}
 \alias{plot_mapping_result}
 \alias{plot_mapping_result,SingleCellExperiment,MappingResult-method}
-\title{Plot a mapping result}
+\title{Plot a summary of the mapping result}
 \usage{
 plot_mapping_result(x, y, ...)
 
@@ -22,7 +22,7 @@ to be used as the coloring for the output plot. Passed to \code{\link[scater:plo
 best mapped bin.}
 }
 \description{
-Plot a mapping result
+Plot a summary of the mapping result
 }
 \examples{
 counts_matrix <- matrix(c(seq_len(120)/10, seq_len(120)/5), ncol=48, nrow=5)
@@ -40,12 +40,7 @@ bulk_counts = matrix(seq_len(15)*10, ncol=3, nrow=5)
 colnames(bulk_counts) = c("A", "B", "C")
 rownames(bulk_counts) = as.character(seq_len(5))
 
-# Map to bin
 result = map_best_bin(atgnat_data, "B", bulk_counts)
-result
-
-# Plot Heatmap
-plot_mapping_result_heatmap(list(result))
 
 # Plot bin
 sce = scater::runUMAP(sce)
@@ -53,4 +48,7 @@ sce = assign_pseudotime_bins(sce, pseudotime_slot="pseudotime", n_bins=4)
 plot_mapping_result(sce, result, group_by_slot="cell_type")
 
 }
-\concept{mapping}
+\seealso{
+\code{\link[=plot_mapping_result_corr]{plot_mapping_result_corr()}}, \code{\link[=plot_bin_population]{plot_bin_population()}}
+}
+\concept{mapping_plots}

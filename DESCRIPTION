@@ -28,7 +28,8 @@ Suggests:
     testthat (>= 3.0.0),
     tradeSeq,
     scran,
-    slingshot
+    slingshot,
+    BiocParallel
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 URL: https://andrewmccluskey-uog.github.io/atgnat/

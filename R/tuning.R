@@ -18,7 +18,25 @@
 #'  Higher is better for differentiation, but it should matter less than the worst value.
 #' @export
 #'
-#' @inherit find_best_params examples
+#' @examples
+#' ncells = 70
+#' ngenes = 100
+#' counts_matrix <- matrix(c(seq_len(3500)/10, seq_len(3500)/5), ncol=ncells, nrow=ngenes)
+#' sce <- SingleCellExperiment::SingleCellExperiment(assays=list(
+#'   normcounts=counts_matrix, logcounts=log(counts_matrix)))
+#' colnames(sce) = seq_len(ncells)
+#' rownames(sce) = as.character(seq_len(ngenes))
+#' sce$cell_type = c(rep("celltype_1", ncells/2), rep("celltype_2", ncells/2))
+#'
+#' sce$pseudotime = seq_len(ncells)
+#' genelist = as.character(seq_len(ngenes))
+#'
+#' # Evaluating created AtgnatData
+#' atgnat_data = as.AtgnatData(sce, pseudotime_slot="pseudotime", n_bins=10)
+#' atgnat_data@genes = genelist[1:20]
+#'
+#' # Check specificity of parameters
+#' evaluate_parameters(atgnat_data, make_plot = TRUE)
 evaluate_parameters <- function(atgnat_data, make_plot=FALSE, plot_columns=4) {
 
   bin_ids = atgnat_data@bins
@@ -98,19 +116,20 @@ evaluate_parameters <- function(atgnat_data, make_plot=FALSE, plot_columns=4) {
 #' genelist = as.character(seq_len(ngenes))
 #'
 #' # Finding the best params for the AtgnatData
-#' best_params = find_best_params(sce, genelist, pseudotime_slot="pseudotime", split_by="cells")
+#' best_params = find_best_params(
+#'   sce, genelist,
+#'   bins_count_range=c(10,20),
+#'   gene_count_range=c(20,50),
+#'   pseudotime_slot="pseudotime",
+#'   split_by="pseudotime_range"
+#' )
 #' best_params
 #' plot_find_best_params_results(best_params)
-#'
-#' # Evaluating created AtgnatData
-#' atgnat_data = as.AtgnatData(sce, pseudotime_slot="pseudotime", n_bins=10)
-#' atgnat_data@genes = genelist[1:20]
-#'
-#' # Check specificity of parameters
-#' evaluate_parameters(atgnat_data, make_plot = TRUE)
-#' # Check gene expression over pseudotime
-#' evaluate_top_n_genes(atgnat_data)
-find_best_params <- function(x, genelist, bins_count_range=c(5,10,15,20,25,30,35), gene_count_range=c(20,30,40,45,50,55,60,70,80), ...) {
+find_best_params <- function(x, genelist, bins_count_range=c(5,10,20,40), gene_count_range=c(10,20,40,80), ...) {
+
+  if (length(genelist) < max(gene_count_range)) {
+    stop(paste0("Not enough genes provided to meet tuning requests. Provided=",length(genelist), " wanted=", max(gene_count_range)))
+  }
 
   results = data.frame(gene_count=c(), bin_count=c(), worst_specificity=c(), mean_specificity=c())
   # TODO consider parallelising this
@@ -172,7 +191,25 @@ plot_find_best_params_results <- function(find_best_params_results, bin_count_co
 #'
 #' @export
 #'
-#' @inherit find_best_params examples
+#' @examples
+#' ncells = 70
+#' ngenes = 100
+#' counts_matrix <- matrix(c(seq_len(3500)/10, seq_len(3500)/5), ncol=ncells, nrow=ngenes)
+#' sce <- SingleCellExperiment::SingleCellExperiment(assays=list(
+#'   normcounts=counts_matrix, logcounts=log(counts_matrix)))
+#' colnames(sce) = seq_len(ncells)
+#' rownames(sce) = as.character(seq_len(ngenes))
+#' sce$cell_type = c(rep("celltype_1", ncells/2), rep("celltype_2", ncells/2))
+#'
+#' sce$pseudotime = seq_len(ncells)
+#' genelist = as.character(seq_len(ngenes))
+#'
+#' # Evaluating created AtgnatData
+#' atgnat_data = as.AtgnatData(sce, pseudotime_slot="pseudotime", n_bins=10)
+#' atgnat_data@genes = genelist[1:20]
+#'
+#' # Check gene expression over pseudotime
+#' evaluate_top_n_genes(atgnat_data)
 evaluate_top_n_genes <- function(atgnat_data, n_genes_to_plot=16, plot_columns=4) {
 
   if (n_genes_to_plot > length(atgnat_data@genes)) {
