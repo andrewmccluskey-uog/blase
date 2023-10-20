@@ -6,8 +6,9 @@ reference:
 - contents: has_concept("atgnat-object")
 - title: Mapping Bulks
 - contents: has_concept("mapping")
+- subtitle: Plots
+- contents: has_concept("mapping_plots")
 - title: Parameter Tuning
 - contents: has_concept("tuning")
 - title: Utilities
 - contents: has_concept("util")
-

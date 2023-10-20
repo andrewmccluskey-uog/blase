@@ -1,14 +1,38 @@
-#' @title Plot a mapping result
+#' @title Plot a summary of the mapping result
 #'
-#' @concept mapping
+#' @concept mapping_plots
 #'
 #' @rdname plot_mapping_result
 #' @param x An object to plot on.
 #' @param y The [MappingResult] object to plot
 #' @param ... additional arguments passed to object-specific methods.
 #'
+#' @seealso [plot_mapping_result_corr()], [plot_bin_population()]
+#'
 #' @export
-#' @inherit MappingResult-class examples
+#' @examples
+#' counts_matrix <- matrix(c(seq_len(120)/10, seq_len(120)/5), ncol=48, nrow=5)
+#' sce <- SingleCellExperiment::SingleCellExperiment(assays=list(
+#'   normcounts=counts_matrix, logcounts=log(counts_matrix)))
+#' colnames(sce) = seq_len(48)
+#' rownames(sce) = as.character(seq_len(5))
+#' sce$cell_type = c(rep("celltype_1", 24), rep("celltype_2", 24))
+#'
+#' sce$pseudotime = seq_len(48)
+#' atgnat_data = as.AtgnatData(sce, pseudotime_slot="pseudotime", n_bins=4)
+#' atgnat_data@genes = as.character(seq_len(5))
+#'
+#' bulk_counts = matrix(seq_len(15)*10, ncol=3, nrow=5)
+#' colnames(bulk_counts) = c("A", "B", "C")
+#' rownames(bulk_counts) = as.character(seq_len(5))
+#'
+#' result = map_best_bin(atgnat_data, "B", bulk_counts)
+#'
+#' # Plot bin
+#' sce = scater::runUMAP(sce)
+#' sce = assign_pseudotime_bins(sce, pseudotime_slot="pseudotime", n_bins=4)
+#' plot_mapping_result(sce, result, group_by_slot="cell_type")
+#'
 setGeneric(name = "plot_mapping_result",
            signature = c(x="x", y="y"),
            def = function(x, y, ...) standardGeneric("plot_mapping_result"))
@@ -44,7 +68,7 @@ setMethod(
 
 #' @title Plot the populations of a bin
 #'
-#' @concept mapping
+#' @concept mapping_plots
 #'
 #' @rdname plot_bin_population
 #' @param x An object to plot on.
@@ -85,7 +109,7 @@ setMethod(
 #' @description
 #' Plots Spearman's Rho as the fill colour, and adds * if the [MappingResult] was confidently assigned.
 #'
-#' @concept mapping
+#' @concept mapping_plots
 #'
 #' @param mapping_result_list A list of [MappingResult] objects to include in the heatmap.
 #' @param heatmap_fill_scale The ggplot2 compatible fill scale to apply to the heatmap.
@@ -140,12 +164,12 @@ plot_mapping_result_heatmap = function(mapping_result_list, heatmap_fill_scale=v
 
 }
 
-#' @title Plot a mapping result
+#' @title Plot a mapping result's correlation
 #'
 #' @description
 #' Plots the mapping results correlations with each pseudobin
 #'
-#' @concept mapping
+#' @concept mapping_plots
 #'
 #' @param mapping_result A [MappingResult] object to plot the correlations for.
 #'
@@ -159,7 +183,7 @@ plot_mapping_result_corr = function(mapping_result){
   upper_bound_sym = ggplot2::sym("upper_bound")
   lower_bound_sym = ggplot2::sym("lower_bound")
   return(ggplot2::ggplot(mapping_result@history, ggplot2::aes(x={{bin_sym}}, y={{correlation_sym}})) +
-           ggplot2::geom_line() + # TODO add the upper and lower bounds
+           ggplot2::geom_line() +
            ggplot2::geom_hline(yintercept=mapping_result@best_correlation, linetype="dashed") +
            ggplot2::geom_vline(xintercept=mapping_result@best_bin, linetype="dashed") +
            ggplot2::geom_line(ggplot2::aes(y={{lower_bound_sym}}), linetype="dotted") +

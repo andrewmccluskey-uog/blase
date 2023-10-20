@@ -2,7 +2,7 @@
 % Please edit documentation in R/mapping_result_plotting.R
 \name{plot_mapping_result_corr}
 \alias{plot_mapping_result_corr}
-\title{Plot a mapping result}
+\title{Plot a mapping result's correlation}
 \usage{
 plot_mapping_result_corr(mapping_result)
 }
@@ -38,10 +38,11 @@ result
 # Plot Heatmap
 plot_mapping_result_heatmap(list(result))
 
-# Plot bin
-sce = scater::runUMAP(sce)
-sce = assign_pseudotime_bins(sce, pseudotime_slot="pseudotime", n_bins=4)
-plot_mapping_result(sce, result, group_by_slot="cell_type")
+# Plot Correlation
+plot_mapping_result_corr(result)
 
+# Plot populations
+sce = assign_pseudotime_bins(sce, pseudotime_slot="pseudotime", n_bins=4)
+plot_bin_population(sce, result@best_bin, group_by_slot="cell_type")
 }
-\concept{mapping}
+\concept{mapping_plots}

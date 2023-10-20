@@ -52,11 +52,12 @@ result
 # Plot Heatmap
 plot_mapping_result_heatmap(list(result))
 
-# Plot bin
-sce = scater::runUMAP(sce)
-sce = assign_pseudotime_bins(sce, pseudotime_slot="pseudotime", n_bins=4)
-plot_mapping_result(sce, result, group_by_slot="cell_type")
+# Plot Correlation
+plot_mapping_result_corr(result)
 
+# Plot populations
+sce = assign_pseudotime_bins(sce, pseudotime_slot="pseudotime", n_bins=4)
+plot_bin_population(sce, result@best_bin, group_by_slot="cell_type")
 }
 \seealso{
 \code{\link[=map_best_bin]{map_best_bin()}}
