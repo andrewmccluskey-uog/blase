@@ -14,20 +14,24 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
+```{r setup, results='hide', message=FALSE, warning=FALSE}
 library(atgnat)
-library(SingleCellExperiment, quietly=TRUE)
-library(tradeSeq, quietly=TRUE)
-library(slingshot, quietly=TRUE)
-library(scran, quietly=TRUE)
-library(scater, quietly=TRUE)
+library(SingleCellExperiment)
+library(tradeSeq)
+library(slingshot)
+library(scran)
+library(scater)
+library(BiocParallel)
+```
+
+```{r randomseed}
 RNGversion("3.5.0")
 set.seed(7)
 ```
 
 ## Setting up the Single Cell Experiment
 
-First, let's generate a Single Cell Experiment to use the tool with, based on the tradeSeq vignette [<https://bioconductor.org/packages/devel/bioc/vignettes/tradeSeq/inst/doc/tradeSeq.html>]. We need to have the following to use Atgnat:
+First, let's generate a Single Cell Experiment to use the tool with, based on the tradeSeq vignette [https://bioconductor.org/packages/devel/bioc/vignettes/tradeSeq/inst/doc/tradeSeq.html]. We need to have the following to use Atgnat:
 
 -   A Single Cell Experiment with pseudotime.
 
@@ -43,7 +47,7 @@ data(celltype, package = "tradeSeq")
 pseudotime <- slingPseudotime(crv, na = FALSE)
 cellWeights <- slingCurveWeights(crv)
 sce <- fitGAM(counts = counts, pseudotime = pseudotime, cellWeights = cellWeights,
-                 nknots = 6, verbose = FALSE)
+                 nknots = 6, verbose = FALSE, BPPARAM=MulticoreParam(2))
 
 sce$pseudotime = pseudotime[,"curve1"]
 sce$celltype = celltype
@@ -65,7 +69,7 @@ Now we'll find the genes we want to use. We select the top 100 so that we can do
 ```{r}
 # Use consecutive for genes that change over time
 assoRes = associationTest(sce, lineages=T, global=F, contrastType="consecutive")
-genelist = atgnat::get_top_n_genes(assoRes, n_genes = 100, lineage = 1)
+genelist = atgnat::get_top_n_genes(assoRes, n_genes = 200, lineage = 1)
 ```
 
 ## Parameter Tuning for Atgnat
@@ -146,3 +150,8 @@ gridExtra::grid.arrange(
 )
 ```
 We can see here that both of these bins have high proportions of the GMP cell type, which is why Atgnat could not make a convincing call on either of these being the true "best" mapping. In this case, since Bin 3 has a larger proportion and number of GMP cells, it is likely the best mapping, and this is reflected in Atgnat's correlation score.
+
+## Session
+```{r, sessionInfo}
+sessionInfo()
+```

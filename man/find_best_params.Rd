@@ -7,8 +7,8 @@
 find_best_params(
   x,
   genelist,
-  bins_count_range = c(5, 10, 15, 20, 25, 30, 35),
-  gene_count_range = c(20, 30, 40, 45, 50, 55, 60, 70, 80),
+  bins_count_range = c(5, 10, 20, 40),
+  gene_count_range = c(10, 20, 40, 80),
   ...
 )
 }
@@ -49,18 +49,15 @@ sce$pseudotime = seq_len(ncells)
 genelist = as.character(seq_len(ngenes))
 
 # Finding the best params for the AtgnatData
-best_params = find_best_params(sce, genelist, pseudotime_slot="pseudotime", split_by="cells")
+best_params = find_best_params(
+  sce, genelist,
+  bins_count_range=c(10,20),
+  gene_count_range=c(20,50),
+  pseudotime_slot="pseudotime",
+  split_by="pseudotime_range"
+)
 best_params
 plot_find_best_params_results(best_params)
-
-# Evaluating created AtgnatData
-atgnat_data = as.AtgnatData(sce, pseudotime_slot="pseudotime", n_bins=10)
-atgnat_data@genes = genelist[1:20]
-
-# Check specificity of parameters
-evaluate_parameters(atgnat_data, make_plot = TRUE)
-# Check gene expression over pseudotime
-evaluate_top_n_genes(atgnat_data)
 }
 \seealso{
 \code{\link[=plot_find_best_params_results]{plot_find_best_params_results()}} for plotting the results of this function.
