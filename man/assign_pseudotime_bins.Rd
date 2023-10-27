@@ -4,6 +4,7 @@
 \alias{assign_pseudotime_bins}
 \alias{assign_pseudotime_bins,SingleCellExperiment-method}
 \alias{assign_pseudotime_bins,data.frame-method}
+\alias{assign_pseudotime_bins,Seurat-method}
 \title{Assign Pseudotime Bins to a source object's metadata}
 \usage{
 assign_pseudotime_bins(x, split_by = "pseudotime_range", n_bins = 20, ...)
@@ -16,6 +17,13 @@ assign_pseudotime_bins(x, split_by = "pseudotime_range", n_bins = 20, ...)
 )
 
 \S4method{assign_pseudotime_bins}{data.frame}(x, split_by, n_bins)
+
+\S4method{assign_pseudotime_bins}{Seurat}(
+  x,
+  split_by,
+  n_bins,
+  pseudotime_slot = "slingPseudotime_1"
+)
 }
 \arguments{
 \item{x}{An object to add metadata to.}

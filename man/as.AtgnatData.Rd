@@ -3,12 +3,20 @@
 \name{as.AtgnatData}
 \alias{as.AtgnatData}
 \alias{as.AtgnatData,data.frame-method}
+\alias{as.AtgnatData,Seurat-method}
 \alias{as.AtgnatData,SingleCellExperiment-method}
 \title{Conversion to AtgnatData}
 \usage{
 as.AtgnatData(x, ...)
 
 \S4method{as.AtgnatData}{data.frame}(x)
+
+\S4method{as.AtgnatData}{Seurat}(
+  x,
+  pseudotime_slot = "slingPseudotime_1",
+  n_bins = 20,
+  split_by = "pseudotime_range"
+)
 
 \S4method{as.AtgnatData}{SingleCellExperiment}(
   x,
