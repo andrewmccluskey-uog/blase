@@ -26,6 +26,8 @@ setMethod(
   signature = c(x="SingleCellExperiment"),
   definition = function(x, split_by, n_bins, pseudotime_slot="slingPseudotime_1"){
 
+    # TODO overlapping bins
+
     if (is.na(match(split_by, c("pseudotime_range", "cells")))) {
       stop("split_by must be 'pseudotime_range' or 'cells'")
     }
@@ -79,5 +81,21 @@ setMethod(
   signature = c(x="data.frame"),
   definition = function(x, split_by, n_bins){
     stop("Can't update bulk data, using each sample as bins.")
+  }
+)
+
+#' @rdname assign_pseudotime_bins
+#'
+#' @import rlang
+#'
+#' @export
+setMethod(
+  f = "assign_pseudotime_bins",
+  signature = c(x="Seurat"),
+  definition = function(x, split_by, n_bins, pseudotime_slot="slingPseudotime_1"){
+    rlang::check_installed("Seurat", reason = "to handle Seurat objects.")
+    sce = Seurat::as.SingleCellExperiment(x)
+    sce = assign_pseudotime_bins(sce, split_by, n_bins, pseudotime_slot)
+    return(Seurat::as.Seurat(sce))
   }
 )

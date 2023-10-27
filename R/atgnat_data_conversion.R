@@ -14,6 +14,7 @@ setGeneric(name = "as.AtgnatData",
            signature = c("x"),
            def = function(x, ...) standardGeneric("as.AtgnatData"))
 
+# TODO perhaps this should be a bit more permissive about how to split the bins (i.e. by cell type)
 #' @rdname as.AtgnatData
 #'
 #' @import methods
@@ -25,6 +26,24 @@ setMethod(
   signature = c(x="data.frame"),
   definition = function(x){
     return(methods::new("AtgnatData", pseudobulks = x, bins = colnames(x)))
+  }
+)
+
+#' @rdname as.AtgnatData
+#'
+#' @import methods
+#' @import Matrix
+#'
+#' @import rlang
+#'
+#' @export
+setMethod(
+  f = "as.AtgnatData",
+  signature = c(x="Seurat"),
+  definition = function(x, pseudotime_slot="slingPseudotime_1", n_bins=20, split_by="pseudotime_range"){
+    rlang::check_installed("Seurat", reason = "to handle Seurat objects.")
+    sce = Seurat::as.SingleCellExperiment(x)
+    return(as.AtgnatData(sce, pseudotime_slot=pseudotime_slot, n_bins=n_bins, split_by=split_by))
   }
 )
 

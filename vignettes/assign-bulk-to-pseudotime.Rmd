@@ -1,8 +1,8 @@
 ---
-title: "Atgnat from SingleCellExperiment"
+title: "Assigning bulk RNA-seq to pseudotime"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{from-sce}
+  %\VignetteIndexEntry{assign-bulk-to-pseudotime}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

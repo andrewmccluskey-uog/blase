@@ -67,7 +67,9 @@ map_best_bin <- function(atgnat_data, bulk_id, bulk_data, bootstrap_iterations=2
     correlations_history[correlations_history$bin!=best_i,]$upper_bound
   )
   top_mapping_lower_bound = correlations_history[correlations_history$bin==best_i,]$lower_bound
-  confident_mapping = non_top_mapping_best_upper_bound < top_mapping_lower_bound
+
+  ## TODO surface to the user why the mapping wasn't confident, and allow user override of the cutoff
+  confident_mapping = non_top_mapping_best_upper_bound < top_mapping_lower_bound && top_mapping_lower_bound > 0.6
 
   return(methods::new("MappingResult",
                       bulk_name=bulk_id,

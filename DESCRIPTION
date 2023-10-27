@@ -21,7 +21,8 @@ Imports:
   viridis,
   Matrix,
   scater,
-  methods
+  methods,
+  rlang
 Suggests: 
     knitr,
     rmarkdown,
@@ -29,7 +30,8 @@ Suggests:
     tradeSeq,
     scran,
     slingshot,
-    BiocParallel
+    BiocParallel,
+    Seurat
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 URL: https://andrewmccluskey-uog.github.io/atgnat/
