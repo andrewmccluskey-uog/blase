@@ -24,7 +24,8 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/from-sce.html">Atgnat from SingleCellExperiment</a>
+    <a class="dropdown-item" href="../articles/DE-for-non-synchronous-bulk.html">DE For Non-synchronous Bulk RNAseq</a>
+    <a class="dropdown-item" href="../articles/assign-bulk-to-pseudotime.html">Assigning bulk RNA-seq to pseudotime</a>
   </div>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
@@ -59,7 +60,15 @@
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for data.frame</span></span>
-<span><span class="fu">assign_pseudotime_bins</span><span class="op">(</span><span class="va">x</span>, <span class="va">split_by</span>, <span class="va">n_bins</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">assign_pseudotime_bins</span><span class="op">(</span><span class="va">x</span>, <span class="va">split_by</span>, <span class="va">n_bins</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for Seurat</span></span>
+<span><span class="fu">assign_pseudotime_bins</span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  <span class="va">split_by</span>,</span>
+<span>  <span class="va">n_bins</span>,</span>
+<span>  pseudotime_slot <span class="op">=</span> <span class="st">"slingPseudotime_1"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
