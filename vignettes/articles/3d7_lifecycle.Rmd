@@ -1,0 +1,175 @@
+---
+title: "3d7_lifecycle"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(readxl)
+library(atgnat)
+library(scran)
+library(slingshot)
+library(tradeSeq)
+library(BiocParallel)
+
+# TODO rename this as it's no longer PF3d7
+# https://academic.oup.com/nar/article/44/5/2110/2464621?login=true alternative bulk option
+```
+
+In this article we will use BLASE to map Plasmodium Falciparum microarray data of the asexual lifecycle ([Painter et al. 2018](https://doi.org/10.1038/s41467-018-04966-3), 3d7 strain) onto the Malaria Cell Atlas ([Howick et al. 2019](https://doi.org/10.1126/science.aaw2619), 7G8 & NF54 strains)  to try and annotate it over a 48 hour period. 
+
+```{r getData}
+root_dir = tools::R_user_dir("BLASE", "data")
+article_dir = paste0(root_dir, "/3d7_lifecycle")
+if (!dir.exists(article_dir)) {
+  dir.create(article_dir)
+}
+article_dir
+
+bulk_path = paste0(article_dir, '/3d7_bulk_timepoints.xlsx')
+if (!file.exists(bulk_path)) {
+  download.file('https://static-content.springer.com/esm/art%3A10.1038%2Fs41467-018-04966-3/MediaObjects/41467_2018_4966_MOESM4_ESM.xlsx', bulk_path)
+}else {
+  print(paste("Using cached", bulk_path))
+}
+
+mca_path = paste0(article_dir, '/MCA.zip')
+if (!file.exists(mca_path)) {
+  download.file('https://www.malariacellatlas.org/downloads/pf.zip', mca_path)
+  unzip(mca_path, exdir = paste0(article_dir, '/MCA'))
+}else {
+  print(paste("Using cached", mca_path))
+}
+
+bulk = as.data.frame(read_excel(bulk_path, sheet = "Estimated Total Abundance"))
+rownames(bulk) = bulk$`Gene ID`
+rownames(bulk) = gsub(x=rownames(bulk), pattern="_", replacement="-", fixed=TRUE)
+bulk = bulk[7:nrow(bulk),]
+bulk = subset(bulk, , -c(`Gene ID`, `Annotation`, `Peak Time (hpi)`, `p-value`))
+mca_counts_path = paste0(article_dir, '/MCA/pf-ch10x-raw.csv')
+sc_readcounts = read.csv(mca_counts_path, row.names=1)
+mca_annotation_path = paste0(article_dir, '/MCA/pf-ch10x-data.csv')
+sc_annotations = read.csv(mca_annotation_path, row.names=1)
+```
+## Prepare SC
+```{r}
+rownames(sc_annotations) = gsub(x = rownames(sc_annotations), pattern="-", replacement=".", fixed=TRUE)
+sc_annotations
+
+# Combine all genes with multiple transcripts
+genes_to_fix = rownames(sc_readcounts)[!(rownames(sc_readcounts) %in% sub(x=rownames(sc_readcounts), pattern="\\.[0-9]", replacement=""))]
+genes_to_fix = unique(sub(x=genes_to_fix, pattern="\\.[0-9]", replacement=""))
+print(paste("Fixing this many genes:", length(genes_to_fix)))
+
+for (gene in genes_to_fix) {
+  print(gene)
+  targetRowNames = rownames(sc_readcounts)[grep(x=rownames(sc_readcounts), pattern=gene)]
+  counts = colSums(sc_readcounts[targetRowNames,])
+  counts = t(data.frame(counts=colSums(sc_readcounts[targetRowNames,])))
+  rownames(counts) = c(gene)
+  
+  sc_readcounts <- sc_readcounts[ !(rownames(sc_readcounts) %in% targetRowNames), ]
+
+  sc_readcounts = rbind(sc_readcounts, counts)
+}
+
+genes_to_fix = rownames(sc_readcounts)[!(rownames(sc_readcounts) %in% sub(x=rownames(sc_readcounts), pattern="\\.[0-9]", replacement=""))]
+genes_to_fix = unique(sub(x=genes_to_fix, pattern="\\.[0-9]", replacement=""))
+print(paste("Remaining genes with dups:", genes_to_fix))
+
+sce = SingleCellExperiment(assays=list(counts=as.matrix(sc_readcounts)), colData=sc_annotations)
+rownames(sce) = sub(x=rownames(sce), pattern="\\.[0-9]", replacement="")
+
+rm(sc_annotations, sc_readcounts)
+gc()
+
+sce = subset(sce, , STAGE_LR != 'gametocyte')
+
+sce <- computeSumFactors(sce)
+sce <- logNormCounts(sce)
+normcounts(sce) <- exp(logcounts(sce))
+
+reducedDim(sce, "PCA") = as.matrix(cbind(sce@colData["PC_1"], sce@colData["PC_2"],sce@colData["PC_3"]))
+# better separation in the 2nd and 3rd dimension for just asexual stages
+reducedDim(sce, "UMAP") = as.matrix(cbind(sce@colData["UMAP_2"], sce@colData["UMAP_3"]))
+
+sce <- slingshot(sce, reducedDim = 'UMAP', clusterLabels="STAGE_LR", start.clus="ring")
+
+gridExtra::grid.arrange(
+  plotPCA(sce, colour_by="STAGE_LR"),
+  plotUMAP(sce, colour_by="STAGE_LR"),
+  plotPCA(sce, colour_by="DAY"),
+  plotUMAP(sce, colour_by="DAY"),
+  plotPCA(sce, colour_by="STRAIN"),
+  plotUMAP(sce, colour_by="STRAIN"),
+  plotPCA(sce, colour_by="slingPseudotime_1"),
+  plotUMAP(sce, colour_by="slingPseudotime_1"),
+  ncol=2
+)
+
+```
+
+```{r}
+# evaluateK(sce, k=6:8, parallel=T, BPPARAM=MulticoreParam(2))
+```
+
+```{r}
+sce <- fitGAM(sce, parallel=T, BPPARAM=MulticoreParam(3), nknots=7)
+associationTestResult <- associationTest(sce, lineages=T, global=F, contrastType="consecutive")
+```
+
+## Prepare BLASE
+```{r}
+genelist = atgnat::get_top_n_genes(associationTestResult, n_genes = 500, lineage = 1)
+res = find_best_params(sce,
+                       genelist,
+                       split_by="pseudotime_range",
+                       pseudotime_slot="slingPseudotime_1",
+                       bins_count_range = seq.int(10, 14, 1),
+                       gene_count_range = seq.int(12, 192, 3))
+plot_find_best_params_results(res)
+```
+```{r}
+res2 = find_best_params(sce,
+                       genelist,
+                       split_by="pseudotime_range",
+                       pseudotime_slot="slingPseudotime_1",
+                       bins_count_range = 12,
+                       gene_count_range = seq.int(12, 192, 3))
+plot_find_best_params_results(res2)
+```
+
+```{r}
+genes = 300
+bins = 8
+atgnatData = as.AtgnatData(sce, pseudotime_slot="slingPseudotime_1", n_bins=bins, split_by="pseudotime_range")
+atgnatData@genes = genelist[1:genes]
+evaluate_parameters(atgnatData, make_plot = TRUE)
+sce = assign_pseudotime_bins(sce, pseudotime_slot="slingPseudotime_1", n_bins=bins, split_by="pseudotime_range")
+plotUMAP(sce, color="pseudotime_bin")
+gridExtra::grid.arrange(
+  plotUMAP(sce, color="STAGE_LR"),
+  plotUMAP(sce, color="pseudotime_bin"),
+  ncol=2
+)
+```
+
+```{r}
+## Map Bulk data onto Single Cell
+
+mapping_results = c()
+for (bulkname in colnames(bulk)) {
+  print(bulkname)
+  res = map_best_bin(atgnatData, bulkname, bulk)
+  mapping_results = c(mapping_results, res)
+  # print(res)
+}
+
+atgnat::plot_mapping_result_heatmap(rev(mapping_results), annotate = TRUE)
+ggplot2::ggsave(paste0("blase_heatmap_", bins, "_bins_", genes, "_genes.png"), path="/Users/andrewmccluskey/code/PhD")
+```

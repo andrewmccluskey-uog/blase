@@ -1,0 +1,252 @@
+---
+title: "compare_simulated_data"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, results='hide', message=FALSE, warning=FALSE}
+#library(atgnat)
+library(SingleCellExperiment)
+library(tradeSeq)
+library(slingshot)
+library(scran)
+library(scater)
+library(BiocParallel)
+library(dyngen)
+library(bluster)
+```
+
+```{r randomseed}
+RNGversion("3.5.0")
+SEED = 7
+set.seed(SEED)
+```
+## Generate the simulation data
+Based on the [dyngen](https://dyngen.dynverse.org/articles/getting_started.html#step-1-define-backbone-and-other-parameters) Getting Started tutorial. 
+```{r generateCounts}
+
+root_dir = tools::R_user_dir("BLASE", "data")
+article_dir = paste0(root_dir, "/compare_simulated_data")
+if (!dir.exists(article_dir)) {
+  dir.create(article_dir)
+}
+article_dir
+
+simulation_rds_path = paste0(article_dir, '/simulation.rds')
+
+if (!file.exists(simulation_rds_path)) {
+  # realnet for featurenetwork from realnets
+  # realcount for generate experiment from realcounts
+  
+  simulations_num = 150
+  backbone <- backbone_linear_simple()
+  config <-
+    initialise_model(
+      backbone = backbone,
+      num_cells = 2000,
+      num_tfs = nrow(backbone$module_info),
+      num_targets = 400,
+      num_hks = 50,
+      verbose = FALSE,
+      feature_network_params = feature_network_default(
+        #realnet="regulatorycircuits_12_lymphocytes_of_b_lineage"
+        realnet="regulatorycircuits_04_mesenchymal_mixed"
+      ),
+      experiment_params = experiment_snapshot(
+        #realcount="zenodo_1443566_real_silver_bone-marrow-mesenchyme-erythrocyte-differentiation_mca"
+        realcount="zenodo_1443566_real_silver_trophoblast-stem-cell-trophoblast-differentiation_mca"
+      ),
+      download_cache_dir = tools::R_user_dir("dyngen", "data"),
+      simulation_params = simulation_default(
+        total_time = 1000,
+        ssa_algorithm = ssa_etl(tau = 30/3600),
+        census_interval = 4,
+        experiment_params = simulation_type_wild_type(num_simulations = simulations_num, seed=seq_len(simulations_num))
+      ),
+      num_cores=8
+    )
+  
+  #realcounts$name
+  #realnets$name
+  # Should be > 10 ideally
+  floor(config$simulation_params$total_time / config$simulation_params$census_interval) * simulations_num / config$numbers$num_cells
+  config$experiment_params$realcount
+  config$feature_network_params$realnet
+  
+  
+  model <- generate_tf_network(config)
+  model <- generate_feature_network(model)
+  model <- generate_kinetics(model)
+  model <- generate_gold_standard(model)
+  model <- generate_cells(model)
+  model <- generate_experiment(model)
+  
+  saveRDS(model, simulation_rds_path);
+} else {
+    print(paste("Using cached", simulation_rds_path))
+    model = readRDS(simulation_rds_path)
+}
+
+```
+
+## Cluster SCE
+```{r clusterSCE}
+sce <- as_sce(model)
+
+sce <- computeSumFactors(sce)
+sce <- logNormCounts(sce)
+normcounts(sce) <- exp(logcounts(sce))
+sce = runPCA(sce)
+
+colLabels(sce) <- clusterCells(sce, use.dimred='PCA',
+    BLUSPARAM=NNGraphParam(cluster.fun="louvain")) 
+
+sce = runUMAP(sce)
+gridExtra::grid.arrange(
+  plotPCA(sce, colour_by="label"),
+  plotUMAP(sce, colour_by="label"),
+  plotPCA(sce, colour_by="sim_time"),
+  plotUMAP(sce, colour_by="sim_time"),
+  ncol=2
+)
+
+```
+```{r}
+START_CLUSTER = 4
+```
+
+## Split Datasets
+```{r}
+
+sce$useAsBulk = round(runif(n=ncol(sce), min=0, max=1)) == 1
+bulk_sce = subset(sce, , useAsBulk==TRUE)
+sc_sce = subset(sce, , useAsBulk==FALSE)
+rm(sce)
+
+# TODO save and cache this dataset
+```
+
+## Prepare single cell
+Now we can generate our bulk and single cell datasets
+```{r}
+sc_sce
+
+sc_sce <- slingshot(sc_sce, reducedDim = 'UMAP', clusterLabels='label', start.clus=START_CLUSTER)
+
+gridExtra::grid.arrange(
+  plotPCA(sc_sce, colour_by="sim_time"),
+  plotPCA(sc_sce, colour_by="slingPseudotime_1"),
+  plotUMAP(sc_sce, colour_by="sim_time"),
+  plotUMAP(sc_sce, colour_by="slingPseudotime_1"),
+  plotPCA(sc_sce, colour_by="label"),
+  plotUMAP(sc_sce, colour_by="label"),
+  ncol=2
+)
+
+sc_sce <- fitGAM(sc_sce, parallel=T, BPPARAM=MulticoreParam(4), nknots=4)
+associationTestResult <- associationTest(sc_sce, lineages=T, global=F, contrastType="consecutive")
+
+```
+
+## Analyse with BLASE
+```{r}
+genelist = atgnat::get_top_n_genes(associationTestResult, n_genes = 200, lineage = 1)
+res = find_best_params(sc_sce,
+                       genelist,
+                       split_by="pseudotime_range",
+                       pseudotime_slot="slingPseudotime_1",
+                       bins_count_range = seq.int(3, 10, 1),
+                       gene_count_range = seq.int(3, 60, 3))
+plot_find_best_params_results(res)
+```
+```{r}
+genes = 30
+bins =5
+atgnatData = as.AtgnatData(sc_sce, pseudotime_slot="slingPseudotime_1", n_bins=bins, split_by="pseudotime_range")
+atgnatData@genes = genelist[1:genes]
+evaluate_parameters(atgnatData, make_plot = TRUE)
+```
+## Prepare Bulk
+```{r}
+bulk_sce
+
+bulk_sce <- slingshot(bulk_sce, reducedDim = 'UMAP', clusterLabels='label', start.clus=START_CLUSTER)
+
+gridExtra::grid.arrange(
+  plotPCA(bulk_sce, colour_by="sim_time"),
+  plotPCA(bulk_sce, colour_by="slingPseudotime_1"),
+  plotUMAP(bulk_sce, colour_by="sim_time"),
+  plotUMAP(bulk_sce, colour_by="slingPseudotime_1"),
+  ncol=2
+)
+
+bulk_sce = assign_pseudotime_bins(bulk_sce, split_by='pseudotime_range', n_bins = bins, pseudotime_slot="slingPseudotime_1")
+bulk_sce$replicate = round(runif(n=ncol(bulk_sce), min=1, max=2))
+bulkified_bins = atgnat::get_bins_as_bulk(bulk_sce, min_cells_for_bulk = 20)
+```
+
+## Map the bulk to the single cell
+```{r}
+mapping_results = c()
+for (bulkname in colnames(bulkified_bins)) {
+  res = map_best_bin(atgnatData, bulkname, bulkified_bins)
+  mapping_results = c(mapping_results, res)
+  print(res)
+}
+
+sc_sce = assign_pseudotime_bins(sc_sce, split_by = 'pseudotime_range', n_bins = bins, pseudotime_slot='slingPseudotime_1')
+gridExtra::grid.arrange(
+  plotUMAP(bulk_sce, colour_by="sim_time"),
+  plotUMAP(bulk_sce, colour_by="slingPseudotime_1"),
+  plotUMAP(sc_sce, colour="pseudotime_bin"),
+  ncol=3
+)
+atgnat::plot_mapping_result_heatmap(rev(mapping_results))
+```
+```{r}
+gridExtra::grid.arrange(
+  plotUMAP(sc_sce, colour_by="label"),
+  plotUMAP(sc_sce, colour="pseudotime_bin"),
+  plotUMAP(bulk_sce, colour_by="label"),
+  plotUMAP(bulk_sce, colour="pseudotime_bin"),
+  ncol=2
+)
+
+gridExtra::grid.arrange(
+  atgnat::plot_bin_population(sc_sce, 1, group_by_slot="label"),
+  atgnat::plot_bin_population(bulk_sce, 1, group_by_slot="label"),
+  atgnat::plot_mapping_result_corr(mapping_results[[1]]),
+  atgnat::plot_mapping_result_corr(mapping_results[[2]]),
+  atgnat::plot_bin_population(sc_sce, 2, group_by_slot="label"),
+  atgnat::plot_bin_population(bulk_sce, 2, group_by_slot="label"),
+  atgnat::plot_mapping_result_corr(mapping_results[[3]]),
+  atgnat::plot_mapping_result_corr(mapping_results[[4]]),
+  atgnat::plot_bin_population(sc_sce, 3, group_by_slot="label"),
+  atgnat::plot_bin_population(bulk_sce, 3, group_by_slot="label"),
+  atgnat::plot_mapping_result_corr(mapping_results[[5]]),
+  atgnat::plot_mapping_result_corr(mapping_results[[6]]),
+  atgnat::plot_bin_population(sc_sce, 4, group_by_slot="label"),
+  atgnat::plot_bin_population(bulk_sce, 4, group_by_slot="label"),
+  atgnat::plot_mapping_result_corr(mapping_results[[7]]),
+  atgnat::plot_mapping_result_corr(mapping_results[[8]]),
+  atgnat::plot_bin_population(sc_sce, 5, group_by_slot="label"),
+  atgnat::plot_bin_population(bulk_sce, 5, group_by_slot="label"),
+  atgnat::plot_mapping_result_corr(mapping_results[[9]]),
+  atgnat::plot_mapping_result_corr(mapping_results[[10]]),
+  ncol=4
+)
+
+atgnat::plot_mapping_result_corr(mapping_results[[4]])
+
+gridExtra::grid.arrange(
+  plotUMAP(bulk_sce, colour_by="slingPseudotime_1"),
+  plotUMAP(bulk_sce, colour_by="pseudotime_bin"),
+  ncol=2
+)
+
+```

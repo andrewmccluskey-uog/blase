@@ -27,6 +27,9 @@ setMethod(
   definition = function(x, split_by, n_bins, pseudotime_slot="slingPseudotime_1"){
 
     # TODO overlapping bins
+    # Need to change this to be a list of bins a cell is in
+    #   This will need to be changed in atgnatData Conversion too
+    #   Then can handle multiple bin overlaps
 
     if (is.na(match(split_by, c("pseudotime_range", "cells")))) {
       stop("split_by must be 'pseudotime_range' or 'cells'")

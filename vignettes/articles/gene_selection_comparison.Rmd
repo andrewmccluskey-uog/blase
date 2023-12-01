@@ -1,0 +1,424 @@
+---
+title: "gene_selection_comparison"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(readxl)
+library(atgnat)
+library(scran)
+library(slingshot)
+library(tradeSeq)
+library(BiocParallel)
+library(UpSetR)
+```
+
+In this article we will look at different methods for gene selection, using the MCA's Plasmodium Berghei Data [Howick et al, 2019](https://dx.doi.org/10.1126/science.aaw2619), and bulk RNA seq of the lifecycle stages [Otto et al, 2004](https://doi.org/10.1186/s12915-014-0086-0).
+```{r getData}
+root_dir = tools::R_user_dir("BLASE", "data")
+article_dir = paste0(root_dir, "/gene_selection_comparison")
+if (!dir.exists(article_dir)) {
+  dir.create(article_dir)
+}
+article_dir
+
+bulk_path = paste0(article_dir, '/otto_pb_bulk_timepoints.xlsx')
+if (!file.exists(bulk_path)) {
+  download.file('https://static-content.springer.com/esm/art%3A10.1186%2Fs12915-014-0086-0/MediaObjects/12915_2014_86_MOESM9_ESM.xlsx', bulk_path)
+}else {
+  print(paste("Using cached", bulk_path))
+}
+
+mca_path = paste0(article_dir, '/MCA-pb.zip')
+if (!file.exists(mca_path)) {
+  download.file('https://www.malariacellatlas.org/downloads/pb-ch10x-set1.zip', mca_path)
+  unzip(mca_path, exdir = paste0(article_dir, '/MCA-pb'))
+}else {
+  print(paste("Using cached", mca_path))
+}
+
+bulk = as.data.frame(read_excel(bulk_path, range = "FPKM PbA !A4:L5024"))
+rownames(bulk) = bulk$`Gene Models (IDs)`
+rownames(bulk) = gsub(x=rownames(bulk), pattern="_", replacement="-", fixed=TRUE)
+bulk = subset(bulk, , -c(`Gene Models (IDs)`))
+rownames(bulk) = paste0(rownames(bulk), '0');
+
+mca_counts_path = paste0(article_dir, '/MCA-pb/pb-ch10x-set1-ch10x-exp.csv')
+sc_readcounts = read.csv(mca_counts_path, row.names=1)
+mca_annotation_path = paste0(article_dir, '/MCA-pb/pb-ch10x-set1-ch10x-data.csv')
+sc_annotations = read.csv(mca_annotation_path, row.names=1)
+```
+
+```{r}
+rownames(sc_annotations) = gsub(x = rownames(sc_annotations), pattern="-", replacement=".", fixed=TRUE)
+rownames(sc_readcounts) = gsub(x=rownames(sc_readcounts), pattern="_", replacement="-", fixed=TRUE)
+sce = SingleCellExperiment(assays=list(counts=as.matrix(sc_readcounts)), colData=sc_annotations)
+rm(sc_annotations, sc_readcounts)
+gc()
+
+# sce = subset(sce, , STAGE_LR != 'gametocyte')
+
+sce <- computeSumFactors(sce)
+sce <- logNormCounts(sce)
+normcounts(sce) <- exp(logcounts(sce))
+reducedDim(sce, "PCA") = as.matrix(cbind(sce@colData["PC_1"], sce@colData["PC_2"]))
+sce = runUMAP(sce)
+
+sce <- slingshot(sce, reducedDim = 'UMAP', clusterLabels="STAGE_LR", start.clus="ring")
+sce = assign_pseudotime_bins(sce, pseudotime_slot="slingPseudotime_1", n_bins=12, split_by="pseudotime_range")
+
+gridExtra::grid.arrange(
+  plotPCA(sce, colour_by="STAGE_LR"),
+  plotUMAP(sce, colour_by="STAGE_LR"),
+  plotPCA(sce, colour_by="slingPseudotime_1"),
+  plotUMAP(sce, colour_by="slingPseudotime_1"),
+  plotPCA(sce, colour_by="pseudotime_bin"),
+  plotUMAP(sce, colour_by="pseudotime_bin"),
+  ncol=2
+)
+
+```
+## Using TradeSeq
+First, we'll use tradeSeq to find the good genes
+```{r}
+#sce <- fitGAM(sce, parallel=T, BPPARAM=MulticoreParam(PARALLELISM_CORES), nknots=6)
+#associationTestResult <- associationTest(sce, lineages=T, global=F, contrastType="consecutive")
+```
+```{r}
+#genelist = atgnat::get_top_n_genes(associationTestResult, n_genes = 200, lineage = 1)
+
+#res = find_best_params(sce,
+#                       genelist,
+#                       split_by="pseudotime_range",
+#                       pseudotime_slot="slingPseudotime_1",
+#                       bins_count_range = seq.int(8, 16, 2),
+#                       gene_count_range = seq.int(20, 200, 3))
+#tradeseq_tuning = plot_find_best_params_results(res)
+```
+
+```{r}
+#BUCKETS_COUNT = 12
+#GENES_TO_USE_COUNT = 60
+#x = as.AtgnatData(sce, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
+#x@genes = genelist[1:GENES_TO_USE_COUNT]
+
+#genes_tradeseq = x@genes
+
+#sce = assign_pseudotime_bins(sce, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
+
+#plotUMAP(sce, colour="pseudotime_bin")
+
+#mapping_results = c()
+#for (bulkname in colnames(bulk)) {
+#  res = map_best_bin(x, bulkname, bulk)
+#  mapping_results = c(mapping_results, res)
+#  print(res)
+#}
+
+#tradeseq_heat = atgnat::plot_mapping_result_heatmap(rev(mapping_results)) + ggplot2::ggtitle(paste0('TradeSeq (', GENES_TO_USE_COUNT,')'))
+#tradeseq_heat
+```
+
+## Using marker genes
+```{r}
+markers <- scoreMarkers(sce, lfc=1, groups=sce$STAGE_LR)
+
+top_n_markers_per_group = 20
+genes=DataFrame()
+for (group in names(markers)) {
+  group_markers=markers[[group]]
+  top_genes=group_markers[order(-group_markers$mean.logFC.cohen),][0:top_n_markers_per_group,]
+  top_genes=top_genes[0:top_n_markers_per_group,]
+  top_genes
+  top_genes$group = group
+  genes = rbind(genes,top_genes)
+}
+
+genes = DataFrame(genes$mean.logFC.cohen, genes$group)
+genelist = rownames(genes)
+res = find_best_params(sce,
+                       genelist,
+                       split_by="pseudotime_range",
+                       pseudotime_slot="slingPseudotime_1",
+                       bins_count_range = c(12),
+                       gene_count_range = c(60))
+markergenes_tuning = plot_find_best_params_results(res)
+```
+
+```{r}
+BUCKETS_COUNT = 12
+GENES_TO_USE_COUNT = 60
+x = as.AtgnatData(sce, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
+x@genes = genelist[1:GENES_TO_USE_COUNT]
+genes_markergenes = x@genes
+
+sce = assign_pseudotime_bins(sce, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
+
+mapping_results = c()
+for (bulkname in colnames(bulk)) {
+  res = map_best_bin(x, bulkname, bulk)
+  mapping_results = c(mapping_results, res)
+  print(res)
+}
+
+markergenes_heat = atgnat::plot_mapping_result_heatmap(rev(mapping_results)) + ggplot2::ggtitle(paste0('Marker Genes (', GENES_TO_USE_COUNT,')'))
+markergenes_heat
+```
+## Pseudotime bin marker genes
+## Using marker genes
+```{r}
+sce = assign_pseudotime_bins(sce, pseudotime_slot="slingPseudotime_1", n_bins=12, split_by="pseudotime_range")
+
+markers <- scoreMarkers(sce, lfc=1, groups=sce$pseudotime_bin)
+
+top_n_markers_per_group = 5
+genes=DataFrame()
+for (group in names(markers)) {
+  group_markers=markers[[group]]
+  top_genes=group_markers[order(-group_markers$mean.logFC.cohen),][0:top_n_markers_per_group,]
+  top_genes=top_genes[0:top_n_markers_per_group,]
+  top_genes
+  top_genes$group = group
+  genes = rbind(genes,top_genes)
+}
+
+genes = DataFrame(genes$mean.logFC.cohen, genes$group)
+genelist = rownames(genes)
+
+res = find_best_params(sce,
+                       genelist,
+                       split_by="pseudotime_range",
+                       pseudotime_slot="slingPseudotime_1",
+                       bins_count_range = c(12),
+                       gene_count_range = c(60))
+markergenes_by_bin_tuning = plot_find_best_params_results(res)
+```
+
+
+```{r}
+BUCKETS_COUNT = 12
+GENES_TO_USE_COUNT = 60
+x = as.AtgnatData(sce, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
+x@genes = genelist[1:GENES_TO_USE_COUNT]
+
+genes_markergenes_by_bin = x@genes
+
+sce = assign_pseudotime_bins(sce, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
+
+mapping_results = c()
+for (bulkname in colnames(bulk)) {
+  res = map_best_bin(x, bulkname, bulk)
+  mapping_results = c(mapping_results, res)
+  print(res)
+}
+
+markergenes_by_bin_heat = atgnat::plot_mapping_result_heatmap(rev(mapping_results)) + ggplot2::ggtitle(paste0('Marker Genes by bin (', GENES_TO_USE_COUNT,')'))
+markergenes_by_bin_heat
+```
+
+## Using Bozdech Fourier Method
+
+```{r}
+library(metR)
+sce = assign_pseudotime_bins(sce, pseudotime_slot="slingPseudotime_1", n_bins=12, split_by="pseudotime_range")
+
+counts = normcounts(sce)[,order(sce$slingPseudotime_1)]
+waves = as.data.frame(FitWave(as.matrix(counts['PBANKA-0831000',]), 0:20))
+waves$gene = rownames(waves)
+
+ggplot2::ggplot(waves, ggplot2::aes(phase, r2, color=amplitude)) +
+    ggplot2::geom_point()
+ggplot2::ggplot(waves, ggplot2::aes(phase, amplitude, color=r2)) +
+    ggplot2::geom_point()
+ggplot2::ggplot(waves, ggplot2::aes(phase, amplitude, color=k)) +
+    ggplot2::geom_point()
+
+target_to_plot = 'PBANKA-0831000'
+
+toplot = as.data.frame(counts[target_to_plot,order(sce$slingPseudotime_1)])
+toplot$pdt = sce$slingPseudotime_1[order(sce$slingPseudotime_1)]
+colnames(toplot)[1] = 'count'
+
+# I'm pretty sure the x value for buildwave is wrong here
+toplot$wave1 = BuildWave(seq(from=0, to=max(sce$slingPseudotime_1), length.out=nrow(toplot)), wave = FitWave(as.matrix(counts[target_to_plot,]), 1))
+toplot$wave1and2 = BuildWave(seq(from=0, to=max(sce$slingPseudotime_1), length.out=nrow(toplot)), wave = FitWave(as.matrix(counts[target_to_plot,]), 1))
+toplot$wave1to3 = BuildWave(seq(from=0, to=max(sce$slingPseudotime_1), length.out=nrow(toplot)), wave = FitWave(as.matrix(counts[target_to_plot,]), 1:3))
+toplot$wave1toten = BuildWave(seq(from=0, to=max(sce$slingPseudotime_1), length.out=nrow(toplot)), wave = FitWave(as.matrix(counts[target_to_plot,]), 1:10))
+
+ggplot2::ggplot(toplot, ggplot2::aes(pdt, count)) +
+    ggplot2::geom_line() +
+    ggplot2::geom_line(ggplot2::aes(pdt, wave1, color='wave1')) +
+    ggplot2::geom_line(ggplot2::aes(pdt, wave1and2, color='wave1to2')) +
+    ggplot2::geom_line(ggplot2::aes(pdt, wave1to3, color='wave1to3')) +
+    ggplot2::geom_line(ggplot2::aes(pdt, wave1toten, color='wave1toten')) +
+    ggplot2::geom_line(ggplot2::aes(pdt, wave1tohundred, color='waveonetohundred')) +
+    ggplot2::ggtitle(target_to_plot)
+
+ggplot2::ggplot(toplot, ggplot2::aes(pdt, wave1)) +
+    ggplot2::geom_line() +
+    ggplot2::ggtitle(target_to_plot)
+
+```
+
+
+```{r}
+counts = normcounts(sce)[,order(sce$slingPseudotime_1)]
+waves = DataFrame()
+for (gene in rownames(counts)) {
+  wave = as.data.frame(FitWave(as.matrix(counts[gene,]), 1))
+  rownames(wave) = c(gene)
+  waves = rbind(waves, wave)
+}
+waves = as.data.frame(waves)
+
+waves$phase = waves$phase * ((180/3.141593)/3.6) # % through pseudotime
+waves$gene = rownames(waves)
+
+ggplot2::ggplot(waves, ggplot2::aes(phase, r2, color=amplitude)) +
+    ggplot2::geom_point()
+ggplot2::ggplot(waves, ggplot2::aes(phase, amplitude, color=r2)) +
+    ggplot2::geom_point()
+```
+
+### Top r2 waves
+```{r}
+top_r2_waves = waves[order(-waves$r2),][0:60,]
+ggplot2::ggplot(top_r2_waves, ggplot2::aes(phase, amplitude, color=r2)) +
+    ggplot2::geom_point() +
+      ggplot2::xlim(c(0, 100)) +
+    ggplot2::ggtitle('top_r2_waves')
+
+top_genes_fourier_top_r2 = rownames(top_r2_waves)
+
+BUCKETS_COUNT = 12
+GENES_TO_USE_COUNT = 60
+x = as.AtgnatData(sce, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
+x@genes = top_genes_fourier_top_r2
+
+sce = assign_pseudotime_bins(sce, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
+
+mapping_results = c()
+for (bulkname in colnames(bulk)) {
+  res = map_best_bin(x, bulkname, bulk)
+  mapping_results = c(mapping_results, res)
+  print(res)
+}
+
+fourier_top_r2_heat = atgnat::plot_mapping_result_heatmap(rev(mapping_results)) + ggplot2::ggtitle(paste0('fourier_top_r2 (', GENES_TO_USE_COUNT,')'))
+fourier_top_r2_heat
+```
+
+### Top r2 waves with spread
+```{r}
+best_r2_waves_spread = data.frame()
+for(i in seq(from=1, to=max(waves$phase), length.out=60)) {
+  stepsize = max(waves$phase)/60
+  waves_in_block = waves[waves$phase>i-(stepsize/2) & waves$phase<i+(stepsize/2),]
+  best_wave_in_block = waves_in_block[order(-waves_in_block$r2),][1,]
+  best_r2_waves_spread = rbind(best_r2_waves_spread, best_wave_in_block)
+}
+
+ggplot2::ggplot(best_r2_waves_spread, ggplot2::aes(phase, amplitude, color=r2)) +
+    ggplot2::geom_point() +
+      ggplot2::xlim(c(0, 100)) +
+    ggplot2::ggtitle('top_r2_waves_spread')
+
+top_genes_fourier_top_r2_spread = rownames(best_r2_waves_spread)
+
+BUCKETS_COUNT = 12
+GENES_TO_USE_COUNT = 60
+x = as.AtgnatData(sce, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
+x@genes = top_genes_fourier_top_r2_spread
+
+sce = assign_pseudotime_bins(sce, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
+
+mapping_results = c()
+for (bulkname in colnames(bulk)) {
+  res = map_best_bin(x, bulkname, bulk)
+  mapping_results = c(mapping_results, res)
+  print(res)
+}
+
+fourier_top_r2_spread_heat = atgnat::plot_mapping_result_heatmap(rev(mapping_results)) + ggplot2::ggtitle(paste0('fourier_top_r2_spread (', GENES_TO_USE_COUNT,')'))
+fourier_top_r2_spread_heat
+```
+
+### Top amp waves
+```{r}
+top_amp_waves = waves[order(-waves$amplitude),][0:60,]
+ggplot2::ggplot(top_amp_waves, ggplot2::aes(phase, amplitude, color=r2)) +
+    ggplot2::geom_point() +
+    ggplot2::xlim(c(0, 100)) +
+    ggplot2::ggtitle('top_amp_waves')
+
+top_genes_fourier_top_amp = rownames(top_amp_waves)
+
+BUCKETS_COUNT = 12
+GENES_TO_USE_COUNT = 60
+x = as.AtgnatData(sce, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
+x@genes = top_genes_fourier_top_amp
+
+sce = assign_pseudotime_bins(sce, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
+
+mapping_results = c()
+for (bulkname in colnames(bulk)) {
+  res = map_best_bin(x, bulkname, bulk)
+  mapping_results = c(mapping_results, res)
+  print(res)
+}
+
+fourier_top_amp_heat = atgnat::plot_mapping_result_heatmap(rev(mapping_results)) + ggplot2::ggtitle(paste0('fourier_top_amp (', GENES_TO_USE_COUNT,')'))
+fourier_top_amp_heat
+```
+## Summary
+```{r}
+#gridExtra::grid.arrange(
+#  tradeseq_heat,
+#  tradeseq_tuning,
+#  ncol=1
+#)
+gridExtra::grid.arrange(
+  markergenes_heat,
+  markergenes_tuning,
+  ncol=1
+)
+gridExtra::grid.arrange(
+  markergenes_by_bin_heat,
+  markergenes_by_bin_tuning,
+  ncol=1
+)
+fourier_top_r2_heat
+fourier_top_amp_heat
+fourier_top_r2_spread_heat
+
+#upsetInput = list(tradeseq=genes_tradeseq, markergenes=genes_markergenes, markergenes_by_bins=genes_markergenes_by_bin, top_genes_fourier_top_r2=top_genes_fourier_top_r2)
+upsetInput = list(
+  markergenes=genes_markergenes,
+  markergenes_by_bins=genes_markergenes_by_bin,
+  top_genes_fourier_top_r2=top_genes_fourier_top_r2,
+  top_genes_fourier_top_amp=top_genes_fourier_top_amp,
+  top_genes_fourier_top_r2_spread=top_genes_fourier_top_r2_spread
+  )
+
+upsetPlot = upset(fromList(upsetInput))
+upsetPlot
+
+library(ggplotify)
+gridExtra::grid.arrange(
+#  tradeseq_heat,
+  markergenes_heat,
+  markergenes_by_bin_heat,
+  fourier_top_r2_heat,
+  fourier_top_amp_heat,
+  fourier_top_r2_spread_heat,
+  as.grob(upsetPlot),
+  ncol=2
+)
+
+```
