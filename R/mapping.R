@@ -19,14 +19,20 @@ map_best_bin <- function(atgnat_data, bulk_id, bulk_data, bootstrap_iterations=2
     stop("No genes to map with. Please add something to the atgnat_data@genes slot.")
   }
 
-
-  counts_for_top_genes = bulk_data[atgnat_data@genes,bulk_id]
-
   best_cor = -1
   best_i = 0
   correlations_history = data.frame()
-  for (i in atgnat_data@bins ) {
-    bin_ratios = atgnat_data@pseudobulk_bins[[i]][atgnat_data@genes,]
+
+  for (i in atgnat_data@bins) {
+
+    genes_present = atgnat_data@genes[atgnat_data@genes %in% rownames(atgnat_data@pseudobulk_bins[[i]])]
+    counts_for_top_genes = bulk_data[genes_present,as.character(bulk_id)]
+
+    if (any(length(genes_present) != length(atgnat_data@genes))) {
+      warn(paste('Not all genes present in bucket',i,"continuing without checking correlation for these genes.\n"))
+    }
+
+    bin_ratios = atgnat_data@pseudobulk_bins[[i]][genes_present,]
 
     all_info_correlation = stats::cor.test(unname(Matrix::rowMeans(bin_ratios)), counts_for_top_genes, method='spearman', exact=FALSE)
     corr_estimate = unname(all_info_correlation$estimate)

@@ -46,7 +46,7 @@ evaluate_parameters <- function(atgnat_data, make_plot=FALSE, plot_columns=4) {
   results.history = c()
   results.specificity = c()
 
-  pseudobulked_bins = data.frame(lapply(seq_len(length(atgnat_data@pseudobulk_bins)), function (i) {
+  pseudobulked_bins = data.frame(lapply(atgnat_data@bins, function (i) {
     x = atgnat_data@pseudobulk_bins[[i]]
     return(Matrix::rowMeans(x))
   }))

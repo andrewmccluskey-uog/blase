@@ -66,7 +66,12 @@ setMethod(
     bin_ids = sort(unique(pseudotime_sce$pseudotime_bin))
     pseudobulks = list()
 
-    pseudobulks = c(lapply(bin_ids, function(i) SingleCellExperiment::normcounts(subset(pseudotime_sce, , pseudotime_sce@colData[["pseudotime_bin"]] == i))))
+    for (i in bin_ids) {
+      bin_subset_sce = subset(pseudotime_sce, , pseudotime_bin == i)
+      counts = SingleCellExperiment::normcounts(bin_subset_sce)
+      pseudobulks[[i]] = SingleCellExperiment::normcounts(bin_subset_sce)
+    }
+
     return(methods::new("AtgnatData", pseudobulk_bins = pseudobulks, bins = bin_ids))
   }
 )

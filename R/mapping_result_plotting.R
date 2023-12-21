@@ -155,27 +155,26 @@ plot_mapping_result_heatmap = function(mapping_result_list, heatmap_fill_scale=v
   confident_mapping_sym = ggplot2::sym("confident_mapping")
   is_best_bin_sym = ggplot2::sym("is_best_bin")
 
+ # Change elow here
   p = ggplot2::ggplot(bulk_results, ggplot2::aes(
     x={{pseudobin_sym}},
     y={{bulk_name_sym}},
     fill={{correlation_sym}},
-    label={{confident_mapping_sym}}
+    label={{confident_mapping_sym}},
+    color={{is_best_bin_sym}}
   )) +
-    ggplot2::geom_tile() +
-    heatmap_fill_scale
+    heatmap_fill_scale +
+    ggplot2::guides(color = "none")
+
+  print(bulk_results[bulk_results$confident_mapping=="*",])
 
   if (annotate==TRUE) {
-    bestMappings <- data.frame(is_best_bin=c(TRUE))
-    bestMappings <- merge(bulk_results, bestMappings)
-
-    p = p +
-      ggplot2::geom_text(fontface = "bold") +
-      ggplot2::geom_tile(
-        data=bestMappings,
-        ggplot2::aes(x={{pseudobin_sym}},y={{bulk_name_sym}}),
-        fill="transparent",
-        colour="black",
-        size=0.5)
+    p = p + ggplot2::geom_tile(ggplot2::aes(width=0.975, height=0.975), size = 0.45) +
+    ggplot2::geom_text(fontface = "bold") +
+    ggplot2::scale_color_manual(breaks = c(FALSE, TRUE), values=c("#ffffff", "#000000"))
+  } else {
+    p = p + ggplot2::geom_tile() +
+    ggplot2::scale_color_manual(breaks = c(FALSE, TRUE), values=c("transparent", "transparent"))
   }
 
   return(p)

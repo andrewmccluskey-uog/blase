@@ -34,7 +34,8 @@ Suggests:
     Seurat,
     dyngen,
     bluster,
-    UpSetR
+    UpSetR,
+    wasserstein
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 URL: https://andrewmccluskey-uog.github.io/atgnat/

@@ -11,7 +11,7 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(readxl)
-library(atgnat)
+#library(atgnat)
 library(scran)
 library(slingshot)
 library(tradeSeq)
@@ -58,6 +58,11 @@ sc_annotations = read.csv(mca_annotation_path, row.names=1)
 ```{r}
 rownames(sc_annotations) = gsub(x = rownames(sc_annotations), pattern="-", replacement=".", fixed=TRUE)
 rownames(sc_readcounts) = gsub(x=rownames(sc_readcounts), pattern="_", replacement="-", fixed=TRUE)
+
+# Remove unshared genes from bulk and sc
+bulk = bulk[rownames(bulk) %in% rownames(sc_readcounts),]
+sc_readcounts = sc_readcounts[rownames(sc_readcounts) %in% rownames(bulk),]
+
 sce = SingleCellExperiment(assays=list(counts=as.matrix(sc_readcounts)), colData=sc_annotations)
 rm(sc_annotations, sc_readcounts)
 gc()
@@ -87,42 +92,46 @@ gridExtra::grid.arrange(
 ## Using TradeSeq
 First, we'll use tradeSeq to find the good genes
 ```{r}
-#sce <- fitGAM(sce, parallel=T, BPPARAM=MulticoreParam(PARALLELISM_CORES), nknots=6)
-#associationTestResult <- associationTest(sce, lineages=T, global=F, contrastType="consecutive")
+PARALLELISM_CORES = 4
+sce <- fitGAM(sce, parallel=T, BPPARAM=MulticoreParam(PARALLELISM_CORES), nknots=6)
+associationTestResult <- associationTest(sce, lineages=T, global=F, contrastType="consecutive")
 ```
 ```{r}
-#genelist = atgnat::get_top_n_genes(associationTestResult, n_genes = 200, lineage = 1)
+genelist = atgnat::get_top_n_genes(associationTestResult, n_genes = 200, lineage = 1)
 
-#res = find_best_params(sce,
-#                       genelist,
-#                       split_by="pseudotime_range",
-#                       pseudotime_slot="slingPseudotime_1",
-#                       bins_count_range = seq.int(8, 16, 2),
-#                       gene_count_range = seq.int(20, 200, 3))
-#tradeseq_tuning = plot_find_best_params_results(res)
+res = find_best_params(sce,
+                       genelist,
+                       split_by="pseudotime_range",
+                       pseudotime_slot="slingPseudotime_1",
+                       bins_count_range = seq.int(8, 16, 2),
+                       gene_count_range = seq.int(20, 180, 3))
+
+x = as.AtgnatData(sce, pseudotime_slot="slingPseudotime_1", n_bins=14, split_by="pseudotime_range")
+
+tradeseq_tuning = plot_find_best_params_results(res)
 ```
 
 ```{r}
-#BUCKETS_COUNT = 12
-#GENES_TO_USE_COUNT = 60
-#x = as.AtgnatData(sce, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
-#x@genes = genelist[1:GENES_TO_USE_COUNT]
+BUCKETS_COUNT = 12
+GENES_TO_USE_COUNT = 60
+x = as.AtgnatData(sce, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
+x@genes = genelist[1:GENES_TO_USE_COUNT]
 
-#genes_tradeseq = x@genes
+genes_tradeseq = x@genes
 
-#sce = assign_pseudotime_bins(sce, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
+sce = assign_pseudotime_bins(sce, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
 
-#plotUMAP(sce, colour="pseudotime_bin")
+plotUMAP(sce, colour="pseudotime_bin")
 
-#mapping_results = c()
-#for (bulkname in colnames(bulk)) {
-#  res = map_best_bin(x, bulkname, bulk)
-#  mapping_results = c(mapping_results, res)
-#  print(res)
-#}
+mapping_results = c()
+for (bulkname in colnames(bulk)) {
+  res = map_best_bin(x, bulkname, bulk)
+  mapping_results = c(mapping_results, res)
+  print(res)
+}
 
-#tradeseq_heat = atgnat::plot_mapping_result_heatmap(rev(mapping_results)) + ggplot2::ggtitle(paste0('TradeSeq (', GENES_TO_USE_COUNT,')'))
-#tradeseq_heat
+tradeseq_heat = atgnat::plot_mapping_result_heatmap(rev(mapping_results)) + ggplot2::ggtitle(paste0('TradeSeq (', GENES_TO_USE_COUNT,')'))
+tradeseq_heat
 ```
 
 ## Using marker genes
@@ -257,7 +266,6 @@ ggplot2::ggplot(toplot, ggplot2::aes(pdt, count)) +
     ggplot2::geom_line(ggplot2::aes(pdt, wave1and2, color='wave1to2')) +
     ggplot2::geom_line(ggplot2::aes(pdt, wave1to3, color='wave1to3')) +
     ggplot2::geom_line(ggplot2::aes(pdt, wave1toten, color='wave1toten')) +
-    ggplot2::geom_line(ggplot2::aes(pdt, wave1tohundred, color='waveonetohundred')) +
     ggplot2::ggtitle(target_to_plot)
 
 ggplot2::ggplot(toplot, ggplot2::aes(pdt, wave1)) +
@@ -265,7 +273,6 @@ ggplot2::ggplot(toplot, ggplot2::aes(pdt, wave1)) +
     ggplot2::ggtitle(target_to_plot)
 
 ```
-
 
 ```{r}
 counts = normcounts(sce)[,order(sce$slingPseudotime_1)]
@@ -277,7 +284,7 @@ for (gene in rownames(counts)) {
 }
 waves = as.data.frame(waves)
 
-waves$phase = waves$phase * ((180/3.141593)/3.6) # % through pseudotime
+waves$phase = waves$phase * (((180/3.141593)/360)*max(sce$slingPseudotime_1)) # pseudotime
 waves$gene = rownames(waves)
 
 ggplot2::ggplot(waves, ggplot2::aes(phase, r2, color=amplitude)) +
@@ -286,22 +293,72 @@ ggplot2::ggplot(waves, ggplot2::aes(phase, amplitude, color=r2)) +
     ggplot2::geom_point()
 ```
 
+### Phase Ordering genes
+
+```{r}
+# Snippet from: https://cansnippet.bioinfo-fr.net/details.php?id=3
+redim_matrix <- function(
+    mat,
+    target_height = 100,
+    target_width = 100,
+    summary_func = function(x) mean(x, na.rm = TRUE),
+    n_core = 1
+    ) {
+
+    if(target_height > nrow(mat) | target_width > ncol(mat)) {
+        stop("Input matrix must be bigger than target width and height.")
+    }
+
+    seq_height <- round(seq(1, nrow(mat), length.out = target_height + 1))
+    seq_width  <- round(seq(1, ncol(mat), length.out = target_width  + 1))
+
+    # complicate way to write a double for loop
+    do.call(rbind, parallel::mclapply(seq_len(target_height), function(i) { # i is row
+        vapply(seq_len(target_width), function(j) { # j is column
+            summary_func(
+                mat[
+                    seq(seq_height[i], seq_height[i + 1]),
+                    seq(seq_width[j] , seq_width[j + 1] )
+                    ]
+            )
+        }, 0.0)
+    }, mc.cores = n_core))
+}
+
+# We need to reduce the matrix dims otherwise the heatmap is unwieldy due to having about 5k*5k values. 1k*1k reduces this to about 5% whilst (theoretically) keeping most of the information
+heatmap_counts=logcounts(sce)[,order(sce$slingPseudotime_1)]
+small_heatmap_counts_ordered = redim_matrix(heatmap_counts[order(waves$phase),], target_height = 1000, target_width = 1000, n_core=2)
+heatmap_counts_ordered.df <- reshape2::melt(small_heatmap_counts_ordered, c("gene", "cell"), value.name = "expression")
+ggplot2::ggplot(data=heatmap_counts_ordered.df,ggplot2::aes(x=cell,y=gene,fill=expression)) +
+  ggplot2::geom_tile() + 
+  ggplot2::theme(axis.text.x = ggplot2::element_blank(), axis.text.y = ggplot2::element_blank()) +
+  ggplot2::scale_fill_gradient(low = "white",
+                      high = "red",
+                      guide = "colorbar")
+
+BUCKETS_COUNT = 12
+GENES_TO_USE_COUNT = 60
+
+```
+
+
+
 ### Top r2 waves
 ```{r}
-top_r2_waves = waves[order(-waves$r2),][0:60,]
+top_r2_waves = waves[order(-waves$r2),][0:GENES_TO_USE_COUNT,]
 ggplot2::ggplot(top_r2_waves, ggplot2::aes(phase, amplitude, color=r2)) +
     ggplot2::geom_point() +
-      ggplot2::xlim(c(0, 100)) +
+    ggplot2::xlim(c(0, max(sce$slingPseudotime_1))) +
     ggplot2::ggtitle('top_r2_waves')
 
 top_genes_fourier_top_r2 = rownames(top_r2_waves)
 
-BUCKETS_COUNT = 12
-GENES_TO_USE_COUNT = 60
 x = as.AtgnatData(sce, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
 x@genes = top_genes_fourier_top_r2
 
 sce = assign_pseudotime_bins(sce, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
+
+any( !(x@genes %in% rownames(x@pseudobulk_bins[[1]])))
 
 mapping_results = c()
 for (bulkname in colnames(bulk)) {
@@ -316,9 +373,10 @@ fourier_top_r2_heat
 
 ### Top r2 waves with spread
 ```{r}
+#load_all('code/PhD/R/atgnat')
 best_r2_waves_spread = data.frame()
-for(i in seq(from=1, to=max(waves$phase), length.out=60)) {
-  stepsize = max(waves$phase)/60
+for(i in seq(from=1, to=max(waves$phase), length.out=GENES_TO_USE_COUNT)) {
+  stepsize = max(waves$phase)/GENES_TO_USE_COUNT
   waves_in_block = waves[waves$phase>i-(stepsize/2) & waves$phase<i+(stepsize/2),]
   best_wave_in_block = waves_in_block[order(-waves_in_block$r2),][1,]
   best_r2_waves_spread = rbind(best_r2_waves_spread, best_wave_in_block)
@@ -326,13 +384,11 @@ for(i in seq(from=1, to=max(waves$phase), length.out=60)) {
 
 ggplot2::ggplot(best_r2_waves_spread, ggplot2::aes(phase, amplitude, color=r2)) +
     ggplot2::geom_point() +
-      ggplot2::xlim(c(0, 100)) +
+    ggplot2::xlim(c(0, max(sce$slingPseudotime_1))) +
     ggplot2::ggtitle('top_r2_waves_spread')
 
 top_genes_fourier_top_r2_spread = rownames(best_r2_waves_spread)
 
-BUCKETS_COUNT = 12
-GENES_TO_USE_COUNT = 60
 x = as.AtgnatData(sce, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
 x@genes = top_genes_fourier_top_r2_spread
 
@@ -351,16 +407,14 @@ fourier_top_r2_spread_heat
 
 ### Top amp waves
 ```{r}
-top_amp_waves = waves[order(-waves$amplitude),][0:60,]
+top_amp_waves = waves[order(-waves$amplitude),][0:GENES_TO_USE_COUNT,]
 ggplot2::ggplot(top_amp_waves, ggplot2::aes(phase, amplitude, color=r2)) +
     ggplot2::geom_point() +
-    ggplot2::xlim(c(0, 100)) +
+    ggplot2::xlim(c(0, max(sce$slingPseudotime_1))) +
     ggplot2::ggtitle('top_amp_waves')
 
 top_genes_fourier_top_amp = rownames(top_amp_waves)
 
-BUCKETS_COUNT = 12
-GENES_TO_USE_COUNT = 60
 x = as.AtgnatData(sce, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
 x@genes = top_genes_fourier_top_amp
 
@@ -376,13 +430,194 @@ for (bulkname in colnames(bulk)) {
 fourier_top_amp_heat = atgnat::plot_mapping_result_heatmap(rev(mapping_results)) + ggplot2::ggtitle(paste0('fourier_top_amp (', GENES_TO_USE_COUNT,')'))
 fourier_top_amp_heat
 ```
+### Top Amp Waves with spread
+```{r}
+
+best_amp_waves_spread = data.frame()
+for(i in seq(from=1, to=max(waves$phase), length.out=GENES_TO_USE_COUNT)) {
+  stepsize = max(waves$phase)/GENES_TO_USE_COUNT
+  waves_in_block = waves[waves$phase>i-(stepsize/2) & waves$phase<i+(stepsize/2),]
+  best_wave_in_block = waves_in_block[order(-waves_in_block$amp),][1,]
+  best_amp_waves_spread = rbind(best_amp_waves_spread, best_wave_in_block)
+}
+
+ggplot2::ggplot(best_amp_waves_spread, ggplot2::aes(phase, amplitude, color=r2)) +
+    ggplot2::geom_point() +
+    ggplot2::xlim(c(0, max(sce$slingPseudotime_1))) +
+    ggplot2::ggtitle('top_amp_waves_spread')
+
+top_genes_fourier_top_amp_spread = rownames(best_amp_waves_spread)
+
+x = as.AtgnatData(sce, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
+x@genes = top_genes_fourier_top_amp_spread
+
+sce = assign_pseudotime_bins(sce, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
+
+mapping_results = c()
+for (bulkname in colnames(bulk)) {
+  res = map_best_bin(x, bulkname, bulk)
+  mapping_results = c(mapping_results, res)
+  print(res)
+}
+
+fourier_top_amp_spread_heat = atgnat::plot_mapping_result_heatmap(rev(mapping_results)) + ggplot2::ggtitle(paste0('fourier_top_amp_spread (', GENES_TO_USE_COUNT,')'))
+fourier_top_amp_spread_heat
+```
+### Amplitude power
+
+We calculate this by using the amplitude of the peak divided by the sum of total expression
+
+```{r}
+waves$total_expression = rowSums(counts[,order(sce$slingPseudotime_1)])
+five_percent_of_pdt = 0.05*max(sce$slingPseudotime_1) # Bozdech et al. use plus or minus 1/48 (i.e. one bulk either side of the peak)
+
+# Review this works with someone because I think it might be questionable
+waves$peak_expression = 0
+for (gene in rownames(counts)) {
+  waves[gene,"peak_expression"] = sum(counts[gene,sce$slingPseudotime_1 > waves[gene,]$phase-five_percent_of_pdt & sce$slingPseudotime_1 < waves[gene,]$phase+five_percent_of_pdt])
+  waves[gene,"cellcount_in_peak"] = length(counts[gene,sce$slingPseudotime_1 > waves[gene,]$phase-five_percent_of_pdt & sce$slingPseudotime_1 < waves[gene,]$phase+five_percent_of_pdt])
+}
+waves$power = waves$amplitude / waves$peak_expression
+
+waves[order(-waves$power),]
+
+top_power_waves = waves[order(-waves$power),][0:GENES_TO_USE_COUNT,]
+ggplot2::ggplot(top_power_waves, ggplot2::aes(phase, amplitude, color=r2)) +
+    ggplot2::geom_point() +
+    ggplot2::xlim(c(0, max(sce$slingPseudotime_1))) +
+    ggplot2::ggtitle('top_power_waves')
+
+top_genes_fourier_top_power = rownames(top_power_waves)
+
+x = as.AtgnatData(sce, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
+x@genes = top_genes_fourier_top_power
+
+sce = assign_pseudotime_bins(sce, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
+
+mapping_results = c()
+for (bulkname in colnames(bulk)) {
+  res = map_best_bin(x, bulkname, bulk)
+  mapping_results = c(mapping_results, res)
+  print(res)
+}
+
+fourier_top_power_heat = atgnat::plot_mapping_result_heatmap(rev(mapping_results)) + ggplot2::ggtitle(paste0('fourier_top_power (', GENES_TO_USE_COUNT,')'))
+fourier_top_power_heat
+
+```
+### Amplitude Power Spread
+
+``` {r}
+
+best_power_waves_spread = data.frame()
+for(i in seq(from=1, to=max(waves$phase), length.out=GENES_TO_USE_COUNT)) {
+  stepsize = max(waves$phase)/GENES_TO_USE_COUNT
+  waves_in_block = waves[waves$phase>i-(stepsize/2) & waves$phase<i+(stepsize/2),]
+  best_wave_in_block = waves_in_block[order(-waves_in_block$power),][1,]
+  best_power_waves_spread = rbind(best_power_waves_spread, best_wave_in_block)
+}
+
+ggplot2::ggplot(best_power_waves_spread, ggplot2::aes(phase, amplitude, color=r2)) +
+    ggplot2::geom_point() +
+    ggplot2::xlim(c(0, max(sce$slingPseudotime_1))) +
+    ggplot2::ggtitle('top_power_waves_spread')
+
+top_genes_fourier_top_power_spread = rownames(best_power_waves_spread)
+
+x = as.AtgnatData(sce, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
+x@genes = top_genes_fourier_top_power_spread
+
+sce = assign_pseudotime_bins(sce, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
+
+mapping_results = c()
+for (bulkname in colnames(bulk)) {
+  res = map_best_bin(x, bulkname, bulk)
+  mapping_results = c(mapping_results, res)
+  print(res)
+}
+
+fourier_top_power_spread_heat = atgnat::plot_mapping_result_heatmap(rev(mapping_results)) + ggplot2::ggtitle(paste0('fourier_top_power_spread (', GENES_TO_USE_COUNT,')'))
+fourier_top_power_spread_heat
+```
+
+## Fourier Map Correlations
+```{r}
+heatmap_counts=normcounts(sce)[order(waves$phase),order(sce$slingPseudotime_1)]
+mat = heatmap_counts[rownames(heatmap_counts) %in% top_genes_fourier_top_power_spread,]
+
+# wasserstein - define perfect matrix, then wasserstein versus real matrix
+# Both need to have same *mass* - i.e. expression.
+
+# 1x1 continuous "perfect" version
+x = runif(10000)
+y = x
+
+x = x*nrow(mat)
+y = y*nrow(mat)
+
+x = ceiling(x)
+y = ceiling(y)
+
+plot(x,y)
+
+sim_mat = matrix(0, ncol=nrow(mat),nrow=nrow(mat))
+  
+for (i in seq_len(length(x))) {
+  sim_mat[y[i], x[i]] = sim_mat[y[i], x[i]] + 1 # Squish gene expression onto the place we think it should be
+}
+
+sim_mat <- sim_mat/rowSums(sim_mat)
+sim_mat <- sim_mat/sum(sim_mat) * sum(mat)
+
+#blah = redim_matrix(sim_mat, target_height = nrow(sim_mat), target_width = 1000, n_core=2)
+blah <- reshape2::melt(sim_mat, c("gene", "cell"), value.name = "expr")
+ggplot2::ggplot(data=blah, ggplot2::aes(x=cell,y=gene,fill=expr)) +
+  ggplot2::geom_tile() + 
+  ggplot2::theme(axis.text.x = ggplot2::element_blank(), axis.text.y = ggplot2::element_blank()) +
+  ggplot2::scale_fill_gradient(low = "white",
+                      high = "red",
+                      guide = "colorbar",
+                      limits=c(0, max(blah$expr))) + 
+  ggplot2::ggtitle("Test SIM_MAT")
+rm(blah)
+
+blah = redim_matrix(mat, target_height = nrow(sim_mat), target_width = nrow(sim_mat), n_core=2)
+blah <- reshape2::melt(blah, c("gene", "cell"), value.name = "expr")
+ggplot2::ggplot(data=blah, ggplot2::aes(x=cell,y=gene,fill=expr)) +
+  ggplot2::geom_tile() + 
+  ggplot2::theme(axis.text.x = ggplot2::element_blank(), axis.text.y = ggplot2::element_blank()) +
+  ggplot2::scale_fill_gradient(low = "white",
+                      high = "red",
+                      guide = "colorbar",
+                      limits=c(0, max(blah$expr))) + 
+  ggplot2::ggtitle("Test MAT")
+rm(blah)
+
+#library(dad)
+#wasserstein(mat, sim_mat)
+
+dim(mat)
+dim(sim_mat)
+
+reduced_mat = redim_matrix(mat, target_height = nrow(mat), target_width = nrow(mat), n_core=2)
+reduced_sim_mat = redim_matrix(sim_mat, target_height = nrow(sim_mat), target_width = nrow(mat), n_core=2)
+
+
+dim(reduced_mat)
+dim(reduced_sim_mat)
+
+library(emdist)
+dist = emd2d(reduced_mat, reduced_sim_mat, max.iter=5000)
+dist
+```
+
 ## Summary
 ```{r}
-#gridExtra::grid.arrange(
-#  tradeseq_heat,
-#  tradeseq_tuning,
-#  ncol=1
-#)
+gridExtra::grid.arrange(
+  tradeseq_heat,
+  tradeseq_tuning,
+  ncol=1
+)
 gridExtra::grid.arrange(
   markergenes_heat,
   markergenes_tuning,
@@ -395,30 +630,128 @@ gridExtra::grid.arrange(
 )
 fourier_top_r2_heat
 fourier_top_amp_heat
+fourier_top_power_heat
 fourier_top_r2_spread_heat
+fourier_top_amp_spread_heat
+fourier_top_power_spread_heat
 
 #upsetInput = list(tradeseq=genes_tradeseq, markergenes=genes_markergenes, markergenes_by_bins=genes_markergenes_by_bin, top_genes_fourier_top_r2=top_genes_fourier_top_r2)
 upsetInput = list(
+  tradeseq=genes_tradeseq,
   markergenes=genes_markergenes,
   markergenes_by_bins=genes_markergenes_by_bin,
   top_genes_fourier_top_r2=top_genes_fourier_top_r2,
   top_genes_fourier_top_amp=top_genes_fourier_top_amp,
-  top_genes_fourier_top_r2_spread=top_genes_fourier_top_r2_spread
+  top_genes_fourier_top_power=top_genes_fourier_top_power,
+  top_genes_fourier_top_r2_spread=top_genes_fourier_top_r2_spread,
+  top_genes_fourier_top_amp_spread=top_genes_fourier_top_amp_spread,
+  top_genes_fourier_top_power_spread=top_genes_fourier_top_power_spread
   )
 
-upsetPlot = upset(fromList(upsetInput))
+upsetPlot = upset(fromList(upsetInput), nsets=length(upsetInput))
 upsetPlot
 
 library(ggplotify)
 gridExtra::grid.arrange(
-#  tradeseq_heat,
+  tradeseq_heat,
   markergenes_heat,
   markergenes_by_bin_heat,
-  fourier_top_r2_heat,
-  fourier_top_amp_heat,
-  fourier_top_r2_spread_heat,
   as.grob(upsetPlot),
   ncol=2
 )
 
+
+heatmap_counts=logcounts(sce)[order(waves$phase),order(sce$slingPseudotime_1)]
+small_heatmap_counts_ordered = redim_matrix(heatmap_counts[order(waves$phase),], target_height = 1000, target_width = 1000, n_core=2)
+heatmap_counts_ordered.df <- reshape2::melt(small_heatmap_counts_ordered, c("gene", "cell"), value.name = "log_expression")
+
+
+top_r2_phases = heatmap_counts[rownames(heatmap_counts) %in% top_genes_fourier_top_r2,]
+top_r2_phases = redim_matrix(top_r2_phases, target_height = nrow(top_r2_phases), target_width = 1000, n_core=2)
+top_r2_phases <- reshape2::melt(top_r2_phases, c("gene", "cell"), value.name = "log_expression")
+fourier_top_r2_phases = ggplot2::ggplot(data=top_r2_phases,ggplot2::aes(x=cell,y=gene,fill=log_expression)) +
+  ggplot2::geom_tile() + 
+  ggplot2::theme(axis.text.x = ggplot2::element_blank(), axis.text.y = ggplot2::element_blank()) +
+  ggplot2::scale_fill_gradient(low = "white",
+                      high = "red",
+                      guide = "colorbar",
+                      limits=c(0, max(heatmap_counts))) + 
+  ggplot2::ggtitle("Top Fourier R2 Genes")
+
+top_amp_phases = heatmap_counts[rownames(heatmap_counts) %in% top_genes_fourier_top_amp,]
+top_amp_phases = redim_matrix(top_amp_phases, target_height = nrow(top_amp_phases), target_width = 1000, n_core=2)
+top_amp_phases <- reshape2::melt(top_amp_phases, c("gene", "cell"), value.name = "log_expression")
+fourier_top_amp_phases = ggplot2::ggplot(data=top_amp_phases,ggplot2::aes(x=cell,y=gene,fill=log_expression)) +
+  ggplot2::geom_tile() + 
+  ggplot2::theme(axis.text.x = ggplot2::element_blank(), axis.text.y = ggplot2::element_blank()) +
+  ggplot2::scale_fill_gradient(low = "white",
+                      high = "red",
+                      guide = "colorbar",
+                      limits=c(0, max(heatmap_counts)))+ 
+  ggplot2::ggtitle("Top Fourier Amp Genes")
+
+top_power_phases = heatmap_counts[rownames(heatmap_counts) %in% top_genes_fourier_top_power,]
+top_power_phases = redim_matrix(top_power_phases, target_height = nrow(top_power_phases), target_width = 1000, n_core=2)
+top_power_phases <- reshape2::melt(top_power_phases, c("gene", "cell"), value.name = "log_expression")
+fourier_top_power_phases = ggplot2::ggplot(data=top_power_phases,ggplot2::aes(x=cell,y=gene,fill=log_expression)) +
+  ggplot2::geom_tile() + 
+  ggplot2::theme(axis.text.x = ggplot2::element_blank(), axis.text.y = ggplot2::element_blank()) +
+  ggplot2::scale_fill_gradient(low = "white",
+                      high = "red",
+                      guide = "colorbar",
+                      limits=c(0, max(heatmap_counts))) + 
+  ggplot2::ggtitle("Top Fourier Power Genes")
+
+
+top_r2_spread_phases = heatmap_counts[rownames(heatmap_counts) %in% top_genes_fourier_top_r2_spread,]
+top_r2_spread_phases = redim_matrix(top_r2_spread_phases, target_height = nrow(top_r2_spread_phases), target_width = 1000, n_core=2)
+top_r2_spread_phases <- reshape2::melt(top_r2_spread_phases, c("gene", "cell"), value.name = "log_expression")
+fourier_top_r2_spread_phases = ggplot2::ggplot(data=top_r2_spread_phases,ggplot2::aes(x=cell,y=gene,fill=log_expression)) +
+  ggplot2::geom_tile() + 
+  ggplot2::theme(axis.text.x = ggplot2::element_blank(), axis.text.y = ggplot2::element_blank()) +
+  ggplot2::scale_fill_gradient(low = "white",
+                      high = "red",
+                      guide = "colorbar",
+                      limits=c(0, max(heatmap_counts))) + 
+  ggplot2::ggtitle("Top Fourier R2 Spread Genes")
+
+top_amp_spread_phases = heatmap_counts[rownames(heatmap_counts) %in% top_genes_fourier_top_amp_spread,]
+top_amp_spread_phases = redim_matrix(top_amp_spread_phases, target_height = nrow(top_amp_spread_phases), target_width = 1000, n_core=2)
+top_amp_spread_phases <- reshape2::melt(top_amp_spread_phases, c("gene", "cell"), value.name = "log_expression")
+fourier_top_amp_spread_phases = ggplot2::ggplot(data=top_amp_spread_phases,ggplot2::aes(x=cell,y=gene,fill=log_expression)) +
+  ggplot2::geom_tile() + 
+  ggplot2::theme(axis.text.x = ggplot2::element_blank(), axis.text.y = ggplot2::element_blank()) +
+  ggplot2::scale_fill_gradient(low = "white",
+                      high = "red",
+                      guide = "colorbar",
+                      limits=c(0, max(heatmap_counts))) + 
+  ggplot2::ggtitle("Top Fourier Amp Spread Genes")
+
+top_power_spread_phases = heatmap_counts[rownames(heatmap_counts) %in% top_genes_fourier_top_power_spread,]
+top_power_spread_phases = redim_matrix(top_power_spread_phases, target_height = nrow(top_power_spread_phases), target_width = 1000, n_core=2)
+top_power_spread_phases <- reshape2::melt(top_power_spread_phases, c("gene", "cell"), value.name = "log_expression")
+fourier_top_power_spread_phases = ggplot2::ggplot(data=top_power_spread_phases,ggplot2::aes(x=cell,y=gene,fill=log_expression)) +
+  ggplot2::geom_tile() + 
+  ggplot2::theme(axis.text.x = ggplot2::element_blank(), axis.text.y = ggplot2::element_blank()) +
+  ggplot2::scale_fill_gradient(low = "white",
+                      high = "red",
+                      guide = "colorbar",
+                      limits=c(0, max(heatmap_counts))) + 
+  ggplot2::ggtitle("Top Fourier Power Spread Genes")
+
+gridExtra::grid.arrange(
+  fourier_top_r2_phases,
+  fourier_top_amp_phases,
+  fourier_top_power_phases,
+  fourier_top_r2_spread_phases,
+  fourier_top_amp_spread_phases,
+  fourier_top_power_spread_phases,
+  ncol=2
+)
+
+gridExtra::grid.arrange(
+  plotUMAP(sce, colour_by="STAGE_LR"),
+  plotUMAP(sce, colour_by="pseudotime_bin"),
+  ncol=2
+)
 ```
