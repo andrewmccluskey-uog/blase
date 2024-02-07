@@ -9,6 +9,11 @@ knitr::opts_chunk$set(
 )
 ```
 
+```{r loadatgnat}
+library(devtools)
+load_all('/Users/andrewmccluskey/code/PhD/R/atgnat')
+```
+
 ```{r setup}
 library(readxl)
 #library(atgnat)
@@ -18,6 +23,7 @@ library(tradeSeq)
 library(BiocParallel)
 library(UpSetR)
 library(emdist)
+library(scater)
 ```
 
 In this article we will look at different methods for gene selection, using the MCA's Plasmodium Berghei Data [Howick et al, 2019](https://dx.doi.org/10.1126/science.aaw2619), and bulk RNA seq of the lifecycle stages [Otto et al, 2004](https://doi.org/10.1186/s12915-014-0086-0).
@@ -96,6 +102,8 @@ First, we'll use tradeSeq to find the good genes
 PARALLELISM_CORES = 4
 sce <- fitGAM(sce, parallel=T, BPPARAM=MulticoreParam(PARALLELISM_CORES), nknots=6)
 associationTestResult <- associationTest(sce, lineages=T, global=F, contrastType="consecutive")
+table(sce$pseudotime_bin)
+plotUMAP(sce, colour_by="pseudotime_bin")
 ```
 ```{r}
 genelist = atgnat::get_top_n_genes(associationTestResult, n_genes = 200, lineage = 1)
@@ -114,7 +122,7 @@ tradeseq_tuning = plot_find_best_params_results(res)
 
 ```{r}
 BUCKETS_COUNT = 12
-GENES_TO_USE_COUNT = 60
+GENES_TO_USE_COUNT = 120
 x = as.AtgnatData(sce, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
 x@genes = genelist[1:GENES_TO_USE_COUNT]
 
@@ -139,7 +147,7 @@ tradeseq_heat
 ```{r}
 markers <- scoreMarkers(sce, lfc=1, groups=sce$STAGE_LR)
 
-top_n_markers_per_group = 20
+top_n_markers_per_group = 40
 genes=DataFrame()
 for (group in names(markers)) {
   group_markers=markers[[group]]
@@ -157,13 +165,13 @@ res = find_best_params(sce,
                        split_by="pseudotime_range",
                        pseudotime_slot="slingPseudotime_1",
                        bins_count_range = c(12),
-                       gene_count_range = c(60))
+                       gene_count_range = c(120))
 markergenes_tuning = plot_find_best_params_results(res)
 ```
 
 ```{r}
 BUCKETS_COUNT = 12
-GENES_TO_USE_COUNT = 60
+GENES_TO_USE_COUNT = 120
 x = as.AtgnatData(sce, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
 x@genes = genelist[1:GENES_TO_USE_COUNT]
 genes_markergenes = x@genes
@@ -187,7 +195,7 @@ sce = assign_pseudotime_bins(sce, pseudotime_slot="slingPseudotime_1", n_bins=12
 
 markers <- scoreMarkers(sce, lfc=1, groups=sce$pseudotime_bin)
 
-top_n_markers_per_group = 5
+top_n_markers_per_group = 10
 genes=DataFrame()
 for (group in names(markers)) {
   group_markers=markers[[group]]
@@ -206,14 +214,14 @@ res = find_best_params(sce,
                        split_by="pseudotime_range",
                        pseudotime_slot="slingPseudotime_1",
                        bins_count_range = c(12),
-                       gene_count_range = c(60))
+                       gene_count_range = c(120))
 markergenes_by_bin_tuning = plot_find_best_params_results(res)
 ```
 
 
 ```{r}
 BUCKETS_COUNT = 12
-GENES_TO_USE_COUNT = 60
+GENES_TO_USE_COUNT = 120
 x = as.AtgnatData(sce, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
 x@genes = genelist[1:GENES_TO_USE_COUNT]
 
@@ -338,17 +346,20 @@ ggplot2::ggplot(data=heatmap_counts_ordered.df,ggplot2::aes(x=cell,y=gene,fill=e
                       guide = "colorbar")
 
 BUCKETS_COUNT = 12
-GENES_TO_USE_COUNT = 60
+GENES_TO_USE_COUNT = 120
 
 ```
 ### Util
 ```{r}
 get_by_spread = function(waves, n_groups, parameter, top_n_per_group=1) {
   best_waves_in_spread = data.frame()
-  for(i in seq(from=1, to=max(waves$phase), length.out=n_groups)) {
-    stepsize = max(waves$phase)/n_groups
-    waves_in_block = waves[waves$phase<i+stepsize,]
+  stepsize = max(waves$phase)/n_groups
+  for(i in seq(from=0, to=max(waves$phase), length.out=n_groups)) {
+    waves_in_block = waves[waves$phase>i-stepsize & waves$phase<i+stepsize,]
+    # TODO Need to select second best if gene already in the df
+    # remove genes in `best_waves_in_spread` from `waves_in_block` and then select best
     best_wave_in_block = waves_in_block[order(-waves_in_block[,parameter]),][1:top_n_per_group,]
+    best_wave_in_block = best_wave_in_block[!(rownames(best_wave_in_block) %in% best_waves_in_spread)]
     best_waves_in_spread = rbind(best_waves_in_spread, best_wave_in_block)
   }
   return(best_waves_in_spread)
@@ -386,7 +397,6 @@ fourier_top_r2_heat
 
 ### Top r2 waves with spread
 ```{r}
-#load_all('code/PhD/R/atgnat')
 best_r2_waves_spread = get_by_spread(waves, GENES_TO_USE_COUNT, "r2")
 ggplot2::ggplot(best_r2_waves_spread, ggplot2::aes(phase, amplitude, color=r2)) +
     ggplot2::geom_point() +
@@ -438,7 +448,8 @@ fourier_top_amp_heat
 ```
 ### Top Amp Waves with spread
 ```{r}
-best_amp_waves_spread = best_r2_waves_spread = get_by_spread(waves, GENES_TO_USE_COUNT, "amp")
+best_amp_waves_spread
+best_amp_waves_spread = get_by_spread(waves, GENES_TO_USE_COUNT, "amplitude")
 ggplot2::ggplot(best_amp_waves_spread, ggplot2::aes(phase, amplitude, color=r2)) +
     ggplot2::geom_point() +
     ggplot2::xlim(c(0, max(sce$slingPseudotime_1))) +
@@ -461,7 +472,7 @@ for (bulkname in colnames(bulk)) {
 fourier_top_amp_spread_heat = atgnat::plot_mapping_result_heatmap(rev(mapping_results)) + ggplot2::ggtitle(paste0('fourier_top_amp_spread (', GENES_TO_USE_COUNT,')'))
 fourier_top_amp_spread_heat
 ```
-### Amplitude power
+### Top Power
 
 We calculate this by using the amplitude of the peak divided by the sum of total expression
 
@@ -503,11 +514,11 @@ fourier_top_power_heat = atgnat::plot_mapping_result_heatmap(rev(mapping_results
 fourier_top_power_heat
 
 ```
-### Amplitude Power Spread
+### Top Power Spread
 
 ``` {r}
 
-best_power_waves_spread = best_r2_waves_spread = get_by_spread(waves, GENES_TO_USE_COUNT, "power")
+best_power_waves_spread = get_by_spread(waves, GENES_TO_USE_COUNT, "power")
 ggplot2::ggplot(best_power_waves_spread, ggplot2::aes(phase, amplitude, color=r2)) +
     ggplot2::geom_point() +
     ggplot2::xlim(c(0, max(sce$slingPseudotime_1))) +
@@ -656,6 +667,9 @@ print(paste("Amp Spread:", get_earthmovers_distance_from_diagonal(top_genes_four
 
 top_genes_fourier_top_power_mat = heatmap_counts[rownames(heatmap_counts) %in% top_genes_fourier_top_power,]
 print(paste("Power:", get_earthmovers_distance_from_diagonal(top_genes_fourier_top_power_mat, "Top Power")))
+
+#top_genes_fourier_top_power_spread
+#rownames(top_genes_fourier_top_power_spread_mat)
 
 top_genes_fourier_top_power_spread_mat = heatmap_counts[rownames(heatmap_counts) %in% top_genes_fourier_top_power_spread,]
 print(paste("Power Spread:", get_earthmovers_distance_from_diagonal(top_genes_fourier_top_power_spread_mat, "Top Power Spread")))
