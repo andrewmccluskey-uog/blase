@@ -41,44 +41,6 @@ get_top_n_genes = function(association_test_results, n_genes=40, lineage=NA, p_c
 
 }
 
-
-#' Title
-#'
-#' @param sce
-#' @param lineage
-#' @param power_cutoff
-#'
-#' @return
-#' @export
-#'
-#' @examples
-get_cyclical_genes_bezdech = function(sce, lineage=1, power_cutoff=0.7) {
-
-  # check pseudotime bins are there
-  #if (sum(is.na(sce$pseudotime_bin)) == 0) {
-  #  stop("No Pseudotime bins, please run assign_pseudotime_bins()")
-  #}
-
-  # pull out the pseudotime bins
-  profiles = colSums(counts(sce), sce$pseudotime_bin)
-
-  # for every gene
-    # run fourier transforms over the vector of values at each timepoint
-  ffts = fft(profiles)
-
-  spectrum_density = spectrum(ffts)
-  plot(spectrum_density)
-
-  # for every fourier result
-    # calculate power
-
-  # subset only the genes meeting the cutoff criteria
-
-  # order by phase
-
-}
-
-
 #' Get a pseudobulk of bins with at least 2 replicates
 #'
 #' This function will try to create a pseudobulked count matrix for the bins.

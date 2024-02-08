@@ -6,7 +6,7 @@
 \usage{
 plot_mapping_result_heatmap(
   mapping_result_list,
-  heatmap_fill_scale = viridis::scale_fill_viridis(option = "viridis"),
+  heatmap_fill_scale = viridis::scale_fill_viridis(option = "viridis", limits = c(-1, 1)),
   annotate = TRUE
 )
 }
