@@ -26,11 +26,12 @@ setGeneric(name = "gene_selection_matrix",
 setMethod(
   f = "gene_selection_matrix",
   signature = c(x="Seurat"),
-  definition = function(x, genes=c(), pseudotime_slot="slingPseudotime_1", target_matrix_size=1000, n_cores=1){
+  definition = function(x, waves, genes=c(), pseudotime_slot="slingPseudotime_1", target_matrix_size=1000, n_cores=1){
     rlang::check_installed("Seurat", reason = "to handle Seurat objects.")
     sce = Seurat::as.SingleCellExperiment(x)
     return(gene_selection_matrix(
       sce,
+      waves,
       genes=genes,
       pseudotime_slot=pseudotime_slot,
       target_matrix_size=target_matrix_size,
@@ -48,7 +49,7 @@ setMethod(
 setMethod(
   f = "gene_selection_matrix",
   signature = c(x="SingleCellExperiment"),
-  definition = function(x, genes=c(), pseudotime_slot="slingPseudotime_1", target_matrix_size=1000, n_cores=1){
+  definition = function(x, waves, genes=c(), pseudotime_slot="slingPseudotime_1", target_matrix_size=1000, n_cores=1){
 
     if ( !any(colnames(x@colData) == pseudotime_slot)) {
       stop(paste0("Pseudotime slot '", pseudotime_slot ,"' does not exist"))
@@ -59,14 +60,12 @@ setMethod(
     if (length(genes) > 0) {
       # R passes parameters by value not reference so this is safe
       x = x[rownames(x) %in% genes,]
+      waves = waves[rownames(waves) %in% genes,]
     }
 
+    # Then get the normalised count matrix
     pseudotime = x@colData[[pseudotime_slot]]
-    # TODO MOVE WAVES TO BE PARAMETER
-    waves = get_waves(x, pseudotime_slot, n_cores)
-
-    # Then get the log count matrix
-    heatmap_counts = SingleCellExperiment::logcounts(sce)[,order(pseudotime)]
+    heatmap_counts = SingleCellExperiment::normcounts(x)[,order(pseudotime)]
     heatmap_counts = heatmap_counts[order(waves$phase),]
 
     small_heatmap_counts = redim_matrix(
@@ -76,8 +75,8 @@ setMethod(
       n_core=n_cores
     )
 
-    heatmap_counts_ordered.df <- reshape2::melt(small_heatmap_counts, c("gene", "cell"), value.name = "log_expression")
-    plot = ggplot2::ggplot(data=heatmap_counts_ordered.df,ggplot2::aes(x=cell,y=gene,fill=log_expression)) +
+    heatmap_counts_ordered.df <- reshape2::melt(small_heatmap_counts, c("gene", "cell"), value.name = "expression")
+    plot = ggplot2::ggplot(data=heatmap_counts_ordered.df,ggplot2::aes(x=cell,y=gene,fill=expression)) +
       ggplot2::geom_tile() +
       ggplot2::theme(axis.text.x = ggplot2::element_blank(), axis.text.y = ggplot2::element_blank()) +
       ggplot2::scale_fill_gradient(low = "white",
@@ -88,7 +87,7 @@ setMethod(
   }
 )
 
-#' Title
+#' select_genes_by_fourier_method
 #'
 #' @param x
 #' @param ...
@@ -104,7 +103,7 @@ setGeneric(name = "select_genes_by_fourier_method",
            def = function(x, ...)
              standardGeneric("select_genes_by_fourier_method"))
 
-#' Title
+#' select_genes_by_fourier_method
 #'
 #' @param x Seurat.
 #'
@@ -117,14 +116,14 @@ setGeneric(name = "select_genes_by_fourier_method",
 setMethod(
   f = "select_genes_by_fourier_method",
   signature = c(x="Seurat"),
-  definition = function(x, n_genes=100, n_groups=40, top_n_per_group=1, method="power", force_spread_selection=TRUE, pseudotime_slot="slingPseudotime_1"){
+  definition = function(x, waves, n_genes=100, n_groups=40, top_n_per_group=1, method="power", force_spread_selection=TRUE, pseudotime_slot="slingPseudotime_1"){
     rlang::check_installed("Seurat", reason = "to handle Seurat objects.")
     sce = Seurat::as.SingleCellExperiment(x)
-    return(select_genes_by_fourier_method(sce))
+    return(select_genes_by_fourier_method(sce, waves, n_genes, n_groups, top_n_per_group, method, force_spread_selection, pseudotime_slot))
   }
 )
 
-#' Title
+#' select_genes_by_fourier_method
 #'
 #' @param x SingleCellExperiment.
 #'
@@ -140,14 +139,11 @@ setMethod(
 setMethod(
   f = "select_genes_by_fourier_method",
   signature = c(x="SingleCellExperiment"),
-  definition = function(x, n_genes=100, n_groups=40, top_n_per_group=1, method="power", force_spread_selection=TRUE, pseudotime_slot="slingPseudotime_1", n_cores=1){
+  definition = function(x, waves, n_genes=100, n_groups=40, top_n_per_group=1, method="power", force_spread_selection=TRUE, pseudotime_slot="slingPseudotime_1"){
 
     if(method != "power" & method != "amplitude" & method != "r2") {
       stop("Requested method is not valud, must be one of ['power','amplitude','r2']")
     }
-
-    # TODO MOVE WAVES TO BE PARAMETER
-    waves = get_waves(x, pseudotime_slot, n_cores)
 
     if (force_spread_selection) {
 
@@ -200,8 +196,9 @@ get_waves <- function(
   }
   pseudotime = sce@colData[[pseudotime_slot]]
 
-  heatmap_counts = SingleCellExperiment::logcounts(sce)[,order(pseudotime)]
+  heatmap_counts = SingleCellExperiment::normcounts(sce)[,order(pseudotime)]
 
+  # TODO AM rewrite with https://bioconductor.org/packages/release/bioc/vignettes/BiocParallel/inst/doc/Introduction_To_BiocParallel.html#single-machine
   waves_list = parallel::mclapply(rownames(heatmap_counts), function (gene) {
     wave = as.data.frame(FitWave(as.matrix(heatmap_counts[gene,]), 1))
     rownames(wave) = c(gene)
@@ -258,6 +255,7 @@ redim_matrix <- function(
   seq_width  <- round(seq(1, ncol(mat), length.out = target_width  + 1))
 
   # complicate way to write a double for loop
+  # TODO AM rewrite with https://bioconductor.org/packages/release/bioc/vignettes/BiocParallel/inst/doc/Introduction_To_BiocParallel.html#single-machine
   do.call(rbind, parallel::mclapply(seq_len(target_height), function(i) { # i is row
     vapply(seq_len(target_width), function(j) { # j is column
       summary_func(

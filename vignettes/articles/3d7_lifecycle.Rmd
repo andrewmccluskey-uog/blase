@@ -11,31 +11,37 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(readxl)
-library(atgnat)
 library(scran)
 library(slingshot)
 library(tradeSeq)
 library(BiocParallel)
+library(fs)
+library(atgnat)
+
 ```
 
 In this article we will use BLASE to map Plasmodium Falciparum microarray data of the asexual lifecycle ([Painter et al. 2018](https://doi.org/10.1038/s41467-018-04966-3), 3d7 strain) onto the Malaria Cell Atlas ([Howick et al. 2019](https://doi.org/10.1126/science.aaw2619), 7G8 & NF54 strains)  to try and annotate it over a 48 hour period. 
 
 ```{r getData}
 root_dir = tools::R_user_dir("BLASE", "data")
-article_dir = paste0(root_dir, "/3d7_lifecycle")
+#article_dir = paste0(root_dir, "/3d7_lifecycle")
+article_dir = path(root_dir, "3d7_lifecycle")
 if (!dir.exists(article_dir)) {
   dir.create(article_dir)
 }
 article_dir
 
-bulk_path = paste0(article_dir, '/3d7_bulk_timepoints.xlsx')
+#bulk_path = paste0(article_dir, '/3d7_bulk_timepoints.xlsx')
+bulk_path = path(article_dir, "3d7_bulk_timepoints", ext="xlsx")
 if (!file.exists(bulk_path)) {
   download.file('https://static-content.springer.com/esm/art%3A10.1038%2Fs41467-018-04966-3/MediaObjects/41467_2018_4966_MOESM4_ESM.xlsx', bulk_path)
 }else {
   print(paste("Using cached", bulk_path))
 }
 
-mca_path = paste0(article_dir, '/MCA.zip')
+#mca_path = paste0(article_dir, '/MCA.zip')
+mca_path = path(article_dir, "MCA", ext="zip")
+
 if (!file.exists(mca_path)) {
   download.file('https://www.malariacellatlas.org/downloads/pf.zip', mca_path)
   unzip(mca_path, exdir = paste0(article_dir, '/MCA'))
@@ -48,9 +54,13 @@ rownames(bulk) = bulk$`Gene ID`
 rownames(bulk) = gsub(x=rownames(bulk), pattern="_", replacement="-", fixed=TRUE)
 bulk = bulk[7:nrow(bulk),]
 bulk = subset(bulk, , -c(`Gene ID`, `Annotation`, `Peak Time (hpi)`, `p-value`))
-mca_counts_path = paste0(article_dir, '/MCA/pf-ch10x-raw.csv')
+
+#mca_counts_path = paste0(article_dir, '/MCA/pf-ch10x-raw.csv')
+mca_counts_path = path(article_dir, "MCA", "pf-ch10x-raw", ext="csv")
 sc_readcounts = read.csv(mca_counts_path, row.names=1)
-mca_annotation_path = paste0(article_dir, '/MCA/pf-ch10x-data.csv')
+
+#mca_annotation_path = paste0(article_dir, '/MCA/pf-ch10x-data.csv')
+mca_annotation_path = path(article_dir, "MCA", "pf-ch10x-data", ext="csv")
 sc_annotations = read.csv(mca_annotation_path, row.names=1)
 ```
 ## Prepare SC
@@ -63,6 +73,7 @@ genes_to_fix = rownames(sc_readcounts)[!(rownames(sc_readcounts) %in% sub(x=rown
 genes_to_fix = unique(sub(x=genes_to_fix, pattern="\\.[0-9]", replacement=""))
 print(paste("Fixing this many genes:", length(genes_to_fix)))
 
+# TODO: Slow on windows, see if there's a way to speed up
 for (gene in genes_to_fix) {
   print(gene)
   targetRowNames = rownames(sc_readcounts)[grep(x=rownames(sc_readcounts), pattern=gene)]
@@ -116,21 +127,21 @@ gridExtra::grid.arrange(
 ```
 
 ```{r}
-sce <- fitGAM(sce, parallel=T, BPPARAM=MulticoreParam(3), nknots=7)
+sce <- fitGAM(sce, parallel=T, BPPARAM=MulticoreParam(5), nknots=7)
 associationTestResult <- associationTest(sce, lineages=T, global=F, contrastType="consecutive")
 ```
 
 ## Compare Gene Lists
 ```{r}
-gene_selection_matrix(sce)
+waves = get_waves(sce, "slingPseudotime_1", n_cores=1)
+gene_selection_matrix(sce, waves, n_cores=1)
 ```
 
 ## Get Fourier Genes
 ```{r}
-waves = get_waves(sce, "slingPseudotime_1")
 fourier_power_genes = select_genes_by_fourier_method(sce, n_groups=40, top_n_per_group=2)
 # TODO give waves and then order rows by phase
-gene_selection_matrix(sce, genes=rownames(fourier_power_genes), target_matrix_size=50)
+gene_selection_matrix(sce, waves, genes=rownames(fourier_power_genes), target_matrix_size=50)
 ```
 
 ## Prepare BLASE
