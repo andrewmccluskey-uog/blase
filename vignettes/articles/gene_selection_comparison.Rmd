@@ -487,7 +487,6 @@ for (gene in rownames(counts)) {
   waves[gene,"cellcount_in_peak"] = length(counts[gene,sce$slingPseudotime_1 > waves[gene,]$phase-five_percent_of_pdt & sce$slingPseudotime_1 < waves[gene,]$phase+five_percent_of_pdt])
 }
 waves$power = waves$amplitude / waves$peak_expression
-
 waves[order(-waves$power),]
 
 top_power_waves = waves[order(-waves$power),][0:GENES_TO_USE_COUNT,]

@@ -24,7 +24,8 @@ Imports:
   methods,
   rlang,
   metR,
-  S4Vectors
+  S4Vectors,
+  parallel
 Suggests: 
     knitr,
     rmarkdown,

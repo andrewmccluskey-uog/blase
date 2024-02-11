@@ -16,9 +16,6 @@ library(scran)
 library(slingshot)
 library(tradeSeq)
 library(BiocParallel)
-
-# TODO rename this as it's no longer PF3d7
-# https://academic.oup.com/nar/article/44/5/2110/2464621?login=true alternative bulk option
 ```
 
 In this article we will use BLASE to map Plasmodium Falciparum microarray data of the asexual lifecycle ([Painter et al. 2018](https://doi.org/10.1038/s41467-018-04966-3), 3d7 strain) onto the Malaria Cell Atlas ([Howick et al. 2019](https://doi.org/10.1126/science.aaw2619), 7G8 & NF54 strains)  to try and annotate it over a 48 hour period. 
@@ -123,6 +120,19 @@ sce <- fitGAM(sce, parallel=T, BPPARAM=MulticoreParam(3), nknots=7)
 associationTestResult <- associationTest(sce, lineages=T, global=F, contrastType="consecutive")
 ```
 
+## Compare Gene Lists
+```{r}
+gene_selection_matrix(sce)
+```
+
+## Get Fourier Genes
+```{r}
+waves = get_waves(sce, "slingPseudotime_1")
+fourier_power_genes = select_genes_by_fourier_method(sce, n_groups=40, top_n_per_group=2)
+# TODO give waves and then order rows by phase
+gene_selection_matrix(sce, genes=rownames(fourier_power_genes), target_matrix_size=50)
+```
+
 ## Prepare BLASE
 ```{r}
 genelist = atgnat::get_top_n_genes(associationTestResult, n_genes = 500, lineage = 1)
@@ -164,7 +174,7 @@ gridExtra::grid.arrange(
 
 mapping_results = c()
 for (bulkname in colnames(bulk)) {
-  print(bulkname)
+  # print(bulkname)
   res = map_best_bin(atgnatData, bulkname, bulk)
   mapping_results = c(mapping_results, res)
   # print(res)

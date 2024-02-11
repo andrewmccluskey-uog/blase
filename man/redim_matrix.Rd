@@ -29,3 +29,4 @@ The matrix with reduced dimensions
 \description{
 Snippet from: https://cansnippet.bioinfo-fr.net/details.php?id=3
 }
+\concept{gene-selection}

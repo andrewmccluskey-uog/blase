@@ -54,6 +54,7 @@ setMethod(
       stop(paste0("Pseudotime slot '", pseudotime_slot ,"' does not exist"))
     }
 
+    # TODO removing genes and then sorting messes up the ordering of the graph, I think, because waves$phase has all the genes
     # First we need to subset only the requested genes
     if (length(genes) > 0) {
       # R passes parameters by value not reference so this is safe
@@ -61,11 +62,12 @@ setMethod(
     }
 
     pseudotime = x@colData[[pseudotime_slot]]
-    waves = get_waves(x, pseudotime)
+    # TODO MOVE WAVES TO BE PARAMETER
+    waves = get_waves(x, pseudotime_slot, n_cores)
 
     # Then get the log count matrix
+    heatmap_counts = SingleCellExperiment::logcounts(sce)[,order(pseudotime)]
     heatmap_counts = heatmap_counts[order(waves$phase),]
-    heatmap_counts
 
     small_heatmap_counts = redim_matrix(
       heatmap_counts,
@@ -73,8 +75,9 @@ setMethod(
       target_width = target_matrix_size,
       n_core=n_cores
     )
-    heatmap_counts_ordered.df <- reshape2::melt(small_heatmap_counts, c("gene", "cell"), value.name = "expression")
-    ggplot2::ggplot(data=heatmap_counts_ordered.df,ggplot2::aes(x=cell,y=gene,fill=expression)) +
+
+    heatmap_counts_ordered.df <- reshape2::melt(small_heatmap_counts, c("gene", "cell"), value.name = "log_expression")
+    plot = ggplot2::ggplot(data=heatmap_counts_ordered.df,ggplot2::aes(x=cell,y=gene,fill=log_expression)) +
       ggplot2::geom_tile() +
       ggplot2::theme(axis.text.x = ggplot2::element_blank(), axis.text.y = ggplot2::element_blank()) +
       ggplot2::scale_fill_gradient(low = "white",
@@ -90,6 +93,8 @@ setMethod(
 #' @param x
 #' @param ...
 #'
+#' @concept gene-selection
+#'
 #' @return
 #' @export
 #'
@@ -103,6 +108,8 @@ setGeneric(name = "select_genes_by_fourier_method",
 #'
 #' @param x Seurat.
 #'
+#' @concept gene-selection
+#'
 #' @return
 #' @export
 #'
@@ -110,7 +117,7 @@ setGeneric(name = "select_genes_by_fourier_method",
 setMethod(
   f = "select_genes_by_fourier_method",
   signature = c(x="Seurat"),
-  definition = function(x, n_genes=100, method="power", force_spread_selection=TRUE, pseudotime_slot="slingPseudotime_1"){
+  definition = function(x, n_genes=100, n_groups=40, top_n_per_group=1, method="power", force_spread_selection=TRUE, pseudotime_slot="slingPseudotime_1"){
     rlang::check_installed("Seurat", reason = "to handle Seurat objects.")
     sce = Seurat::as.SingleCellExperiment(x)
     return(select_genes_by_fourier_method(sce))
@@ -121,21 +128,26 @@ setMethod(
 #'
 #' @param x SingleCellExperiment.
 #'
+#' @import metR
+#'
+#' @concept gene-selection
+#'
 #' @return
+#'
 #' @export
 #'
 #' @examples
 setMethod(
   f = "select_genes_by_fourier_method",
   signature = c(x="SingleCellExperiment"),
-  definition = function(x, n_genes=100, n_groups=10, top_n_per_group=1, method="power", force_spread_selection=TRUE, pseudotime_slot="slingPseudotime_1"){
+  definition = function(x, n_genes=100, n_groups=40, top_n_per_group=1, method="power", force_spread_selection=TRUE, pseudotime_slot="slingPseudotime_1", n_cores=1){
 
     if(method != "power" & method != "amplitude" & method != "r2") {
       stop("Requested method is not valud, must be one of ['power','amplitude','r2']")
     }
 
-    pseudotime = x@colData[[pseudotime_slot]]
-    waves = get_waves(x, pseudotime)
+    # TODO MOVE WAVES TO BE PARAMETER
+    waves = get_waves(x, pseudotime_slot, n_cores)
 
     if (force_spread_selection) {
 
@@ -166,20 +178,52 @@ setMethod(
   }
 )
 
+
+#' get_waves
+#'
+#' @param sce
+#' @param pseudotime
+#' @param n_cores
+#'
+#' @return
+#' @export
+#'
+#' @examples
 get_waves <- function(
     sce,
-    pseudotime
+    pseudotime_slot,
+    n_cores
 ) {
+
+  if ( !any(colnames(sce@colData) == pseudotime_slot)) {
+    stop(paste0("Pseudotime slot '", pseudotime_slot ,"' does not exist"))
+  }
+  pseudotime = sce@colData[[pseudotime_slot]]
+
   heatmap_counts = SingleCellExperiment::logcounts(sce)[,order(pseudotime)]
-  waves = S4Vectors::DataFrame()
-  for (gene in rownames(heatmap_counts)) {
+
+  waves_list = parallel::mclapply(rownames(heatmap_counts), function (gene) {
     wave = as.data.frame(FitWave(as.matrix(heatmap_counts[gene,]), 1))
     rownames(wave) = c(gene)
-    waves = rbind(waves, wave)
-  }
+    return(wave)
+  }, mc.cores=n_cores)
+  waves <- do.call("rbind", waves_list)
+
   waves = as.data.frame(waves)
   waves$phase = waves$phase * (((180/3.141593)/360)*max(pseudotime)) # pseudotime
   waves$gene = rownames(waves)
+
+  # Add power to waves
+  waves$total_expression = rowSums(heatmap_counts[rownames(waves),])
+  # Bozdech et al. use plus or minus 1/48 (i.e. one bulk either side of the peak, 6.25% window)
+  # Here we use plus or minus 5% (i.e. a 10% window)
+  five_percent_of_pdt = 0.05*max(waves$phase)
+  waves$peak_expression = 0
+  for (gene in rownames(waves)) {
+    waves[gene,"peak_expression"] = sum(heatmap_counts[gene,pseudotime > waves[gene,]$phase-five_percent_of_pdt & pseudotime < waves[gene,]$phase+five_percent_of_pdt])
+    waves[gene,"cellcount_in_peak"] = length(heatmap_counts[gene,pseudotime > waves[gene,]$phase-five_percent_of_pdt & pseudotime < waves[gene,]$phase+five_percent_of_pdt])
+  }
+  waves$power = waves$amplitude / waves$peak_expression
 
   return(waves)
 }
@@ -191,6 +235,8 @@ get_waves <- function(
 #' @param target_width target number of columns in the matrix. Default 100.
 #' @param summary_func How to reduce the cells. Defaults to the mean.
 #' @param n_core Number of cores to use in the redimensioning.
+#'
+#' @concept gene-selection
 #'
 #' @return The matrix with reduced dimensions
 #'

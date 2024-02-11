@@ -12,3 +12,5 @@ reference:
 - contents: has_concept("tuning")
 - title: Utilities
 - contents: has_concept("util")
+- title: Gene Selection
+- contents: has_concept("gene-selection")
