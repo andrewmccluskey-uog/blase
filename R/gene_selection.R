@@ -65,7 +65,7 @@ setMethod(
 
     # Then get the normalised count matrix
     pseudotime = x@colData[[pseudotime_slot]]
-    heatmap_counts = SingleCellExperiment::normcounts(x)[,order(pseudotime)]
+    heatmap_counts = SingleCellExperiment::logcounts(x)[,order(pseudotime)]
     heatmap_counts = heatmap_counts[order(waves$phase),]
 
     small_heatmap_counts = redim_matrix(
@@ -75,8 +75,8 @@ setMethod(
       n_core=n_cores
     )
 
-    heatmap_counts_ordered.df <- reshape2::melt(small_heatmap_counts, c("gene", "cell"), value.name = "expression")
-    plot = ggplot2::ggplot(data=heatmap_counts_ordered.df,ggplot2::aes(x=cell,y=gene,fill=expression)) +
+    heatmap_counts_ordered.df <- reshape2::melt(small_heatmap_counts, c("gene", "cell"), value.name = "log_expression")
+    plot = ggplot2::ggplot(data=heatmap_counts_ordered.df,ggplot2::aes(x=cell,y=gene,fill=log_expression)) +
       ggplot2::geom_tile() +
       ggplot2::theme(axis.text.x = ggplot2::element_blank(), axis.text.y = ggplot2::element_blank()) +
       ggplot2::scale_fill_gradient(low = "white",
@@ -151,13 +151,14 @@ setMethod(
         warning("n_genes is not used when force_spread_selection==TRUE")
       }
 
+      # TODO still returning duplicate genes?
       best_waves_in_spread = data.frame()
       stepsize = max(waves$phase)/n_groups
       for(i in seq(from=0, to=max(waves$phase), length.out=n_groups)) {
-        waves_in_block = waves[waves$phase>i-stepsize & waves$phase<i+stepsize,]
+        waves_in_block = waves[waves$phase>i-(stepsize/2) & waves$phase<i+(stepsize/2),]
         # remove genes in `best_waves_in_spread` from `waves_in_block` and then select best
+        # waves_in_block = best_wave_in_block[!(rownames(best_wave_in_block) %in% best_waves_in_spread)]
         best_wave_in_block = waves_in_block[order(-waves_in_block[,method]),][1:top_n_per_group,]
-        best_wave_in_block = best_wave_in_block[!(rownames(best_wave_in_block) %in% best_waves_in_spread)]
         best_waves_in_spread = rbind(best_waves_in_spread, best_wave_in_block)
       }
       return(best_waves_in_spread)

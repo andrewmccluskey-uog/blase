@@ -133,20 +133,23 @@ associationTestResult <- associationTest(sce, lineages=T, global=F, contrastType
 
 ## Compare Gene Lists
 ```{r}
-waves = get_waves(sce, "slingPseudotime_1", n_cores=1)
-gene_selection_matrix(sce, waves, n_cores=1)
+waves = get_waves(sce, "slingPseudotime_1", n_cores=4)
+gene_selection_matrix(sce, waves, n_cores=4)
 ```
 
 ## Get Fourier Genes
 ```{r}
-fourier_power_genes = select_genes_by_fourier_method(sce, n_groups=40, top_n_per_group=2)
-# TODO give waves and then order rows by phase
-gene_selection_matrix(sce, waves, genes=rownames(fourier_power_genes), target_matrix_size=50)
+fourier_power_genes = select_genes_by_fourier_method(sce, waves, n_groups=100, top_n_per_group=2)
+gene_selection_matrix(sce, waves, genes=rownames(fourier_power_genes), target_matrix_size=nrow(fourier_power_genes))
 ```
 
 ## Prepare BLASE
 ```{r}
 genelist = atgnat::get_top_n_genes(associationTestResult, n_genes = 500, lineage = 1)
+gene_selection_matrix(sce, waves, genes=genelist[0:300], target_matrix_size=300)
+```
+
+```{r}
 res = find_best_params(sce,
                        genelist,
                        split_by="pseudotime_range",
@@ -165,12 +168,10 @@ res2 = find_best_params(sce,
 plot_find_best_params_results(res2)
 ```
 
+### Using TradeSeq genes
 ```{r}
 genes = 300
-bins = 8
-atgnatData = as.AtgnatData(sce, pseudotime_slot="slingPseudotime_1", n_bins=bins, split_by="pseudotime_range")
-atgnatData@genes = genelist[1:genes]
-evaluate_parameters(atgnatData, make_plot = TRUE)
+bins = 12
 sce = assign_pseudotime_bins(sce, pseudotime_slot="slingPseudotime_1", n_bins=bins, split_by="pseudotime_range")
 plotUMAP(sce, color="pseudotime_bin")
 gridExtra::grid.arrange(
@@ -180,17 +181,127 @@ gridExtra::grid.arrange(
 )
 ```
 
+
+```{r}
+atgnatData = as.AtgnatData(sce, pseudotime_slot="slingPseudotime_1", n_bins=bins, split_by="pseudotime_range")
+atgnatData@genes = genelist[1:genes]
+evaluate_parameters(atgnatData, make_plot = TRUE)
+```
+
 ```{r}
 ## Map Bulk data onto Single Cell
 
 mapping_results = c()
 for (bulkname in colnames(bulk)) {
-  # print(bulkname)
   res = map_best_bin(atgnatData, bulkname, bulk)
   mapping_results = c(mapping_results, res)
-  # print(res)
 }
 
 atgnat::plot_mapping_result_heatmap(rev(mapping_results), annotate = TRUE)
-ggplot2::ggsave(paste0("blase_heatmap_", bins, "_bins_", genes, "_genes.png"), path="/Users/andrewmccluskey/code/PhD")
+ggplot2::ggsave(paste0("blase_heatmap_tradeseq_", bins, "_bins_", genes, "_genes.png"), path="/Users/andrewmccluskey/code/PhD")
 ```
+
+### Using Fourier Genes
+```{r}
+atgnatData = as.AtgnatData(sce, pseudotime_slot="slingPseudotime_1", n_bins=bins, split_by="pseudotime_range")
+atgnatData@genes = rownames(fourier_power_genes)
+evaluate_parameters(atgnatData, make_plot = TRUE)
+```
+
+```{r}
+## Map Bulk data onto Single Cell
+
+mapping_results_fourier = c()
+for (bulkname in colnames(bulk)) {
+  res = map_best_bin(atgnatData, bulkname, bulk)
+  mapping_results_fourier = c(mapping_results_fourier, res)
+}
+
+atgnat::plot_mapping_result_heatmap(rev(mapping_results_fourier), annotate = TRUE)
+ggplot2::ggsave(paste0("blase_heatmap_fourierpower_", bins, "_bins_", genes, "_genes.png"), path="/Users/andrewmccluskey/code/PhD")
+```
+## Analysing Accuracy
+
+The Bulk paper describes the following timepoints HPI matching to lifecycle stages, in figure 1:
+* 5-15: Ring
+* 15-34: Troph
+* 34-40: Schizont
+* 40-45: Merozoites
+```{r}
+expected_rings_hpi = 5:15
+expected_trophs_hpi = 16:34
+expected_schizont_hpi = 35:42
+```
+
+
+Below, we can see how out bins are aligned with lifecycle stages
+```{r}
+table(sce@colData[c("STAGE_LR", "pseudotime_bin")])
+called_ring_bins = sort(unique(sce@colData[sce@colData[["STAGE_LR"]] == "ring",][["pseudotime_bin"]]))
+called_troph_bins = sort(unique(sce@colData[sce@colData[["STAGE_LR"]] == "trophozoite",][["pseudotime_bin"]]))
+called_schizont_bins = sort(unique(sce@colData[sce@colData[["STAGE_LR"]] == "schizont",][["pseudotime_bin"]]))
+```
+Now we can check the accuracy of these techniques, according to prior knowledge.
+
+```{r}
+analyse_mapping_results = function(mapping_results) {
+  results = data.frame()
+  for (bulk_sample in mapping_results) {
+    timepoint = as.numeric(gsub(x=bulk_sample@bulk_name, pattern=" hpi", replacement=""))
+    
+    expected_stage_from_hpi = "NA"
+    if (timepoint %in% expected_rings_hpi) {
+      expected_stage_from_hpi = "Rings"
+    } else if (timepoint %in% expected_trophs_hpi) {
+      expected_stage_from_hpi = "Trophs"
+    } else if (timepoint %in% expected_schizont_hpi) {
+      expected_stage_from_hpi = "Schizonts"
+    } else {
+      next
+    }
+    
+    blase_predicted_stage = ""
+    if (bulk_sample@best_bin %in% called_ring_bins) {
+      blase_predicted_stage = paste(blase_predicted_stage,"Rings")
+    }
+    if (bulk_sample@best_bin %in% called_troph_bins) {
+      blase_predicted_stage = paste(blase_predicted_stage,"Trophs")
+    }
+    if (bulk_sample@best_bin %in% called_schizont_bins) {
+      blase_predicted_stage = paste(blase_predicted_stage,"Schizonts")
+    }
+    
+    results = rbind(results, data.frame(
+      timepoint=timepoint, 
+      expected_stage_from_hpi=expected_stage_from_hpi, 
+      blase_predicted_stage=blase_predicted_stage,
+      bin_call=bulk_sample@best_bin,
+      confident_call=bulk_sample@confident_mapping))
+  
+  }
+  return(results)
+}
+
+describe_results = function(result_set) {
+  # Wrong because %in% is just checking the whole list, but we want the sublist
+  incorrect = nrow(result_set[!mapply(`grepl`, result_set$expected_stage_from_hpi, result_set$blase_predicted_stage),])
+  confident = nrow(result_set[result_set$confident_call,])
+  incorrect_confident = nrow(result_set[!mapply(`grepl`, result_set$expected_stage_from_hpi, result_set$blase_predicted_stage) & result_set$confident_call,])
+  
+  return(paste(
+    paste(incorrect, "wrong out of", nrow(result_set)),
+    paste(incorrect_confident, "confident calls wrong out of", confident),
+    sep=", "
+  ))
+}
+
+```
+
+```{r}
+results_tradeseq = analyse_mapping_results(mapping_results)
+results_fourier = analyse_mapping_results(mapping_results_fourier)
+
+print(paste("Tradeseq:", describe_results(results_tradeseq)))
+print(paste("Fourier:", describe_results(results_fourier)))
+```
+
