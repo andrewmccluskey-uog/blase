@@ -1,5 +1,5 @@
 ---
-title: "3d7_lifecycle"
+title: "falciparum_lifecycle"
 ---
 
 ```{r, include = FALSE}
@@ -17,21 +17,18 @@ library(tradeSeq)
 library(BiocParallel)
 library(fs)
 library(atgnat)
-
 ```
 
 In this article we will use BLASE to map Plasmodium Falciparum microarray data of the asexual lifecycle ([Painter et al. 2018](https://doi.org/10.1038/s41467-018-04966-3), 3d7 strain) onto the Malaria Cell Atlas ([Howick et al. 2019](https://doi.org/10.1126/science.aaw2619), 7G8 & NF54 strains)  to try and annotate it over a 48 hour period. 
 
 ```{r getData}
 root_dir = tools::R_user_dir("BLASE", "data")
-#article_dir = paste0(root_dir, "/3d7_lifecycle")
 article_dir = path(root_dir, "3d7_lifecycle")
 if (!dir.exists(article_dir)) {
   dir.create(article_dir)
 }
 article_dir
 
-#bulk_path = paste0(article_dir, '/3d7_bulk_timepoints.xlsx')
 bulk_path = path(article_dir, "3d7_bulk_timepoints", ext="xlsx")
 if (!file.exists(bulk_path)) {
   download.file('https://static-content.springer.com/esm/art%3A10.1038%2Fs41467-018-04966-3/MediaObjects/41467_2018_4966_MOESM4_ESM.xlsx', bulk_path)
@@ -39,9 +36,7 @@ if (!file.exists(bulk_path)) {
   print(paste("Using cached", bulk_path))
 }
 
-#mca_path = paste0(article_dir, '/MCA.zip')
 mca_path = path(article_dir, "MCA", ext="zip")
-
 if (!file.exists(mca_path)) {
   download.file('https://www.malariacellatlas.org/downloads/pf.zip', mca_path)
   unzip(mca_path, exdir = paste0(article_dir, '/MCA'))
@@ -55,11 +50,9 @@ rownames(bulk) = gsub(x=rownames(bulk), pattern="_", replacement="-", fixed=TRUE
 bulk = bulk[7:nrow(bulk),]
 bulk = subset(bulk, , -c(`Gene ID`, `Annotation`, `Peak Time (hpi)`, `p-value`))
 
-#mca_counts_path = paste0(article_dir, '/MCA/pf-ch10x-raw.csv')
 mca_counts_path = path(article_dir, "MCA", "pf-ch10x-raw", ext="csv")
 sc_readcounts = read.csv(mca_counts_path, row.names=1)
 
-#mca_annotation_path = paste0(article_dir, '/MCA/pf-ch10x-data.csv')
 mca_annotation_path = path(article_dir, "MCA", "pf-ch10x-data", ext="csv")
 sc_annotations = read.csv(mca_annotation_path, row.names=1)
 ```

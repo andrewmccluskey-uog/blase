@@ -1,5 +1,5 @@
 ---
-title: "3d7_lifecycle"
+title: "DE With BLASE"
 ---
 
 ```{r, include = FALSE}
@@ -20,25 +20,27 @@ library(BiocParallel)
 # TODO rename this as it's no longer PF3d7
 # https://academic.oup.com/nar/article/44/5/2110/2464621?login=true alternative bulk option
 ```
+## TODO Ensure comments are clear and accurate, this copied from PF Article
 
 In this article we will use BLASE to map Plasmodium Falciparum microarray data of the asexual lifecycle ([Painter et al. 2018](https://doi.org/10.1038/s41467-018-04966-3), 3d7 strain) onto the Malaria Cell Atlas ([Howick et al. 2019](https://doi.org/10.1126/science.aaw2619), 7G8 & NF54 strains)  to try and annotate it over a 48 hour period. 
 
 ```{r getData}
 root_dir = tools::R_user_dir("BLASE", "data")
-article_dir = paste0(root_dir, "/DE_with_blase")
+article_dir = path(root_dir, "DE_with_blase")
+
 if (!dir.exists(article_dir)) {
   dir.create(article_dir)
 }
 article_dir
 
-bulk_path = paste0(article_dir, '/heat_shock_bulks.xlsx')
+bulk_path = path(article_dir, "heat_shock_bulks", ext="xlsx")
 if (!file.exists(bulk_path)) {
   download.file('https://static-content.springer.com/esm/art%3A10.1038%2Fs41467-021-24814-1/MediaObjects/41467_2021_24814_MOESM5_ESM.xlsx', bulk_path)
 }else {
   print(paste("Using cached", bulk_path))
 }
 
-mca_path = paste0(article_dir, '/MCA.zip')
+mca_path = path(article_dir, "MCA", ext="zip")
 if (!file.exists(mca_path)) {
   download.file('https://www.malariacellatlas.org/downloads/pf.zip', mca_path)
   unzip(mca_path, exdir = paste0(article_dir, '/MCA'))
@@ -71,10 +73,10 @@ genes_to_fix_bulk = rownames(bulk)[!(rownames(bulk) %in% sub(x=rownames(bulk), p
 genes_to_fix_bulk = unique(sub(x=genes_to_fix_bulk, pattern="\\.[0-9]", replacement=""))
 print(paste("Remaining genes with dups:", genes_to_fix_bulk))
 
-
-mca_counts_path = paste0(article_dir, '/MCA/pf-ch10x-raw.csv')
+mca_counts_path = path(article_dir, "MCA", "pf-ch10x-raw", ext="csv")
 sc_readcounts = read.csv(mca_counts_path, row.names=1)
-mca_annotation_path = paste0(article_dir, '/MCA/pf-ch10x-data.csv')
+
+mca_annotation_path = path(article_dir, "MCA", "pf-ch10x-data", ext="csv")
 sc_annotations = read.csv(mca_annotation_path, row.names=1)
 ```
 

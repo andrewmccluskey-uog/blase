@@ -24,7 +24,6 @@ Imports:
   methods,
   rlang,
   metR,
-  S4Vectors,
   parallel
 Suggests: 
     knitr,
@@ -37,7 +36,9 @@ Suggests:
     Seurat,
     dyngen,
     bluster,
-    UpSetR
+    UpSetR,
+    readxl,
+    tools
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 URL: https://andrewmccluskey-uog.github.io/atgnat/

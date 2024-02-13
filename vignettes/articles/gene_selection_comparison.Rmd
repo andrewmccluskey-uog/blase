@@ -10,13 +10,13 @@ knitr::opts_chunk$set(
 ```
 
 ```{r loadatgnat}
-library(devtools)
-load_all('/Users/andrewmccluskey/code/PhD/R/atgnat')
+#library(devtools)
+#load_all('/Users/andrewmccluskey/code/PhD/R/atgnat')
 ```
 
 ```{r setup}
 library(readxl)
-#library(atgnat)
+library(atgnat)
 library(scran)
 library(slingshot)
 library(tradeSeq)
