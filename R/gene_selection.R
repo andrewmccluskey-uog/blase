@@ -206,7 +206,7 @@ setMethod(
 #'
 #' @param sce SCE to generate waves from.
 #' @param pseudotime_slot slot pseudotime is in.
-#' @param n_cores Number of cores to use for the fourier analysis.
+#' @param n_cores Number of cores to use for the fourier analysis. Defaults to 1.
 #'
 #' @return Waves dataframe, used by `select_genes_by_fourier_method` and
 #' `gene_selection_matrix`. Phase is normalised to position in pseudotime.
@@ -221,7 +221,7 @@ setMethod(
 get_waves <- function(
     sce,
     pseudotime_slot,
-    n_cores
+    n_cores = 1
 ) {
 
   if ( !any(colnames(sce@colData) == pseudotime_slot)) {

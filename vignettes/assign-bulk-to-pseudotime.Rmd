@@ -91,6 +91,11 @@ evaluate_parameters(atgnat_data, make_plot = TRUE)
 ### Inspect Genes Choice
 
 ```{r}
+waves = get_waves(sce, pseudotime_slot="pseudotime")
+gene_selection_matrix(sce, waves, pseudotime_slot="pseudotime", genes=atgnat_data@genes, target_matrix_size=length(atgnat_data@genes))
+```
+
+```{r}
 evaluate_top_n_genes(atgnat_data)
 ```
 

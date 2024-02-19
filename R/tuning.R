@@ -50,6 +50,7 @@ evaluate_parameters <- function(atgnat_data, make_plot=FALSE, plot_columns=4) {
     x = atgnat_data@pseudobulk_bins[[i]]
     return(Matrix::rowMeans(x))
   }))
+
   colnames(pseudobulked_bins) = atgnat_data@bins
 
   for (i in bin_ids) {
