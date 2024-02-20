@@ -30,7 +30,11 @@ library(utils)
 
 In this article we will look at different methods for gene selection, using the MCA's Plasmodium Berghei Data [Howick et al, 2019](https://dx.doi.org/10.1126/science.aaw2619), and bulk RNA seq of the lifecycle stages [Otto et al, 2004](https://doi.org/10.1186/s12915-014-0086-0).
 ```{r getData}
-root_dir = tools::R_user_dir("BLASE", "data")
+root_dir = "articles"
+if (!ami::using_ci()) {
+  root_dir = tools::R_user_dir("BLASE", "data")
+}
+
 article_dir = path(root_dir, "gene_selection_comparison")
 if (!dir.exists(article_dir)) {
   dir.create(article_dir)

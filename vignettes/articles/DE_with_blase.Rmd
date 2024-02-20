@@ -29,7 +29,11 @@ library(utils)
 In this article we will use BLASE to map Plasmodium Falciparum microarray data of the asexual lifecycle ([Painter et al. 2018](https://doi.org/10.1038/s41467-018-04966-3), 3d7 strain) onto the Malaria Cell Atlas ([Howick et al. 2019](https://doi.org/10.1126/science.aaw2619), 7G8 & NF54 strains)  to try and annotate it over a 48 hour period. 
 
 ```{r getData}
-root_dir = tools::R_user_dir("BLASE", "data")
+root_dir = "articles"
+if (!ami::using_ci()) {
+  root_dir = tools::R_user_dir("BLASE", "data")
+}
+
 article_dir = path(root_dir, "DE_with_blase")
 
 if (!dir.exists(article_dir)) {
@@ -84,11 +88,9 @@ sc_annotations = read.csv(mca_annotation_path, row.names=1)
 ## Prepare SC
 ```{r prepareSC}
 rownames(sc_annotations) = gsub(x = rownames(sc_annotations), pattern="-", replacement=".", fixed=TRUE)
-sc_annotations
 
 genes_to_fix = rownames(sc_readcounts)[!(rownames(sc_readcounts) %in% sub(x=rownames(sc_readcounts), pattern="\\.[0-9]", replacement=""))]
 genes_to_fix = unique(sub(x=genes_to_fix, pattern="\\.[0-9]", replacement=""))
-print(genes_to_fix)
 
 for (gene in genes_to_fix) {
   print(gene)
@@ -122,41 +124,8 @@ normcounts(sce) <- exp(logcounts(sce))
 reducedDim(sce, "PCA") = as.matrix(cbind(sce@colData["PC_1"], sce@colData["PC_2"],sce@colData["PC_3"]))
 # better separation in the 2nd and 3rd dimension for just asexual stages
 reducedDim(sce, "UMAP") = as.matrix(cbind(sce@colData["UMAP_2"], sce@colData["UMAP_3"]))
-as.matrix(cbind(sce@colData["UMAP_2"], sce@colData["UMAP_3"]))
 sce <- slingshot(sce, reducedDim = 'UMAP', clusterLabels="STAGE_LR", start.clus="ring")
-```
 
-```{r getDataIsThisBrokenStageLRPCA}
-#plotPCA(sce, colour_by="STAGE_LR")
-```
-```{r getDataIsThisBrokenStageLRUMAP}
-#plotUMAP(sce, colour_by="STAGE_LR")
-```
-```{r getDataIsThisBrokenPCA}
-plotPCA(sce)
-```
-```{r getDataIsThisBrokenUMAP}
-plotUMAP(sce)
-```
-```{r getDataIsThisBrokenDayPCA}
-plotPCA(sce, colour_by="DAY")
-```
-```{r getDataIsThisBrokenDayUMAP}
-plotUMAP(sce)
-```
-```{r getDataIsThisBrokenStrainPCA}
-plotPCA(sce, colour_by="STRAIN")
-```
-```{r getDataIsThisBrokenStrainUMAP}
-plotUMAP(sce, colour_by="STRAIN")
-```
-```{r getDataIsThisBrokenPseudotimePCA}
-plotPCA(sce, colour_by="slingPseudotime_1")
-```
-```{r getDataIsThisBrokenPseudotimeUMAP}
-plotUMAP(sce, colour_by="slingPseudotime_1")
-```
-```{r getDataIsThisBroken1}
 gridExtra::grid.arrange(
   plotPCA(sce, colour_by="STAGE_LR"),
   plotUMAP(sce, colour_by="STAGE_LR"),
