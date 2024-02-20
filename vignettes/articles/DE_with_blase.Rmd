@@ -16,6 +16,9 @@ library(scran)
 library(slingshot)
 library(tradeSeq)
 library(BiocParallel)
+library(fs)
+library(gridExtra)
+library(scater)
 
 # TODO rename this as it's no longer PF3d7
 # https://academic.oup.com/nar/article/44/5/2110/2464621?login=true alternative bulk option
@@ -51,21 +54,18 @@ if (!file.exists(mca_path)) {
 bulk = as.data.frame(read_excel(bulk_path, range = 'S3A_RNAseq!A4:P2571'))
 rownames(bulk) = bulk$`Transcript_ID`
 rownames(bulk) = gsub(x=rownames(bulk), pattern="_", replacement="-", fixed=TRUE)
+
 bulk = subset(bulk, , -c(`GeneID`, `Transcript_ID`, `Gene.NameSymbol`, `TranscriptProductDescription`))
-bulk
 
 genes_to_fix_bulk = rownames(bulk)[!(rownames(bulk) %in% sub(x=rownames(bulk), pattern="\\.[0-9]", replacement=""))]
 genes_to_fix_bulk = unique(sub(x=genes_to_fix_bulk, pattern="\\.[0-9]", replacement=""))
-print(genes_to_fix_bulk)
+
 for (gene in genes_to_fix_bulk) {
-  print(gene)
   targetRowNames = rownames(bulk)[grep(x=rownames(bulk), pattern=gene)]
   counts = colSums(bulk[targetRowNames,])
   counts = t(data.frame(counts=colSums(bulk[targetRowNames,])))
   rownames(counts) = c(gene)
-  
   bulk <- bulk[ !(rownames(bulk) %in% targetRowNames), ]
-
   bulk = rbind(bulk, counts)
 }
 
@@ -81,13 +81,14 @@ sc_annotations = read.csv(mca_annotation_path, row.names=1)
 ```
 
 ## Prepare SC
-```{r}
+```{r prepareSC}
 rownames(sc_annotations) = gsub(x = rownames(sc_annotations), pattern="-", replacement=".", fixed=TRUE)
 sc_annotations
 
 genes_to_fix = rownames(sc_readcounts)[!(rownames(sc_readcounts) %in% sub(x=rownames(sc_readcounts), pattern="\\.[0-9]", replacement=""))]
 genes_to_fix = unique(sub(x=genes_to_fix, pattern="\\.[0-9]", replacement=""))
 print(genes_to_fix)
+
 for (gene in genes_to_fix) {
   print(gene)
   targetRowNames = rownames(sc_readcounts)[grep(x=rownames(sc_readcounts), pattern=gene)]
@@ -110,6 +111,7 @@ rownames(sce) = sub(x=rownames(sce), pattern="\\.[0-9]", replacement="")
 rm(sc_annotations, sc_readcounts)
 gc()
 
+
 sce = subset(sce, , STAGE_LR != 'gametocyte')
 
 sce <- computeSumFactors(sce)
@@ -119,9 +121,41 @@ normcounts(sce) <- exp(logcounts(sce))
 reducedDim(sce, "PCA") = as.matrix(cbind(sce@colData["PC_1"], sce@colData["PC_2"],sce@colData["PC_3"]))
 # better separation in the 2nd and 3rd dimension for just asexual stages
 reducedDim(sce, "UMAP") = as.matrix(cbind(sce@colData["UMAP_2"], sce@colData["UMAP_3"]))
-
+as.matrix(cbind(sce@colData["UMAP_2"], sce@colData["UMAP_3"]))
 sce <- slingshot(sce, reducedDim = 'UMAP', clusterLabels="STAGE_LR", start.clus="ring")
+```
 
+```{r getDataIsThisBrokenStageLRPCA}
+#plotPCA(sce, colour_by="STAGE_LR")
+```
+```{r getDataIsThisBrokenStageLRUMAP}
+#plotUMAP(sce, colour_by="STAGE_LR")
+```
+```{r getDataIsThisBrokenPCA}
+plotPCA(sce)
+```
+```{r getDataIsThisBrokenUMAP}
+plotUMAP(sce)
+```
+```{r getDataIsThisBrokenDayPCA}
+plotPCA(sce, colour_by="DAY")
+```
+```{r getDataIsThisBrokenDayUMAP}
+plotUMAP(sce)
+```
+```{r getDataIsThisBrokenStrainPCA}
+plotPCA(sce, colour_by="STRAIN")
+```
+```{r getDataIsThisBrokenStrainUMAP}
+plotUMAP(sce, colour_by="STRAIN")
+```
+```{r getDataIsThisBrokenPseudotimePCA}
+plotPCA(sce, colour_by="slingPseudotime_1")
+```
+```{r getDataIsThisBrokenPseudotimeUMAP}
+plotUMAP(sce, colour_by="slingPseudotime_1")
+```
+```{r getDataIsThisBroken1}
 gridExtra::grid.arrange(
   plotPCA(sce, colour_by="STAGE_LR"),
   plotUMAP(sce, colour_by="STAGE_LR"),
@@ -133,14 +167,13 @@ gridExtra::grid.arrange(
   plotUMAP(sce, colour_by="slingPseudotime_1"),
   ncol=2
 )
-
 ```
 
-```{r}
+```{r evaluateKForTradeSeq}
 # evaluateK(sce, k=6:8, parallel=T, BPPARAM=MulticoreParam(2))
 ```
 
-```{r}
+```{r tradeSeq}
 sce <- fitGAM(sce, parallel=T, BPPARAM=MulticoreParam(4), nknots=7)
 associationTestResult <- associationTest(sce, lineages=T, global=F, contrastType="consecutive")
 ```

@@ -24,28 +24,28 @@ library(BiocParallel)
 library(UpSetR)
 library(emdist)
 library(scater)
+library(fs)
 ```
 
 In this article we will look at different methods for gene selection, using the MCA's Plasmodium Berghei Data [Howick et al, 2019](https://dx.doi.org/10.1126/science.aaw2619), and bulk RNA seq of the lifecycle stages [Otto et al, 2004](https://doi.org/10.1186/s12915-014-0086-0).
 ```{r getData}
 root_dir = tools::R_user_dir("BLASE", "data")
-article_dir = paste0(root_dir, "/gene_selection_comparison")
+article_dir = path(root_dir, "gene_selection_comparison")
 if (!dir.exists(article_dir)) {
   dir.create(article_dir)
 }
-article_dir
 
-bulk_path = paste0(article_dir, '/otto_pb_bulk_timepoints.xlsx')
+bulk_path = path(article_dir, 'otto_pb_bulk_timepoints', ext="xlsx")
 if (!file.exists(bulk_path)) {
   download.file('https://static-content.springer.com/esm/art%3A10.1186%2Fs12915-014-0086-0/MediaObjects/12915_2014_86_MOESM9_ESM.xlsx', bulk_path)
 }else {
   print(paste("Using cached", bulk_path))
 }
 
-mca_path = paste0(article_dir, '/MCA-pb.zip')
+mca_path = path(article_dir, 'MCA-pb', ext="zip")
 if (!file.exists(mca_path)) {
   download.file('https://www.malariacellatlas.org/downloads/pb-ch10x-set1.zip', mca_path)
-  unzip(mca_path, exdir = paste0(article_dir, '/MCA-pb'))
+  unzip(mca_path, exdir = path(article_dir, 'MCA-pb'))
 }else {
   print(paste("Using cached", mca_path))
 }
@@ -56,9 +56,9 @@ rownames(bulk) = gsub(x=rownames(bulk), pattern="_", replacement="-", fixed=TRUE
 bulk = subset(bulk, , -c(`Gene Models (IDs)`))
 rownames(bulk) = paste0(rownames(bulk), '0');
 
-mca_counts_path = paste0(article_dir, '/MCA-pb/pb-ch10x-set1-ch10x-exp.csv')
+mca_counts_path = path(article_dir, 'MCA-pb','pb-ch10x-set1-ch10x-exp', ext="csv")
 sc_readcounts = read.csv(mca_counts_path, row.names=1)
-mca_annotation_path = paste0(article_dir, '/MCA-pb/pb-ch10x-set1-ch10x-data.csv')
+mca_annotation_path = path(article_dir, 'MCA-pb','pb-ch10x-set1-ch10x-data', ext="csv")
 sc_annotations = read.csv(mca_annotation_path, row.names=1)
 ```
 
@@ -448,7 +448,6 @@ fourier_top_amp_heat
 ```
 ### Top Amp Waves with spread
 ```{r}
-best_amp_waves_spread
 best_amp_waves_spread = get_by_spread(waves, GENES_TO_USE_COUNT, "amplitude")
 ggplot2::ggplot(best_amp_waves_spread, ggplot2::aes(phase, amplitude, color=r2)) +
     ggplot2::geom_point() +

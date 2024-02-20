@@ -19,6 +19,7 @@ library(scater)
 library(BiocParallel)
 library(dyngen)
 library(bluster)
+library(fs)
 ```
 
 ```{r randomseed}
@@ -31,14 +32,14 @@ Based on the [dyngen](https://dyngen.dynverse.org/articles/getting_started.html#
 ```{r generateCounts}
 
 root_dir = tools::R_user_dir("BLASE", "data")
-article_dir = paste0(root_dir, "/compare_simulated_data")
+article_dir = path(root_dir, "compare_simulated_data")
+
 if (!dir.exists(article_dir)) {
   dir.create(article_dir)
 }
 article_dir
 
-simulation_rds_path = paste0(article_dir, '/simulation.rds')
-
+simulation_rds_path = path(article_dir, "simulation", ext="rds")
 if (!file.exists(simulation_rds_path)) {
   # realnet for featurenetwork from realnets
   # realcount for generate experiment from realcounts
