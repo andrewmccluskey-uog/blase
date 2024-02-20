@@ -29,15 +29,15 @@ library(utils)
 In this article we will use BLASE to map Plasmodium Falciparum microarray data of the asexual lifecycle ([Painter et al. 2018](https://doi.org/10.1038/s41467-018-04966-3), 3d7 strain) onto the Malaria Cell Atlas ([Howick et al. 2019](https://doi.org/10.1126/science.aaw2619), 7G8 & NF54 strains)  to try and annotate it over a 48 hour period. 
 
 ```{r getData}
-root_dir = "articles"
-if (!ami::using_ci()) {
-  root_dir = tools::R_user_dir("BLASE", "data")
-}
+#root_dir = "articles"
+#if (!ami::using_ci()) {
+root_dir = tools::R_user_dir("BLASE", "data")
+#}
 
 article_dir = path(root_dir, "DE_with_blase")
 
 if (!dir.exists(article_dir)) {
-  dir.create(article_dir)
+  dir.create(article_dir, recursive = TRUE)
 }
 article_dir
 
