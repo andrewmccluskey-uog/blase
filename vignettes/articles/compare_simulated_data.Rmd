@@ -20,6 +20,7 @@ library(BiocParallel)
 library(dyngen)
 library(bluster)
 library(fs)
+library(utils)
 ```
 
 ```{r randomseed}

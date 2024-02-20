@@ -25,6 +25,7 @@ library(UpSetR)
 library(emdist)
 library(scater)
 library(fs)
+library(utils)
 ```
 
 In this article we will look at different methods for gene selection, using the MCA's Plasmodium Berghei Data [Howick et al, 2019](https://dx.doi.org/10.1126/science.aaw2619), and bulk RNA seq of the lifecycle stages [Otto et al, 2004](https://doi.org/10.1186/s12915-014-0086-0).
