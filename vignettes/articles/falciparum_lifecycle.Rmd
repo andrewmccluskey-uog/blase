@@ -24,16 +24,12 @@ library(utils)
 In this article we will use BLASE to map Plasmodium Falciparum microarray data of the asexual lifecycle ([Painter et al. 2018](https://doi.org/10.1038/s41467-018-04966-3), 3d7 strain) onto the Malaria Cell Atlas ([Howick et al. 2019](https://doi.org/10.1126/science.aaw2619), 7G8 & NF54 strains)  to try and annotate it over a 48 hour period. 
 
 ```{r getData}
-#root_dir = "articles"
-#if (!ami::using_ci()) {
 root_dir = tools::R_user_dir("BLASE", "data")
-#}
 
 article_dir = path(root_dir, "3d7_lifecycle")
 if (!dir.exists(article_dir)) {
   dir.create(article_dir, recursive = TRUE)
 }
-article_dir
 
 bulk_path = path(article_dir, "3d7_bulk_timepoints", ext="xlsx")
 if (!file.exists(bulk_path)) {
@@ -71,20 +67,32 @@ sc_annotations
 genes_to_fix = rownames(sc_readcounts)[!(rownames(sc_readcounts) %in% sub(x=rownames(sc_readcounts), pattern="\\.[0-9]", replacement=""))]
 genes_to_fix = unique(sub(x=genes_to_fix, pattern="\\.[0-9]", replacement=""))
 print(paste("Fixing this many genes:", length(genes_to_fix)))
+```
 
-# TODO: Slow on windows, see if there's a way to speed up
+```{R removeSCDupTranscripts}
+new_rows = data.frame()
+rownames_to_remove = c()
+
+# Do some pre-work to get colSums quickly
+sc_readcounts_matrix = data.matrix(sc_readcounts)
+sc_readcounts_n = ncol(sc_readcounts_matrix)
+
 for (gene in genes_to_fix) {
-  print(gene)
   targetRowNames = rownames(sc_readcounts)[grep(x=rownames(sc_readcounts), pattern=gene)]
-  counts = colSums(sc_readcounts[targetRowNames,])
-  counts = t(data.frame(counts=colSums(sc_readcounts[targetRowNames,])))
+  rownames_to_remove = c(rownames_to_remove, targetRowNames)
+  # N = col index, M = row index
+  counts = .colSums(sc_readcounts_matrix[targetRowNames,], m=length(targetRowNames), n=sc_readcounts_n)
+  counts = t(data.frame(counts=counts))
   rownames(counts) = c(gene)
-  
-  sc_readcounts <- sc_readcounts[ !(rownames(sc_readcounts) %in% targetRowNames), ]
-
-  sc_readcounts = rbind(sc_readcounts, counts)
+  colnames(counts) = colnames(sc_readcounts)
+  new_rows = rbind(new_rows, counts)
 }
 
+sc_readcounts <- sc_readcounts[ !(rownames(sc_readcounts) %in% rownames_to_remove), ]
+sc_readcounts = rbind(sc_readcounts, new_rows)
+```
+
+```{r}
 genes_to_fix = rownames(sc_readcounts)[!(rownames(sc_readcounts) %in% sub(x=rownames(sc_readcounts), pattern="\\.[0-9]", replacement=""))]
 genes_to_fix = unique(sub(x=genes_to_fix, pattern="\\.[0-9]", replacement=""))
 print(paste("Remaining genes with dups:", genes_to_fix))

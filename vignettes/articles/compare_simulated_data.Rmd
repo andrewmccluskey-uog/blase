@@ -31,17 +31,13 @@ set.seed(SEED)
 ## Generate the simulation data
 Based on the [dyngen](https://dyngen.dynverse.org/articles/getting_started.html#step-1-define-backbone-and-other-parameters) Getting Started tutorial. 
 ```{r generateCounts}
-#root_dir = "articles"
-#if (!ami::using_ci()) {
 root_dir = tools::R_user_dir("BLASE", "data")
-#}
 
 article_dir = path(root_dir, "compare_simulated_data")
 
 if (!dir.exists(article_dir)) {
   dir.create(article_dir, recursive = TRUE)
 }
-article_dir
 
 simulation_rds_path = path(article_dir, "simulation", ext="rds")
 if (!file.exists(simulation_rds_path)) {

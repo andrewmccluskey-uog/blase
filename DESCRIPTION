@@ -38,8 +38,7 @@ Suggests:
     bluster,
     UpSetR,
     readxl,
-    tools,
-    ami
+    tools
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 URL: https://andrewmccluskey-uog.github.io/atgnat/
