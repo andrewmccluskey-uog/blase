@@ -140,8 +140,8 @@ associationTestResult <- associationTest(sce, lineages=T, global=F, contrastType
 
 ## Compare Gene Lists
 ```{r}
-waves = get_waves(sce, "slingPseudotime_1", n_cores=4)
-gene_selection_matrix(sce, waves, n_cores=4)
+waves = get_waves(sce, "slingPseudotime_1", n_cores=2)
+gene_selection_matrix(sce, waves, n_cores=2)
 ```
 
 ## Get Fourier Genes
