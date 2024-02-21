@@ -2,7 +2,7 @@
 title: "Assigning bulk RNA-seq to pseudotime"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{assign-bulk-to-pseudotime}
+  %\VignetteIndexEntry{Assigning bulk RNA-seq to pseudotime}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
