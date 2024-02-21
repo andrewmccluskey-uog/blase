@@ -101,7 +101,7 @@ gridExtra::grid.arrange(
 ## Using TradeSeq
 First, we'll use tradeSeq to find the good genes
 ```{r}
-PARALLELISM_CORES = 4
+PARALLELISM_CORES = 2
 sce <- fitGAM(sce, parallel=T, BPPARAM=MulticoreParam(PARALLELISM_CORES), nknots=6)
 associationTestResult <- associationTest(sce, lineages=T, global=F, contrastType="consecutive")
 table(sce$pseudotime_bin)

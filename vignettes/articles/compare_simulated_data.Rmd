@@ -149,7 +149,7 @@ gridExtra::grid.arrange(
   ncol=2
 )
 
-sc_sce <- fitGAM(sc_sce, parallel=T, BPPARAM=MulticoreParam(4), nknots=4)
+sc_sce <- fitGAM(sc_sce, parallel=T, BPPARAM=MulticoreParam(2), nknots=4)
 associationTestResult <- associationTest(sc_sce, lineages=T, global=F, contrastType="consecutive")
 
 ```
