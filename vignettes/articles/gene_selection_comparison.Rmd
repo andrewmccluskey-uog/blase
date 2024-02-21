@@ -769,5 +769,5 @@ gridExtra::grid.arrange(
 ```
 
 ``` {r}
-session_info()
+sessionInfo()
 ```

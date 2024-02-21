@@ -253,3 +253,6 @@ gridExtra::grid.arrange(
 )
 
 ```
+```{r sessionInfo}
+sessionInfo()
+```

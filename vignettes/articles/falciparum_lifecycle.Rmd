@@ -315,3 +315,6 @@ print(paste("Tradeseq:", describe_results(results_tradeseq)))
 print(paste("Fourier:", describe_results(results_fourier)))
 ```
 
+```{r sessionInfo}
+sessionInfo()
+```

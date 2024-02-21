@@ -20,6 +20,7 @@ library(gridExtra)
 library(scater)
 library(utils)
 library(atgnat)
+library(utils)
 
 # TODO rename this as it's no longer PF3d7
 # https://academic.oup.com/nar/article/44/5/2110/2464621?login=true alternative bulk option
@@ -253,4 +254,8 @@ gridExtra::grid.arrange(
 )
 
 #ggplot2::ggsave(paste0("blase_heatmap_", bins, "_bins_", genes, "_genes.png"), path="/Users/andrewmccluskey/code/PhD")
+```
+
+```{r sessionInfo}
+sessionInfo()
 ```
