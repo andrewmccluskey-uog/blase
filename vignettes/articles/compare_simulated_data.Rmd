@@ -28,6 +28,13 @@ RNGversion("3.5.0")
 SEED = 7
 set.seed(SEED)
 ```
+
+```{r concurrency}
+N_CORES = 4
+if (ami::using_ci()) {
+  N_CORES = 2
+}
+```
 ## Generate the simulation data
 Based on the [dyngen](https://dyngen.dynverse.org/articles/getting_started.html#step-1-define-backbone-and-other-parameters) Getting Started tutorial. 
 ```{r generateCounts}
@@ -151,7 +158,7 @@ gridExtra::grid.arrange(
   ncol=2
 )
 
-sc_sce <- fitGAM(sc_sce, parallel=T, BPPARAM=MulticoreParam(2), nknots=4)
+sc_sce <- fitGAM(sc_sce, parallel=T, BPPARAM=MulticoreParam(N_CORES), nknots=4)
 associationTestResult <- associationTest(sc_sce, lineages=T, global=F, contrastType="consecutive")
 
 ```

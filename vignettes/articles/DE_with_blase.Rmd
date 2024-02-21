@@ -21,9 +21,23 @@ library(scater)
 library(utils)
 library(atgnat)
 library(utils)
+library(ami)
 
 # TODO rename this as it's no longer PF3d7
 # https://academic.oup.com/nar/article/44/5/2110/2464621?login=true alternative bulk option
+```
+
+```{r randomseed}
+RNGversion("3.5.0")
+SEED = 7
+set.seed(SEED)
+```
+
+```{r concurrency}
+N_CORES = 4
+if (ami::using_ci()) {
+  N_CORES = 2
+}
 ```
 ## TODO Ensure comments are clear and accurate, this copied from PF Article
 
@@ -89,10 +103,10 @@ genes_to_fix_bulk = rownames(bulk)[!(rownames(bulk) %in% sub(x=rownames(bulk), p
 genes_to_fix_bulk = unique(sub(x=genes_to_fix_bulk, pattern="\\.[0-9]", replacement=""))
 print(paste("Remaining genes with dups:", genes_to_fix_bulk))
 
-rm (new_rows, rownames_to_remove, bulk_matrix, bulk_n, genes_to_fix_bulk)
+rm (new_rows, rownames_to_remove, bulk_matrix, bulk_n, genes_to_fix_bulk, counts)
 gc()
 ```
-
+## Prepare SC
 ```{r loadSC}
 
 mca_counts_path = path(article_dir, "MCA", "pf-ch10x-raw", ext="csv")
@@ -102,7 +116,6 @@ mca_annotation_path = path(article_dir, "MCA", "pf-ch10x-data", ext="csv")
 sc_annotations = read.csv(mca_annotation_path, row.names=1)
 ```
 
-## Prepare SC
 ```{r prepareSC}
 rownames(sc_annotations) = gsub(x = rownames(sc_annotations), pattern="-", replacement=".", fixed=TRUE)
 
@@ -136,20 +149,22 @@ genes_to_fix = rownames(sc_readcounts)[!(rownames(sc_readcounts) %in% sub(x=rown
 genes_to_fix = unique(sub(x=genes_to_fix, pattern="\\.[0-9]", replacement=""))
 print(paste("Remaining genes with dups:", genes_to_fix))
 
-rm (new_rows, rownames_to_remove, sc_readcounts_matrix, sc_readcounts_n, genes_to_fix)
+rm (new_rows, rownames_to_remove, sc_readcounts_matrix, sc_readcounts_n, genes_to_fix, targetRowNames, gene)
 gc()
 ```
 
 ```{r scPreprocessing}
 sce = SingleCellExperiment(assays=list(counts=as.matrix(sc_readcounts)), colData=sc_annotations)
-
 rownames(sce) = sub(x=rownames(sce), pattern="\\.[0-9]", replacement="")
 
-rm(sc_annotations, sc_readcounts)
-gc()
-
-
 sce = subset(sce, , STAGE_LR != 'gametocyte')
+
+# Subsample to reduce memory consumption
+cells_to_keep = sample(colnames(sce), size=12000)
+sce = sce[,colnames(sce) %in% cells_to_keep]
+
+rm(sc_annotations, sc_readcounts, cells_to_keep)
+gc()
 
 sce <- computeSumFactors(sce)
 sce <- logNormCounts(sce)
@@ -174,11 +189,11 @@ gridExtra::grid.arrange(
 ```
 
 ```{r evaluateKForTradeSeq}
-# evaluateK(sce, k=6:8, parallel=T, BPPARAM=MulticoreParam(2))
+# evaluateK(sce, k=6:8, parallel=T, BPPARAM=MulticoreParam(N_CORES))
 ```
 
 ```{r tradeSeq}
-sce <- fitGAM(sce, parallel=T, BPPARAM=MulticoreParam(2), nknots=7)
+sce <- fitGAM(sce, parallel=T, BPPARAM=MulticoreParam(N_CORES), nknots=7)
 associationTestResult <- associationTest(sce, lineages=T, global=F, contrastType="consecutive")
 ```
 

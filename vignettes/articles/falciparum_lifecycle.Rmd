@@ -19,8 +19,21 @@ library(fs)
 library(atgnat)
 library(scater)
 library(utils)
+library(ami)
 ```
 
+```{r randomseed}
+RNGversion("3.5.0")
+SEED = 7
+set.seed(SEED)
+```
+
+```{r concurrency}
+N_CORES = 4
+if (ami::using_ci()) {
+  N_CORES = 2
+}
+```
 In this article we will use BLASE to map Plasmodium Falciparum microarray data of the asexual lifecycle ([Painter et al. 2018](https://doi.org/10.1038/s41467-018-04966-3), 3d7 strain) onto the Malaria Cell Atlas ([Howick et al. 2019](https://doi.org/10.1126/science.aaw2619), 7G8 & NF54 strains)  to try and annotate it over a 48 hour period. 
 
 ```{r getData}
@@ -108,6 +121,10 @@ gc()
 
 sce = subset(sce, , STAGE_LR != 'gametocyte')
 
+# Subsample to reduce memory consumption
+cells_to_keep = sample(colnames(sce), size=12000)
+sce = sce[,colnames(sce) %in% cells_to_keep]
+
 sce <- computeSumFactors(sce)
 sce <- logNormCounts(sce)
 normcounts(sce) <- exp(logcounts(sce))
@@ -133,18 +150,18 @@ gridExtra::grid.arrange(
 ```
 
 ```{r}
-# evaluateK(sce, k=6:8, parallel=T, BPPARAM=MulticoreParam(2))
+# evaluateK(sce, k=6:8, parallel=T, BPPARAM=MulticoreParam(N_CORES))
 ```
 
 ```{r}
-sce <- fitGAM(sce, parallel=T, BPPARAM=MulticoreParam(2), nknots=7)
+sce <- fitGAM(sce, parallel=T, BPPARAM=MulticoreParam(N_CORES), nknots=7)
 associationTestResult <- associationTest(sce, lineages=T, global=F, contrastType="consecutive")
 ```
 
 ## Compare Gene Lists
 ```{r}
-waves = get_waves(sce, "slingPseudotime_1", n_cores=2)
-gene_selection_matrix(sce, waves, n_cores=2)
+waves = get_waves(sce, "slingPseudotime_1", n_cores=N_CORES)
+gene_selection_matrix(sce, waves, n_cores=N_CORES)
 ```
 
 ## Get Fourier Genes

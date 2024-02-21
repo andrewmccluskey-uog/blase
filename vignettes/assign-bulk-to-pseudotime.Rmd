@@ -22,13 +22,21 @@ library(slingshot)
 library(scran)
 library(scater)
 library(BiocParallel)
+library(ami)
 ```
 
 ```{r randomseed}
 RNGversion("3.5.0")
-set.seed(7)
+SEED = 7
+set.seed(SEED)
 ```
 
+```{r concurrency}
+N_CORES = 4
+if (ami::using_ci()) {
+  N_CORES = 2
+}
+```
 ## Setting up the Single Cell Experiment
 
 First, let's generate a Single Cell Experiment to use the tool with, based on the tradeSeq vignette [https://bioconductor.org/packages/devel/bioc/vignettes/tradeSeq/inst/doc/tradeSeq.html]. We need to have the following to use Atgnat:
@@ -47,7 +55,7 @@ data(celltype, package = "tradeSeq")
 pseudotime <- slingPseudotime(crv, na = FALSE)
 cellWeights <- slingCurveWeights(crv)
 sce <- fitGAM(counts = counts, pseudotime = pseudotime, cellWeights = cellWeights,
-                 nknots = 6, verbose = FALSE, BPPARAM=MulticoreParam(2))
+                 nknots = 6, verbose = FALSE, BPPARAM=MulticoreParam(N_CORES))
 
 sce$pseudotime = pseudotime[,"curve1"]
 sce$celltype = celltype
