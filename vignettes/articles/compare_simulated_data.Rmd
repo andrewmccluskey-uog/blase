@@ -98,6 +98,8 @@ if (!file.exists(simulation_rds_path)) {
 ## Cluster SCE
 ```{r clusterSCE}
 sce <- as_sce(model)
+rm(model)
+gc()
 
 sce <- computeSumFactors(sce)
 sce <- logNormCounts(sce)

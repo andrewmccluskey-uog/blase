@@ -83,12 +83,16 @@ for (gene in genes_to_fix_bulk) {
 
 bulk = bulk[ !(rownames(bulk) %in% rownames_to_remove), ]
 bulk = rbind(bulk, new_rows)
-```
 
-```{r loadSC}
 genes_to_fix_bulk = rownames(bulk)[!(rownames(bulk) %in% sub(x=rownames(bulk), pattern="\\.[0-9]", replacement=""))]
 genes_to_fix_bulk = unique(sub(x=genes_to_fix_bulk, pattern="\\.[0-9]", replacement=""))
 print(paste("Remaining genes with dups:", genes_to_fix_bulk))
+
+rm (new_rows, rownames_to_remove, bulk_matrix, bulk_n, genes_to_fix_bulk)
+gc()
+```
+
+```{r loadSC}
 
 mca_counts_path = path(article_dir, "MCA", "pf-ch10x-raw", ext="csv")
 sc_readcounts = read.csv(mca_counts_path, row.names=1)
@@ -126,15 +130,18 @@ for (gene in genes_to_fix) {
 
 sc_readcounts <- sc_readcounts[ !(rownames(sc_readcounts) %in% rownames_to_remove), ]
 sc_readcounts = rbind(sc_readcounts, new_rows)
-```
-
-```{r scPreprocessing}
 
 genes_to_fix = rownames(sc_readcounts)[!(rownames(sc_readcounts) %in% sub(x=rownames(sc_readcounts), pattern="\\.[0-9]", replacement=""))]
 genes_to_fix = unique(sub(x=genes_to_fix, pattern="\\.[0-9]", replacement=""))
 print(paste("Remaining genes with dups:", genes_to_fix))
 
+rm (new_rows, rownames_to_remove, sc_readcounts_matrix, sc_readcounts_n, genes_to_fix)
+gc()
+```
+
+```{r scPreprocessing}
 sce = SingleCellExperiment(assays=list(counts=as.matrix(sc_readcounts)), colData=sc_annotations)
+
 rownames(sce) = sub(x=rownames(sce), pattern="\\.[0-9]", replacement="")
 
 rm(sc_annotations, sc_readcounts)

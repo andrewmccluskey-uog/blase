@@ -16,7 +16,6 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(readxl)
-library(atgnat)
 library(scran)
 library(slingshot)
 library(tradeSeq)
@@ -26,6 +25,7 @@ library(emdist)
 library(scater)
 library(fs)
 library(utils)
+library(atgnat)
 ```
 
 In this article we will look at different methods for gene selection, using the MCA's Plasmodium Berghei Data [Howick et al, 2019](https://dx.doi.org/10.1126/science.aaw2619), and bulk RNA seq of the lifecycle stages [Otto et al, 2004](https://doi.org/10.1186/s12915-014-0086-0).
