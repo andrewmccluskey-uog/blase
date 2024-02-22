@@ -598,7 +598,9 @@ ggplot2::ggplot(data=df,ggplot2::aes(x=x,y=y,fill=expression)) +
 
 ```
 ### Normalised Count Plotting
-```{r}
+
+Disabled as not sure we want to keep this section
+```{r, eval=FALSE}
 
 get_earthmovers_distance_from_diagonal = function (expression_matrix, title) {
   # wasserstein - define perfect matrix, then wasserstein versus real matrix
@@ -679,9 +681,6 @@ print(paste("Amp Spread:", get_earthmovers_distance_from_diagonal(top_genes_four
 
 top_genes_fourier_top_power_mat = heatmap_counts[rownames(heatmap_counts) %in% top_genes_fourier_top_power,]
 print(paste("Power:", get_earthmovers_distance_from_diagonal(top_genes_fourier_top_power_mat, "Top Power")))
-
-#top_genes_fourier_top_power_spread
-#rownames(top_genes_fourier_top_power_spread_mat)
 
 top_genes_fourier_top_power_spread_mat = heatmap_counts[rownames(heatmap_counts) %in% top_genes_fourier_top_power_spread,]
 print(paste("Power Spread:", get_earthmovers_distance_from_diagonal(top_genes_fourier_top_power_spread_mat, "Top Power Spread")))

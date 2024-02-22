@@ -1,9 +1,11 @@
 Package: atgnat
-Title: Characterise Bulk Trajectory Acceleration
+Title: Enhancing Single Cell RNA-seq data with bulk RNA-seq data
 Version: 0.0.0.9000
 Authors@R: c(
   person("Andrew", "McCluskey", , "2117532m@student.gla.ac.uk", role = c("aut", "cre"), 
     comment = c(ORCID = "0009-0004-4187-799X")),
+  person("Toby", "Kettlewell", , "???@student.gla.ac.uk", role = c("ctb"), 
+    comment = c()),
   person("Thomas", "Otto", , "thomasdan.otto@glasgow.ac.uk", role=("ths"), 
     comment=c(ORCID = "0000-0002-1246-7404"))
   )

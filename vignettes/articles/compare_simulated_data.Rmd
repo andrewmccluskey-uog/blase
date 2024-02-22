@@ -42,6 +42,7 @@ root_dir = tools::R_user_dir("BLASE", "data")
 
 article_dir = path(root_dir, "compare_simulated_data")
 
+# TODO create an article with steps to create the simulated data and then just save as package data like we do for the MCA data
 if (!dir.exists(article_dir)) {
   dir.create(article_dir, recursive = TRUE)
 }
@@ -76,7 +77,7 @@ if (!file.exists(simulation_rds_path)) {
         census_interval = 4,
         experiment_params = simulation_type_wild_type(num_simulations = simulations_num, seed=seq_len(simulations_num))
       ),
-      num_cores=8
+      num_cores=N_CORES
     )
   
   #realcounts$name
