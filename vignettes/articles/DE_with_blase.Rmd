@@ -37,7 +37,7 @@ if (ami::using_ci()) {
 }
 ```
 
-In this article we will use BLASE to map bulk Plasmodium Falciparum data from an experiment ([Zhang et al. 2021](https://doi.org/10.1038/s41467-021-24814-1)) on heat shock response in P. Falciparum, onto the Malaria Cell Atlas ([Howick et al. 2019](https://doi.org/10.1126/science.aaw2619), 7G8 & NF54 strains). We look at Zhang et al's wild type control data (from the NF54 strain) as well as the knockouts (pb4 and pb31) in this article. The paper reported that the knockouts both handled the heat shock less well than the wild type strain, which we will see in our analysis below.
+In this article we will use BLASE to map bulk Plasmodium Falciparum data from an experiment ([Zhang et al. 2021](https://doi.org/10.1038/s41467-021-24814-1)) on heat shock response in P. Falciparum, onto the Malaria Cell Atlas ([Howick et al. 2019](https://doi.org/10.1126/science.aaw2619), 7G8 & NF54 strains). We look at Zhang et al's wild type control data (from the NF54 strain) as well as the knockouts (pb4 and pb31) in this article. The paper reported that the knockouts both handled the heat shock less well than the wild type strain, and that pb31 was most susceptible to heat shock, which we will see in our analysis below.
 
 The controls kept all strains at 37 degrees, whereas the heat shock was applied to each strain as 3 8-hour increases to 41 degrees, simulating malarial fever.
 
