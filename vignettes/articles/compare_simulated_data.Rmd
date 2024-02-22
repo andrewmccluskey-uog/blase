@@ -29,17 +29,21 @@ SEED = 7
 set.seed(SEED)
 ```
 
+In this article, we'll simulate a dataset, and show that BLASE works well with it, 
+mapping pseudobulked SC counts to the same SC data. We split the simulated data in 
+half and use one half of it as the scRNA-seq, and the other for pseudobulking.
+
 ```{r concurrency}
 N_CORES = 4
 if (ami::using_ci()) {
   N_CORES = 2
 }
 ```
+
 ## Generate the simulation data
-Based on the [dyngen](https://dyngen.dynverse.org/articles/getting_started.html#step-1-define-backbone-and-other-parameters) Getting Started tutorial. 
+Based on the [dyngen Getting Started tutorial](https://dyngen.dynverse.org/articles/getting_started.html#step-1-define-backbone-and-other-parameters). 
 ```{r generateCounts}
 root_dir = tools::R_user_dir("BLASE", "data")
-
 article_dir = path(root_dir, "compare_simulated_data")
 
 # TODO create an article with steps to create the simulated data and then just save as package data like we do for the MCA data
@@ -63,11 +67,9 @@ if (!file.exists(simulation_rds_path)) {
       num_hks = 50,
       verbose = FALSE,
       feature_network_params = feature_network_default(
-        #realnet="regulatorycircuits_12_lymphocytes_of_b_lineage"
         realnet="regulatorycircuits_04_mesenchymal_mixed"
       ),
       experiment_params = experiment_snapshot(
-        #realcount="zenodo_1443566_real_silver_bone-marrow-mesenchyme-erythrocyte-differentiation_mca"
         realcount="zenodo_1443566_real_silver_trophoblast-stem-cell-trophoblast-differentiation_mca"
       ),
       download_cache_dir = tools::R_user_dir("dyngen", "data"),
@@ -80,13 +82,10 @@ if (!file.exists(simulation_rds_path)) {
       num_cores=N_CORES
     )
   
-  #realcounts$name
-  #realnets$name
   # Should be > 10 ideally
   floor(config$simulation_params$total_time / config$simulation_params$census_interval) * simulations_num / config$numbers$num_cells
   config$experiment_params$realcount
   config$feature_network_params$realnet
-  
   
   model <- generate_tf_network(config)
   model <- generate_feature_network(model)
@@ -97,13 +96,17 @@ if (!file.exists(simulation_rds_path)) {
   
   saveRDS(model, simulation_rds_path);
 } else {
-    print(paste("Using cached", simulation_rds_path))
+    print("Using cached")
     model = readRDS(simulation_rds_path)
 }
 
 ```
 
 ## Cluster SCE
+
+Here we'll set up the SCE and preprocess the data ready for trajectory analysis. 
+We show the `sim_time` mapped onto it, which shows the true simulated trajectory.
+
 ```{r clusterSCE}
 sce <- as_sce(model)
 rm(model)
@@ -132,18 +135,18 @@ START_CLUSTER = 4
 ```
 
 ## Split Datasets
-```{r}
 
+We will now split the dataset so that the test dataset is unseen.
+
+```{r}
 sce$useAsBulk = round(runif(n=ncol(sce), min=0, max=1)) == 1
 bulk_sce = subset(sce, , useAsBulk==TRUE)
 sc_sce = subset(sce, , useAsBulk==FALSE)
 rm(sce)
-
-# TODO save and cache this dataset
 ```
 
-## Prepare single cell
-Now we can generate our bulk and single cell datasets
+## SC Trajectory Analysis
+Now we'll use slingshot to infer a trajectory, and tradeseq to identify highly variable genes. We will compare the trajectory to the simulated time below.
 ```{r}
 sc_sce
 
@@ -165,6 +168,9 @@ associationTestResult <- associationTest(sc_sce, lineages=T, global=F, contrastT
 ```
 
 ## Analyse with BLASE
+
+We start by tuning the parameters for BLASE. See the [vignette](articles/assign-bulk-to-pseudotime.html) for more details.
+
 ```{r}
 genelist = atgnat::get_top_n_genes(associationTestResult, n_genes = 200, lineage = 1)
 res = find_best_params(sc_sce,
@@ -183,6 +189,9 @@ atgnatData@genes = genelist[1:genes]
 evaluate_parameters(atgnatData, make_plot = TRUE)
 ```
 ## Prepare Bulk
+
+Here we set up the same trajectory with the bulk dataset, and split it into separate "bulk" counts.
+
 ```{r}
 bulk_sce
 
@@ -202,6 +211,9 @@ bulkified_bins = atgnat::get_bins_as_bulk(bulk_sce, min_cells_for_bulk = 20)
 ```
 
 ## Map the bulk to the single cell
+
+Now we'll map the bulk onto the single cell data with BLASE. We can see the bins and mapping results below. Most are confidently mapped correctly, and 4 are not confidently mapped, but still correctly.
+
 ```{r}
 mapping_results = c()
 for (bulkname in colnames(bulkified_bins)) {
@@ -219,6 +231,7 @@ gridExtra::grid.arrange(
 )
 atgnat::plot_mapping_result_heatmap(rev(mapping_results))
 ```
+Now we can look at the population proportions of the bins:
 ```{r}
 gridExtra::grid.arrange(
   plotUMAP(sc_sce, colour_by="label"),
@@ -250,14 +263,6 @@ gridExtra::grid.arrange(
   atgnat::plot_mapping_result_corr(mapping_results[[9]]),
   atgnat::plot_mapping_result_corr(mapping_results[[10]]),
   ncol=4
-)
-
-atgnat::plot_mapping_result_corr(mapping_results[[4]])
-
-gridExtra::grid.arrange(
-  plotUMAP(bulk_sce, colour_by="slingPseudotime_1"),
-  plotUMAP(bulk_sce, colour_by="pseudotime_bin"),
-  ncol=2
 )
 
 ```

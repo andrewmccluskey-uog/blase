@@ -4,14 +4,14 @@
 \alias{get_waves}
 \title{get_waves}
 \usage{
-get_waves(sce, pseudotime_slot, n_cores)
+get_waves(sce, pseudotime_slot, n_cores = 1)
 }
 \arguments{
 \item{sce}{SCE to generate waves from.}
 
 \item{pseudotime_slot}{slot pseudotime is in.}
 
-\item{n_cores}{Number of cores to use for the fourier analysis.}
+\item{n_cores}{Number of cores to use for the fourier analysis. Defaults to 1.}
 }
 \value{
 Waves dataframe, used by \code{select_genes_by_fourier_method} and

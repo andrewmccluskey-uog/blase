@@ -129,7 +129,7 @@ evaluate_top_n_genes(blase_data)
 
 ## Mapping Bulk Samples to SC with BLASE
 
-If we're happy, now we can try to map a bulk sample onto the single cell. We'll do this by cell types in the SingleCellExperiment but in reality you should use a real bulk dataset.
+If we're happy, now we can try to map a bulk sample onto the single cell. We'll do this by pseudobulking cell types in the SingleCellExperiment but in reality you should use a real bulk dataset. See some of our other articles for examples.
 
 ```{r}
 bulks_df = DataFrame(row.names = rownames(counts(sce)))
