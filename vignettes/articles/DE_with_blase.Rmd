@@ -59,14 +59,6 @@ if (!file.exists(bulk_path)) {
   print(paste("Using cached", bulk_path))
 }
 
-mca_path = path(article_dir, "MCA", ext="zip")
-if (!file.exists(mca_path)) {
-  download.file('https://www.malariacellatlas.org/downloads/pf.zip', mca_path)
-  unzip(mca_path, exdir = paste0(article_dir, '/MCA'))
-}else {
-  print(paste("Using cached", mca_path))
-}
-
 bulk = as.data.frame(read_excel(bulk_path, range = 'S3A_RNAseq!A4:P2571'))
 rownames(bulk) = bulk$`Transcript_ID`
 rownames(bulk) = gsub(x=rownames(bulk), pattern="_", replacement="-", fixed=TRUE)
@@ -108,93 +100,22 @@ gc()
 ```
 ## Prepare SC
 ```{r loadSC}
-
-mca_counts_path = path(article_dir, "MCA", "pf-ch10x-raw", ext="csv")
-sc_readcounts = read.csv(mca_counts_path, row.names=1)
-
-mca_annotation_path = path(article_dir, "MCA", "pf-ch10x-data", ext="csv")
-sc_annotations = read.csv(mca_annotation_path, row.names=1)
-```
-
-```{r prepareSC}
-rownames(sc_annotations) = gsub(x = rownames(sc_annotations), pattern="-", replacement=".", fixed=TRUE)
-
-genes_to_fix = rownames(sc_readcounts)[!(rownames(sc_readcounts) %in% sub(x=rownames(sc_readcounts), pattern="\\.[0-9]", replacement=""))]
-genes_to_fix = unique(sub(x=genes_to_fix, pattern="\\.[0-9]", replacement=""))
-```
-
-```{R removeSCDupTranscripts}
-new_rows = data.frame()
-rownames_to_remove = c()
-
-# Do some pre-work to get colSums quickly
-sc_readcounts_matrix = data.matrix(sc_readcounts)
-sc_readcounts_n = ncol(sc_readcounts_matrix)
-
-for (gene in genes_to_fix) {
-  targetRowNames = rownames(sc_readcounts)[grep(x=rownames(sc_readcounts), pattern=gene)]
-  rownames_to_remove = c(rownames_to_remove, targetRowNames)
-  # N = col index, M = row index
-  counts = .colSums(sc_readcounts_matrix[targetRowNames,], m=length(targetRowNames), n=sc_readcounts_n)
-  counts = t(data.frame(counts=counts))
-  rownames(counts) = c(gene)
-  colnames(counts) = colnames(sc_readcounts)
-  new_rows = rbind(new_rows, counts)
-}
-
-sc_readcounts <- sc_readcounts[ !(rownames(sc_readcounts) %in% rownames_to_remove), ]
-sc_readcounts = rbind(sc_readcounts, new_rows)
-
-genes_to_fix = rownames(sc_readcounts)[!(rownames(sc_readcounts) %in% sub(x=rownames(sc_readcounts), pattern="\\.[0-9]", replacement=""))]
-genes_to_fix = unique(sub(x=genes_to_fix, pattern="\\.[0-9]", replacement=""))
-print(paste("Remaining genes with dups:", genes_to_fix))
-
-rm (new_rows, rownames_to_remove, sc_readcounts_matrix, sc_readcounts_n, genes_to_fix, targetRowNames, gene)
-gc()
-```
-
-```{r scPreprocessing}
-sce = SingleCellExperiment(assays=list(counts=as.matrix(sc_readcounts)), colData=sc_annotations)
-rownames(sce) = sub(x=rownames(sce), pattern="\\.[0-9]", replacement="")
-
-sce = subset(sce, , STAGE_LR != 'gametocyte')
-
-# Subsample to reduce memory consumption
-cells_to_keep = sample(colnames(sce), size=12000)
-sce = sce[,colnames(sce) %in% cells_to_keep]
-
-rm(sc_annotations, sc_readcounts, cells_to_keep)
-gc()
-
-sce <- computeSumFactors(sce)
-sce <- logNormCounts(sce)
-normcounts(sce) <- exp(logcounts(sce))
-
-reducedDim(sce, "PCA") = as.matrix(cbind(sce@colData["PC_1"], sce@colData["PC_2"],sce@colData["PC_3"]))
-# better separation in the 2nd and 3rd dimension for just asexual stages
-reducedDim(sce, "UMAP") = as.matrix(cbind(sce@colData["UMAP_2"], sce@colData["UMAP_3"]))
-sce <- slingshot(sce, reducedDim = 'UMAP', clusterLabels="STAGE_LR", start.clus="ring")
-
+data(processed_MCA_PF_SCE, package="atgnat")
 gridExtra::grid.arrange(
-  plotPCA(sce, colour_by="STAGE_LR"),
-  plotUMAP(sce, colour_by="STAGE_LR"),
-  plotPCA(sce, colour_by="DAY"),
-  plotUMAP(sce, colour_by="DAY"),
-  plotPCA(sce, colour_by="STRAIN"),
-  plotUMAP(sce, colour_by="STRAIN"),
-  plotPCA(sce, colour_by="slingPseudotime_1"),
-  plotUMAP(sce, colour_by="slingPseudotime_1"),
+  plotPCA(processed_MCA_PF_SCE, colour_by="STAGE_LR"),
+  plotUMAP(processed_MCA_PF_SCE, colour_by="STAGE_LR"),
+  plotPCA(processed_MCA_PF_SCE, colour_by="DAY"),
+  plotUMAP(processed_MCA_PF_SCE, colour_by="DAY"),
+  plotPCA(processed_MCA_PF_SCE, colour_by="STRAIN"),
+  plotUMAP(processed_MCA_PF_SCE, colour_by="STRAIN"),
+  plotPCA(processed_MCA_PF_SCE, colour_by="slingPseudotime_1"),
+  plotUMAP(processed_MCA_PF_SCE, colour_by="slingPseudotime_1"),
   ncol=2
 )
 ```
 
-```{r evaluateKForTradeSeq}
-# evaluateK(sce, k=6:8, parallel=T, BPPARAM=MulticoreParam(N_CORES))
-```
-
 ```{r tradeSeq}
-sce <- fitGAM(sce, parallel=T, BPPARAM=MulticoreParam(N_CORES), nknots=7)
-associationTestResult <- associationTest(sce, lineages=T, global=F, contrastType="consecutive")
+associationTestResult <- associationTest(processed_MCA_PF_SCE, lineages=T, global=F, contrastType="consecutive")
 ```
 
 ## Prepare BLASE
@@ -205,7 +126,7 @@ genelist = atgnat::get_top_n_genes(associationTestResult, n_genes = 500, lineage
 "PF3D7-1122900" %in% rownames(genelist) #DHC
 "PF3D7-1432400" %in% rownames(genelist) #LRR5
 
-res = find_best_params(sce,
+res = find_best_params(processed_MCA_PF_SCE,
                        genelist,
                        split_by="pseudotime_range",
                        pseudotime_slot="slingPseudotime_1",
@@ -217,14 +138,14 @@ plot_find_best_params_results(res)
 ```{r}
 genes = 300
 bins = 8
-atgnatData = as.AtgnatData(sce, pseudotime_slot="slingPseudotime_1", n_bins=bins, split_by="pseudotime_range")
+atgnatData = as.AtgnatData(processed_MCA_PF_SCE, pseudotime_slot="slingPseudotime_1", n_bins=bins, split_by="pseudotime_range")
 atgnatData@genes = genelist[1:genes]
 evaluate_parameters(atgnatData, make_plot = TRUE)
-sce = assign_pseudotime_bins(sce, pseudotime_slot="slingPseudotime_1", n_bins=bins, split_by="pseudotime_range")
-plotUMAP(sce, color="pseudotime_bin")
+processed_MCA_PF_SCE = assign_pseudotime_bins(processed_MCA_PF_SCE, pseudotime_slot="slingPseudotime_1", n_bins=bins, split_by="pseudotime_range")
+plotUMAP(processed_MCA_PF_SCE, color="pseudotime_bin")
 gridExtra::grid.arrange(
-  plotUMAP(sce, color="STAGE_LR"),
-  plotUMAP(sce, color="pseudotime_bin"),
+  plotUMAP(processed_MCA_PF_SCE, color="STAGE_LR"),
+  plotUMAP(processed_MCA_PF_SCE, color="pseudotime_bin"),
   ncol=2
 )
 ```
@@ -245,25 +166,25 @@ atgnat::plot_mapping_result_heatmap(rev(mapping_results), annotate = TRUE)
 gridExtra::grid.arrange(
   atgnat::plot_mapping_result_heatmap(rev(mapping_results[1:2]), annotate = TRUE), # 1
   atgnat::plot_mapping_result_heatmap(rev(mapping_results[3:4]), annotate = TRUE), # 2
-  atgnat::plot_bin_population(sce, 3, group_by_slot="STAGE_LR"), # 1
-  atgnat::plot_bin_population(sce, 4, group_by_slot="STAGE_LR"), # 2
+  atgnat::plot_bin_population(processed_MCA_PF_SCE, 3, group_by_slot="STAGE_LR"), # 1
+  atgnat::plot_bin_population(processed_MCA_PF_SCE, 4, group_by_slot="STAGE_LR"), # 2
   ncol=2
 )
 gridExtra::grid.arrange(
   atgnat::plot_mapping_result_heatmap(rev(mapping_results[5:6]), annotate = TRUE), # 1
   atgnat::plot_mapping_result_heatmap(rev(mapping_results[7:8]), annotate = TRUE), # 2
-  atgnat::plot_bin_population(sce, 2, group_by_slot="STAGE_LR"), # 1
-  atgnat::plot_bin_population(sce, 3, group_by_slot="STAGE_LR"), # 2
-  atgnat::plot_bin_population(sce, 3, group_by_slot="STAGE_LR"), # 1
-  atgnat::plot_bin_population(sce, 4, group_by_slot="STAGE_LR"), # 2
+  atgnat::plot_bin_population(processed_MCA_PF_SCE, 2, group_by_slot="STAGE_LR"), # 1
+  atgnat::plot_bin_population(processed_MCA_PF_SCE, 3, group_by_slot="STAGE_LR"), # 2
+  atgnat::plot_bin_population(processed_MCA_PF_SCE, 3, group_by_slot="STAGE_LR"), # 1
+  atgnat::plot_bin_population(processed_MCA_PF_SCE, 4, group_by_slot="STAGE_LR"), # 2
   ncol=2
 )
 gridExtra::grid.arrange(
   atgnat::plot_mapping_result_heatmap(rev(mapping_results[9:10]), annotate = TRUE), # 1
   atgnat::plot_mapping_result_heatmap(rev(mapping_results[11:12]), annotate = TRUE), # 2
-  atgnat::plot_bin_population(sce, 1, group_by_slot="STAGE_LR"), # 1
-  atgnat::plot_bin_population(sce, 4, group_by_slot="STAGE_LR"), # 2
-  atgnat::plot_bin_population(sce, 2, group_by_slot="STAGE_LR"), # 1
+  atgnat::plot_bin_population(processed_MCA_PF_SCE, 1, group_by_slot="STAGE_LR"), # 1
+  atgnat::plot_bin_population(processed_MCA_PF_SCE, 4, group_by_slot="STAGE_LR"), # 2
+  atgnat::plot_bin_population(processed_MCA_PF_SCE, 2, group_by_slot="STAGE_LR"), # 1
   ggplot() + theme_void(),
   ncol=2
 )

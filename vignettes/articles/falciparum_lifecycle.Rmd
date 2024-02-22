@@ -51,133 +51,55 @@ if (!file.exists(bulk_path)) {
   print(paste("Using cached", bulk_path))
 }
 
-mca_path = path(article_dir, "MCA", ext="zip")
-if (!file.exists(mca_path)) {
-  download.file('https://www.malariacellatlas.org/downloads/pf.zip', mca_path)
-  unzip(mca_path, exdir = paste0(article_dir, '/MCA'))
-}else {
-  print(paste("Using cached", mca_path))
-}
-
 bulk = as.data.frame(read_excel(bulk_path, sheet = "Estimated Total Abundance"))
 rownames(bulk) = bulk$`Gene ID`
 rownames(bulk) = gsub(x=rownames(bulk), pattern="_", replacement="-", fixed=TRUE)
 bulk = bulk[7:nrow(bulk),]
 bulk = subset(bulk, , -c(`Gene ID`, `Annotation`, `Peak Time (hpi)`, `p-value`))
 
-mca_counts_path = path(article_dir, "MCA", "pf-ch10x-raw", ext="csv")
-sc_readcounts = read.csv(mca_counts_path, row.names=1)
-
-mca_annotation_path = path(article_dir, "MCA", "pf-ch10x-data", ext="csv")
-sc_annotations = read.csv(mca_annotation_path, row.names=1)
 ```
 ## Prepare SC
-```{r}
-rownames(sc_annotations) = gsub(x = rownames(sc_annotations), pattern="-", replacement=".", fixed=TRUE)
-sc_annotations
+Here we use the Malaria Cell Atlas's Plasmodium Falciparum 10x data ([Howick et al. 2019](https://doi.org/10.1126/science.aaw2619), with some processing described in [generate-MCA-pf-object](generate-MCA-pf-object). 
 
-# Combine all genes with multiple transcripts
-genes_to_fix = rownames(sc_readcounts)[!(rownames(sc_readcounts) %in% sub(x=rownames(sc_readcounts), pattern="\\.[0-9]", replacement=""))]
-genes_to_fix = unique(sub(x=genes_to_fix, pattern="\\.[0-9]", replacement=""))
-print(paste("Fixing this many genes:", length(genes_to_fix)))
-```
-
-```{R removeSCDupTranscripts}
-new_rows = data.frame()
-rownames_to_remove = c()
-
-# Do some pre-work to get colSums quickly
-sc_readcounts_matrix = data.matrix(sc_readcounts)
-sc_readcounts_n = ncol(sc_readcounts_matrix)
-
-for (gene in genes_to_fix) {
-  targetRowNames = rownames(sc_readcounts)[grep(x=rownames(sc_readcounts), pattern=gene)]
-  rownames_to_remove = c(rownames_to_remove, targetRowNames)
-  # N = col index, M = row index
-  counts = .colSums(sc_readcounts_matrix[targetRowNames,], m=length(targetRowNames), n=sc_readcounts_n)
-  counts = t(data.frame(counts=counts))
-  rownames(counts) = c(gene)
-  colnames(counts) = colnames(sc_readcounts)
-  new_rows = rbind(new_rows, counts)
-}
-
-sc_readcounts <- sc_readcounts[ !(rownames(sc_readcounts) %in% rownames_to_remove), ]
-sc_readcounts = rbind(sc_readcounts, new_rows)
-
-genes_to_fix = rownames(sc_readcounts)[!(rownames(sc_readcounts) %in% sub(x=rownames(sc_readcounts), pattern="\\.[0-9]", replacement=""))]
-genes_to_fix = unique(sub(x=genes_to_fix, pattern="\\.[0-9]", replacement=""))
-print(paste("Remaining genes with dups:", genes_to_fix))
-
-rm (new_rows, rownames_to_remove, sc_readcounts_matrix, sc_readcounts_n, genes_to_fix)
-gc()
-```
-
-```{r}
-sce = SingleCellExperiment(assays=list(counts=as.matrix(sc_readcounts)), colData=sc_annotations)
-rownames(sce) = sub(x=rownames(sce), pattern="\\.[0-9]", replacement="")
-
-rm(sc_annotations, sc_readcounts)
-gc()
-
-sce = subset(sce, , STAGE_LR != 'gametocyte')
-
-# Subsample to reduce memory consumption
-cells_to_keep = sample(colnames(sce), size=12000)
-sce = sce[,colnames(sce) %in% cells_to_keep]
-
-sce <- computeSumFactors(sce)
-sce <- logNormCounts(sce)
-normcounts(sce) <- exp(logcounts(sce))
-
-reducedDim(sce, "PCA") = as.matrix(cbind(sce@colData["PC_1"], sce@colData["PC_2"],sce@colData["PC_3"]))
-# better separation in the 2nd and 3rd dimension for just asexual stages
-reducedDim(sce, "UMAP") = as.matrix(cbind(sce@colData["UMAP_2"], sce@colData["UMAP_3"]))
-
-sce <- slingshot(sce, reducedDim = 'UMAP', clusterLabels="STAGE_LR", start.clus="ring")
-
+```{r loadSC}
+data(processed_MCA_PF_SCE, package="atgnat")
 gridExtra::grid.arrange(
-  plotPCA(sce, colour_by="STAGE_LR"),
-  plotUMAP(sce, colour_by="STAGE_LR"),
-  plotPCA(sce, colour_by="DAY"),
-  plotUMAP(sce, colour_by="DAY"),
-  plotPCA(sce, colour_by="STRAIN"),
-  plotUMAP(sce, colour_by="STRAIN"),
-  plotPCA(sce, colour_by="slingPseudotime_1"),
-  plotUMAP(sce, colour_by="slingPseudotime_1"),
+  plotPCA(processed_MCA_PF_SCE, colour_by="STAGE_LR"),
+  plotUMAP(processed_MCA_PF_SCE, colour_by="STAGE_LR"),
+  plotPCA(processed_MCA_PF_SCE, colour_by="DAY"),
+  plotUMAP(processed_MCA_PF_SCE, colour_by="DAY"),
+  plotPCA(processed_MCA_PF_SCE, colour_by="STRAIN"),
+  plotUMAP(processed_MCA_PF_SCE, colour_by="STRAIN"),
+  plotPCA(processed_MCA_PF_SCE, colour_by="slingPseudotime_1"),
+  plotUMAP(processed_MCA_PF_SCE, colour_by="slingPseudotime_1"),
   ncol=2
 )
-
 ```
 
-```{r}
-# evaluateK(sce, k=6:8, parallel=T, BPPARAM=MulticoreParam(N_CORES))
-```
-
-```{r}
-sce <- fitGAM(sce, parallel=T, BPPARAM=MulticoreParam(N_CORES), nknots=7)
-associationTestResult <- associationTest(sce, lineages=T, global=F, contrastType="consecutive")
+```{r tradeSeq}
+associationTestResult <- associationTest(processed_MCA_PF_SCE, lineages=T, global=F, contrastType="consecutive")
 ```
 
 ## Compare Gene Lists
 ```{r}
-waves = get_waves(sce, "slingPseudotime_1", n_cores=N_CORES)
-gene_selection_matrix(sce, waves, n_cores=N_CORES)
+waves = get_waves(processed_MCA_PF_SCE, "slingPseudotime_1", n_cores=N_CORES)
+gene_selection_matrix(processed_MCA_PF_SCE, waves, n_cores=N_CORES, target_matrix_size=nrow(waves))
 ```
 
 ## Get Fourier Genes
 ```{r}
-fourier_power_genes = select_genes_by_fourier_method(sce, waves, n_groups=100, top_n_per_group=2)
-gene_selection_matrix(sce, waves, genes=rownames(fourier_power_genes), target_matrix_size=nrow(fourier_power_genes))
+fourier_power_genes = select_genes_by_fourier_method(processed_MCA_PF_SCE, waves, n_groups=100, top_n_per_group=2)
+gene_selection_matrix(processed_MCA_PF_SCE, waves, genes=rownames(fourier_power_genes), target_matrix_size=nrow(fourier_power_genes))
 ```
 
 ## Prepare BLASE
 ```{r}
 genelist = atgnat::get_top_n_genes(associationTestResult, n_genes = 500, lineage = 1)
-gene_selection_matrix(sce, waves, genes=genelist[0:300], target_matrix_size=300)
+gene_selection_matrix(processed_MCA_PF_SCE, waves, genes=genelist[0:300], target_matrix_size=300)
 ```
 
 ```{r}
-res = find_best_params(sce,
+res = find_best_params(processed_MCA_PF_SCE,
                        genelist,
                        split_by="pseudotime_range",
                        pseudotime_slot="slingPseudotime_1",
@@ -186,7 +108,7 @@ res = find_best_params(sce,
 plot_find_best_params_results(res)
 ```
 ```{r}
-res2 = find_best_params(sce,
+res2 = find_best_params(processed_MCA_PF_SCE,
                        genelist,
                        split_by="pseudotime_range",
                        pseudotime_slot="slingPseudotime_1",
@@ -199,18 +121,18 @@ plot_find_best_params_results(res2)
 ```{r}
 genes = 300
 bins = 12
-sce = assign_pseudotime_bins(sce, pseudotime_slot="slingPseudotime_1", n_bins=bins, split_by="pseudotime_range")
-plotUMAP(sce, color="pseudotime_bin")
+processed_MCA_PF_SCE = assign_pseudotime_bins(processed_MCA_PF_SCE, pseudotime_slot="slingPseudotime_1", n_bins=bins, split_by="pseudotime_range")
+plotUMAP(processed_MCA_PF_SCE, color="pseudotime_bin")
 gridExtra::grid.arrange(
-  plotUMAP(sce, color="STAGE_LR"),
-  plotUMAP(sce, color="pseudotime_bin"),
+  plotUMAP(processed_MCA_PF_SCE, color="STAGE_LR"),
+  plotUMAP(processed_MCA_PF_SCE, color="pseudotime_bin"),
   ncol=2
 )
 ```
 
 
 ```{r}
-atgnatData = as.AtgnatData(sce, pseudotime_slot="slingPseudotime_1", n_bins=bins, split_by="pseudotime_range")
+atgnatData = as.AtgnatData(processed_MCA_PF_SCE, pseudotime_slot="slingPseudotime_1", n_bins=bins, split_by="pseudotime_range")
 atgnatData@genes = genelist[1:genes]
 evaluate_parameters(atgnatData, make_plot = TRUE)
 ```
@@ -230,7 +152,7 @@ ggplot2::ggsave(paste0("blase_heatmap_tradeseq_", bins, "_bins_", genes, "_genes
 
 ### Using Fourier Genes
 ```{r}
-atgnatData = as.AtgnatData(sce, pseudotime_slot="slingPseudotime_1", n_bins=bins, split_by="pseudotime_range")
+atgnatData = as.AtgnatData(processed_MCA_PF_SCE, pseudotime_slot="slingPseudotime_1", n_bins=bins, split_by="pseudotime_range")
 atgnatData@genes = rownames(fourier_power_genes)
 evaluate_parameters(atgnatData, make_plot = TRUE)
 ```
@@ -263,10 +185,10 @@ expected_schizont_hpi = 35:42
 
 Below, we can see how out bins are aligned with lifecycle stages
 ```{r}
-table(sce@colData[c("STAGE_LR", "pseudotime_bin")])
-called_ring_bins = sort(unique(sce@colData[sce@colData[["STAGE_LR"]] == "ring",][["pseudotime_bin"]]))
-called_troph_bins = sort(unique(sce@colData[sce@colData[["STAGE_LR"]] == "trophozoite",][["pseudotime_bin"]]))
-called_schizont_bins = sort(unique(sce@colData[sce@colData[["STAGE_LR"]] == "schizont",][["pseudotime_bin"]]))
+table(processed_MCA_PF_SCE@colData[c("STAGE_LR", "pseudotime_bin")])
+called_ring_bins = sort(unique(processed_MCA_PF_SCE@colData[processed_MCA_PF_SCE@colData[["STAGE_LR"]] == "ring",][["pseudotime_bin"]]))
+called_troph_bins = sort(unique(processed_MCA_PF_SCE@colData[processed_MCA_PF_SCE@colData[["STAGE_LR"]] == "trophozoite",][["pseudotime_bin"]]))
+called_schizont_bins = sort(unique(processed_MCA_PF_SCE@colData[processed_MCA_PF_SCE@colData[["STAGE_LR"]] == "schizont",][["pseudotime_bin"]]))
 ```
 Now we can check the accuracy of these techniques, according to prior knowledge.
 

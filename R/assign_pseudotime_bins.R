@@ -35,10 +35,6 @@ setMethod(
       stop("split_by must be 'pseudotime_range' or 'cells'")
     }
 
-    print("Checking pseudotime_slot")
-    print(pseudotime_slot)
-    print(!any(colnames(x@colData) == pseudotime_slot))
-
     if ( !any(colnames(x@colData) == pseudotime_slot)) {
       stop(paste0("Pseudotime slot '", pseudotime_slot ,"' does not exist"))
     }

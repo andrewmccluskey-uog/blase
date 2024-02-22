@@ -179,9 +179,23 @@ setMethod(
         waves_in_block = waves[waves$phase>i-(stepsize/2) & waves$phase<i+(stepsize/2),]
         # remove genes in `best_waves_in_spread` from `waves_in_block` and then select best
         # waves_in_block = best_wave_in_block[!(rownames(best_wave_in_block) %in% best_waves_in_spread)]
-        best_wave_in_block = waves_in_block[order(-waves_in_block[,method]),][1:top_n_per_group,]
-        best_waves_in_spread = rbind(best_waves_in_spread, best_wave_in_block)
+
+        best_waves_in_block = waves_in_block[order(-waves_in_block[,method]),]
+
+                # If there are more genes than we need, just take
+        # the top n, otherwise just all the remaining genes can be used.
+        if (nrow(best_waves_in_block) > top_n_per_group) {
+          best_waves_in_block = best_waves_in_block[1:top_n_per_group,]
+        }
+
+        best_waves_in_spread = rbind(best_waves_in_spread, best_waves_in_block)
       }
+
+      if (nrow(best_waves_in_spread) < top_n_per_group*n_groups) {
+        warning(paste0("Fewer genes identified as good matches than requested. requested=",
+                       top_n_per_group*n_groups," found=",nrow(best_waves_in_spread)))
+      }
+
       return(best_waves_in_spread)
 
     } else {
@@ -189,7 +203,7 @@ setMethod(
         warning("n_groups and top_n_per_group are not used when force_spread_selection==FALSE")
       }
 
-      top_waves = waves[order(-waves$r2),][0:n_genes,]
+      top_waves = waves[order(-waves[,method]),][0:n_genes,]
       return(top_waves)
     }
 
