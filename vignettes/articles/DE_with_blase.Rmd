@@ -22,9 +22,6 @@ library(utils)
 library(atgnat)
 library(utils)
 library(ami)
-
-# TODO rename this as it's no longer PF3d7
-# https://academic.oup.com/nar/article/44/5/2110/2464621?login=true alternative bulk option
 ```
 
 ```{r randomseed}
@@ -39,13 +36,14 @@ if (ami::using_ci()) {
   N_CORES = 2
 }
 ```
-## TODO Ensure comments are clear and accurate, this copied from PF Article
 
-In this article we will use BLASE to map Plasmodium Falciparum microarray data of the asexual lifecycle ([Painter et al. 2018](https://doi.org/10.1038/s41467-018-04966-3), 3d7 strain) onto the Malaria Cell Atlas ([Howick et al. 2019](https://doi.org/10.1126/science.aaw2619), 7G8 & NF54 strains)  to try and annotate it over a 48 hour period. 
+In this article we will use BLASE to map bulk Plasmodium Falciparum data from an experiment ([Zhang et al. 2021](https://doi.org/10.1038/s41467-021-24814-1)) on heat shock response in P. Falciparum, onto the Malaria Cell Atlas ([Howick et al. 2019](https://doi.org/10.1126/science.aaw2619), 7G8 & NF54 strains). We look at Zhang et al's wild type control data (from the NF54 strain) as well as the knockouts (pb4 and pb31) in this article. The paper reported that the knockouts both handled the heat shock less well than the wild type strain, which we will see in our analysis below.
 
+The controls kept all strains at 37 degrees, whereas the heat shock was applied to each strain as 3 8-hour increases to 41 degrees, simulating malarial fever.
+
+## Fetch the data
 ```{r getData}
 root_dir = tools::R_user_dir("BLASE", "data")
-
 article_dir = path(root_dir, "DE_with_blase")
 
 if (!dir.exists(article_dir)) {
@@ -56,7 +54,7 @@ bulk_path = path(article_dir, "heat_shock_bulks", ext="xlsx")
 if (!file.exists(bulk_path)) {
   download.file('https://static-content.springer.com/esm/art%3A10.1038%2Fs41467-021-24814-1/MediaObjects/41467_2021_24814_MOESM5_ESM.xlsx', bulk_path)
 }else {
-  print(paste("Using cached", bulk_path))
+  print("Using cached")
 }
 
 bulk = as.data.frame(read_excel(bulk_path, range = 'S3A_RNAseq!A4:P2571'))
@@ -99,6 +97,9 @@ rm (new_rows, rownames_to_remove, bulk_matrix, bulk_n, genes_to_fix_bulk, counts
 gc()
 ```
 ## Prepare SC
+
+We are using the Malaria Cell Atlas data which we have pre-processed (here)[articles/generate-MCA-pf-object.html]. This data is available for your to experiment with as part of the package.
+
 ```{r loadSC}
 data(processed_MCA_PF_SCE, package="atgnat")
 gridExtra::grid.arrange(
@@ -119,18 +120,15 @@ associationTestResult <- associationTest(processed_MCA_PF_SCE, lineages=T, globa
 ```
 
 ## Prepare BLASE
+We prepare BLASE by checking for a good number of genes and bins.
 ```{r}
 genelist = atgnat::get_top_n_genes(associationTestResult, n_genes = 500, lineage = 1)
-
-# Check the knockouts are not in the genelist
-"PF3D7-1122900" %in% rownames(genelist) #DHC
-"PF3D7-1432400" %in% rownames(genelist) #LRR5
 
 res = find_best_params(processed_MCA_PF_SCE,
                        genelist,
                        split_by="pseudotime_range",
                        pseudotime_slot="slingPseudotime_1",
-                       bins_count_range = 12,
+                       bins_count_range = c(6, 8, 10),
                        gene_count_range = seq.int(250, 340, 3))
 plot_find_best_params_results(res)
 ```
@@ -149,49 +147,56 @@ gridExtra::grid.arrange(
   ncol=2
 )
 ```
-
-```{r}
 ## Map Bulk data onto Single Cell
-
+Now we can map the bulk data onto the single cell.
+```{r}
 mapping_results = c()
 for (bulkname in colnames(bulk)) {
-  print(bulkname)
   res = map_best_bin(atgnatData, bulkname, bulk)
   mapping_results = c(mapping_results, res)
-  # print(res)
 }
 
 atgnat::plot_mapping_result_heatmap(rev(mapping_results), annotate = TRUE)
+```
 
+We can see the wild type develops more normally than the 2 knockouts, who show delayed growth generally, and less of a response to the heat shock (41 degrees).
+
+```{r}
+# Wildtype
 gridExtra::grid.arrange(
   atgnat::plot_mapping_result_heatmap(rev(mapping_results[1:2]), annotate = TRUE), # 1
   atgnat::plot_mapping_result_heatmap(rev(mapping_results[3:4]), annotate = TRUE), # 2
+  atgnat::plot_bin_population(processed_MCA_PF_SCE, 2, group_by_slot="STAGE_LR"), # 1
+  atgnat::plot_bin_population(processed_MCA_PF_SCE, 4, group_by_slot="STAGE_LR"), # 2
   atgnat::plot_bin_population(processed_MCA_PF_SCE, 3, group_by_slot="STAGE_LR"), # 1
   atgnat::plot_bin_population(processed_MCA_PF_SCE, 4, group_by_slot="STAGE_LR"), # 2
   ncol=2
 )
+
+# pb4 knockout
 gridExtra::grid.arrange(
   atgnat::plot_mapping_result_heatmap(rev(mapping_results[5:6]), annotate = TRUE), # 1
   atgnat::plot_mapping_result_heatmap(rev(mapping_results[7:8]), annotate = TRUE), # 2
   atgnat::plot_bin_population(processed_MCA_PF_SCE, 2, group_by_slot="STAGE_LR"), # 1
-  atgnat::plot_bin_population(processed_MCA_PF_SCE, 3, group_by_slot="STAGE_LR"), # 2
-  atgnat::plot_bin_population(processed_MCA_PF_SCE, 3, group_by_slot="STAGE_LR"), # 1
-  atgnat::plot_bin_population(processed_MCA_PF_SCE, 4, group_by_slot="STAGE_LR"), # 2
+  ggplot() + theme_void(), # 2
+  atgnat::plot_bin_population(processed_MCA_PF_SCE, 4, group_by_slot="STAGE_LR"), # 1
+  ggplot() + theme_void(), # 2
   ncol=2
 )
+
+# pb31 knockout
 gridExtra::grid.arrange(
   atgnat::plot_mapping_result_heatmap(rev(mapping_results[9:10]), annotate = TRUE), # 1
   atgnat::plot_mapping_result_heatmap(rev(mapping_results[11:12]), annotate = TRUE), # 2
   atgnat::plot_bin_population(processed_MCA_PF_SCE, 1, group_by_slot="STAGE_LR"), # 1
-  atgnat::plot_bin_population(processed_MCA_PF_SCE, 4, group_by_slot="STAGE_LR"), # 2
+  atgnat::plot_bin_population(processed_MCA_PF_SCE, 3, group_by_slot="STAGE_LR"), # 2
   atgnat::plot_bin_population(processed_MCA_PF_SCE, 2, group_by_slot="STAGE_LR"), # 1
-  ggplot() + theme_void(),
+  ggplot() + theme_void(), #2
   ncol=2
 )
-
-#ggplot2::ggsave(paste0("blase_heatmap_", bins, "_bins_", genes, "_genes.png"), path="/Users/andrewmccluskey/code/PhD")
 ```
 
+## Session Info
 ```{r sessionInfo}
 sessionInfo()
 ```

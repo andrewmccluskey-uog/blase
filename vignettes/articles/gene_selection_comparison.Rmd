@@ -750,7 +750,7 @@ gridExtra::grid.arrange(
   ncol=2
 )
 ```
-
+## Session Info
 ``` {r}
 sessionInfo()
 ```

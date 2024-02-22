@@ -266,6 +266,7 @@ gridExtra::grid.arrange(
 )
 
 ```
+## Session Info
 ```{r sessionInfo}
 sessionInfo()
 ```

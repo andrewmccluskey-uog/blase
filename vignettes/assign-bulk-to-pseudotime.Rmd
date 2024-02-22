@@ -180,7 +180,7 @@ plot_bin_population(binned_sce, 1, group_by_slot="celltype")
 ```
 We can see here that both of these bins have high proportions of the GMP cell type, which is why Atgnat could not make a convincing call on either of these being the true "best" mapping. In this case, since Bin 3 has a larger proportion and number of GMP cells, it is likely the best mapping, and this is reflected in Atgnat's correlation score.
 
-## Session
+## Session Info
 ```{r, sessionInfo}
 sessionInfo()
 ```
