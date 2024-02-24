@@ -34,7 +34,12 @@ if (ami::using_ci()) {
   N_CORES = 2
 }
 ```
-In this article we will use BLASE to map Plasmodium Falciparum microarray data of the asexual lifecycle ([Painter et al. 2018](https://doi.org/10.1038/s41467-018-04966-3), 3d7 strain) onto the Malaria Cell Atlas ([Howick et al. 2019](https://doi.org/10.1126/science.aaw2619), 7G8 & NF54 strains)  to try and annotate it over a 48 hour period. 
+
+In this article we will use BLASE to map Plasmodium Falciparum microarray data of the asexual lifecycle ([Painter et al. 2018](https://doi.org/10.1038/s41467-018-04966-3), 3d7 strain) onto the Malaria Cell Atlas ([Howick et al. 2019](https://doi.org/10.1126/science.aaw2619), 7G8 & NF54 strains) to try and annotate it over a 48 hour period.
+
+We will also investigate the Bozdech method for finding genes that change over the lifecycle, and compare it with TradeSeq's results.
+
+## Load Data
 
 ```{r getData}
 root_dir = tools::R_user_dir("BLASE", "data")
@@ -58,8 +63,10 @@ bulk = bulk[7:nrow(bulk),]
 bulk = subset(bulk, , -c(`Gene ID`, `Annotation`, `Peak Time (hpi)`, `p-value`))
 
 ```
+
 ## Prepare SC
-Here we use the Malaria Cell Atlas's Plasmodium Falciparum 10x data ([Howick et al. 2019](https://doi.org/10.1126/science.aaw2619), with some processing described in [generate-MCA-pf-object](generate-MCA-pf-object). 
+
+Here we use the Malaria Cell Atlas's Plasmodium Falciparum 10x data ([Howick et al. 2019](https://doi.org/10.1126/science.aaw2619), with some processing described in [generate-MCA-pf-object](generate-MCA-pf-object).
 
 ```{r loadSC}
 data(processed_MCA_PF_SCE, package="atgnat")
@@ -76,26 +83,12 @@ gridExtra::grid.arrange(
 )
 ```
 
+## Get Genes
+
+### TradeSeq
+
 ```{r tradeSeq}
 associationTestResult <- associationTest(processed_MCA_PF_SCE, lineages=T, global=F, contrastType="consecutive")
-```
-
-## Compare Gene Lists
-```{r}
-waves = get_waves(processed_MCA_PF_SCE, "slingPseudotime_1", n_cores=N_CORES)
-gene_selection_matrix(processed_MCA_PF_SCE, waves, n_cores=N_CORES, target_matrix_size=nrow(waves))
-```
-
-## Get Fourier Genes
-```{r}
-fourier_power_genes = select_genes_by_fourier_method(processed_MCA_PF_SCE, waves, n_groups=100, top_n_per_group=2)
-gene_selection_matrix(processed_MCA_PF_SCE, waves, genes=rownames(fourier_power_genes), target_matrix_size=nrow(fourier_power_genes))
-```
-
-## Prepare BLASE
-```{r}
-genelist = atgnat::get_top_n_genes(associationTestResult, n_genes = 500, lineage = 1)
-gene_selection_matrix(processed_MCA_PF_SCE, waves, genes=genelist[0:300], target_matrix_size=300)
 ```
 
 ```{r}
@@ -107,6 +100,7 @@ res = find_best_params(processed_MCA_PF_SCE,
                        gene_count_range = seq.int(12, 192, 3))
 plot_find_best_params_results(res)
 ```
+
 ```{r}
 res2 = find_best_params(processed_MCA_PF_SCE,
                        genelist,
@@ -117,7 +111,35 @@ res2 = find_best_params(processed_MCA_PF_SCE,
 plot_find_best_params_results(res2)
 ```
 
+```{r}
+genelist = atgnat::get_top_n_genes(associationTestResult, n_genes = 500, lineage = 1)
+head(fourier_power_genes)
+```
+
+### Get Bozdech Genes
+
+Bozdech's paper describes using a fourier transform on the gene expression of cells ordered by time. This gives the amplitude and phase of the peak of waves. In this case we assume that many genes important for lifecycle development are turned on temporarily during the lifecycle, then turned off, resulting in a clear peak. They then find the top "power" genes by analysing how strong peaks are versus the average expression of the gene over pseudotime.
+
+BLASE provides a convenience function to perform this analysis, and also allows you to select the top genes by amplitude and explained variance if preferred. See the documentation for `select_genes_by_fourier_method()` for more information. It is noteworthy that BLASE will force these genes to be selected to cover a wide range of pseudotime by default, instead of simply the top power genes.
+
+```{r}
+waves = get_waves(processed_MCA_PF_SCE, "slingPseudotime_1", n_cores=N_CORES)
+fourier_power_genes = select_genes_by_fourier_method(processed_MCA_PF_SCE, waves, n_groups=100, top_n_per_group=2)
+head(fourier_power_genes)
+```
+
+### Compare Gene Lists
+Here we generate a heatmap of log counts of the selected genes, ordered by pseudotime. Genes are ordered by their phase in pseudotime.
+
+```{r}
+gene_selection_matrix(processed_MCA_PF_SCE, waves, genes=genelist[0:300], target_matrix_size=300)
+gene_selection_matrix(processed_MCA_PF_SCE, waves, n_cores=N_CORES, target_matrix_size=nrow(waves))
+```
+
+## Use each gene list
+
 ### Using TradeSeq genes
+Now we will 
 ```{r}
 genes = 300
 bins = 12
@@ -129,7 +151,6 @@ gridExtra::grid.arrange(
   ncol=2
 )
 ```
-
 
 ```{r}
 atgnatData = as.AtgnatData(processed_MCA_PF_SCE, pseudotime_slot="slingPseudotime_1", n_bins=bins, split_by="pseudotime_range")
@@ -150,7 +171,8 @@ atgnat::plot_mapping_result_heatmap(rev(mapping_results), annotate = TRUE)
 ggplot2::ggsave(paste0("blase_heatmap_tradeseq_", bins, "_bins_", genes, "_genes.png"), path="/Users/andrewmccluskey/code/PhD")
 ```
 
-### Using Fourier Genes
+### Using Bozdech Genes
+
 ```{r}
 atgnatData = as.AtgnatData(processed_MCA_PF_SCE, pseudotime_slot="slingPseudotime_1", n_bins=bins, split_by="pseudotime_range")
 atgnatData@genes = rownames(fourier_power_genes)
@@ -169,30 +191,29 @@ for (bulkname in colnames(bulk)) {
 atgnat::plot_mapping_result_heatmap(rev(mapping_results_fourier), annotate = TRUE)
 ggplot2::ggsave(paste0("blase_heatmap_fourierpower_", bins, "_bins_", genes, "_genes.png"), path="/Users/andrewmccluskey/code/PhD")
 ```
+
 ## Analysing Accuracy
 
-The Bulk paper describes the following timepoints HPI matching to lifecycle stages, in figure 1:
-* 5-15: Ring
-* 15-34: Troph
-* 34-40: Schizont
-* 40-45: Merozoites
+The Bulk paper describes the following timepoints HPI matching to lifecycle stages, in figure 1: \* 5-15: Ring \* 15-34: Troph \* 34-40: Schizont \* 40-45: Merozoites
+
 ```{r}
 expected_rings_hpi = 5:15
 expected_trophs_hpi = 16:34
 expected_schizont_hpi = 35:42
 ```
 
-
 Below, we can see how out bins are aligned with lifecycle stages
+
 ```{r}
 table(processed_MCA_PF_SCE@colData[c("STAGE_LR", "pseudotime_bin")])
 called_ring_bins = sort(unique(processed_MCA_PF_SCE@colData[processed_MCA_PF_SCE@colData[["STAGE_LR"]] == "ring",][["pseudotime_bin"]]))
 called_troph_bins = sort(unique(processed_MCA_PF_SCE@colData[processed_MCA_PF_SCE@colData[["STAGE_LR"]] == "trophozoite",][["pseudotime_bin"]]))
 called_schizont_bins = sort(unique(processed_MCA_PF_SCE@colData[processed_MCA_PF_SCE@colData[["STAGE_LR"]] == "schizont",][["pseudotime_bin"]]))
 ```
+
 Now we can check the accuracy of these techniques, according to prior knowledge.
 
-```{r}
+```{r, include=FALSE}
 analyse_mapping_results = function(mapping_results) {
   results = data.frame()
   for (bulk_sample in mapping_results) {
@@ -232,7 +253,6 @@ analyse_mapping_results = function(mapping_results) {
 }
 
 describe_results = function(result_set) {
-  # Wrong because %in% is just checking the whole list, but we want the sublist
   incorrect = nrow(result_set[!mapply(`grepl`, result_set$expected_stage_from_hpi, result_set$blase_predicted_stage),])
   confident = nrow(result_set[result_set$confident_call,])
   incorrect_confident = nrow(result_set[!mapply(`grepl`, result_set$expected_stage_from_hpi, result_set$blase_predicted_stage) & result_set$confident_call,])
@@ -254,7 +274,12 @@ print(paste("Tradeseq:", describe_results(results_tradeseq)))
 print(paste("Fourier:", describe_results(results_fourier)))
 ```
 
+## Summary
+
+We've shown here that using Bozdech's method can give better mappings than using tradeseq in this case of the P. Falciparum lifecycle. Selecting informative genes is vital for BLASE's performance, however this is an non-trivial problem as of now - we reccomend that you select genes carefully and apply prior knowledge of genes that change over the trajectory where possible.
+
 ## Session Info
+
 ```{r sessionInfo}
 sessionInfo()
 ```

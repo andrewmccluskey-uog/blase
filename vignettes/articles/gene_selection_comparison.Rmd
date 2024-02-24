@@ -2,16 +2,13 @@
 title: "gene_selection_comparison"
 ---
 
+TODO: Switch to BLASE methods where possible.
+
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-```
-
-```{r loadatgnat}
-#library(devtools)
-#load_all('/Users/andrewmccluskey/code/PhD/R/atgnat')
 ```
 
 ```{r setup}
@@ -25,6 +22,7 @@ library(emdist)
 library(scater)
 library(fs)
 library(utils)
+library(metR)
 library(atgnat)
 ```
 
@@ -41,7 +39,11 @@ if (ami::using_ci()) {
 }
 ```
 
-In this article we will look at different methods for gene selection, using the MCA's Plasmodium Berghei Data [Howick et al, 2019](https://dx.doi.org/10.1126/science.aaw2619), and bulk RNA seq of the lifecycle stages [Otto et al, 2004](https://doi.org/10.1186/s12915-014-0086-0).
+In this article we will look at different methods for gene selection, using the MCA's Plasmodium Berghei Data [Howick et al, 2019](https://dx.doi.org/10.1126/science.aaw2619), and bulk RNA seq of the lifecycle stages [Otto et al, 2004](https://doi.org/10.1186/s12915-014-0086-0). 
+
+We will investigate in detail the Bozdech method for gene selection described in PAPER.
+
+## Load Data
 ```{r getData}
 root_dir = tools::R_user_dir("BLASE", "data")
 
@@ -54,7 +56,7 @@ bulk_path = path(article_dir, 'otto_pb_bulk_timepoints', ext="xlsx")
 if (!file.exists(bulk_path)) {
   download.file('https://static-content.springer.com/esm/art%3A10.1186%2Fs12915-014-0086-0/MediaObjects/12915_2014_86_MOESM9_ESM.xlsx', bulk_path)
 }else {
-  print(paste("Using cached", bulk_path))
+  print("Using cached")
 }
 
 bulk = as.data.frame(read_excel(bulk_path, range = "FPKM PbA !A4:L5024"))
@@ -80,12 +82,12 @@ gridExtra::grid.arrange(
   plotUMAP(processed_MCA_PB_SCE, colour_by="pseudotime_bin"),
   ncol=2
 )
-
 ```
-## Using TradeSeq
-First, we'll use tradeSeq to find the good genes
-```{r}
 
+## Using TradeSeq
+First, we'll use tradeSeq to find the genes that Tradeseq thinks are variable over pseudotime.
+
+```{r}
 associationTestResult <- associationTest(processed_MCA_PB_SCE, lineages=T, global=F, contrastType="consecutive")
 table(processed_MCA_PB_SCE$pseudotime_bin)
 plotUMAP(processed_MCA_PB_SCE, colour_by="pseudotime_bin")
@@ -130,6 +132,9 @@ tradeseq_heat
 ```
 
 ## Using marker genes
+
+Here we will simply select the top n marker genes for our lifecycle stage annotations.
+
 ```{r}
 markers <- scoreMarkers(processed_MCA_PB_SCE, lfc=1, groups=processed_MCA_PB_SCE$STAGE_LR)
 
@@ -175,7 +180,9 @@ markergenes_heat = atgnat::plot_mapping_result_heatmap(rev(mapping_results)) + g
 markergenes_heat
 ```
 ## Pseudotime bin marker genes
-## Using marker genes
+
+Here we select the marker genes for each pseudotime bin.
+
 ```{r}
 processed_MCA_PB_SCE = assign_pseudotime_bins(processed_MCA_PB_SCE, pseudotime_slot="slingPseudotime_1", n_bins=12, split_by="pseudotime_range")
 
@@ -229,7 +236,6 @@ markergenes_by_bin_heat
 ## Using Bozdech Fourier Method
 
 ```{r}
-library(metR)
 processed_MCA_PB_SCE = assign_pseudotime_bins(processed_MCA_PB_SCE, pseudotime_slot="slingPseudotime_1", n_bins=12, split_by="pseudotime_range")
 
 counts = normcounts(processed_MCA_PB_SCE)[,order(processed_MCA_PB_SCE$slingPseudotime_1)]
@@ -289,7 +295,7 @@ ggplot2::ggplot(waves, ggplot2::aes(phase, amplitude, color=r2)) +
 ```
 
 ### Phase Ordering genes
-
+Here we've plotted the genes and cells ordered by their peak phase and pseudotime respectively. This functionality is available as a part of BLASE, please see the `gene_selection_matrix()` function.
 ```{r}
 # Snippet from: https://cansnippet.bioinfo-fr.net/details.php?id=3
 redim_matrix <- function(
@@ -336,6 +342,7 @@ GENES_TO_USE_COUNT = 120
 
 ```
 ### Util
+# TODO JUST USE THE FIXED FUNCTION FROM BLASE
 ```{r}
 get_by_spread = function(waves, n_groups, parameter, top_n_per_group=1) {
   best_waves_in_spread = data.frame()
@@ -526,9 +533,15 @@ fourier_top_power_spread_heat = atgnat::plot_mapping_result_heatmap(rev(mapping_
 fourier_top_power_spread_heat
 ```
 
-## Earth Movers Distance for Gene Scoring (Coverage Scoring)
+## Analysing All Gene Lists
 
-### Util
+Now we can analyse all of these genelists together and compare some statistics.
+
+### Earth Movers Distance for Gene Scoring (Coverage Scoring)
+
+
+
+#### Util
 
 ```{r}
 fourier_phase_aligned_plot = function(heatmap_counts, genes_to_plot, title) {
@@ -548,7 +561,7 @@ fourier_phase_aligned_plot = function(heatmap_counts, genes_to_plot, title) {
 }
 ```
 
-### Goal State
+#### Goal State
 We can use the phase calculated for each gene to now score how well the selected genes cover the lifecycle. A perfect set of genes would look roughly like a diagonal line from one corner to the other:
 ```{r}
 sim_mat = matrix(0, ncol=1000,nrow=1000)
@@ -569,7 +582,7 @@ ggplot2::ggplot(data=df,ggplot2::aes(x=x,y=y,fill=expression)) +
     ggplot2::ggtitle("Goal State")
 
 ```
-### Normalised Count Plotting
+#### Normalised Count Plotting
 
 Disabled as not sure we want to keep this section
 ```{r, eval=FALSE}
@@ -658,7 +671,7 @@ top_genes_fourier_top_power_spread_mat = heatmap_counts[rownames(heatmap_counts)
 print(paste("Power Spread:", get_earthmovers_distance_from_diagonal(top_genes_fourier_top_power_spread_mat, "Top Power Spread")))
 ```
 
-## Fourier Phase Aligned Plotting (Log Expression)
+### Fourier Phase Aligned Plotting (Log Expression)
 
 ```{r}
 heatmap_counts=logcounts(processed_MCA_PB_SCE)[order(waves$phase),order(processed_MCA_PB_SCE$slingPseudotime_1)]
