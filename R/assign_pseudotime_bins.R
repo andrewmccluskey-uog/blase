@@ -1,6 +1,6 @@
 #' @title Assign Pseudotime Bins to a source object's metadata
 #'
-#' @concept atgnat-object
+#' @concept blase-object
 #'
 #' @rdname assign_pseudotime_bins
 #' @param x An object to add metadata to.

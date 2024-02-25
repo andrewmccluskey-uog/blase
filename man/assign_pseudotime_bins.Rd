@@ -71,4 +71,4 @@ plot_mapping_result_corr(result)
 sce = assign_pseudotime_bins(sce, pseudotime_slot="pseudotime", n_bins=4)
 plot_bin_population(sce, result@best_bin, group_by_slot="cell_type")
 }
-\concept{atgnat-object}
+\concept{blase-object}

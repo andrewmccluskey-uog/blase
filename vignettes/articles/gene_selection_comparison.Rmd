@@ -1,5 +1,5 @@
 ---
-title: "gene_selection_comparison"
+title: "Comparing Gene Selection Methods"
 ---
 
 ```{r, include = FALSE}
@@ -9,7 +9,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
+```{r setup, results='hide', message=FALSE, warning=FALSE}
 library(readxl)
 library(scran)
 library(slingshot)
@@ -524,9 +524,19 @@ ggplot2::ggplot(data=df,ggplot2::aes(x=x,y=y,fill=expression)) +
     ggplot2::ggtitle("Goal State")
 
 ```
-#### Normalised Count Plotting
+#### Earth Movers Distance
 
-Disabled as not sure we want to keep this section
+We can also generate a quantified heuristic for how well the genes are selected.
+Earth Mover's Distance (EMD) will give a value for how much of the matrix's mass needs
+to be moved and how far in order to obtain the "ideal" state. A lower EMD means that
+the gene expression matchs the expected expression in the "ideal" case.
+
+Here, we assume that the perfect case is a straight diagonal line - i.e. each gene 
+is expressed serially, and does not overlap with other stages. This isn't realistic, 
+but can help us make a decision about which gene list will be most informative.
+
+We will only perform this for some of the gene lists, as EMD is a slow function, however, 
+we show the code that can be used to calculate for the other gene lists too.
 ```{r}
 
 get_earthmovers_distance_from_diagonal = function (expression_matrix, title) {
@@ -550,10 +560,10 @@ get_earthmovers_distance_from_diagonal = function (expression_matrix, title) {
   sim_mat <- sim_mat/sum(sim_mat) * sum(expression_matrix)
   
   # redimension the matrices to speed up EMD approximation
-  reduced_mat = redim_matrix(expression_matrix, target_height = nrow(expression_matrix), target_width = nrow(expression_matrix), n_core=N_CORES)
-  reduced_sim_mat = redim_matrix(sim_mat, target_height = nrow(sim_mat), target_width = nrow(expression_matrix), n_core=N_CORES)
+  reduced_mat = redim_matrix(expression_matrix, target_height = 40, target_width = 40, n_core=N_CORES)
+  reduced_sim_mat = redim_matrix(sim_mat, target_height = 40, target_width = 40, n_core=N_CORES)
   
-  dist = emd2d(reduced_mat, reduced_sim_mat, max.iter=5000)
+  dist = emd2d(reduced_mat, reduced_sim_mat, max.iter=750)
   
   return(dist)
 }
@@ -569,17 +579,17 @@ print(paste("Markers:", get_earthmovers_distance_from_diagonal(top_genes_marker_
 top_genes_bin_markers_mat = heatmap_counts[rownames(heatmap_counts) %in% genes_markergenes_by_bin,]
 print(paste("Bin Markers:", get_earthmovers_distance_from_diagonal(top_genes_bin_markers_mat, "Bin Markers")))
 
-top_genes_fourier_top_r2_mat = heatmap_counts[rownames(heatmap_counts) %in% top_genes_fourier_top_r2,]
-print(paste("R2:", get_earthmovers_distance_from_diagonal(top_genes_fourier_top_r2_mat, "Top r2")))
+#top_genes_fourier_top_r2_mat = heatmap_counts[rownames(heatmap_counts) %in% top_genes_fourier_top_r2,]
+#print(paste("R2:", get_earthmovers_distance_from_diagonal(top_genes_fourier_top_r2_mat, "Top r2")))
 
-top_genes_fourier_top_r2_spread_mat = heatmap_counts[rownames(heatmap_counts) %in% top_genes_fourier_top_r2_spread,]
-print(paste("R2 Spread:", get_earthmovers_distance_from_diagonal(top_genes_fourier_top_r2_spread_mat, "Top r2 Spread")))
+#top_genes_fourier_top_r2_spread_mat = heatmap_counts[rownames(heatmap_counts) %in% top_genes_fourier_top_r2_spread,]
+#print(paste("R2 Spread:", get_earthmovers_distance_from_diagonal(top_genes_fourier_top_r2_spread_mat, "Top r2 Spread")))
 
-top_genes_fourier_top_amp_mat = heatmap_counts[rownames(heatmap_counts) %in% top_genes_fourier_top_amp,]
-print(paste("Amp:", get_earthmovers_distance_from_diagonal(top_genes_fourier_top_amp_mat, "Top Amp")))
+#top_genes_fourier_top_amp_mat = heatmap_counts[rownames(heatmap_counts) %in% top_genes_fourier_top_amp,]
+#print(paste("Amp:", get_earthmovers_distance_from_diagonal(top_genes_fourier_top_amp_mat, "Top Amp")))
 
-top_genes_fourier_top_amp_spread_mat = heatmap_counts[rownames(heatmap_counts) %in% top_genes_fourier_top_amp_spread,]
-print(paste("Amp Spread:", get_earthmovers_distance_from_diagonal(top_genes_fourier_top_amp_spread_mat, "Top Amp Spread")))
+#top_genes_fourier_top_amp_spread_mat = heatmap_counts[rownames(heatmap_counts) %in% top_genes_fourier_top_amp_spread,]
+#print(paste("Amp Spread:", get_earthmovers_distance_from_diagonal(top_genes_fourier_top_amp_spread_mat, "Top Amp Spread")))
 
 top_genes_fourier_top_power_mat = heatmap_counts[rownames(heatmap_counts) %in% top_genes_fourier_top_power,]
 print(paste("Power:", get_earthmovers_distance_from_diagonal(top_genes_fourier_top_power_mat, "Top Power")))

@@ -1,5 +1,5 @@
 ---
-title: "compare_simulated_data"
+title: "BLASE on Simulated Data"
 ---
 
 ```{r, include = FALSE}

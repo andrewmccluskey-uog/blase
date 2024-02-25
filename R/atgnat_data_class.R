@@ -2,7 +2,7 @@
 #'
 #' For creation details, see [as.AtgnatData()]
 #'
-#' @concept atgnat-object
+#' @concept blase-object
 #'
 #' @slot pseudobulk_bins list of [data.frame]s. Each item is a normalised count
 #' matrix representing a bin, where a column is a cell in the bin and each row is a gene.
@@ -31,7 +31,7 @@ AtgnatData = setClass(
 
 #' @title Show an AtgnatData object
 #'
-#' @concept atgnat-object
+#' @concept blase-object
 #'
 #' @param object an [AtgnatData] object
 #' @export

@@ -18,4 +18,4 @@ sce <- SingleCellExperiment::SingleCellExperiment(assays = list(normcounts = cou
 sce$pseudotime = seq_len(10)
 as.AtgnatData(sce, pseudotime_slot="pseudotime", n_bins=3)
 }
-\concept{atgnat-object}
+\concept{blase-object}

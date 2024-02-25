@@ -1,6 +1,6 @@
 #' @title Conversion to AtgnatData
 #'
-#' @concept atgnat-object
+#' @concept blase-object
 #'
 #' @rdname as.AtgnatData
 #' @param x An object to take counts from
@@ -14,7 +14,6 @@ setGeneric(name = "as.AtgnatData",
            signature = c("x"),
            def = function(x, ...) standardGeneric("as.AtgnatData"))
 
-# TODO perhaps this should be a bit more permissive about how to split the bins (i.e. by cell type)
 #' @rdname as.AtgnatData
 #'
 #' @import methods
