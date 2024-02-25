@@ -62,7 +62,6 @@ setMethod(
       stop(paste0("Pseudotime slot '", pseudotime_slot ,"' does not exist"))
     }
 
-    # TODO removing genes and then sorting messes up the ordering of the graph, I think, because waves$phase has all the genes
     # First we need to subset only the requested genes
     if (length(genes) > 0) {
       # R passes parameters by value not reference so this is safe
@@ -234,7 +233,7 @@ setMethod(
 #' @examples
 get_waves <- function(
     sce,
-    pseudotime_slot,
+    pseudotime_slot = "slingPseudotime_1",
     n_cores = 1
 ) {
 

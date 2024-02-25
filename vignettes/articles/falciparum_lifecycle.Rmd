@@ -89,6 +89,7 @@ gridExtra::grid.arrange(
 
 ```{r tradeSeq}
 associationTestResult <- associationTest(processed_MCA_PF_SCE, lineages=T, global=F, contrastType="consecutive")
+genelist = atgnat::get_top_n_genes(associationTestResult, n_genes = 500, lineage = 1)
 ```
 
 ```{r}
@@ -109,11 +110,6 @@ res2 = find_best_params(processed_MCA_PF_SCE,
                        bins_count_range = 12,
                        gene_count_range = seq.int(12, 192, 3))
 plot_find_best_params_results(res2)
-```
-
-```{r}
-genelist = atgnat::get_top_n_genes(associationTestResult, n_genes = 500, lineage = 1)
-head(fourier_power_genes)
 ```
 
 ### Get Bozdech Genes
@@ -206,14 +202,15 @@ Below, we can see how out bins are aligned with lifecycle stages
 
 ```{r}
 table(processed_MCA_PF_SCE@colData[c("STAGE_LR", "pseudotime_bin")])
-called_ring_bins = sort(unique(processed_MCA_PF_SCE@colData[processed_MCA_PF_SCE@colData[["STAGE_LR"]] == "ring",][["pseudotime_bin"]]))
-called_troph_bins = sort(unique(processed_MCA_PF_SCE@colData[processed_MCA_PF_SCE@colData[["STAGE_LR"]] == "trophozoite",][["pseudotime_bin"]]))
-called_schizont_bins = sort(unique(processed_MCA_PF_SCE@colData[processed_MCA_PF_SCE@colData[["STAGE_LR"]] == "schizont",][["pseudotime_bin"]]))
 ```
 
 Now we can check the accuracy of these techniques, according to prior knowledge.
 
 ```{r, include=FALSE}
+called_ring_bins = sort(unique(processed_MCA_PF_SCE@colData[processed_MCA_PF_SCE@colData[["STAGE_LR"]] == "ring",][["pseudotime_bin"]]))
+called_troph_bins = sort(unique(processed_MCA_PF_SCE@colData[processed_MCA_PF_SCE@colData[["STAGE_LR"]] == "trophozoite",][["pseudotime_bin"]]))
+called_schizont_bins = sort(unique(processed_MCA_PF_SCE@colData[processed_MCA_PF_SCE@colData[["STAGE_LR"]] == "schizont",][["pseudotime_bin"]]))
+
 analyse_mapping_results = function(mapping_results) {
   results = data.frame()
   for (bulk_sample in mapping_results) {

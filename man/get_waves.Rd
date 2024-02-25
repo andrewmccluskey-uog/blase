@@ -4,7 +4,7 @@
 \alias{get_waves}
 \title{get_waves}
 \usage{
-get_waves(sce, pseudotime_slot, n_cores = 1)
+get_waves(sce, pseudotime_slot = "slingPseudotime_1", n_cores = 1)
 }
 \arguments{
 \item{sce}{SCE to generate waves from.}
