@@ -1,4 +1,4 @@
-Package: atgnat
+Package: blase
 Title: Enhancing Single Cell RNA-seq data with bulk RNA-seq data
 Version: 0.0.0.9000
 Authors@R: c(

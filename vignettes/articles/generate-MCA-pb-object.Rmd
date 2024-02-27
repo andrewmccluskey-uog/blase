@@ -28,7 +28,7 @@ library(fs)
 library(gridExtra)
 library(scater)
 library(utils)
-library(atgnat)
+library(blase)
 library(utils)
 library(ami)
 ```
@@ -150,7 +150,7 @@ usethis::use_data(processed_MCA_PB_SCE, overwrite = TRUE)
 ## Loading the SCE Object
 You can load this SCE with:
 ```{r, loadRDS}
-data(processed_MCA_PB_SCE, package="atgnat")
+data(processed_MCA_PB_SCE, package="blase")
 processed_MCA_PB_SCE
 ```
 

@@ -1,34 +1,34 @@
-#' @title Conversion to AtgnatData
+#' @title Conversion to BlaseData
 #'
 #' @concept blase-object
 #'
-#' @rdname as.AtgnatData
+#' @rdname as.BlaseData
 #' @param x An object to take counts from
 #' @param ... additional arguments passed to object-specific methods.
 #'
-#' @return An [AtgnatData] object
+#' @return An [BlaseData] object
 #'
 #' @export
-#' @inherit AtgnatData-class examples
-setGeneric(name = "as.AtgnatData",
+#' @inherit BlaseData-class examples
+setGeneric(name = "as.BlaseData",
            signature = c("x"),
-           def = function(x, ...) standardGeneric("as.AtgnatData"))
+           def = function(x, ...) standardGeneric("as.BlaseData"))
 
-#' @rdname as.AtgnatData
+#' @rdname as.BlaseData
 #'
 #' @import methods
 #' @import Matrix
 #'
 #' @export
 setMethod(
-  f = "as.AtgnatData",
+  f = "as.BlaseData",
   signature = c(x="data.frame"),
   definition = function(x){
-    return(methods::new("AtgnatData", pseudobulks = x, bins = colnames(x)))
+    return(methods::new("BlaseData", pseudobulks = x, bins = colnames(x)))
   }
 )
 
-#' @rdname as.AtgnatData
+#' @rdname as.BlaseData
 #'
 #' @import methods
 #' @import Matrix
@@ -37,17 +37,17 @@ setMethod(
 #'
 #' @export
 setMethod(
-  f = "as.AtgnatData",
+  f = "as.BlaseData",
   signature = c(x="Seurat"),
   definition = function(x, pseudotime_slot="slingPseudotime_1", n_bins=20, split_by="pseudotime_range"){
     rlang::check_installed("Seurat", reason = "to handle Seurat objects.")
     sce = Seurat::as.SingleCellExperiment(x)
-    return(as.AtgnatData(sce, pseudotime_slot=pseudotime_slot, n_bins=n_bins, split_by=split_by))
+    return(as.BlaseData(sce, pseudotime_slot=pseudotime_slot, n_bins=n_bins, split_by=split_by))
   }
 )
 
 
-#' @rdname as.AtgnatData
+#' @rdname as.BlaseData
 #' @param pseudotime_slot The [SingleCellExperiment::SingleCellExperiment] slot
 #' containing pseudotime values for each cell to be passed to [assign_pseudotime_bins()].
 #' @param n_bins The number of bins to create, passed to [assign_pseudotime_bins()].
@@ -57,7 +57,7 @@ setMethod(
 #'
 #' @export
 setMethod(
-  f = "as.AtgnatData",
+  f = "as.BlaseData",
   signature = c(x="SingleCellExperiment"),
   definition = function(x, pseudotime_slot="slingPseudotime_1", n_bins=20, split_by="pseudotime_range"){
 
@@ -75,7 +75,7 @@ setMethod(
       counts = SingleCellExperiment::normcounts(bin_subset_sce)
       pseudobulks[[i]] = SingleCellExperiment::normcounts(bin_subset_sce)
     }
-    return(methods::new("AtgnatData", pseudobulk_bins = pseudobulks, bins = bin_ids))
+    return(methods::new("BlaseData", pseudobulk_bins = pseudobulks, bins = bin_ids))
   }
 )
 

@@ -27,7 +27,7 @@ then we sample from it twice to create the pseudobulks.
 }
 \examples{
 library(SingleCellExperiment, quietly=TRUE)
-library(atgnat)
+library(blase)
 counts <- matrix(rpois(1000, lambda = 10), ncol=100, nrow=10)
 sce <- SingleCellExperiment::SingleCellExperiment(
   assays = list(normcounts = counts, counts = counts/2)

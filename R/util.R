@@ -58,7 +58,7 @@ get_top_n_genes = function(association_test_results, n_genes=40, lineage=NA, p_c
 #'
 #' @examples
 #' library(SingleCellExperiment, quietly=TRUE)
-#' library(atgnat)
+#' library(blase)
 #' counts <- matrix(rpois(1000, lambda = 10), ncol=100, nrow=10)
 #' sce <- SingleCellExperiment::SingleCellExperiment(
 #'   assays = list(normcounts = counts, counts = counts/2)

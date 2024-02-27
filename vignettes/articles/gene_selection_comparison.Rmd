@@ -21,7 +21,7 @@ library(scater)
 library(fs)
 library(utils)
 library(metR)
-library(atgnat)
+library(blase)
 ```
 
 ```{r randomseed}
@@ -65,7 +65,7 @@ rownames(bulk) = paste0(rownames(bulk), '0');
 ```
 
 ```{r}
-data(processed_MCA_PB_SCE, package="atgnat")
+data(processed_MCA_PB_SCE, package="blase")
 
 # Remove unshared genes from bulk and sc
 bulk = bulk[rownames(bulk) %in% rownames(processed_MCA_PB_SCE),]
@@ -92,7 +92,7 @@ plotUMAP(processed_MCA_PB_SCE, colour_by="pseudotime_bin")
 ```
 
 ```{r}
-genelist = atgnat::get_top_n_genes(associationTestResult, n_genes = 200, lineage = 1)
+genelist = blase::get_top_n_genes(associationTestResult, n_genes = 200, lineage = 1)
 
 res = find_best_params(processed_MCA_PB_SCE,
                        genelist,
@@ -101,7 +101,7 @@ res = find_best_params(processed_MCA_PB_SCE,
                        bins_count_range = seq.int(8, 16, 2),
                        gene_count_range = seq.int(20, 180, 3))
 
-x = as.AtgnatData(processed_MCA_PB_SCE, pseudotime_slot="slingPseudotime_1", n_bins=14, split_by="pseudotime_range")
+x = as.BlaseData(processed_MCA_PB_SCE, pseudotime_slot="slingPseudotime_1", n_bins=14, split_by="pseudotime_range")
 
 tradeseq_tuning = plot_find_best_params_results(res)
 ```
@@ -109,7 +109,7 @@ tradeseq_tuning = plot_find_best_params_results(res)
 ```{r}
 BUCKETS_COUNT = 12
 GENES_TO_USE_COUNT = 120
-x = as.AtgnatData(processed_MCA_PB_SCE, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
+x = as.BlaseData(processed_MCA_PB_SCE, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
 x@genes = genelist[1:GENES_TO_USE_COUNT]
 
 genes_tradeseq = x@genes
@@ -125,7 +125,7 @@ for (bulkname in colnames(bulk)) {
   print(res)
 }
 
-tradeseq_heat = atgnat::plot_mapping_result_heatmap(rev(mapping_results)) + ggplot2::ggtitle(paste0('TradeSeq (', GENES_TO_USE_COUNT,')'))
+tradeseq_heat = blase::plot_mapping_result_heatmap(rev(mapping_results)) + ggplot2::ggtitle(paste0('TradeSeq (', GENES_TO_USE_COUNT,')'))
 tradeseq_heat
 ```
 
@@ -161,7 +161,7 @@ markergenes_tuning = plot_find_best_params_results(res)
 ```{r}
 BUCKETS_COUNT = 12
 GENES_TO_USE_COUNT = 120
-x = as.AtgnatData(processed_MCA_PB_SCE, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
+x = as.BlaseData(processed_MCA_PB_SCE, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
 x@genes = genelist[1:GENES_TO_USE_COUNT]
 genes_markergenes = x@genes
 
@@ -174,7 +174,7 @@ for (bulkname in colnames(bulk)) {
   print(res)
 }
 
-markergenes_heat = atgnat::plot_mapping_result_heatmap(rev(mapping_results)) + ggplot2::ggtitle(paste0('Marker Genes (', GENES_TO_USE_COUNT,')'))
+markergenes_heat = blase::plot_mapping_result_heatmap(rev(mapping_results)) + ggplot2::ggtitle(paste0('Marker Genes (', GENES_TO_USE_COUNT,')'))
 markergenes_heat
 ```
 ## Pseudotime bin marker genes
@@ -213,7 +213,7 @@ markergenes_by_bin_tuning = plot_find_best_params_results(res)
 ```{r}
 BUCKETS_COUNT = 12
 GENES_TO_USE_COUNT = 120
-x = as.AtgnatData(processed_MCA_PB_SCE, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
+x = as.BlaseData(processed_MCA_PB_SCE, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
 x@genes = genelist[1:GENES_TO_USE_COUNT]
 
 genes_markergenes_by_bin = x@genes
@@ -227,7 +227,7 @@ for (bulkname in colnames(bulk)) {
   print(res)
 }
 
-markergenes_by_bin_heat = atgnat::plot_mapping_result_heatmap(rev(mapping_results)) + ggplot2::ggtitle(paste0('Marker Genes by bin (', GENES_TO_USE_COUNT,')'))
+markergenes_by_bin_heat = blase::plot_mapping_result_heatmap(rev(mapping_results)) + ggplot2::ggtitle(paste0('Marker Genes by bin (', GENES_TO_USE_COUNT,')'))
 markergenes_by_bin_heat
 ```
 
@@ -310,7 +310,7 @@ ggplot2::ggplot(top_r2_waves, ggplot2::aes(phase, amplitude, color=r2)) +
 
 top_genes_fourier_top_r2 = rownames(top_r2_waves)
 
-x = as.AtgnatData(processed_MCA_PB_SCE, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
+x = as.BlaseData(processed_MCA_PB_SCE, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
 x@genes = top_genes_fourier_top_r2
 
 processed_MCA_PB_SCE = assign_pseudotime_bins(processed_MCA_PB_SCE, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
@@ -322,7 +322,7 @@ for (bulkname in colnames(bulk)) {
   print(res)
 }
 
-fourier_top_r2_heat = atgnat::plot_mapping_result_heatmap(rev(mapping_results)) + ggplot2::ggtitle(paste0('fourier_top_r2 (', GENES_TO_USE_COUNT,')'))
+fourier_top_r2_heat = blase::plot_mapping_result_heatmap(rev(mapping_results)) + ggplot2::ggtitle(paste0('fourier_top_r2 (', GENES_TO_USE_COUNT,')'))
 fourier_top_r2_heat
 ```
 
@@ -337,7 +337,7 @@ ggplot2::ggplot(top_r2_waves_spread, ggplot2::aes(phase, amplitude, color=r2)) +
 
 top_genes_fourier_top_r2_spread = rownames(top_r2_waves_spread)
 
-x = as.AtgnatData(processed_MCA_PB_SCE, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
+x = as.BlaseData(processed_MCA_PB_SCE, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
 x@genes = top_genes_fourier_top_r2_spread
 
 processed_MCA_PB_SCE = assign_pseudotime_bins(processed_MCA_PB_SCE, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
@@ -349,7 +349,7 @@ for (bulkname in colnames(bulk)) {
   print(res)
 }
 
-fourier_top_r2_spread_heat = atgnat::plot_mapping_result_heatmap(rev(mapping_results)) + ggplot2::ggtitle(paste0('fourier_top_r2_spread (', GENES_TO_USE_COUNT,')'))
+fourier_top_r2_spread_heat = blase::plot_mapping_result_heatmap(rev(mapping_results)) + ggplot2::ggtitle(paste0('fourier_top_r2_spread (', GENES_TO_USE_COUNT,')'))
 fourier_top_r2_spread_heat
 ```
 
@@ -365,7 +365,7 @@ ggplot2::ggplot(top_amp_waves, ggplot2::aes(phase, amplitude, color=r2)) +
 
 top_genes_fourier_top_amp = rownames(top_amp_waves)
 
-x = as.AtgnatData(processed_MCA_PB_SCE, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
+x = as.BlaseData(processed_MCA_PB_SCE, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
 x@genes = top_genes_fourier_top_amp
 
 processed_MCA_PB_SCE = assign_pseudotime_bins(processed_MCA_PB_SCE, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
@@ -377,7 +377,7 @@ for (bulkname in colnames(bulk)) {
   print(res)
 }
 
-fourier_top_amp_heat = atgnat::plot_mapping_result_heatmap(rev(mapping_results)) + ggplot2::ggtitle(paste0('fourier_top_amp (', GENES_TO_USE_COUNT,')'))
+fourier_top_amp_heat = blase::plot_mapping_result_heatmap(rev(mapping_results)) + ggplot2::ggtitle(paste0('fourier_top_amp (', GENES_TO_USE_COUNT,')'))
 fourier_top_amp_heat
 ```
 ### Top Amp Waves with spread
@@ -391,7 +391,7 @@ ggplot2::ggplot(top_amp_waves_spread, ggplot2::aes(phase, amplitude, color=r2)) 
 
 top_genes_fourier_top_amp_spread = rownames(top_amp_waves_spread)
 
-x = as.AtgnatData(processed_MCA_PB_SCE, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
+x = as.BlaseData(processed_MCA_PB_SCE, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
 x@genes = top_genes_fourier_top_amp_spread
 
 processed_MCA_PB_SCE = assign_pseudotime_bins(processed_MCA_PB_SCE, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
@@ -403,7 +403,7 @@ for (bulkname in colnames(bulk)) {
   print(res)
 }
 
-fourier_top_amp_spread_heat = atgnat::plot_mapping_result_heatmap(rev(mapping_results)) + ggplot2::ggtitle(paste0('fourier_top_amp_spread (', GENES_TO_USE_COUNT,')'))
+fourier_top_amp_spread_heat = blase::plot_mapping_result_heatmap(rev(mapping_results)) + ggplot2::ggtitle(paste0('fourier_top_amp_spread (', GENES_TO_USE_COUNT,')'))
 fourier_top_amp_spread_heat
 ```
 ### Top Power
@@ -419,7 +419,7 @@ ggplot2::ggplot(top_power_waves, ggplot2::aes(phase, amplitude, color=r2)) +
 
 top_genes_fourier_top_power = rownames(top_power_waves)
 
-x = as.AtgnatData(processed_MCA_PB_SCE, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
+x = as.BlaseData(processed_MCA_PB_SCE, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
 x@genes = top_genes_fourier_top_power
 
 processed_MCA_PB_SCE = assign_pseudotime_bins(processed_MCA_PB_SCE, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
@@ -431,7 +431,7 @@ for (bulkname in colnames(bulk)) {
   print(res)
 }
 
-fourier_top_power_heat = atgnat::plot_mapping_result_heatmap(rev(mapping_results)) + ggplot2::ggtitle(paste0('fourier_top_power (', GENES_TO_USE_COUNT,')'))
+fourier_top_power_heat = blase::plot_mapping_result_heatmap(rev(mapping_results)) + ggplot2::ggtitle(paste0('fourier_top_power (', GENES_TO_USE_COUNT,')'))
 fourier_top_power_heat
 
 ```
@@ -447,7 +447,7 @@ ggplot2::ggplot(top_power_waves_spread, ggplot2::aes(phase, amplitude, color=r2)
 
 top_genes_fourier_top_power_spread = rownames(top_power_waves_spread)
 
-x = as.AtgnatData(processed_MCA_PB_SCE, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
+x = as.BlaseData(processed_MCA_PB_SCE, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
 x@genes = top_genes_fourier_top_power_spread
 
 processed_MCA_PB_SCE = assign_pseudotime_bins(processed_MCA_PB_SCE, pseudotime_slot="slingPseudotime_1", n_bins=BUCKETS_COUNT, split_by="pseudotime_range")
@@ -459,7 +459,7 @@ for (bulkname in colnames(bulk)) {
   print(res)
 }
 
-fourier_top_power_spread_heat = atgnat::plot_mapping_result_heatmap(rev(mapping_results)) + ggplot2::ggtitle(paste0('fourier_top_power_spread (', GENES_TO_USE_COUNT,')'))
+fourier_top_power_spread_heat = blase::plot_mapping_result_heatmap(rev(mapping_results)) + ggplot2::ggtitle(paste0('fourier_top_power_spread (', GENES_TO_USE_COUNT,')'))
 fourier_top_power_spread_heat
 ```
 

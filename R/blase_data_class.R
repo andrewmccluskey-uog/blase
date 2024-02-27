@@ -1,6 +1,6 @@
-#' Atgnat Data Object
+#' Blase Data Object
 #'
-#' For creation details, see [as.AtgnatData()]
+#' For creation details, see [as.BlaseData()]
 #'
 #' @concept blase-object
 #'
@@ -9,17 +9,17 @@
 #' @slot bins list. A list of bin names for each timepoint.
 #' @slot genes list. A list of the genes selected for discriminating timepoints.
 #'
-#' @return An [AtgnatData] object
+#' @return An [BlaseData] object
 #' @export
 #'
 #' @examples
 #' counts <- matrix(rpois(100, lambda = 10), ncol=10, nrow=10)
 #' sce <- SingleCellExperiment::SingleCellExperiment(assays = list(normcounts = counts))
 #' sce$pseudotime = seq_len(10)
-#' as.AtgnatData(sce, pseudotime_slot="pseudotime", n_bins=3)
+#' as.BlaseData(sce, pseudotime_slot="pseudotime", n_bins=3)
 # TODO make bins and genes hidden with . and then add setters/getters?
-AtgnatData = setClass(
-  Class = "AtgnatData",
+BlaseData = setClass(
+  Class = "BlaseData",
   slots = list(
     pseudobulk_bins = "list",
     bins = "numeric",
@@ -29,19 +29,19 @@ AtgnatData = setClass(
 
 # TODO validation of pseudobulk bins being a list of matrices
 
-#' @title Show an AtgnatData object
+#' @title Show an BlaseData object
 #'
 #' @concept blase-object
 #'
-#' @param object an [AtgnatData] object
+#' @param object an [BlaseData] object
 #' @export
-#' @inherit AtgnatData-class examples
+#' @inherit BlaseData-class examples
 setMethod(f = "show",
-          signature = "AtgnatData",
+          signature = "BlaseData",
           definition = function(object){
 
             output = c(
-              "Atgnat Data with:",
+              "Blase Data with:",
               paste("\tbins:", list(object@bins)),
               paste("\tselected genes:", list(object@genes), "\n")
             )

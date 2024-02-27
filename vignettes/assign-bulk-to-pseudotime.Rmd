@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup, results='hide', message=FALSE, warning=FALSE}
-library(atgnat)
+library(blase)
 library(SingleCellExperiment)
 library(tradeSeq)
 library(slingshot)
@@ -83,7 +83,7 @@ Now we'll find the genes we want to use. We select the top 200 so that we can do
 ```{r}
 # Use consecutive for genes that change over time
 assoRes = associationTest(sce, lineages=T, global=F, contrastType="consecutive")
-genelist = atgnat::get_top_n_genes(assoRes, n_genes = 200, lineage = 1)
+genelist = blase::get_top_n_genes(assoRes, n_genes = 200, lineage = 1)
 ```
 
 ## Parameter Tuning for BLASE
@@ -96,8 +96,8 @@ When using BLASE, it can be a good idea to tune the number of genes and bins use
 
 We can do this using the following commands, provided by BLASE:
 ```{r}
-res = atgnat::find_best_params(sce, genelist, split_by="pseudotime_range", pseudotime_slot="pseudotime")
-atgnat::plot_find_best_params_results(res)
+res = blase::find_best_params(sce, genelist, split_by="pseudotime_range", pseudotime_slot="pseudotime")
+blase::plot_find_best_params_results(res)
 ```
 
 It looks like 80 genes and 10 bins will give us good specificity, but let's double check. In a non trivial dataset, this may take some repetition. We ignore the 5 bin result because this might not be enough resolution - this depends on your dataset. In general, more bins will reduce specificity because each bin will have a more similar cell composition. In general, aim for about as many bins as you have clusters.
@@ -108,7 +108,7 @@ Now we can check if this is a good fit by showing how other bins from the SC dat
 map using these genes. Ideally, each bin is very specific, with a high "worst specificity".
 
 ```{r}
-blase_data = as.AtgnatData(sce, pseudotime_slot="pseudotime", n_bins=10)
+blase_data = as.BlaseData(sce, pseudotime_slot="pseudotime", n_bins=10)
 blase_data@genes = genelist[1:80]
 evaluate_parameters(blase_data, make_plot = TRUE)
 ```
@@ -178,7 +178,7 @@ To view the bin population chart in full, use:
 ```{r}
 plot_bin_population(binned_sce, 1, group_by_slot="celltype")
 ```
-We can see here that both of these bins have high proportions of the GMP cell type, which is why Atgnat could not make a convincing call on either of these being the true "best" mapping. In this case, since Bin 3 has a larger proportion and number of GMP cells, it is likely the best mapping, and this is reflected in Atgnat's correlation score.
+We can see here that both of these bins have high proportions of the GMP cell type, which is why Blase could not make a convincing call on either of these being the true "best" mapping. In this case, since Bin 3 has a larger proportion and number of GMP cells, it is likely the best mapping, and this is reflected in Blase's correlation score.
 
 ## Session Info
 ```{r, sessionInfo}

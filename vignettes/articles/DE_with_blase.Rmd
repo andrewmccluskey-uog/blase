@@ -19,7 +19,7 @@ library(fs)
 library(gridExtra)
 library(scater)
 library(utils)
-library(atgnat)
+library(blase)
 library(utils)
 library(ami)
 ```
@@ -101,7 +101,7 @@ gc()
 We are using the Malaria Cell Atlas data which we have pre-processed (here)[articles/generate-MCA-pf-object.html]. This data is available for your to experiment with as part of the package.
 
 ```{r loadSC}
-data(processed_MCA_PF_SCE, package="atgnat")
+data(processed_MCA_PF_SCE, package="blase")
 gridExtra::grid.arrange(
   plotPCA(processed_MCA_PF_SCE, colour_by="STAGE_LR"),
   plotUMAP(processed_MCA_PF_SCE, colour_by="STAGE_LR"),
@@ -122,7 +122,7 @@ associationTestResult <- associationTest(processed_MCA_PF_SCE, lineages=T, globa
 ## Prepare BLASE
 We prepare BLASE by checking for a good number of genes and bins.
 ```{r}
-genelist = atgnat::get_top_n_genes(associationTestResult, n_genes = 500, lineage = 1)
+genelist = blase::get_top_n_genes(associationTestResult, n_genes = 500, lineage = 1)
 
 res = find_best_params(processed_MCA_PF_SCE,
                        genelist,
@@ -136,9 +136,9 @@ plot_find_best_params_results(res)
 ```{r}
 genes = 300
 bins = 8
-atgnatData = as.AtgnatData(processed_MCA_PF_SCE, pseudotime_slot="slingPseudotime_1", n_bins=bins, split_by="pseudotime_range")
-atgnatData@genes = genelist[1:genes]
-evaluate_parameters(atgnatData, make_plot = TRUE)
+blaseData = as.BlaseData(processed_MCA_PF_SCE, pseudotime_slot="slingPseudotime_1", n_bins=bins, split_by="pseudotime_range")
+blaseData@genes = genelist[1:genes]
+evaluate_parameters(blaseData, make_plot = TRUE)
 processed_MCA_PF_SCE = assign_pseudotime_bins(processed_MCA_PF_SCE, pseudotime_slot="slingPseudotime_1", n_bins=bins, split_by="pseudotime_range")
 plotUMAP(processed_MCA_PF_SCE, color="pseudotime_bin")
 gridExtra::grid.arrange(
@@ -152,11 +152,11 @@ Now we can map the bulk data onto the single cell.
 ```{r}
 mapping_results = c()
 for (bulkname in colnames(bulk)) {
-  res = map_best_bin(atgnatData, bulkname, bulk)
+  res = map_best_bin(blaseData, bulkname, bulk)
   mapping_results = c(mapping_results, res)
 }
 
-atgnat::plot_mapping_result_heatmap(rev(mapping_results), annotate = TRUE)
+blase::plot_mapping_result_heatmap(rev(mapping_results), annotate = TRUE)
 ```
 
 We can see the wild type develops more normally than the 2 knockouts, who show delayed growth generally, and less of a response to the heat shock (41 degrees).
@@ -164,33 +164,33 @@ We can see the wild type develops more normally than the 2 knockouts, who show d
 ```{r}
 # Wildtype
 gridExtra::grid.arrange(
-  atgnat::plot_mapping_result_heatmap(rev(mapping_results[1:2]), annotate = TRUE), # 1
-  atgnat::plot_mapping_result_heatmap(rev(mapping_results[3:4]), annotate = TRUE), # 2
-  atgnat::plot_bin_population(processed_MCA_PF_SCE, 2, group_by_slot="STAGE_LR"), # 1
-  atgnat::plot_bin_population(processed_MCA_PF_SCE, 4, group_by_slot="STAGE_LR"), # 2
-  atgnat::plot_bin_population(processed_MCA_PF_SCE, 3, group_by_slot="STAGE_LR"), # 1
-  atgnat::plot_bin_population(processed_MCA_PF_SCE, 4, group_by_slot="STAGE_LR"), # 2
+  blase::plot_mapping_result_heatmap(rev(mapping_results[1:2]), annotate = TRUE), # 1
+  blase::plot_mapping_result_heatmap(rev(mapping_results[3:4]), annotate = TRUE), # 2
+  blase::plot_bin_population(processed_MCA_PF_SCE, 2, group_by_slot="STAGE_LR"), # 1
+  blase::plot_bin_population(processed_MCA_PF_SCE, 4, group_by_slot="STAGE_LR"), # 2
+  blase::plot_bin_population(processed_MCA_PF_SCE, 3, group_by_slot="STAGE_LR"), # 1
+  blase::plot_bin_population(processed_MCA_PF_SCE, 4, group_by_slot="STAGE_LR"), # 2
   ncol=2
 )
 
 # pb4 knockout
 gridExtra::grid.arrange(
-  atgnat::plot_mapping_result_heatmap(rev(mapping_results[5:6]), annotate = TRUE), # 1
-  atgnat::plot_mapping_result_heatmap(rev(mapping_results[7:8]), annotate = TRUE), # 2
-  atgnat::plot_bin_population(processed_MCA_PF_SCE, 2, group_by_slot="STAGE_LR"), # 1
+  blase::plot_mapping_result_heatmap(rev(mapping_results[5:6]), annotate = TRUE), # 1
+  blase::plot_mapping_result_heatmap(rev(mapping_results[7:8]), annotate = TRUE), # 2
+  blase::plot_bin_population(processed_MCA_PF_SCE, 2, group_by_slot="STAGE_LR"), # 1
   ggplot() + theme_void(), # 2
-  atgnat::plot_bin_population(processed_MCA_PF_SCE, 4, group_by_slot="STAGE_LR"), # 1
+  blase::plot_bin_population(processed_MCA_PF_SCE, 4, group_by_slot="STAGE_LR"), # 1
   ggplot() + theme_void(), # 2
   ncol=2
 )
 
 # pb31 knockout
 gridExtra::grid.arrange(
-  atgnat::plot_mapping_result_heatmap(rev(mapping_results[9:10]), annotate = TRUE), # 1
-  atgnat::plot_mapping_result_heatmap(rev(mapping_results[11:12]), annotate = TRUE), # 2
-  atgnat::plot_bin_population(processed_MCA_PF_SCE, 1, group_by_slot="STAGE_LR"), # 1
-  atgnat::plot_bin_population(processed_MCA_PF_SCE, 3, group_by_slot="STAGE_LR"), # 2
-  atgnat::plot_bin_population(processed_MCA_PF_SCE, 2, group_by_slot="STAGE_LR"), # 1
+  blase::plot_mapping_result_heatmap(rev(mapping_results[9:10]), annotate = TRUE), # 1
+  blase::plot_mapping_result_heatmap(rev(mapping_results[11:12]), annotate = TRUE), # 2
+  blase::plot_bin_population(processed_MCA_PF_SCE, 1, group_by_slot="STAGE_LR"), # 1
+  blase::plot_bin_population(processed_MCA_PF_SCE, 3, group_by_slot="STAGE_LR"), # 2
+  blase::plot_bin_population(processed_MCA_PF_SCE, 2, group_by_slot="STAGE_LR"), # 1
   ggplot() + theme_void(), #2
   ncol=2
 )

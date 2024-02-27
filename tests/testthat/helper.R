@@ -6,9 +6,9 @@ generate_test_sce = function(cells=100, genes=50) {
   return(sce)
 }
 
-generate_test_atgnat_data = function(cells=100, genes=50) {
+generate_test_blase_data = function(cells=100, genes=50) {
   sce = generate_test_sce(cells, genes)
-  atgnat_data = as.AtgnatData(sce)
-  atgnat_data@genes = seq_len(genes)
-  return(atgnat_data)
+  blase_data = as.BlaseData(sce)
+  blase_data@genes = seq_len(genes)
+  return(blase_data)
 }

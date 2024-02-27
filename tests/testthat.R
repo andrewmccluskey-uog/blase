@@ -7,6 +7,6 @@
 # * https://testthat.r-lib.org/articles/special-files.html
 
 library(testthat)
-library(atgnat)
+library(blase)
 
-test_check("atgnat")
+test_check("blase")

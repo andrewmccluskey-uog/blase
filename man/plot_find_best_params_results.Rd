@@ -33,7 +33,7 @@ sce$cell_type = c(rep("celltype_1", ncells/2), rep("celltype_2", ncells/2))
 sce$pseudotime = seq_len(ncells)
 genelist = as.character(seq_len(ngenes))
 
-# Finding the best params for the AtgnatData
+# Finding the best params for the BlaseData
 best_params = find_best_params(
   sce, genelist,
   bins_count_range=c(10,20),

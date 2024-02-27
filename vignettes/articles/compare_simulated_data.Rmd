@@ -10,7 +10,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup, results='hide', message=FALSE, warning=FALSE}
-library(atgnat)
+library(blase)
 library(SingleCellExperiment)
 library(tradeSeq)
 library(slingshot)
@@ -172,7 +172,7 @@ associationTestResult <- associationTest(sc_sce, lineages=T, global=F, contrastT
 We start by tuning the parameters for BLASE. See the [vignette](articles/assign-bulk-to-pseudotime.html) for more details.
 
 ```{r}
-genelist = atgnat::get_top_n_genes(associationTestResult, n_genes = 200, lineage = 1)
+genelist = blase::get_top_n_genes(associationTestResult, n_genes = 200, lineage = 1)
 res = find_best_params(sc_sce,
                        genelist,
                        split_by="pseudotime_range",
@@ -184,9 +184,9 @@ plot_find_best_params_results(res)
 ```{r}
 genes = 30
 bins =5
-atgnatData = as.AtgnatData(sc_sce, pseudotime_slot="slingPseudotime_1", n_bins=bins, split_by="pseudotime_range")
-atgnatData@genes = genelist[1:genes]
-evaluate_parameters(atgnatData, make_plot = TRUE)
+blaseData = as.BlaseData(sc_sce, pseudotime_slot="slingPseudotime_1", n_bins=bins, split_by="pseudotime_range")
+blaseData@genes = genelist[1:genes]
+evaluate_parameters(blaseData, make_plot = TRUE)
 ```
 ## Prepare Bulk
 
@@ -207,7 +207,7 @@ gridExtra::grid.arrange(
 
 bulk_sce = assign_pseudotime_bins(bulk_sce, split_by='pseudotime_range', n_bins = bins, pseudotime_slot="slingPseudotime_1")
 bulk_sce$replicate = round(runif(n=ncol(bulk_sce), min=1, max=2))
-bulkified_bins = atgnat::get_bins_as_bulk(bulk_sce, min_cells_for_bulk = 20)
+bulkified_bins = blase::get_bins_as_bulk(bulk_sce, min_cells_for_bulk = 20)
 ```
 
 ## Map the bulk to the single cell
@@ -217,7 +217,7 @@ Now we'll map the bulk onto the single cell data with BLASE. We can see the bins
 ```{r}
 mapping_results = c()
 for (bulkname in colnames(bulkified_bins)) {
-  res = map_best_bin(atgnatData, bulkname, bulkified_bins)
+  res = map_best_bin(blaseData, bulkname, bulkified_bins)
   mapping_results = c(mapping_results, res)
   print(res)
 }
@@ -229,7 +229,7 @@ gridExtra::grid.arrange(
   plotUMAP(sc_sce, colour="pseudotime_bin"),
   ncol=3
 )
-atgnat::plot_mapping_result_heatmap(rev(mapping_results))
+blase::plot_mapping_result_heatmap(rev(mapping_results))
 ```
 Now we can look at the population proportions of the bins:
 ```{r}
@@ -242,26 +242,26 @@ gridExtra::grid.arrange(
 )
 
 gridExtra::grid.arrange(
-  atgnat::plot_bin_population(sc_sce, 1, group_by_slot="label"),
-  atgnat::plot_bin_population(bulk_sce, 1, group_by_slot="label"),
-  atgnat::plot_mapping_result_corr(mapping_results[[1]]),
-  atgnat::plot_mapping_result_corr(mapping_results[[2]]),
-  atgnat::plot_bin_population(sc_sce, 2, group_by_slot="label"),
-  atgnat::plot_bin_population(bulk_sce, 2, group_by_slot="label"),
-  atgnat::plot_mapping_result_corr(mapping_results[[3]]),
-  atgnat::plot_mapping_result_corr(mapping_results[[4]]),
-  atgnat::plot_bin_population(sc_sce, 3, group_by_slot="label"),
-  atgnat::plot_bin_population(bulk_sce, 3, group_by_slot="label"),
-  atgnat::plot_mapping_result_corr(mapping_results[[5]]),
-  atgnat::plot_mapping_result_corr(mapping_results[[6]]),
-  atgnat::plot_bin_population(sc_sce, 4, group_by_slot="label"),
-  atgnat::plot_bin_population(bulk_sce, 4, group_by_slot="label"),
-  atgnat::plot_mapping_result_corr(mapping_results[[7]]),
-  atgnat::plot_mapping_result_corr(mapping_results[[8]]),
-  atgnat::plot_bin_population(sc_sce, 5, group_by_slot="label"),
-  atgnat::plot_bin_population(bulk_sce, 5, group_by_slot="label"),
-  atgnat::plot_mapping_result_corr(mapping_results[[9]]),
-  atgnat::plot_mapping_result_corr(mapping_results[[10]]),
+  blase::plot_bin_population(sc_sce, 1, group_by_slot="label"),
+  blase::plot_bin_population(bulk_sce, 1, group_by_slot="label"),
+  blase::plot_mapping_result_corr(mapping_results[[1]]),
+  blase::plot_mapping_result_corr(mapping_results[[2]]),
+  blase::plot_bin_population(sc_sce, 2, group_by_slot="label"),
+  blase::plot_bin_population(bulk_sce, 2, group_by_slot="label"),
+  blase::plot_mapping_result_corr(mapping_results[[3]]),
+  blase::plot_mapping_result_corr(mapping_results[[4]]),
+  blase::plot_bin_population(sc_sce, 3, group_by_slot="label"),
+  blase::plot_bin_population(bulk_sce, 3, group_by_slot="label"),
+  blase::plot_mapping_result_corr(mapping_results[[5]]),
+  blase::plot_mapping_result_corr(mapping_results[[6]]),
+  blase::plot_bin_population(sc_sce, 4, group_by_slot="label"),
+  blase::plot_bin_population(bulk_sce, 4, group_by_slot="label"),
+  blase::plot_mapping_result_corr(mapping_results[[7]]),
+  blase::plot_mapping_result_corr(mapping_results[[8]]),
+  blase::plot_bin_population(sc_sce, 5, group_by_slot="label"),
+  blase::plot_bin_population(bulk_sce, 5, group_by_slot="label"),
+  blase::plot_mapping_result_corr(mapping_results[[9]]),
+  blase::plot_mapping_result_corr(mapping_results[[10]]),
   ncol=4
 )
 
