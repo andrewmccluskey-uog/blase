@@ -149,9 +149,7 @@ rm(sce)
 Now we'll use slingshot to infer a trajectory, and tradeseq to identify highly variable genes. We will compare the trajectory to the simulated time below.
 ```{r}
 sc_sce
-
 sc_sce <- slingshot(sc_sce, reducedDim = 'UMAP', clusterLabels='label', start.clus=START_CLUSTER)
-
 gridExtra::grid.arrange(
   plotPCA(sc_sce, colour_by="sim_time"),
   plotPCA(sc_sce, colour_by="slingPseudotime_1"),
@@ -162,9 +160,11 @@ gridExtra::grid.arrange(
   ncol=2
 )
 
+```
+
+```{r, results='hide', message=FALSE, warning=FALSE}
 sc_sce <- fitGAM(sc_sce, parallel=T, BPPARAM=MulticoreParam(N_CORES), nknots=4)
 associationTestResult <- associationTest(sc_sce, lineages=T, global=F, contrastType="consecutive")
-
 ```
 
 ## Analyse with BLASE
@@ -183,7 +183,7 @@ plot_find_best_params_results(res)
 ```
 ```{r}
 genes = 30
-bins =5
+bins = 5
 blaseData = as.BlaseData(sc_sce, pseudotime_slot="slingPseudotime_1", n_bins=bins, split_by="pseudotime_range")
 blaseData@genes = genelist[1:genes]
 evaluate_parameters(blaseData, make_plot = TRUE)
@@ -231,41 +231,56 @@ gridExtra::grid.arrange(
 )
 blase::plot_mapping_result_heatmap(rev(mapping_results))
 ```
-Now we can look at the population proportions of the bins:
+
+Now we can look at the population proportions of the bins.
+
+Each row below shows the following four plots:
+1. The **SC** label proportions for a given bin
+2. The **bulk** label proportions for a given bin
+3. Mapping correlations for replicate 1 of a given bin
+4. Mapping correlations for replicate 2 of a given bin
+
 ```{r}
 gridExtra::grid.arrange(
-  plotUMAP(sc_sce, colour_by="label"),
-  plotUMAP(sc_sce, colour="pseudotime_bin"),
-  plotUMAP(bulk_sce, colour_by="label"),
-  plotUMAP(bulk_sce, colour="pseudotime_bin"),
+  blase::plot_bin_population(sc_sce, 1, group_by_slot="label") + ggtitle("SC Labels in Bin 1"),
+  blase::plot_bin_population(bulk_sce, 1, group_by_slot="label") + ggtitle("Bulk Labels in Bin 1"),
+  blase::plot_mapping_result_corr(mapping_results[[1]]) + ggtitle("Mapping correlations for bin 1 rep. 1"),
+  blase::plot_mapping_result_corr(mapping_results[[2]]) + ggtitle("Mapping correlations for bin 1 rep. 2"),
+  ncol=2
+)
+gridExtra::grid.arrange(
+  blase::plot_bin_population(sc_sce, 2, group_by_slot="label") + ggtitle("SC Labels in Bin 2"),
+  blase::plot_bin_population(bulk_sce, 2, group_by_slot="label") + ggtitle("Bulk Labels in Bin 2"),
+  blase::plot_mapping_result_corr(mapping_results[[3]]) + ggtitle("Mapping correlations for bin 2 rep. 1"),
+  blase::plot_mapping_result_corr(mapping_results[[4]]) + ggtitle("Mapping correlations for bin 2 rep. 2"),
+  ncol=2
+)
+gridExtra::grid.arrange(
+  blase::plot_bin_population(sc_sce, 3, group_by_slot="label") + ggtitle("SC Labels in Bin 3"),
+  blase::plot_bin_population(bulk_sce, 3, group_by_slot="label") + ggtitle("Bulk Labels in Bin 3"),
+  blase::plot_mapping_result_corr(mapping_results[[5]]) + ggtitle("Mapping correlations for bin 3 rep. 1"),
+  blase::plot_mapping_result_corr(mapping_results[[6]]) + ggtitle("Mapping correlations for bin 3 rep. 2"),
+  ncol=2
+)
+gridExtra::grid.arrange(
+  blase::plot_bin_population(sc_sce, 4, group_by_slot="label") + ggtitle("SC Labels in Bin 4"),
+  blase::plot_bin_population(bulk_sce, 4, group_by_slot="label") + ggtitle("Bulk Labels in Bin 4"),
+  blase::plot_mapping_result_corr(mapping_results[[7]]) + ggtitle("Mapping correlations for bin 4 rep. 1"),
+  blase::plot_mapping_result_corr(mapping_results[[8]]) + ggtitle("Mapping correlations for bin 4 rep. 2"),
+  ncol=2
+)
+gridExtra::grid.arrange(
+  blase::plot_bin_population(sc_sce, 5, group_by_slot="label") + ggtitle("SC Labels in Bin 5"),
+  blase::plot_bin_population(bulk_sce, 5, group_by_slot="label") + ggtitle("Bulk Labels in Bin 5"),
+  blase::plot_mapping_result_corr(mapping_results[[9]]) + ggtitle("Mapping correlations for bin 5 rep. 1"),
+  blase::plot_mapping_result_corr(mapping_results[[10]]) + ggtitle("Mapping correlations for bin 5 rep. 2"),
   ncol=2
 )
 
-gridExtra::grid.arrange(
-  blase::plot_bin_population(sc_sce, 1, group_by_slot="label"),
-  blase::plot_bin_population(bulk_sce, 1, group_by_slot="label"),
-  blase::plot_mapping_result_corr(mapping_results[[1]]),
-  blase::plot_mapping_result_corr(mapping_results[[2]]),
-  blase::plot_bin_population(sc_sce, 2, group_by_slot="label"),
-  blase::plot_bin_population(bulk_sce, 2, group_by_slot="label"),
-  blase::plot_mapping_result_corr(mapping_results[[3]]),
-  blase::plot_mapping_result_corr(mapping_results[[4]]),
-  blase::plot_bin_population(sc_sce, 3, group_by_slot="label"),
-  blase::plot_bin_population(bulk_sce, 3, group_by_slot="label"),
-  blase::plot_mapping_result_corr(mapping_results[[5]]),
-  blase::plot_mapping_result_corr(mapping_results[[6]]),
-  blase::plot_bin_population(sc_sce, 4, group_by_slot="label"),
-  blase::plot_bin_population(bulk_sce, 4, group_by_slot="label"),
-  blase::plot_mapping_result_corr(mapping_results[[7]]),
-  blase::plot_mapping_result_corr(mapping_results[[8]]),
-  blase::plot_bin_population(sc_sce, 5, group_by_slot="label"),
-  blase::plot_bin_population(bulk_sce, 5, group_by_slot="label"),
-  blase::plot_mapping_result_corr(mapping_results[[9]]),
-  blase::plot_mapping_result_corr(mapping_results[[10]]),
-  ncol=4
-)
+
 
 ```
+
 ## Session Info
 ```{r sessionInfo}
 sessionInfo()
