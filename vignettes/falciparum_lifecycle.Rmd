@@ -127,9 +127,19 @@ head(fourier_power_genes)
 ### Compare Gene Lists
 Here we generate a heatmap of log counts of the selected genes, ordered by pseudotime. Genes are ordered by their phase in pseudotime.
 
+#### All Genes
 ```{r}
-gene_selection_matrix(processed_MCA_PF_SCE, waves, genes=genelist[0:300], target_matrix_size=300)
 gene_selection_matrix(processed_MCA_PF_SCE, waves, n_cores=N_CORES, target_matrix_size=nrow(waves))
+```
+
+#### TradeSeq Genes
+```{r}
+gene_selection_matrix(processed_MCA_PF_SCE, waves, genes=genelist[0:300], n_cores=N_CORES, target_matrix_size=300)
+```
+
+#### Bozdech Genes
+```{r}
+gene_selection_matrix(processed_MCA_PF_SCE, waves, genes=rownames(fourier_power_genes), n_cores=N_CORES, target_matrix_size=length(unique(rownames(fourier_power_genes))))
 ```
 
 ## Use each gene list

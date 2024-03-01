@@ -1,5 +1,13 @@
 ---
 title: "DE With BLASE"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{DE With BLASE}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
 ```{r, include = FALSE}
@@ -37,7 +45,7 @@ if (ami::using_ci()) {
 }
 ```
 
-In this article we will use BLASE to map bulk Plasmodium Falciparum data from an experiment ([Zhang et al. 2021](https://doi.org/10.1038/s41467-021-24814-1)) on heat shock response in P. Falciparum, onto the Malaria Cell Atlas ([Howick et al. 2019](https://doi.org/10.1126/science.aaw2619), 7G8 & NF54 strains). We look at Zhang et al's wild type control data (from the NF54 strain) as well as the knockouts (pb4 and pb31) in this article. The paper reported that the knockouts both handled the heat shock less well than the wild type strain, and that pb31 was most susceptible to heat shock, which we will see in our analysis below.
+In this vignette we will use BLASE to map bulk Plasmodium Falciparum data from an experiment ([Zhang et al. 2021](https://doi.org/10.1038/s41467-021-24814-1)) on heat shock response in P. Falciparum, onto the Malaria Cell Atlas ([Howick et al. 2019](https://doi.org/10.1126/science.aaw2619), 7G8 & NF54 strains). We look at Zhang et al's wild type control data (from the NF54 strain) as well as the knockouts (pb4 and pb31) in this article. The paper reported that the knockouts both handled the heat shock less well than the wild type strain, and that pb31 was most susceptible to heat shock, which we will see in our analysis below.
 
 The controls kept all strains at 37 degrees, whereas the heat shock was applied to each strain as 3 8-hour increases to 41 degrees, simulating malarial fever.
 
@@ -178,8 +186,8 @@ gridExtra::grid.arrange(
   blase::plot_mapping_result_heatmap(rev(mapping_results[5:6]), annotate = TRUE), # 1
   blase::plot_mapping_result_heatmap(rev(mapping_results[7:8]), annotate = TRUE), # 2
   blase::plot_bin_population(processed_MCA_PF_SCE, 2, group_by_slot="STAGE_LR"), # 1
-  ggplot() + theme_void(), # 2
-  blase::plot_bin_population(processed_MCA_PF_SCE, 4, group_by_slot="STAGE_LR"), # 1
+  blase::plot_bin_population(processed_MCA_PF_SCE, 3, group_by_slot="STAGE_LR"), # 2
+  ggplot() + theme_void(), # 1
   ggplot() + theme_void(), # 2
   ncol=2
 )
