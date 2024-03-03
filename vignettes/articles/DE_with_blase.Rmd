@@ -1,13 +1,5 @@
 ---
 title: "DE With BLASE"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{DE With BLASE}
-  %\VignetteEncoding{UTF-8}
-  %\VignetteEngine{knitr::rmarkdown}
-editor_options: 
-  markdown: 
-    wrap: 72
 ---
 
 ```{r, include = FALSE}

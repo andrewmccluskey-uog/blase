@@ -1,5 +1,13 @@
 ---
 title: "P. Falciparum Lifecycle - Comparing Bozdech and TradeSeq"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{P. Falciparum Lifecycle - Comparing Bozdech and TradeSeq}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
 ```{r, include = FALSE}
