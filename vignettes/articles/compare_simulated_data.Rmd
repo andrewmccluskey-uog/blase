@@ -40,96 +40,28 @@ if (ami::using_ci()) {
 }
 ```
 
-## Generate the simulation data
-Based on the [dyngen Getting Started tutorial](https://dyngen.dynverse.org/articles/getting_started.html#step-1-define-backbone-and-other-parameters). 
+## Get the simulation data
+Steps to generate this data are available in [generate-simulated-data-object](articles/generate-simulated-data-object).
 ```{r generateCounts}
-root_dir = tools::R_user_dir("BLASE", "data")
-article_dir = path(root_dir, "compare_simulated_data")
-
-# TODO create an article with steps to create the simulated data and then just save as package data like we do for the MCA data
-if (!dir.exists(article_dir)) {
-  dir.create(article_dir, recursive = TRUE)
-}
-
-simulation_rds_path = path(article_dir, "simulation", ext="rds")
-if (!file.exists(simulation_rds_path)) {
-  # realnet for featurenetwork from realnets
-  # realcount for generate experiment from realcounts
-  
-  simulations_num = 150
-  backbone <- backbone_linear_simple()
-  config <-
-    initialise_model(
-      backbone = backbone,
-      num_cells = 2000,
-      num_tfs = nrow(backbone$module_info),
-      num_targets = 400,
-      num_hks = 50,
-      verbose = FALSE,
-      feature_network_params = feature_network_default(
-        realnet="regulatorycircuits_04_mesenchymal_mixed"
-      ),
-      experiment_params = experiment_snapshot(
-        realcount="zenodo_1443566_real_silver_trophoblast-stem-cell-trophoblast-differentiation_mca"
-      ),
-      download_cache_dir = tools::R_user_dir("dyngen", "data"),
-      simulation_params = simulation_default(
-        total_time = 1000,
-        ssa_algorithm = ssa_etl(tau = 30/3600),
-        census_interval = 4,
-        experiment_params = simulation_type_wild_type(num_simulations = simulations_num, seed=seq_len(simulations_num))
-      ),
-      num_cores=N_CORES
-    )
-  
-  # Should be > 10 ideally
-  floor(config$simulation_params$total_time / config$simulation_params$census_interval) * simulations_num / config$numbers$num_cells
-  config$experiment_params$realcount
-  config$feature_network_params$realnet
-  
-  model <- generate_tf_network(config)
-  model <- generate_feature_network(model)
-  model <- generate_kinetics(model)
-  model <- generate_gold_standard(model)
-  model <- generate_cells(model)
-  model <- generate_experiment(model)
-  
-  saveRDS(model, simulation_rds_path);
-} else {
-    print("Using cached")
-    model = readRDS(simulation_rds_path)
-}
-
+data(processed_simulated_data_SCE, package="blase")
 ```
-
-## Cluster SCE
 
 Here we'll set up the SCE and preprocess the data ready for trajectory analysis. 
 We show the `sim_time` mapped onto it, which shows the true simulated trajectory.
 
 ```{r clusterSCE}
-sce <- as_sce(model)
-rm(model)
-gc()
+data(processed_simulated_data_SCE, package="blase")
 
-sce <- computeSumFactors(sce)
-sce <- logNormCounts(sce)
-normcounts(sce) <- exp(logcounts(sce))
-sce = runPCA(sce)
-
-colLabels(sce) <- clusterCells(sce, use.dimred='PCA',
-    BLUSPARAM=NNGraphParam(cluster.fun="louvain")) 
-
-sce = runUMAP(sce)
 gridExtra::grid.arrange(
-  plotPCA(sce, colour_by="label"),
-  plotUMAP(sce, colour_by="label"),
-  plotPCA(sce, colour_by="sim_time"),
-  plotUMAP(sce, colour_by="sim_time"),
+  plotPCA(processed_simulated_data_SCE, colour_by="label"),
+  plotUMAP(processed_simulated_data_SCE, colour_by="label"),
+  plotPCA(processed_simulated_data_SCE, colour_by="sim_time"),
+  plotUMAP(processed_simulated_data_SCE, colour_by="sim_time"),
   ncol=2
 )
-
 ```
+
+The start cluster is labeled `4`.
 ```{r}
 START_CLUSTER = 4
 ```
@@ -139,10 +71,10 @@ START_CLUSTER = 4
 We will now split the dataset so that the test dataset is unseen.
 
 ```{r}
-sce$useAsBulk = round(runif(n=ncol(sce), min=0, max=1)) == 1
-bulk_sce = subset(sce, , useAsBulk==TRUE)
-sc_sce = subset(sce, , useAsBulk==FALSE)
-rm(sce)
+processed_simulated_data_SCE$useAsBulk = round(runif(n=ncol(processed_simulated_data_SCE), min=0, max=1)) == 1
+bulk_sce = subset(processed_simulated_data_SCE, , useAsBulk==TRUE)
+sc_sce = subset(processed_simulated_data_SCE, , useAsBulk==FALSE)
+rm(processed_simulated_data_SCE)
 ```
 
 ## SC Trajectory Analysis

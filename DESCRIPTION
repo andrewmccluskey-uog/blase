@@ -41,7 +41,8 @@ Suggests:
     UpSetR,
     readxl,
     tools,
-    ami
+    ami,
+    emdist
 LazyData: true
 Config/testthat/edition: 3
 VignetteBuilder: knitr
