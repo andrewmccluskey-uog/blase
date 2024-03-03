@@ -1,6 +1,6 @@
 #' @title Assign Pseudotime Bins to a source object's metadata
 #'
-#' @concept atgnat-object
+#' @concept blase-object
 #'
 #' @rdname assign_pseudotime_bins
 #' @param x An object to add metadata to.
@@ -25,8 +25,6 @@ setMethod(
   f = "assign_pseudotime_bins",
   signature = c(x="SingleCellExperiment"),
   definition = function(x, split_by, n_bins, pseudotime_slot="slingPseudotime_1"){
-
-    # TODO overlapping bins
 
     if (is.na(match(split_by, c("pseudotime_range", "cells")))) {
       stop("split_by must be 'pseudotime_range' or 'cells'")

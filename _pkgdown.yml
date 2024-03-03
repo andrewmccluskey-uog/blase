@@ -2,13 +2,44 @@ url: https://andrewmccluskey-uog.github.io/atgnat/
 template:
   bootstrap: 5
 reference:
-- title: Atgnat Object
-- contents: has_concept("atgnat-object")
-- title: Mapping Bulks
-- contents: has_concept("mapping")
-- subtitle: Plots
-- contents: has_concept("mapping_plots")
-- title: Parameter Tuning
-- contents: has_concept("tuning")
-- title: Utilities
-- contents: has_concept("util")
+  - title: BLASE Object
+  - contents: has_concept("blase-object")
+  - title: Mapping Bulks
+  - contents: has_concept("mapping")
+  - subtitle: Plots
+  - contents: has_concept("mapping_plots")
+  - title: Parameter Tuning
+  - contents: has_concept("tuning")
+  - title: Utilities
+  - contents: has_concept("util")
+  - title: Gene Selection
+  - contents: has_concept("gene-selection")
+  - title: Datasets
+  - contents: has_concept("blase-data")
+
+navbar:
+ components:
+    articles:
+      text: Articles
+      menu:
+      - text: Vignettes
+      - text: Assign Bulk To SC Pseudotime
+        href: articles/assign-bulk-to-pseudotime.html
+      - text: -------
+      - text: Further Analysis with BLASE
+      - text: Simulated Data Workthrough
+        href: articles/compare_simulated_data.html
+      - text: DE with Blase
+        href: articles/DE_with_blase.html
+      - text: P. Falciparum Lifecycle - Comparing Bozdech and TradeSeq
+        href: articles/falciparum_lifecycle.html
+      - text: Comparing Gene Selection Methods In Depth
+        href: articles/gene_selection_comparison.html
+      - text: -------
+      - text: Data Generation
+      - text: Malaria Cell Atlas PB
+        href: articles/generate-MCA-pb-object.html
+      - text: Malaria Cell Atlas PF
+        href: articles/generate-MCA-pf-object.html
+      - text: Simulation Data
+        href: articles/generate-simulated-data-object.html

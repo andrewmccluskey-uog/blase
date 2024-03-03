@@ -6,13 +6,19 @@
 \usage{
 plot_mapping_result_heatmap(
   mapping_result_list,
-  heatmap_fill_scale = viridis::scale_fill_viridis(option = "viridis")
+  heatmap_fill_scale = viridis::scale_fill_viridis(option = "viridis", limits = c(-1, 1)),
+  annotate = TRUE
 )
 }
 \arguments{
 \item{mapping_result_list}{A list of \link{MappingResult} objects to include in the heatmap.}
 
 \item{heatmap_fill_scale}{The ggplot2 compatible fill scale to apply to the heatmap.}
+
+\item{annotate}{Whether to annotate the heatmap with significant results or not, defaults to TRUE.}
+
+\item{limits}{Limits for the heatmap's colors. The maximum values will be between -1 and 1
+, which the default will show. Defaults to c(-1,1).}
 }
 \description{
 Plots Spearman's Rho as the fill colour, and adds * if the \link{MappingResult} was confidently assigned.
@@ -26,15 +32,15 @@ rownames(sce) = as.character(seq_len(5))
 sce$cell_type = c(rep("celltype_1", 24), rep("celltype_2", 24))
 
 sce$pseudotime = seq_len(48)
-atgnat_data = as.AtgnatData(sce, pseudotime_slot="pseudotime", n_bins=4)
-atgnat_data@genes = as.character(seq_len(5))
+blase_data = as.BlaseData(sce, pseudotime_slot="pseudotime", n_bins=4)
+blase_data@genes = as.character(seq_len(5))
 
 bulk_counts = matrix(seq_len(15)*10, ncol=3, nrow=5)
 colnames(bulk_counts) = c("A", "B", "C")
 rownames(bulk_counts) = as.character(seq_len(5))
 
 # Map to bin
-result = map_best_bin(atgnat_data, "B", bulk_counts)
+result = map_best_bin(blase_data, "B", bulk_counts)
 result
 
 # Plot Heatmap

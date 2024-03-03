@@ -19,14 +19,14 @@
 #' sce$cell_type = c(rep("celltype_1", 24), rep("celltype_2", 24))
 #'
 #' sce$pseudotime = seq_len(48)
-#' atgnat_data = as.AtgnatData(sce, pseudotime_slot="pseudotime", n_bins=4)
-#' atgnat_data@genes = as.character(seq_len(5))
+#' blase_data = as.BlaseData(sce, pseudotime_slot="pseudotime", n_bins=4)
+#' blase_data@genes = as.character(seq_len(5))
 #'
 #' bulk_counts = matrix(seq_len(15)*10, ncol=3, nrow=5)
 #' colnames(bulk_counts) = c("A", "B", "C")
 #' rownames(bulk_counts) = as.character(seq_len(5))
 #'
-#' result = map_best_bin(atgnat_data, "B", bulk_counts)
+#' result = map_best_bin(blase_data, "B", bulk_counts)
 #'
 #' # Plot bin
 #' sce = scater::runUMAP(sce)
@@ -100,7 +100,9 @@ setMethod(
     best_bin_population_data = as.data.frame( table( x[,x$pseudotime_bin==bin]@colData[[group_by_slot]] ))
 
     return(ggplot2::ggplot(best_bin_population_data[best_bin_population_data$Freq>0,], ggplot2::aes(x={{var1_sym}}, y={{freq_sym}})) +
-             ggplot2::geom_bar(stat="identity"))
+             ggplot2::geom_bar(stat="identity") +
+             ggplot2::ggtitle(paste("Bin", bin))
+           )
   }
 )
 
@@ -113,10 +115,13 @@ setMethod(
 #'
 #' @param mapping_result_list A list of [MappingResult] objects to include in the heatmap.
 #' @param heatmap_fill_scale The ggplot2 compatible fill scale to apply to the heatmap.
+#' @param limits Limits for the heatmap's colors. The maximum values will be between -1 and 1
+#' , which the default will show. Defaults to c(-1,1).
+#' @param annotate Whether to annotate the heatmap with significant results or not, defaults to TRUE.
 #'
 #' @export
 #' @inherit MappingResult-class examples
-plot_mapping_result_heatmap = function(mapping_result_list, heatmap_fill_scale=viridis::scale_fill_viridis(option="viridis")){
+plot_mapping_result_heatmap = function(mapping_result_list, heatmap_fill_scale=viridis::scale_fill_viridis(option="viridis", limits=c(-1,1)), annotate=TRUE){
   if( ! all(lapply(mapping_result_list, class) == "MappingResult")) {
     stop("You must provide a list of MappingResult objects only.")
   }
@@ -130,6 +135,7 @@ plot_mapping_result_heatmap = function(mapping_result_list, heatmap_fill_scale=v
       bulk_name=rep(mappingResult@bulk_name, nrow(history)),
       pseudobin=history[,"bin"],
       correlation=history[,"correlation"],
+      is_best_bin=history[,"bin"] == mappingResult@best_bin,
       confident_mapping = ifelse(
         history[,"bin"] == mappingResult@best_bin & rep(mappingResult@confident_mapping, length(history[,"bin"])),
         "*",
@@ -150,18 +156,29 @@ plot_mapping_result_heatmap = function(mapping_result_list, heatmap_fill_scale=v
   pseudobin_sym = ggplot2::sym("pseudobin")
   correlation_sym = ggplot2::sym("correlation")
   confident_mapping_sym = ggplot2::sym("confident_mapping")
+  is_best_bin_sym = ggplot2::sym("is_best_bin")
 
-  ggplot2::ggplot(bulk_results, ggplot2::aes(
+ # Change elow here
+  p = ggplot2::ggplot(bulk_results, ggplot2::aes(
     x={{pseudobin_sym}},
     y={{bulk_name_sym}},
     fill={{correlation_sym}},
-    label={{confident_mapping_sym}}
+    label={{confident_mapping_sym}},
+    color={{is_best_bin_sym}}
   )) +
-    ggplot2::geom_tile() +
     heatmap_fill_scale +
-    ggplot2::geom_text(fontface = "bold")
+    ggplot2::guides(color = "none")
 
+  if (annotate==TRUE) {
+    p = p + ggplot2::geom_tile(ggplot2::aes(width=0.975, height=0.975), size = 0.45) +
+    ggplot2::geom_text(fontface = "bold") +
+    ggplot2::scale_color_manual(breaks = c(FALSE, TRUE), values=c("#ffffff", "#000000"))
+  } else {
+    p = p + ggplot2::geom_tile() +
+    ggplot2::scale_color_manual(breaks = c(FALSE, TRUE), values=c("transparent", "transparent"))
+  }
 
+  return(p)
 }
 
 #' @title Plot a mapping result's correlation

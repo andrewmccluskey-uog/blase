@@ -4,10 +4,10 @@
 \alias{evaluate_parameters}
 \title{Evaluate n_bins and n_genes for bin mapping}
 \usage{
-evaluate_parameters(atgnat_data, make_plot = FALSE, plot_columns = 4)
+evaluate_parameters(blase_data, make_plot = FALSE, plot_columns = 4)
 }
 \arguments{
-\item{atgnat_data}{The \link{AtgnatData} object to use.}
+\item{blase_data}{The \link{BlaseData} object to use.}
 
 \item{make_plot}{Whether or not to render the plot showing the correlations
 for each pseudobulk bin when we try to map the given bin.}
@@ -41,11 +41,11 @@ sce$cell_type = c(rep("celltype_1", ncells/2), rep("celltype_2", ncells/2))
 sce$pseudotime = seq_len(ncells)
 genelist = as.character(seq_len(ngenes))
 
-# Evaluating created AtgnatData
-atgnat_data = as.AtgnatData(sce, pseudotime_slot="pseudotime", n_bins=10)
-atgnat_data@genes = genelist[1:20]
+# Evaluating created BlaseData
+blase_data = as.BlaseData(sce, pseudotime_slot="pseudotime", n_bins=10)
+blase_data@genes = genelist[1:20]
 
 # Check specificity of parameters
-evaluate_parameters(atgnat_data, make_plot = TRUE)
+evaluate_parameters(blase_data, make_plot = TRUE)
 }
 \concept{tuning}

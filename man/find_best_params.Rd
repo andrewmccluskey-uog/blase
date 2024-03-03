@@ -13,7 +13,7 @@ find_best_params(
 )
 }
 \arguments{
-\item{x}{The object to create `AtgnatData`` from}
+\item{x}{The object to create `BlaseData`` from}
 
 \item{genelist}{The list of genes to use (ordered by descending goodness)}
 
@@ -21,7 +21,7 @@ find_best_params(
 
 \item{gene_count_range}{The n_genes list to try out}
 
-\item{...}{params to be passed to child functions, see \code{\link[=as.AtgnatData]{as.AtgnatData()}}}
+\item{...}{params to be passed to child functions, see \code{\link[=as.BlaseData]{as.BlaseData()}}}
 }
 \value{
 A dataframe of the results.
@@ -48,7 +48,7 @@ sce$cell_type = c(rep("celltype_1", ncells/2), rep("celltype_2", ncells/2))
 sce$pseudotime = seq_len(ncells)
 genelist = as.character(seq_len(ngenes))
 
-# Finding the best params for the AtgnatData
+# Finding the best params for the BlaseData
 best_params = find_best_params(
   sce, genelist,
   bins_count_range=c(10,20),

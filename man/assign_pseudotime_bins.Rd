@@ -50,15 +50,15 @@ rownames(sce) = as.character(seq_len(5))
 sce$cell_type = c(rep("celltype_1", 24), rep("celltype_2", 24))
 
 sce$pseudotime = seq_len(48)
-atgnat_data = as.AtgnatData(sce, pseudotime_slot="pseudotime", n_bins=4)
-atgnat_data@genes = as.character(seq_len(5))
+blase_data = as.BlaseData(sce, pseudotime_slot="pseudotime", n_bins=4)
+blase_data@genes = as.character(seq_len(5))
 
 bulk_counts = matrix(seq_len(15)*10, ncol=3, nrow=5)
 colnames(bulk_counts) = c("A", "B", "C")
 rownames(bulk_counts) = as.character(seq_len(5))
 
 # Map to bin
-result = map_best_bin(atgnat_data, "B", bulk_counts)
+result = map_best_bin(blase_data, "B", bulk_counts)
 result
 
 # Plot Heatmap
@@ -71,4 +71,4 @@ plot_mapping_result_corr(result)
 sce = assign_pseudotime_bins(sce, pseudotime_slot="pseudotime", n_bins=4)
 plot_bin_population(sce, result@best_bin, group_by_slot="cell_type")
 }
-\concept{atgnat-object}
+\concept{blase-object}

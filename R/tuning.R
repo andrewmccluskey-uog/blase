@@ -6,7 +6,7 @@
 #'
 #' @concept tuning
 #'
-#' @param atgnat_data The [AtgnatData] object to use.
+#' @param blase_data The [BlaseData] object to use.
 #' @param make_plot Whether or not to render the plot showing the correlations
 #' for each pseudobulk bin when we try to map the given bin.
 #' @param plot_columns How many columns to use in the plot.
@@ -31,29 +31,30 @@
 #' sce$pseudotime = seq_len(ncells)
 #' genelist = as.character(seq_len(ngenes))
 #'
-#' # Evaluating created AtgnatData
-#' atgnat_data = as.AtgnatData(sce, pseudotime_slot="pseudotime", n_bins=10)
-#' atgnat_data@genes = genelist[1:20]
+#' # Evaluating created BlaseData
+#' blase_data = as.BlaseData(sce, pseudotime_slot="pseudotime", n_bins=10)
+#' blase_data@genes = genelist[1:20]
 #'
 #' # Check specificity of parameters
-#' evaluate_parameters(atgnat_data, make_plot = TRUE)
-evaluate_parameters <- function(atgnat_data, make_plot=FALSE, plot_columns=4) {
+#' evaluate_parameters(blase_data, make_plot = TRUE)
+evaluate_parameters <- function(blase_data, make_plot=FALSE, plot_columns=4) {
 
-  bin_ids = atgnat_data@bins
+  bin_ids = blase_data@bins
 
   results.best_bin = c()
   results.best_corr = c()
   results.history = c()
   results.specificity = c()
 
-  pseudobulked_bins = data.frame(lapply(seq_len(length(atgnat_data@pseudobulk_bins)), function (i) {
-    x = atgnat_data@pseudobulk_bins[[i]]
+  pseudobulked_bins = data.frame(lapply(blase_data@bins, function (i) {
+    x = blase_data@pseudobulk_bins[[i]]
     return(Matrix::rowMeans(x))
   }))
-  colnames(pseudobulked_bins) = atgnat_data@bins
+
+  colnames(pseudobulked_bins) = blase_data@bins
 
   for (i in bin_ids) {
-    res = map_best_bin(atgnat_data, i, pseudobulked_bins, bootstrap_iterations = 0)
+    res = map_best_bin(blase_data, i, pseudobulked_bins, bootstrap_iterations = 0)
     results.best_bin = append(results.best_bin, c(res@best_bin))
     results.best_corr = append(results.best_corr, c(res@best_correlation))
     results.specificity = append(results.specificity, c(res@top_2_distance))
@@ -71,7 +72,7 @@ evaluate_parameters <- function(atgnat_data, make_plot=FALSE, plot_columns=4) {
     }
 
     gridExtra::grid.arrange(
-      top=grid::textGrob(paste(length(atgnat_data@genes), "genes and worst specificity:", signif(worst_specificity, 2)),gp=grid::gpar(fontsize=20,font=3)),
+      top=grid::textGrob(paste(length(blase_data@genes), "genes and worst specificity:", signif(worst_specificity, 2)),gp=grid::gpar(fontsize=20,font=3)),
       grobs=plots,
       ncol=plot_columns
     )
@@ -86,11 +87,11 @@ evaluate_parameters <- function(atgnat_data, make_plot=FALSE, plot_columns=4) {
 #'
 #' @concept tuning
 #'
-#' @param x The object to create `AtgnatData`` from
+#' @param x The object to create `BlaseData`` from
 #' @param genelist The list of genes to use (ordered by descending goodness)
 #' @param bins_count_range The n_bins list to try out
 #' @param gene_count_range The n_genes list to try out
-#' @param ... params to be passed to child functions, see [as.AtgnatData()]
+#' @param ... params to be passed to child functions, see [as.BlaseData()]
 #'
 #' @return A dataframe of the results.
 #' * bin_count: The bin count for this attempt
@@ -115,7 +116,7 @@ evaluate_parameters <- function(atgnat_data, make_plot=FALSE, plot_columns=4) {
 #' sce$pseudotime = seq_len(ncells)
 #' genelist = as.character(seq_len(ngenes))
 #'
-#' # Finding the best params for the AtgnatData
+#' # Finding the best params for the BlaseData
 #' best_params = find_best_params(
 #'   sce, genelist,
 #'   bins_count_range=c(10,20),
@@ -136,11 +137,11 @@ find_best_params <- function(x, genelist, bins_count_range=c(5,10,20,40), gene_c
   # https://www.bioconductor.org/packages/devel/bioc/vignettes/BiocParallel/inst/doc/Introduction_To_BiocParallel.html#parallel-looping-vectorized-and-aggregate-operations
   # https://cran.r-project.org/web/packages/foreach/index.html
   for (bin_count in bins_count_range) {
-    atgnat_data = as.AtgnatData(x=x, n_bins=bin_count, ...)
+    blase_data = as.BlaseData(x=x, n_bins=bin_count, ...)
 
     for (genes_count in gene_count_range) {
-      atgnat_data@genes = genelist[1:genes_count]
-      res = evaluate_parameters(atgnat_data, make_plot=FALSE)
+      blase_data@genes = genelist[1:genes_count]
+      res = evaluate_parameters(blase_data, make_plot=FALSE)
       results = rbind(results, data.frame(bin_count=c(bin_count), gene_count=c(genes_count), worst_specificity=c(res[1]), mean_specificity=c(res[2])))
     }
   }
@@ -184,7 +185,7 @@ plot_find_best_params_results <- function(find_best_params_results, bin_count_co
 #'
 #' @concept tuning
 #'
-#' @param atgnat_data The [AtgnatData] to get bins and expression from.
+#' @param blase_data The [BlaseData] to get bins and expression from.
 #' @param n_genes_to_plot The number of genes to plot.
 #' @param plot_columns The number of columns to plot the grid with. Best as a
 #' divisor of `n_genes_to_plot`.
@@ -204,31 +205,31 @@ plot_find_best_params_results <- function(find_best_params_results, bin_count_co
 #' sce$pseudotime = seq_len(ncells)
 #' genelist = as.character(seq_len(ngenes))
 #'
-#' # Evaluating created AtgnatData
-#' atgnat_data = as.AtgnatData(sce, pseudotime_slot="pseudotime", n_bins=10)
-#' atgnat_data@genes = genelist[1:20]
+#' # Evaluating created BlaseData
+#' blase_data = as.BlaseData(sce, pseudotime_slot="pseudotime", n_bins=10)
+#' blase_data@genes = genelist[1:20]
 #'
 #' # Check gene expression over pseudotime
-#' evaluate_top_n_genes(atgnat_data)
-evaluate_top_n_genes <- function(atgnat_data, n_genes_to_plot=16, plot_columns=4) {
+#' evaluate_top_n_genes(blase_data)
+evaluate_top_n_genes <- function(blase_data, n_genes_to_plot=16, plot_columns=4) {
 
-  if (n_genes_to_plot > length(atgnat_data@genes)) {
-    n_genes_to_plot = length(atgnat_data@genes)
+  if (n_genes_to_plot > length(blase_data@genes)) {
+    n_genes_to_plot = length(blase_data@genes)
   }
 
-  pseudobulked_bins = data.frame(lapply(seq_len(length(atgnat_data@pseudobulk_bins)), function (i) {
-    x = atgnat_data@pseudobulk_bins[[i]]
+  pseudobulked_bins = data.frame(lapply(seq_len(length(blase_data@pseudobulk_bins)), function (i) {
+    x = blase_data@pseudobulk_bins[[i]]
     return(Matrix::rowMeans(x))
   }))
-  colnames(pseudobulked_bins) = atgnat_data@bins
+  colnames(pseudobulked_bins) = blase_data@bins
 
   plots = list()
   for (i in seq_len(n_genes_to_plot)) {
-    plots[[i]] = PRIVATE_plot_gene_over_bins(pseudobulked_bins, atgnat_data@genes[i])
+    plots[[i]] = PRIVATE_plot_gene_over_bins(pseudobulked_bins, blase_data@genes[i])
   }
 
   gridExtra::grid.arrange(
-    top=grid::textGrob(paste(length(atgnat_data@genes), "genes"),gp=grid::gpar(fontsize=20,font=3)),
+    top=grid::textGrob(paste(length(blase_data@genes), "genes"),gp=grid::gpar(fontsize=20,font=3)),
     grobs=plots,
     ncol=plot_columns
   )

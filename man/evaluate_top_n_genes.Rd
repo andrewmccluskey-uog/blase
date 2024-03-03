@@ -4,10 +4,10 @@
 \alias{evaluate_top_n_genes}
 \title{Evaluate Top Genes}
 \usage{
-evaluate_top_n_genes(atgnat_data, n_genes_to_plot = 16, plot_columns = 4)
+evaluate_top_n_genes(blase_data, n_genes_to_plot = 16, plot_columns = 4)
 }
 \arguments{
-\item{atgnat_data}{The \link{AtgnatData} to get bins and expression from.}
+\item{blase_data}{The \link{BlaseData} to get bins and expression from.}
 
 \item{n_genes_to_plot}{The number of genes to plot.}
 
@@ -32,11 +32,11 @@ sce$cell_type = c(rep("celltype_1", ncells/2), rep("celltype_2", ncells/2))
 sce$pseudotime = seq_len(ncells)
 genelist = as.character(seq_len(ngenes))
 
-# Evaluating created AtgnatData
-atgnat_data = as.AtgnatData(sce, pseudotime_slot="pseudotime", n_bins=10)
-atgnat_data@genes = genelist[1:20]
+# Evaluating created BlaseData
+blase_data = as.BlaseData(sce, pseudotime_slot="pseudotime", n_bins=10)
+blase_data@genes = genelist[1:20]
 
 # Check gene expression over pseudotime
-evaluate_top_n_genes(atgnat_data)
+evaluate_top_n_genes(blase_data)
 }
 \concept{tuning}
