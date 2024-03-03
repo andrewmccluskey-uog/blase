@@ -192,7 +192,7 @@ nrow(associationTestResult)
 Now we save the RDS so we can distribute with BLASE.
 ```{r, saveRDS, eval=FALSE}
 processed_MCA_PF_SCE = sce
-usethis::use_data(processed_MCA_PF_SCE, overwrite = TRUE)
+usethis::use_data(processed_MCA_PF_SCE, overwrite = TRUE, compress = "bzip2")
 ```
 
 ## Loading the SCE Object

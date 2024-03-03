@@ -14,6 +14,8 @@ reference:
   - contents: has_concept("util")
   - title: Gene Selection
   - contents: has_concept("gene-selection")
+  - title: Datasets
+  - contents: has_concept("blase-data")
 
 navbar:
  components:
@@ -23,15 +25,15 @@ navbar:
       - text: Vignettes
       - text: Assign Bulk To SC Pseudotime
         href: articles/assign-bulk-to-pseudotime.html
-      - text: P. Falciparum Lifecycle - Comparing Bozdech and TradeSeq
-        href: articles/falciparum_lifecycle.html
       - text: -------
       - text: Further Analysis with BLASE
       - text: Simulated Data Workthrough
         href: articles/compare_simulated_data.html
       - text: DE with Blase
         href: articles/DE_with_blase.html
-      - text: Comparing Gene Selection Methods
+      - text: P. Falciparum Lifecycle - Comparing Bozdech and TradeSeq
+        href: articles/falciparum_lifecycle.html
+      - text: Comparing Gene Selection Methods In Depth
         href: articles/gene_selection_comparison.html
       - text: -------
       - text: Data Generation

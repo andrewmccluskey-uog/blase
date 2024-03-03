@@ -91,6 +91,11 @@ model <- generate_cells(model)
 model <- generate_experiment(model)
 ```
 
+
+```{r, eval=FALSE}
+#model = readRDS("/Users/andrewmccluskey/Library/Application Support/org.R-project.R/R/BLASE/compare_simulated_data/simulation.rds")
+```
+
 Now we'll create an SCE out of the simulation
 ```{r, eval=FALSE}
 sce <- as_sce(model)
@@ -108,7 +113,7 @@ colLabels(sce) <- clusterCells(sce, use.dimred='PCA',
 Now we save the RDS so we can distribute with BLASE.
 ```{r, saveRDS, eval=FALSE}
 processed_simulated_data_SCE = sce
-usethis::use_data(processed_simulated_data_SCE, overwrite = TRUE)
+usethis::use_data(processed_simulated_data_SCE, overwrite = TRUE, compress = "bzip2")
 ```
 
 ## Loading the SCE Object
