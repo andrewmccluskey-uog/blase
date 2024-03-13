@@ -57,6 +57,7 @@ if (!file.exists(bulk_path)) {
   print("Using cached")
 }
 
+# FPKM normalised
 bulk = as.data.frame(read_excel(bulk_path, range = 'S3A_RNAseq!A4:P2571'))
 rownames(bulk) = bulk$`Transcript_ID`
 rownames(bulk) = gsub(x=rownames(bulk), pattern="_", replacement="-", fixed=TRUE)
@@ -134,6 +135,26 @@ plot_find_best_params_results(res)
 ```
 
 ```{r}
+#cat(gsub(x=paste0("", genelist), pattern="-", replacement = "_"), sep = "\n")
+
+#waves = blase::get_waves(processed_MCA_PF_SCE)
+
+#waves[c("PF3D7-0831700","PF3D7-1116800"),]
+
+#blase::gene_selection_matrix(processed_MCA_PF_SCE, genes=c(
+#  "PF3D7-0831700", 
+#  "PF3D7-1116800",
+#  "PF3D7-1014100",
+#  "PF3D7-0303200",
+#  "PF3D7-0701900"
+#  ), waves=waves, target_matrix_size=5)
+
+#length(genelist)
+#genelist = genelist[!(genelist %in% c("PF3D7-0831700","PF3D7-1116800"))]
+#length(genelist)
+```
+
+```{r}
 genes = 300
 bins = 8
 blaseData = as.BlaseData(processed_MCA_PF_SCE, pseudotime_slot="slingPseudotime_1", n_bins=bins, split_by="pseudotime_range")
@@ -147,6 +168,28 @@ gridExtra::grid.arrange(
   ncol=2
 )
 ```
+```{r}
+#waves = get_waves(processed_MCA_PF_SCE, n_cores = N_CORES)
+#fourier_genes = blase::select_genes_by_fourier_method(processed_MCA_PF_SCE, waves, n_groups=100, top_n_per_group=5)
+#fourier_genes
+#gene_selection_matrix(processed_MCA_PF_SCE, waves, genes=rownames(fourier_genes), target_matrix_size=90)
+
+#dim(fourier_genes)
+#fourier_genes = fourier_genes[ !(rownames(fourier_genes) %in%  c("PF3D7-0831700","PF3D7-1116800", "PF3D7_0201800")), ]
+#dim(fourier_genes)
+
+#blaseData@genes = rownames(fourier_genes)
+#cat(gsub(x=paste0("", rownames(fourier_genes)), pattern="-", replacement = "_"), sep = "\n")
+
+```
+
+And we can see these genes arranged over pseudotime:
+
+```{r}
+waves = get_waves(processed_MCA_PF_SCE)
+gene_selection_matrix(processed_MCA_PF_SCE, waves, genes=blaseData@genes, target_matrix_size=length(unique(blaseData@genes)))
+```
+
 ## Map Bulk data onto Single Cell
 Now we can map the bulk data onto the single cell.
 ```{r}
@@ -195,6 +238,68 @@ gridExtra::grid.arrange(
   ncol=2
 )
 ```
+
+## Cibersort Analysis for comparison
+
+Cibersortx is another tool which could be used for this kind of analysis. Let's see how it performs compared to BLASE. Below is code for producing the files we used to analyse with cibersortx.
+
+```{r, eval=FALSE}
+cibersort_bulk = bulk
+rownames(cibersort_bulk) = gsub(x=rownames(cibersort_bulk), pattern="-", replacement = ".")
+colnames(cibersort_bulk) = gsub(x=colnames(cibersort_bulk), pattern="_", replacement = ".")
+cibersort_bulk = cbind(genes = rownames(cibersort_bulk), cibersort_bulk, row.names = NULL)
+cibersort_bulk[0:10,0:10]
+
+
+cibersort_sc = normcounts(processed_MCA_PF_SCE)
+rownames(cibersort_sc) = gsub(x=rownames(cibersort_sc), pattern="-", replacement = ".")
+colnames(cibersort_sc) = processed_MCA_PF_SCE@colData$pseudotime_bin
+cibersort_sc = cbind(genes = rownames(cibersort_sc), cibersort_sc, row.names = NULL)
+
+all(colnames(normcounts(processed_MCA_PF_SCE)) == rownames(processed_MCA_PF_SCE@colData))
+
+cibersort_sc[0:10,0:10]
+
+#write.table(cibersort_bulk, file = "cibersort_bulk_de.tsv", sep = "\t", row.names=FALSE, col.names=TRUE)
+#write.table(cibersort_sc, file = "cibersort_sc_de.tsv", sep = "\t", row.names=FALSE, col.names=TRUE)
+```
+After analysing with cibersortx, using default settings, and 100 iterations for confidence, the results are given in this file.
+```{r}
+cibersort_results = read.table('~/Downloads/CIBERSORTX_Job6_Results.csv', sep = ',', header=TRUE)
+rownames(cibersort_results) = cibersort_results$Mixture
+cibersort_results <- subset( cibersort_results, select = -Mixture )
+
+cibersort_results_calls = cibersort_results[c('X1', 'X2', 'X3', 'X4', 'X5', 'X6', 'X7', 'X8')]
+cibersort_results_quality = cibersort_results[c('P.value', 'Correlation', 'RMSE')]
+
+to_plot = cibersort_results_calls
+to_plot$BulkID <- rownames(cibersort_results_calls)
+to_plot <- melt(to_plot)
+p1=ggplot(to_plot, aes(variable, BulkID)) +
+  geom_tile(aes(fill = value), colour = "white") +
+  geom_text(aes(label = round(value, 2))) +
+  scale_fill_gradient(low = "white", high = "red")
+
+cibersort_results_quality
+
+library(plyr)
+library(scales)
+
+to_plot = cibersort_results_quality
+to_plot$BulkID <- rownames(cibersort_results_quality)
+to_plot <- melt(to_plot)
+to_plot <- ddply(to_plot, .(variable), transform, rescale = rescale(value))
+p2=ggplot(to_plot, aes(variable, BulkID)) +
+  geom_tile(aes(fill = rescale), colour = "white") +
+  geom_text(aes(label = round(value, 3))) +
+  scale_fill_gradient(low = "white", high = "red")
+
+p1
+p2
+```
+
+
+
 
 ## Session Info
 ```{r sessionInfo}
