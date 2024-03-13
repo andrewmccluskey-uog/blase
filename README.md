@@ -1,26 +1,36 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# Blase
+# BLASE <a href="man/figures/logo.png"><img src="man/figures/logo.png" align="right" height="138" /></a>
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/andrewmccluskey-uog/atgnat/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/andrewmccluskey-uog/atgnat/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/andrewmccluskey-uog/BLASE/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/andrewmccluskey-uog/BLASE/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
+
+## Overview
 
 The goal of Blase is to enable you to map bulk RNA-seq samples onto
 Single Cell RNA-seq for further analysis, with an emphasis on
 trajectories (but it can work for any continuous variable across your
 data!).
 
+It provides:
+
+- Configurable discretisation of pseudotime into “pseudotime bins”  
+- A fourier method for identifying DE genes, particularly effective for
+  Plasmodium sp., as introduced by Bozdech et al.  
+- Mapping of bulk RNA-seq onto these bins.  
+- Plotting functions
+
 ## Installation
 
-You can install the development version of atgnat from
+You can install the development version of BLASE from
 [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("andrewmccluskey-uog/atgnat")
+devtools::install_github("andrewmccluskey-uog/BLASE")
 ```
 
 ## Getting Started

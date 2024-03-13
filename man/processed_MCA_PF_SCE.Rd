@@ -13,7 +13,7 @@ and tradeSeq analysis.
 \url{https://doi.org/10.1126/science.aaw2619}
 }
 \usage{
-data(processed_MCA_PF_SCE, 'blase')
+data(processed_MCA_PF_SCE, package='blase')
 }
 \description{
 This is a \link{SingleCellExperiment} object which contains 6000 cells and 710 genes.

@@ -22,6 +22,9 @@ library(utils)
 library(blase)
 library(utils)
 library(ami)
+library(plyr)
+library(scales)
+library(reshape2)
 ```
 
 ```{r randomseed}
@@ -281,9 +284,6 @@ p1=ggplot(to_plot, aes(variable, BulkID)) +
   scale_fill_gradient(low = "white", high = "red")
 
 cibersort_results_quality
-
-library(plyr)
-library(scales)
 
 to_plot = cibersort_results_quality
 to_plot$BulkID <- rownames(cibersort_results_quality)

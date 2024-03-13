@@ -41,3 +41,35 @@ ggplot(genes_melt, aes=aes()) +
     geom_vline(xintercept=500, linetype='dashed') +
   labs(x = "pseudotime", y = "Gene Expression", title = "Variable Genes Over Pseudotime")
 ```
+
+## Generating Icon
+```{r, eval=FALSE}
+# Adapted from https://nelson-gon.github.io/12/06/2020/hex-sticker-creation-r/
+library(fontawesome)
+library(magick)
+library(dplyr)
+library(hexSticker)
+library(devtools)
+
+logo_color = "orange"
+fill_color = "red"
+border_color= "red"
+
+svg = fa(name = "fire", fill = logo_color)
+
+img = image_read_svg(svg)
+img %>% 
+  image_convert("png") %>% 
+  image_fill(color=fill_color, point="+50") -> res
+
+final_res<-sticker(res, package="BLASE", p_size=28,
+                   p_y = 1,
+                   s_x=1, s_y=1, s_width=1.2,
+                   s_height = 14,
+                   filename="blase_icon.png",
+                   h_fill=fill_color,
+                   h_color = border_color)
+
+plot(final_res)
+usethis::use_logo('blase_icon.png')
+```
