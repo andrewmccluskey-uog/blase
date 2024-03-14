@@ -264,8 +264,7 @@ all(colnames(normcounts(processed_MCA_PF_SCE)) == rownames(processed_MCA_PF_SCE@
 ```
 After analysing with cibersortx, using default settings, and 100 iterations for confidence, the results are given in this file.
 ```{r}
-cibersort_results_path = system.file("extdata", "CIBERSORTX_Job6_Results.csv", package = "blase")
-cibersort_results = read.table(cibersort_results_path, sep = ',', header=TRUE)
+cibersort_results = read.table('./CIBERSORTX_Job6_Results.csv', sep = ',', header=TRUE)
 rownames(cibersort_results) = cibersort_results$Mixture
 cibersort_results <- subset( cibersort_results, select = -Mixture )
 
