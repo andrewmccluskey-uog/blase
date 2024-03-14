@@ -46,7 +46,6 @@ The controls kept all strains at 37 degrees, whereas the heat shock was applied 
 
 ## Fetch the data
 ```{r getData}
-stop(getwd())
 root_dir = tools::R_user_dir("BLASE", "data")
 article_dir = path(root_dir, "DE_with_blase")
 
