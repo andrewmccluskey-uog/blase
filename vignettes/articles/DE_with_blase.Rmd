@@ -251,8 +251,6 @@ cibersort_bulk = bulk
 rownames(cibersort_bulk) = gsub(x=rownames(cibersort_bulk), pattern="-", replacement = ".")
 colnames(cibersort_bulk) = gsub(x=colnames(cibersort_bulk), pattern="_", replacement = ".")
 cibersort_bulk = cbind(genes = rownames(cibersort_bulk), cibersort_bulk, row.names = NULL)
-cibersort_bulk[0:10,0:10]
-
 
 cibersort_sc = normcounts(processed_MCA_PF_SCE)
 rownames(cibersort_sc) = gsub(x=rownames(cibersort_sc), pattern="-", replacement = ".")
@@ -261,14 +259,13 @@ cibersort_sc = cbind(genes = rownames(cibersort_sc), cibersort_sc, row.names = N
 
 all(colnames(normcounts(processed_MCA_PF_SCE)) == rownames(processed_MCA_PF_SCE@colData))
 
-cibersort_sc[0:10,0:10]
-
 #write.table(cibersort_bulk, file = "cibersort_bulk_de.tsv", sep = "\t", row.names=FALSE, col.names=TRUE)
 #write.table(cibersort_sc, file = "cibersort_sc_de.tsv", sep = "\t", row.names=FALSE, col.names=TRUE)
 ```
 After analysing with cibersortx, using default settings, and 100 iterations for confidence, the results are given in this file.
 ```{r}
-cibersort_results = read.table('./CIBERSORTX_Job6_Results.csv', sep = ',', header=TRUE)
+cibersort_results_path = system.file("extdata", "CIBERSORTX_Job6_Results.csv", package = "blase")
+cibersort_results = read.table(cibersort_results_path, sep = ',', header=TRUE)
 rownames(cibersort_results) = cibersort_results$Mixture
 cibersort_results <- subset( cibersort_results, select = -Mixture )
 
