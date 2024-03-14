@@ -268,7 +268,7 @@ cibersort_sc[0:10,0:10]
 ```
 After analysing with cibersortx, using default settings, and 100 iterations for confidence, the results are given in this file.
 ```{r}
-cibersort_results = read.table('~/Downloads/CIBERSORTX_Job6_Results.csv', sep = ',', header=TRUE)
+cibersort_results = read.table('./CIBERSORTX_Job6_Results.csv', sep = ',', header=TRUE)
 rownames(cibersort_results) = cibersort_results$Mixture
 cibersort_results <- subset( cibersort_results, select = -Mixture )
 
