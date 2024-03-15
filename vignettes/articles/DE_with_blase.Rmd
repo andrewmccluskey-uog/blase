@@ -20,7 +20,6 @@ library(gridExtra)
 library(scater)
 library(utils)
 library(blase)
-library(utils)
 library(ami)
 library(plyr)
 library(scales)
@@ -264,7 +263,10 @@ all(colnames(normcounts(processed_MCA_PF_SCE)) == rownames(processed_MCA_PF_SCE@
 ```
 After analysing with cibersortx, using default settings, and 100 iterations for confidence, the results are given in this file.
 ```{r}
-cibersort_results = read.table('CIBERSORTX_Job6_Results.csv', sep = ',', header=TRUE)
+data_dir <- system.file("extdata/", package = "blase")
+path_to_cibersort_results = path(data_dir, "CIBERSORTX_Job6_Results", ext = "csv")
+
+cibersort_results = read.table(path_to_cibersort_results, sep = ',', header=TRUE)
 rownames(cibersort_results) = cibersort_results$Mixture
 cibersort_results <- subset( cibersort_results, select = -Mixture )
 
