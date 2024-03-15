@@ -45,7 +45,7 @@ The controls kept all strains at 37 degrees, whereas the heat shock was applied 
 
 ## Fetch the data
 ```{r getData}
-ext_data_dir <- system.file("extdata/", package = "blase")
+ext_data_dir <- system.file("extdata", package = "blase")
 
 root_dir = tools::R_user_dir("BLASE", "data")
 article_dir = path(root_dir, "DE_with_blase")
@@ -264,15 +264,14 @@ all(colnames(normcounts(processed_MCA_PF_SCE)) == rownames(processed_MCA_PF_SCE@
 #write.table(cibersort_sc, file = path(ext_data_dir, "cibersort_bulk_de", ext = "tsv"), sep = "\t", row.names=FALSE, col.names=TRUE)
 ```
 After analysing with cibersortx, using default settings, and 100 iterations for confidence, the results are given in this file.
-```{r}
+```{r, eval=FALSE}
 path_to_cibersort_results = path(ext_data_dir, "CIBERSORTX_Job6_Results", ext = "csv")
-#cibersort_results = read.table(path_to_cibersort_results, sep = ',', header=TRUE)
-
 cibersort_results = read.csv(path_to_cibersort_results, row.names=1)
-cibersort_results
+usethis::use_data(cibersort_results, overwrite = TRUE, compress = "bzip2")
+```
 
-#rownames(cibersort_results) = cibersort_results$Mixture
-#cibersort_results <- subset( cibersort_results, select = -Mixture )
+```{r}
+data(cibersort_results, package="blase")
 
 cibersort_results_calls = cibersort_results[c('X1', 'X2', 'X3', 'X4', 'X5', 'X6', 'X7', 'X8')]
 cibersort_results_quality = cibersort_results[c('P.value', 'Correlation', 'RMSE')]
