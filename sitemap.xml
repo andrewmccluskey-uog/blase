@@ -1,114 +1,120 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://andrewmccluskey-uog.github.io/atgnat/404.html</loc>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/404.html</loc>
   </url>
   <url>
-    <loc>https://andrewmccluskey-uog.github.io/atgnat/articles/DE_with_blase.html</loc>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/articles/DE_with_blase.html</loc>
   </url>
   <url>
-    <loc>https://andrewmccluskey-uog.github.io/atgnat/articles/assign-bulk-to-pseudotime.html</loc>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/articles/How-Blase-Works.html</loc>
   </url>
   <url>
-    <loc>https://andrewmccluskey-uog.github.io/atgnat/articles/compare_simulated_data.html</loc>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/articles/assign-bulk-to-pseudotime.html</loc>
   </url>
   <url>
-    <loc>https://andrewmccluskey-uog.github.io/atgnat/articles/falciparum_lifecycle.html</loc>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/articles/compare_simulated_data.html</loc>
   </url>
   <url>
-    <loc>https://andrewmccluskey-uog.github.io/atgnat/articles/gene_selection_comparison.html</loc>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/articles/falciparum_lifecycle.html</loc>
   </url>
   <url>
-    <loc>https://andrewmccluskey-uog.github.io/atgnat/articles/generate-MCA-pb-object.html</loc>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/articles/gene_selection_comparison.html</loc>
   </url>
   <url>
-    <loc>https://andrewmccluskey-uog.github.io/atgnat/articles/generate-MCA-pf-object.html</loc>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/articles/generate-MCA-pb-object.html</loc>
   </url>
   <url>
-    <loc>https://andrewmccluskey-uog.github.io/atgnat/articles/generate-simulated-data-object.html</loc>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/articles/generate-MCA-pf-object.html</loc>
   </url>
   <url>
-    <loc>https://andrewmccluskey-uog.github.io/atgnat/articles/index.html</loc>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/articles/generate-simulated-data-object.html</loc>
   </url>
   <url>
-    <loc>https://andrewmccluskey-uog.github.io/atgnat/authors.html</loc>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/articles/index.html</loc>
   </url>
   <url>
-    <loc>https://andrewmccluskey-uog.github.io/atgnat/index.html</loc>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/authors.html</loc>
   </url>
   <url>
-    <loc>https://andrewmccluskey-uog.github.io/atgnat/reference/BlaseData-class.html</loc>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/index.html</loc>
   </url>
   <url>
-    <loc>https://andrewmccluskey-uog.github.io/atgnat/reference/MappingResult-class.html</loc>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/reference/BlaseData-class.html</loc>
   </url>
   <url>
-    <loc>https://andrewmccluskey-uog.github.io/atgnat/reference/as.BlaseData.html</loc>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/reference/MappingResult-class.html</loc>
   </url>
   <url>
-    <loc>https://andrewmccluskey-uog.github.io/atgnat/reference/assign_pseudotime_bins.html</loc>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/reference/as.BlaseData.html</loc>
   </url>
   <url>
-    <loc>https://andrewmccluskey-uog.github.io/atgnat/reference/evaluate_parameters.html</loc>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/reference/assign_pseudotime_bins.html</loc>
   </url>
   <url>
-    <loc>https://andrewmccluskey-uog.github.io/atgnat/reference/evaluate_top_n_genes.html</loc>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/reference/cibersort_results.html</loc>
   </url>
   <url>
-    <loc>https://andrewmccluskey-uog.github.io/atgnat/reference/find_best_params.html</loc>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/reference/evaluate_parameters.html</loc>
   </url>
   <url>
-    <loc>https://andrewmccluskey-uog.github.io/atgnat/reference/gene_selection_matrix.html</loc>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/reference/evaluate_top_n_genes.html</loc>
   </url>
   <url>
-    <loc>https://andrewmccluskey-uog.github.io/atgnat/reference/get_bins_as_bulk.html</loc>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/reference/find_best_params.html</loc>
   </url>
   <url>
-    <loc>https://andrewmccluskey-uog.github.io/atgnat/reference/get_top_n_genes.html</loc>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/reference/gene_selection_matrix.html</loc>
   </url>
   <url>
-    <loc>https://andrewmccluskey-uog.github.io/atgnat/reference/get_waves.html</loc>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/reference/get_bins_as_bulk.html</loc>
   </url>
   <url>
-    <loc>https://andrewmccluskey-uog.github.io/atgnat/reference/index.html</loc>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/reference/get_top_n_genes.html</loc>
   </url>
   <url>
-    <loc>https://andrewmccluskey-uog.github.io/atgnat/reference/map_best_bin.html</loc>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/reference/get_waves.html</loc>
   </url>
   <url>
-    <loc>https://andrewmccluskey-uog.github.io/atgnat/reference/plot_bin_population.html</loc>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/reference/index.html</loc>
   </url>
   <url>
-    <loc>https://andrewmccluskey-uog.github.io/atgnat/reference/plot_find_best_params_results.html</loc>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/reference/map_best_bin.html</loc>
   </url>
   <url>
-    <loc>https://andrewmccluskey-uog.github.io/atgnat/reference/plot_mapping_result.html</loc>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/reference/plot_bin_population.html</loc>
   </url>
   <url>
-    <loc>https://andrewmccluskey-uog.github.io/atgnat/reference/plot_mapping_result_corr.html</loc>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/reference/plot_find_best_params_results.html</loc>
   </url>
   <url>
-    <loc>https://andrewmccluskey-uog.github.io/atgnat/reference/plot_mapping_result_heatmap.html</loc>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/reference/plot_mapping_result.html</loc>
   </url>
   <url>
-    <loc>https://andrewmccluskey-uog.github.io/atgnat/reference/processed_MCA_PB_SCE.html</loc>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/reference/plot_mapping_result_corr.html</loc>
   </url>
   <url>
-    <loc>https://andrewmccluskey-uog.github.io/atgnat/reference/processed_MCA_PF_SCE.html</loc>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/reference/plot_mapping_result_heatmap.html</loc>
   </url>
   <url>
-    <loc>https://andrewmccluskey-uog.github.io/atgnat/reference/processed_simulated_data_SCE.html</loc>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/reference/processed_MCA_PB_SCE.html</loc>
   </url>
   <url>
-    <loc>https://andrewmccluskey-uog.github.io/atgnat/reference/redim_matrix.html</loc>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/reference/processed_MCA_PF_SCE.html</loc>
   </url>
   <url>
-    <loc>https://andrewmccluskey-uog.github.io/atgnat/reference/select_genes_by_fourier_method.html</loc>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/reference/processed_simulated_data_SCE.html</loc>
   </url>
   <url>
-    <loc>https://andrewmccluskey-uog.github.io/atgnat/reference/show-BlaseData-method.html</loc>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/reference/redim_matrix.html</loc>
   </url>
   <url>
-    <loc>https://andrewmccluskey-uog.github.io/atgnat/reference/show-MappingResult-method.html</loc>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/reference/select_genes_by_fourier_method.html</loc>
+  </url>
+  <url>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/reference/show-BlaseData-method.html</loc>
+  </url>
+  <url>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/reference/show-MappingResult-method.html</loc>
   </url>
 </urlset>
