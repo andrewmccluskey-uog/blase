@@ -1,4 +1,4 @@
-url: https://andrewmccluskey-uog.github.io/atgnat/
+url: https://andrewmccluskey-uog.github.io/BLASE/
 template:
   bootstrap: 5
 reference:
@@ -23,6 +23,8 @@ navbar:
       text: Articles
       menu:
       - text: Vignettes
+      - text: How BLASE Works
+        href: articles/how-blase-works.html
       - text: Assign Bulk To SC Pseudotime
         href: articles/assign-bulk-to-pseudotime.html
       - text: -------

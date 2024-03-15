@@ -43,9 +43,13 @@ Suggests:
     tools,
     ami,
     emdist,
-    ggplotify
+    ggplotify,
+    reshape2,
+    scales,
+    dplyr,
+    plyr
 Config/testthat/edition: 3
 VignetteBuilder: knitr
-URL: https://andrewmccluskey-uog.github.io/atgnat/
+URL: https://andrewmccluskey-uog.github.io/BLASE/
 Depends: 
     R (>= 2.10)

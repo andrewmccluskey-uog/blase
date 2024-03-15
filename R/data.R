@@ -1,3 +1,21 @@
+#' CIBERSORTx Results for P. Falciparum Heat Shock Bulks to MCA data
+#' 
+#' These are CIBERSORTx results for mapping Zhang et al.'s P. falciparum heat shock
+#' RNA-seq data to Howick et al.'s Malaria Cell Atlas P. Falciaprum scRNA-seq
+#'
+#'
+#' Exact steps for generating this object are given in
+#' [our article](articles/DE_with_blase).
+#'
+#' @format
+#' The object contains a CIBERSORTx results table. This includes proportion
+#' estimations for pseudobins 1-8 (X1-X8), and quality scores (P.value, Correlation, RMSE)
+#'
+#' @source DE with BLASE vignette & CIBERSORTx
+#' @usage data(cibersort_results, package='blase')
+#' @concept blase-data
+"cibersort_results"
+
 #' BLASE Malaria Cell Atlas Plasmodium Berghei Test Dataset
 #'
 #' This is a [SingleCellExperiment] object which contains 4890 cells and 4763 genes.

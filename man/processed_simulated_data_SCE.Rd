@@ -12,7 +12,7 @@ and PCA and UMAP coordinates.
 BLASE
 }
 \usage{
-data(processed_simulated_data_SCE, 'blase')
+data(processed_simulated_data_SCE, package='blase')
 }
 \description{
 This is a SingleCellExperiment object which contains 2000 cells and 455 genes.
