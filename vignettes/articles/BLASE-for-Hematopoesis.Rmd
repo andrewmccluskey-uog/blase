@@ -1,0 +1,161 @@
+---
+title: "BLASE for Hematopoesis"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+#library(blase)
+library(fs)
+library(Seurat)
+library(dplyr)
+library(slingshot)
+library(tradeSeq)
+library(BiocParallel)
+library(scran)
+```
+
+First configure R:
+```{r, randomseed}
+RNGversion("3.5.0")
+SEED = 7
+set.seed(SEED)
+```
+
+```{r, concurrency}
+N_CORES = 4
+if (ami::using_ci()) {
+  N_CORES = 2
+}
+```
+
+## Download Data
+```{r}
+options(timeout=300) #5 mins
+
+root_dir = tools::R_user_dir("BLASE", "data")
+article_dir = fs::path(root_dir, "hematopoeisis")
+if (!dir.exists(article_dir)) {
+  dir.create(article_dir, recursive = TRUE)
+}
+
+# https://www.nature.com/articles/s41586-024-07066-z#data-availability
+# https://figshare.com/articles/dataset/Annotated_Seurat_objects/23290004?file=41046020
+# Young1.All.T1.Seurat.RDS
+path = fs::path(article_dir, "Young1.All.T1", ext="RDS")
+if (!file.exists(path)) {
+  download.file('https://figshare.com/ndownloader/files/41046020', path)
+}else {
+  print("Using cached")
+}
+```
+## Load Single Cell
+```{r}
+seurat_obj = readRDS(path)
+seurat_obj
+seurat_obj@meta.data
+
+DimPlot(seurat_obj, reduction = "wnn.umap", group.by = "STD.CellType")
+DimPlot(seurat_obj, reduction = "wnn.umap", group.by = "STD_Cat")
+DimPlot(seurat_obj, reduction = "wnn.umap", group.by = "STD_Cat2")
+
+s = subset(
+  seurat_obj,
+  STD_Cat == 'Lym' | STD_Cat == 'ProB', invert = TRUE
+)
+
+s = subset(
+  seurat_obj,
+  STD.CellType %in% c(
+    'Refined.HSC',
+    'HSC',
+    'MPP',
+    'CMP',
+    'MEP',
+    'EryP'
+    )
+)
+seurat_obj
+DimPlot(seurat_obj, reduction = "umap.rna", group.by = "STD.CellType", label = TRUE)
+DimPlot(s, reduction = "umap.rna", group.by = "STD.CellType", label = TRUE)
+```
+
+```{r}
+sce = as.SingleCellExperiment(s)
+rm(seurat_obj, s)
+gc()
+
+sce = sce[,colnames(sce) %in% sample(colnames(sce), size=6000)]
+sce
+
+dec <- modelGeneVar(sce)
+hvg <- getTopHVGs(dec, prop=0.3)
+sce = sce[hvg,]
+sce
+
+normcounts(sce) <- exp(logcounts(sce))
+
+sce = runUMAP(sce) #Rerun umap with our cells
+plotUMAP(sce, color_by="STD.CellType")
+sce <- slingshot(sce, reducedDim = 'UMAP', clusterLabels="STD.CellType", start.clus="Refined.HSC", end.clus="EryP")
+plotUMAP(sce, color_by="slingPseudotime_1")
+```
+
+```{r}
+evaluateK(sce, k=5:9, parallel=T, BPPARAM=MulticoreParam(2), nGenes=length(rownames(sce)))
+```
+
+```{r}
+sce <- fitGAM(sce, parallel=T, BPPARAM=MulticoreParam(2), nknots=9)
+```
+
+```{r}
+associationTestResult <- associationTest(sce, lineages=T, global=F, contrastType="consecutive")
+head(associationTestResult)
+nrow(associationTestResult)
+```
+## Set up BLASE
+```{r}
+genelist = blase::get_top_n_genes(associationTestResult, n_genes = 200, lineage = 1)
+res = blase::find_best_params(sce, genelist, split_by="pseudotime_range", bins_count_range=c(10,12,14,16,18,20),gene_count_range=c(10,20,40,80,160))
+
+blase::plot_find_best_params_results(res)
+```
+
+```{r}
+blase_data = as.BlaseData(sce, n_bins=18)
+blase_data@genes = genelist[1:80]
+evaluate_parameters(blase_data, make_plot = TRUE)
+```
+
+## Generate "bulk" datasets
+In this article we will pseudobulk the Single Cell data into bulk datasets to demonstrate that
+BLASE can map a given cluster back to itself.
+```{r}
+bulks_df = DataFrame(row.names = rownames(counts(sce)))
+for (type in unique(sce$STD.CellType)) {
+  bulks_df = cbind(bulks_df, rowSums(normcounts(subset(sce, , STD.CellType==type))))
+}
+colnames(bulks_df) = as.character(unique(sce$STD.CellType))
+```
+
+## Run BLASE
+We will now verify that BLASE can accurately map these "bulk" datasets back to the SC clusters
+
+```{r}
+results = c()
+for (type in unique(sce$STD.CellType)) {
+  print(type)
+  results = c(results, map_best_bin(blase_data, type, bulks_df))
+}
+```
+
+```{r}
+results
+plot_mapping_result_heatmap(as.list(results))
+```

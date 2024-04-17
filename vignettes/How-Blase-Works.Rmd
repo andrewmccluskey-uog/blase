@@ -1,5 +1,13 @@
 ---
 title: "How Blase Works"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{How Blase Works}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
 ```{r, include = FALSE}

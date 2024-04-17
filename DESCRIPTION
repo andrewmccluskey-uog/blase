@@ -47,7 +47,8 @@ Suggests:
     reshape2,
     scales,
     dplyr,
-    plyr
+    plyr,
+    Signac
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 URL: https://andrewmccluskey-uog.github.io/BLASE/
