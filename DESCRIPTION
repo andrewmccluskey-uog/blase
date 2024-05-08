@@ -17,7 +17,7 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 biocViews:
 Imports: 
-  SingleCellExperiment (== 1.22.0),
+  SingleCellExperiment,
   ggplot2,
   gridExtra,
   viridis,
