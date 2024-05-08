@@ -51,64 +51,12 @@ In this vignette we will use BLASE to map bulk Plasmodium Falciparum data from a
 
 The controls kept all strains at 37 degrees, whereas the heat shock was applied to each strain as 3 8-hour increases to 41 degrees, simulating malarial fever.
 
-## Fetch the data
-```{r getData}
-ext_data_dir <- system.file("extdata", package = "blase")
-
-root_dir = tools::R_user_dir("BLASE", "data")
-article_dir = path(root_dir, "DE_with_blase")
-
-if (!dir.exists(article_dir)) {
-  dir.create(article_dir, recursive = TRUE)
-}
-
-bulk_path = path(article_dir, "heat_shock_bulks", ext="xlsx")
-if (!file.exists(bulk_path)) {
-  download.file('https://static-content.springer.com/esm/art%3A10.1038%2Fs41467-021-24814-1/MediaObjects/41467_2021_24814_MOESM5_ESM.xlsx', bulk_path)
-}else {
-  print("Using cached")
-}
-
-# FPKM normalised
-bulk = as.data.frame(read_excel(bulk_path, range = 'S3A_RNAseq!A4:P2571'))
-rownames(bulk) = bulk$`Transcript_ID`
-rownames(bulk) = gsub(x=rownames(bulk), pattern="_", replacement="-", fixed=TRUE)
-
-bulk = subset(bulk, , -c(`GeneID`, `Transcript_ID`, `Gene.NameSymbol`, `TranscriptProductDescription`))
-
-genes_to_fix_bulk = rownames(bulk)[!(rownames(bulk) %in% sub(x=rownames(bulk), pattern="\\.[0-9]", replacement=""))]
-genes_to_fix_bulk = unique(sub(x=genes_to_fix_bulk, pattern="\\.[0-9]", replacement=""))
+## Fetch the bulk data
+```{r load_bulk}
+data(zhang_2021_heat_shock_bulk, package="blase")
+bulk = zhang_2021_heat_shock_bulk
 ```
 
-```{R removeBulkDupTranscripts}
-new_rows = data.frame()
-rownames_to_remove = c()
-
-# Do some pre-work to get colSums quickly
-bulk_matrix = data.matrix(bulk)
-bulk_n = ncol(bulk_matrix)
-
-for (gene in genes_to_fix_bulk) {
-  targetRowNames = rownames(bulk)[grep(x=rownames(bulk), pattern=gene)]
-  rownames_to_remove = c(rownames_to_remove, targetRowNames)
-  # N = col index, M = row index
-  counts = .colSums(bulk_matrix[targetRowNames,], m=length(targetRowNames), n=bulk_n)
-  counts = t(data.frame(counts=counts))
-  rownames(counts) = c(gene)
-  colnames(counts) = colnames(bulk)
-  new_rows = rbind(new_rows, counts)
-}
-
-bulk = bulk[ !(rownames(bulk) %in% rownames_to_remove), ]
-bulk = rbind(bulk, new_rows)
-
-genes_to_fix_bulk = rownames(bulk)[!(rownames(bulk) %in% sub(x=rownames(bulk), pattern="\\.[0-9]", replacement=""))]
-genes_to_fix_bulk = unique(sub(x=genes_to_fix_bulk, pattern="\\.[0-9]", replacement=""))
-print(paste("Remaining genes with dups:", genes_to_fix_bulk))
-
-rm (new_rows, rownames_to_remove, bulk_matrix, bulk_n, genes_to_fix_bulk, counts)
-gc()
-```
 ## Prepare SC
 
 We are using the Malaria Cell Atlas data which we have pre-processed (here)[articles/generate-MCA-pf-object.html]. This data is available for your to experiment with as part of the package.
@@ -205,6 +153,7 @@ gene_selection_matrix(processed_MCA_PF_SCE, waves, genes=blaseData@genes, target
 ## Map Bulk data onto Single Cell
 Now we can map the bulk data onto the single cell.
 ```{r}
+bulk
 mapping_results = c()
 for (bulkname in colnames(bulk)) {
   res = map_best_bin(blaseData, bulkname, bulk)
@@ -267,9 +216,6 @@ colnames(cibersort_sc) = processed_MCA_PF_SCE@colData$pseudotime_bin
 cibersort_sc = cbind(genes = rownames(cibersort_sc), cibersort_sc, row.names = NULL)
 
 all(colnames(normcounts(processed_MCA_PF_SCE)) == rownames(processed_MCA_PF_SCE@colData))
-
-#write.table(cibersort_bulk, file = path(ext_data_dir, "cibersort_bulk_de", ext = "tsv"), sep = "\t", row.names=FALSE, col.names=TRUE)
-#write.table(cibersort_sc, file = path(ext_data_dir, "cibersort_bulk_de", ext = "tsv"), sep = "\t", row.names=FALSE, col.names=TRUE)
 ```
 After analysing with cibersortx, using default settings, and 100 iterations for confidence, the results are given in this file.
 ```{r, eval=FALSE}

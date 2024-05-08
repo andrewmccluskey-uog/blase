@@ -71,3 +71,16 @@
 #' @usage data(processed_simulated_data_SCE, package='blase')
 #' @concept blase-data
 "processed_simulated_data_SCE"
+
+#' Zhang et al. 2021 Plasmodium falciparum heat shock bulk RNA-seq FPKM data.
+#' 
+#' To re-generate, use the <articles/generate-zhang-et-al-2021-bulk-FPKM-object>
+#'
+#' @format
+#' The object contains FPKM normalised bulk RNA-seq counts. Each row is a gene, 
+#' and each column is a sample. The column name format is: "${line}_${heat_shock_temp}_${replciate_number}"
+#'
+#' @source <https://doi.org/10.1038/s41467-021-24814-1>
+#' @usage data(zhang_2021_heat_shock_bulk, package='blase')
+#' @concept blase-data
+"zhang_2021_heat_shock_bulk"

@@ -47,3 +47,5 @@ navbar:
         href: articles/generate-MCA-pf-object.html
       - text: Simulation Data
         href: articles/generate-simulated-data-object.html
+      - text: Generating Zhang et al. 2021 bulk FPKM Dataframe
+        href: articles/generate-zhang-et-al-2021-bulk-FPKM-object.html

@@ -48,9 +48,11 @@ Suggests:
     scales,
     dplyr,
     plyr,
-    Signac
+    Signac,
+    destiny
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 URL: https://andrewmccluskey-uog.github.io/BLASE/
 Depends: 
     R (>= 2.10)
+LazyData: true
