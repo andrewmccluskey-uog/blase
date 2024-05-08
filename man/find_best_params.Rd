@@ -9,6 +9,7 @@ find_best_params(
   genelist,
   bins_count_range = c(5, 10, 20, 40),
   gene_count_range = c(10, 20, 40, 80),
+  verbose = FALSE,
   ...
 )
 }

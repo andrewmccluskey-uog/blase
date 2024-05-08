@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 
 # Generating Malaria Cell Atlas PF Test Dataset
 
-This article, which is not run for this website, shows how we prepare the Malaria Cell Atlas Plasmodium Falciparum ([Howick et al. 2019](https://doi.org/10.1126/science.aaw2619) 10x single cell data. It can be used to generate it from scratch, but we provide the processed object with BLASE.
+This article, which is not run for this website, shows how we prepare the [Zhang et al. 2021](https://doi.org/10.1038/s41467-021-24814-1) bulk RNA-seq data set for use with BLASE. It can be used to generate it from scratch, but we provide the processed dataframe with BLASE.
 
 ```{r, setup, eval=FALSE}
 library(readxl)
