@@ -1,5 +1,8 @@
 ---
 title: "Comparing Gene Selection Methods"
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
 ```{r, include = FALSE}
@@ -37,11 +40,18 @@ if (ami::using_ci()) {
 }
 ```
 
-In this article we will look at different methods for gene selection, using the MCA's Plasmodium Berghei Data [Howick et al, 2019](https://dx.doi.org/10.1126/science.aaw2619), and bulk RNA seq of the lifecycle stages [Otto et al, 2004](https://doi.org/10.1186/s12915-014-0086-0). 
+In this article we will look at different methods for gene selection,
+using the MCA's *Plasmodium berghei* Data [Howick et al,
+2019](https://dx.doi.org/10.1126/science.aaw2619), and bulk RNA seq of
+the lifecycle stages [Otto et al,
+2004](https://doi.org/10.1186/s12915-014-0086-0).
 
-We will investigate in detail the Bozdech method for gene selection described in PAPER.
+We will investigate in detail the 'power' method for gene selection
+described in [Bozdech et al.
+2003](https://doi.org/10.1371/journal.pbio.0000005)
 
 ## Load Data
+
 ```{r getData}
 root_dir = tools::R_user_dir("BLASE", "data")
 
@@ -83,7 +93,9 @@ gridExtra::grid.arrange(
 ```
 
 ## Using TradeSeq
-First, we'll use tradeSeq to find the genes that Tradeseq thinks are variable over pseudotime.
+
+First, we'll use tradeSeq to find the genes that Tradeseq thinks are
+variable over pseudotime.
 
 ```{r}
 associationTestResult <- associationTest(processed_MCA_PB_SCE, lineages=T, global=F, contrastType="consecutive")
@@ -131,7 +143,8 @@ tradeseq_heat
 
 ## Using marker genes
 
-Here we will simply select the top n marker genes for our lifecycle stage annotations.
+Here we will simply select the top n marker genes for our lifecycle
+stage annotations.
 
 ```{r}
 markers <- scoreMarkers(processed_MCA_PB_SCE, lfc=1, groups=processed_MCA_PB_SCE$STAGE_LR)
@@ -177,6 +190,7 @@ for (bulkname in colnames(bulk)) {
 markergenes_heat = blase::plot_mapping_result_heatmap(rev(mapping_results)) + ggplot2::ggtitle(paste0('Marker Genes (', GENES_TO_USE_COUNT,')'))
 markergenes_heat
 ```
+
 ## Pseudotime bin marker genes
 
 Here we select the marker genes for each pseudotime bin.
@@ -208,7 +222,6 @@ res = find_best_params(processed_MCA_PB_SCE,
                        gene_count_range = c(120))
 markergenes_by_bin_tuning = plot_find_best_params_results(res)
 ```
-
 
 ```{r}
 BUCKETS_COUNT = 12
@@ -287,19 +300,24 @@ ggplot2::ggplot(waves, ggplot2::aes(phase, power, color=amplitude)) +
 ```
 
 ### Phase Ordering genes
-Here we've plotted the genes and cells ordered by their peak phase and pseudotime respectively. This functionality is available as a part of BLASE, please see the `gene_selection_matrix()` function.
+
+Here we've plotted the genes and cells ordered by their peak phase and
+pseudotime respectively. This functionality is available as a part of
+BLASE, please see the `gene_selection_matrix()` function.
+
 ```{r}
 gene_selection_matrix(processed_MCA_PB_SCE, waves, target_matrix_size=1000, n_cores=N_CORES)
 ```
 
 Here we set the number of buckets and genes to use:
+
 ```{r}
 BUCKETS_COUNT = 12
 GENES_TO_USE_COUNT = 120
 ```
 
-
 ### Top r2 waves
+
 ```{r}
 top_r2_waves = select_genes_by_fourier_method(processed_MCA_PB_SCE, waves, n_genes=GENES_TO_USE_COUNT, method="r2", force_spread_selection=FALSE)
 
@@ -327,6 +345,7 @@ fourier_top_r2_heat
 ```
 
 ### Top r2 waves with spread
+
 ```{r}
 top_r2_waves_spread = select_genes_by_fourier_method(processed_MCA_PB_SCE, waves, n_groups=GENES_TO_USE_COUNT, method="r2", force_spread_selection=TRUE)
 
@@ -354,6 +373,7 @@ fourier_top_r2_spread_heat
 ```
 
 ### Top amp waves
+
 ```{r}
 top_amp_waves = waves[order(-waves$amplitude),][0:GENES_TO_USE_COUNT,]
 top_amp_waves = select_genes_by_fourier_method(processed_MCA_PB_SCE, waves, n_genes=GENES_TO_USE_COUNT, method="amplitude", force_spread_selection=FALSE)
@@ -380,7 +400,9 @@ for (bulkname in colnames(bulk)) {
 fourier_top_amp_heat = blase::plot_mapping_result_heatmap(rev(mapping_results)) + ggplot2::ggtitle(paste0('fourier_top_amp (', GENES_TO_USE_COUNT,')'))
 fourier_top_amp_heat
 ```
+
 ### Top Amp Waves with spread
+
 ```{r}
 top_amp_waves_spread = select_genes_by_fourier_method(processed_MCA_PB_SCE, waves, n_groups=GENES_TO_USE_COUNT, method="amplitude", force_spread_selection=TRUE)
 
@@ -406,9 +428,12 @@ for (bulkname in colnames(bulk)) {
 fourier_top_amp_spread_heat = blase::plot_mapping_result_heatmap(rev(mapping_results)) + ggplot2::ggtitle(paste0('fourier_top_amp_spread (', GENES_TO_USE_COUNT,')'))
 fourier_top_amp_spread_heat
 ```
+
 ### Top Power
 
-We calculate this by using the amplitude of the peak divided by the sum of total expression
+We calculate this by using the amplitude of the peak divided by the sum
+of total expression
+
 ```{r}
 top_power_waves = select_genes_by_fourier_method(processed_MCA_PB_SCE, waves, n_genes=GENES_TO_USE_COUNT, method="power", force_spread_selection=FALSE)
 
@@ -435,9 +460,10 @@ fourier_top_power_heat = blase::plot_mapping_result_heatmap(rev(mapping_results)
 fourier_top_power_heat
 
 ```
+
 ### Top Power Spread
 
-``` {r}
+```{r}
 top_power_waves_spread = select_genes_by_fourier_method(processed_MCA_PB_SCE, waves, n_groups=GENES_TO_USE_COUNT, method="power", force_spread_selection=TRUE)
 
 ggplot2::ggplot(top_power_waves_spread, ggplot2::aes(phase, amplitude, color=r2)) +
@@ -465,7 +491,8 @@ fourier_top_power_spread_heat
 
 ## Analysing All Gene Lists
 
-Now we can analyse all of these genelists together and compare some statistics.
+Now we can analyse all of these genelists together and compare some
+statistics.
 
 ### Earth Movers Distance for Gene Scoring (Coverage Scoring)
 
@@ -504,7 +531,11 @@ redim_matrix <- function(
 ```
 
 #### Goal State
-We can use the phase calculated for each gene to now score how well the selected genes cover the lifecycle. A perfect set of genes would look roughly like a diagonal line from one corner to the other:
+
+We can use the phase calculated for each gene to now score how well the
+selected genes cover the lifecycle. A perfect set of genes would look
+roughly like a diagonal line from one corner to the other:
+
 ```{r}
 sim_mat = matrix(0, ncol=1000,nrow=1000)
 for (i in seq_len(nrow(sim_mat))) {
@@ -524,19 +555,24 @@ ggplot2::ggplot(data=df,ggplot2::aes(x=x,y=y,fill=expression)) +
     ggplot2::ggtitle("Goal State")
 
 ```
+
 #### Earth Movers Distance
 
-We can also generate a quantified heuristic for how well the genes are selected.
-Earth Mover's Distance (EMD) will give a value for how much of the matrix's mass needs
-to be moved and how far in order to obtain the "ideal" state. A lower EMD means that
-the gene expression matchs the expected expression in the "ideal" case.
+We can also generate a quantified heuristic for how well the genes are
+selected. Earth Mover's Distance (EMD) will give a value for how much of
+the matrix's mass needs to be moved and how far in order to obtain the
+"ideal" state. A lower EMD means that the gene expression matchs the
+expected expression in the "ideal" case.
 
-Here, we assume that the perfect case is a straight diagonal line - i.e. each gene 
-is expressed serially, and does not overlap with other stages. This isn't realistic, 
-but can help us make a decision about which gene list will be most informative.
+Here, we assume that the perfect case is a straight diagonal line - i.e.
+each gene is expressed serially, and does not overlap with other stages.
+This isn't realistic, but can help us make a decision about which gene
+list will be most informative.
 
-We will only perform this for some of the gene lists, as EMD is a slow function, however, 
-we show the code that can be used to calculate for the other gene lists too.
+We will only perform this for some of the gene lists, as EMD is a slow
+function, however, we show the code that can be used to calculate for
+the other gene lists too.
+
 ```{r}
 
 get_earthmovers_distance_from_diagonal = function (expression_matrix, title) {
@@ -599,6 +635,7 @@ print(paste("Power Spread:", get_earthmovers_distance_from_diagonal(top_genes_fo
 ```
 
 ### Fourier Phase Aligned Plotting (Log Expression)
+
 ```{r}
 top_tradeseq_phases_plot = gene_selection_matrix(processed_MCA_PB_SCE, waves, genes=genes_tradeseq, target_matrix_size=length(genes_tradeseq), n_cores=N_CORES) + ggplot2::ggtitle("TradeSeq")
 
@@ -645,7 +682,7 @@ gridExtra::grid.arrange(
 
 ## Summary
 
-Below, we show a summary of the different results that all methods give. 
+Below, we show a summary of the different results that all methods give.
 
 ```{r}
 gridExtra::grid.arrange(
@@ -701,7 +738,9 @@ gridExtra::grid.arrange(
   ncol=2
 )
 ```
+
 ## Session Info
-``` {r}
+
+```{r}
 sessionInfo()
 ```

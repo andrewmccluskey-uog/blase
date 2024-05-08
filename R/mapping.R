@@ -31,6 +31,12 @@ map_best_bin <- function(blase_data, bulk_id, bulk_data, bootstrap_iterations=20
     if (any(length(genes_present) != length(blase_data@genes))) {
       warn(paste('Not all genes present in bucket',i,"continuing without checking correlation for these genes.\n"))
     }
+    
+    
+    #print(dim(blase_data@pseudobulk_bins[[i]]))
+    if (ncol(blase_data@pseudobulk_bins[[i]]) <= 1) {
+      stop(paste0('Not enough cells in bin ', i,' to map against, please reduce number of bins (currently ', length(blase_data@pseudobulk_bins),') or split by cells'))
+    }
 
     bin_ratios = blase_data@pseudobulk_bins[[i]][genes_present,]
 

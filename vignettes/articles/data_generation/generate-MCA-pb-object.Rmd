@@ -1,0 +1,160 @@
+---
+title: "Generating Malaria Cell Atlas PB Test Dataset"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Generating Malaria Cell Atlas PB Test Dataset}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE, eval=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Generating Malaria Cell Atlas PB Test Dataset
+
+This article, which is not run for this website, shows how we prepare the Malaria Cell Atlas Plasmodium Berghei ([Howick et al. 2019](https://doi.org/10.1126/science.aaw2619) 10x single cell data. It can be used to generate it from scratch, but we provide the processed object with BLASE.
+
+```{r, setup, eval=FALSE}
+library(readxl)
+library(scran)
+library(slingshot)
+library(tradeSeq)
+library(BiocParallel)
+library(fs)
+library(gridExtra)
+library(scater)
+library(utils)
+library(blase)
+library(utils)
+library(ami)
+```
+
+First configure R:
+```{r, randomseed, eval=FALSE}
+RNGversion("3.5.0")
+SEED = 7
+set.seed(SEED)
+```
+
+```{r, concurrency, eval=FALSE}
+N_CORES = 4
+if (ami::using_ci()) {
+  N_CORES = 2
+}
+```
+
+First download the data from the Malaria Cell Atlas
+```{r, getData, eval=FALSE}
+root_dir = tools::R_user_dir("BLASE", "data")
+article_dir = path(root_dir, "Generate_MCA_PB_Object")
+
+if (!dir.exists(article_dir)) {
+  dir.create(article_dir, recursive = TRUE)
+}
+
+mca_path = path(article_dir, 'MCA-pb', ext="zip")
+if (!file.exists(mca_path)) {
+  download.file('https://www.malariacellatlas.org/downloads/pb-ch10x-set1.zip', mca_path)
+  unzip(mca_path, exdir = path(article_dir, 'MCA-pb'))
+}else {
+  print("Using cached")
+}
+```
+
+## Prepare SC
+Now we read the files and create an SCE.
+
+```{r, loadSC, eval=FALSE}
+mca_counts_path = path(article_dir, 'MCA-pb','pb-ch10x-set1-ch10x-exp', ext="csv")
+sc_readcounts = read.csv(mca_counts_path, row.names=1)
+
+mca_annotation_path = path(article_dir, 'MCA-pb','pb-ch10x-set1-ch10x-data', ext="csv")
+sc_annotations = read.csv(mca_annotation_path, row.names=1)
+
+rownames(sc_annotations) = gsub(x = rownames(sc_annotations), pattern="-", replacement=".", fixed=TRUE)
+rownames(sc_readcounts) = gsub(x=rownames(sc_readcounts), pattern="_", replacement="-", fixed=TRUE)
+```
+
+Now we can create a `SingleCellExperiment` object:
+```{r, sceCreation, eval=FALSE}
+sce = SingleCellExperiment(assays=list(counts=as.matrix(sc_readcounts)), colData=sc_annotations)
+rm(sc_annotations, sc_readcounts)
+gc()
+
+sce@colData$STAGE_LR = factor(sce@colData$STAGE_LR)
+sce@colData$STAGE_HR = factor(sce@colData$STAGE_HR)
+sce@colData$STRAIN = factor(sce@colData$STRAIN)
+sce@colData$DAY = factor(sce@colData$DAY)
+sce@colData$HOST = factor(sce@colData$HOST)
+```
+
+Now we start annotating and preprocessing the data.
+```{r, scPreprocessing, eval=FALSE}
+sce <- computeSumFactors(sce)
+sce <- logNormCounts(sce)
+normcounts(sce) <- exp(logcounts(sce))
+reducedDim(sce, "PCA") = as.matrix(cbind(sce@colData["PC_1"], sce@colData["PC_2"]))
+sce = runUMAP(sce)
+
+gridExtra::grid.arrange(
+  plotPCA(sce, colour_by="STAGE_LR"),
+  plotUMAP(sce, colour_by="STAGE_LR"),
+  ncol=2
+)
+```
+
+## Running Trajectory Analysis
+
+Generate the pseudotime trajectory
+```{r, runSlingShot, eval=FALSE}
+sce <- slingshot(sce, reducedDim = 'UMAP', clusterLabels="STAGE_LR", start.clus="ring")
+sce = assign_pseudotime_bins(sce, pseudotime_slot="slingPseudotime_1", n_bins=12, split_by="pseudotime_range")
+
+gridExtra::grid.arrange(
+  plotPCA(sce, colour_by="slingPseudotime_1"),
+  plotUMAP(sce, colour_by="slingPseudotime_1"),
+  plotPCA(sce, colour_by="pseudotime_bin"),
+  plotUMAP(sce, colour_by="pseudotime_bin"),
+  ncol=2
+)
+```
+
+Evaluate the number of knots required by tradeseq for differential gene expression over pseudotime.
+```{r, evaluateKForTradeSeq, eval=FALSE}
+evaluateK(sce, k=6:8, parallel=T, BPPARAM=MulticoreParam(N_CORES), nGenes=length(rownames(sce)))
+```
+
+Find differentially expressed genes over pseudotime:
+```{r, tradeSeq, eval=FALSE}
+sce <- fitGAM(sce, parallel=T, BPPARAM=MulticoreParam(N_CORES), nknots=7)
+```
+
+The differentially expressed genes can be found using the association test like this in other places:
+```{r, associationTest, eval=FALSE}
+associationTestResult <- associationTest(sce, lineages=T, global=F, contrastType="consecutive")
+head(associationTestResult)
+nrow(associationTestResult)
+```
+
+## Saving the SCE Object
+Now we save the RDS so we can distribute with BLASE.
+```{r, saveRDS, eval=FALSE}
+processed_MCA_PB_SCE = sce
+usethis::use_data(processed_MCA_PB_SCE, overwrite = TRUE, compress = "bzip2")
+```
+
+## Loading the SCE Object
+You can load this SCE with:
+```{r, loadRDS}
+data(processed_MCA_PB_SCE, package="blase")
+processed_MCA_PB_SCE
+```
+
+## Session Info
+``` {r}
+sessionInfo()
+```

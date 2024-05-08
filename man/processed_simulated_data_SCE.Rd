@@ -21,7 +21,7 @@ generated with the dyngen library.
 }
 \details{
 Exact steps for generating this object are given in
-\href{articles/generate-simulated-data-object}{our article}.
+\href{../articles/generate-simulated-data-object.html}{our article}.
 }
 \concept{blase-data}
 \keyword{datasets}

@@ -67,7 +67,7 @@ evaluate_parameters <- function(blase_data, make_plot=FALSE, plot_columns=4) {
   if (make_plot == TRUE) {
     plots=list()
 
-    for (i in bin_ids) {
+    for (i in seq_len(length(bin_ids))) {
       plots[[i]] = PRIVATE_plot_history(i, results.best_bin, results.best_corr, results.history, results.specificity)
     }
 
@@ -91,6 +91,7 @@ evaluate_parameters <- function(blase_data, make_plot=FALSE, plot_columns=4) {
 #' @param genelist The list of genes to use (ordered by descending goodness)
 #' @param bins_count_range The n_bins list to try out
 #' @param gene_count_range The n_genes list to try out
+#' @param verbose Whether to print the n_gene/n_bin combination in progress. Defaults to False.
 #' @param ... params to be passed to child functions, see [as.BlaseData()]
 #'
 #' @return A dataframe of the results.
@@ -126,7 +127,7 @@ evaluate_parameters <- function(blase_data, make_plot=FALSE, plot_columns=4) {
 #' )
 #' best_params
 #' plot_find_best_params_results(best_params)
-find_best_params <- function(x, genelist, bins_count_range=c(5,10,20,40), gene_count_range=c(10,20,40,80), ...) {
+find_best_params <- function(x, genelist, bins_count_range=c(5,10,20,40), gene_count_range=c(10,20,40,80), verbose=FALSE, ...) {
 
   if (length(genelist) < max(gene_count_range)) {
     stop(paste0("Not enough genes provided to meet tuning requests. Provided=",length(genelist), " wanted=", max(gene_count_range)))
@@ -141,6 +142,11 @@ find_best_params <- function(x, genelist, bins_count_range=c(5,10,20,40), gene_c
 
     for (genes_count in gene_count_range) {
       blase_data@genes = genelist[1:genes_count]
+      
+      if (verbose) {
+        print(paste0('Bins=', bin_count, ' genes=', genes_count))
+      }
+
       res = evaluate_parameters(blase_data, make_plot=FALSE)
       results = rbind(results, data.frame(bin_count=c(bin_count), gene_count=c(genes_count), worst_specificity=c(res[1]), mean_specificity=c(res[2])))
     }

@@ -13,14 +13,14 @@ knitr::opts_chunk$set(
 )
 ```
 
-# BLASE <a href="man/figures/logo.png"><img src="man/figures/logo.png" align="right" height="138" /></a>
+# BLASE: Bulk Linking Analysis for Single-cell Experiments <a href="man/figures/logo.png"><img src="man/figures/logo.png" align="right" height="138" /></a>
 <!-- badges: start -->
   [![R-CMD-check](https://github.com/andrewmccluskey-uog/BLASE/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/andrewmccluskey-uog/BLASE/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 ## Overview
 
-The goal of Blase is to enable you to map bulk RNA-seq samples onto Single Cell RNA-seq for further analysis, with an emphasis on trajectories (but it can work for any continuous variable across your data!).
+The goal of BLASE is to enable you to map bulk RNA-seq samples onto Single Cell RNA-seq for further analysis, with an emphasis on trajectories (but it can work for any continuous variable across your data!).
 
 It provides:  
 

@@ -9,6 +9,7 @@ find_best_params(
   genelist,
   bins_count_range = c(5, 10, 20, 40),
   gene_count_range = c(10, 20, 40, 80),
+  verbose = FALSE,
   ...
 )
 }
@@ -20,6 +21,8 @@ find_best_params(
 \item{bins_count_range}{The n_bins list to try out}
 
 \item{gene_count_range}{The n_genes list to try out}
+
+\item{verbose}{Whether to print the n_gene/n_bin combination in progress. Defaults to False.}
 
 \item{...}{params to be passed to child functions, see \code{\link[=as.BlaseData]{as.BlaseData()}}}
 }

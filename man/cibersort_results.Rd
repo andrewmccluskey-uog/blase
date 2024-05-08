@@ -20,7 +20,7 @@ RNA-seq data to Howick et al.'s Malaria Cell Atlas P. Falciaprum scRNA-seq
 }
 \details{
 Exact steps for generating this object are given in
-\href{articles/DE_with_blase}{our article}.
+\href{../articles/DE_with_blase.html}{our article}.
 }
 \concept{blase-data}
 \keyword{datasets}
