@@ -4,6 +4,12 @@
     <loc>https://andrewmccluskey-uog.github.io/BLASE/404.html</loc>
   </url>
   <url>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/articles/BLASE-for-Hematopoesis.html</loc>
+  </url>
+  <url>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/articles/BLASE-with-GeoMx-Data.html</loc>
+  </url>
+  <url>
     <loc>https://andrewmccluskey-uog.github.io/BLASE/articles/DE_with_blase.html</loc>
   </url>
   <url>
@@ -16,19 +22,25 @@
     <loc>https://andrewmccluskey-uog.github.io/BLASE/articles/compare_simulated_data.html</loc>
   </url>
   <url>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/articles/data_generation/generate-MCA-pb-object.html</loc>
+  </url>
+  <url>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/articles/data_generation/generate-MCA-pf-object.html</loc>
+  </url>
+  <url>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/articles/data_generation/generate-simulated-data-object.html</loc>
+  </url>
+  <url>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/articles/data_generation/generate-weng-2024-haematopoiesis-object.html</loc>
+  </url>
+  <url>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/articles/data_generation/generate-zhang-et-al-2021-bulk-FPKM-object.html</loc>
+  </url>
+  <url>
     <loc>https://andrewmccluskey-uog.github.io/BLASE/articles/falciparum_lifecycle.html</loc>
   </url>
   <url>
     <loc>https://andrewmccluskey-uog.github.io/BLASE/articles/gene_selection_comparison.html</loc>
-  </url>
-  <url>
-    <loc>https://andrewmccluskey-uog.github.io/BLASE/articles/generate-MCA-pb-object.html</loc>
-  </url>
-  <url>
-    <loc>https://andrewmccluskey-uog.github.io/BLASE/articles/generate-MCA-pf-object.html</loc>
-  </url>
-  <url>
-    <loc>https://andrewmccluskey-uog.github.io/BLASE/articles/generate-simulated-data-object.html</loc>
   </url>
   <url>
     <loc>https://andrewmccluskey-uog.github.io/BLASE/articles/index.html</loc>
@@ -106,6 +118,9 @@
     <loc>https://andrewmccluskey-uog.github.io/BLASE/reference/processed_simulated_data_SCE.html</loc>
   </url>
   <url>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/reference/processed_weng_2024_haematopoiesis.html</loc>
+  </url>
+  <url>
     <loc>https://andrewmccluskey-uog.github.io/BLASE/reference/redim_matrix.html</loc>
   </url>
   <url>
@@ -116,5 +131,8 @@
   </url>
   <url>
     <loc>https://andrewmccluskey-uog.github.io/BLASE/reference/show-MappingResult-method.html</loc>
+  </url>
+  <url>
+    <loc>https://andrewmccluskey-uog.github.io/BLASE/reference/zhang_2021_heat_shock_bulk.html</loc>
   </url>
 </urlset>
