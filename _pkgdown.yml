@@ -42,12 +42,12 @@ navbar:
       - text: -------
       - text: Data Generation
       - text: Malaria Cell Atlas PB
-        href: articles/generate-MCA-pb-object.html
+        href: articles/data_generation/generate-MCA-pb-object.html
       - text: Malaria Cell Atlas PF
-        href: articles/generate-MCA-pf-object.html
+        href: articles/data_generation/generate-MCA-pf-object.html
       - text: Weng 2024 Haematopoiesis Test Dataset
-        href: articles/generate-weng-2024-haematopoiesis-object.html
+        href: articles/data_generation/generate-weng-2024-haematopoiesis-object.html
       - text: Simulation Data
-        href: articles/generate-simulated-data-object.html
+        href: articles/data_generation/generate-simulated-data-object.html
       - text: Generating Zhang et al. 2021 bulk FPKM Dataframe
-        href: articles/generate-zhang-et-al-2021-bulk-FPKM-object.html
+        href: articles/data_generation/generate-zhang-et-al-2021-bulk-FPKM-object.html
