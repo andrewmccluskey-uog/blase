@@ -108,3 +108,6 @@ for (type in expected_trajectory) {
 results
 plot_mapping_result_heatmap(as.list(results))
 ```
+```{r}
+sessionInfo()
+```
