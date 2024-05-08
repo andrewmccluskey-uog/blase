@@ -45,6 +45,8 @@ navbar:
         href: articles/generate-MCA-pb-object.html
       - text: Malaria Cell Atlas PF
         href: articles/generate-MCA-pf-object.html
+      - text: Weng 2024 Haematopoiesis Test Dataset
+        href: articles/generate-weng-2024-haematopoiesis-object.html
       - text: Simulation Data
         href: articles/generate-simulated-data-object.html
       - text: Generating Zhang et al. 2021 bulk FPKM Dataframe

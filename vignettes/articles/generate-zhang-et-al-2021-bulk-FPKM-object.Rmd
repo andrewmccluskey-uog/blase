@@ -22,6 +22,7 @@ This article, which is not run for this website, shows how we prepare the [Zhang
 library(readxl)
 library(fs)
 library(utils)
+library(blase)
 ```
 
 First configure R:
@@ -58,7 +59,7 @@ zhang_2021_heat_shock_bulk = as.data.frame(read_excel(bulk_path, range = 'S3A_RN
 ```
 
 ## Clean up the data for use with BLASE
-```{r, getData, eval=FALSE}
+```{r, cleanData, eval=FALSE}
 rownames(zhang_2021_heat_shock_bulk) = zhang_2021_heat_shock_bulk$Transcript_ID
 
 rownames(zhang_2021_heat_shock_bulk) = gsub(x=rownames(zhang_2021_heat_shock_bulk), pattern="_", replacement="-", fixed=TRUE)

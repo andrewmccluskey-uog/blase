@@ -22,6 +22,8 @@ find_best_params(
 
 \item{gene_count_range}{The n_genes list to try out}
 
+\item{verbose}{Whether to print the n_gene/n_bin combination in progress. Defaults to False.}
+
 \item{...}{params to be passed to child functions, see \code{\link[=as.BlaseData]{as.BlaseData()}}}
 }
 \value{

@@ -10,7 +10,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-#library(blase)
+library(blase)
 library(fs)
 library(Seurat)
 library(dplyr)
@@ -36,53 +36,17 @@ if (ami::using_ci()) {
 }
 ```
 
-## Download Data
-```{r}
-options(timeout=300) #5 mins
-
-root_dir = tools::R_user_dir("BLASE", "data")
-article_dir = fs::path(root_dir, "hematopoeisis")
-if (!dir.exists(article_dir)) {
-  dir.create(article_dir, recursive = TRUE)
-}
-
-# https://www.nature.com/articles/s41586-024-07066-z#data-availability
-# https://figshare.com/articles/dataset/Annotated_Seurat_objects/23290004?file=41046020
-# Young1.All.T1.Seurat.RDS
-path = fs::path(article_dir, "Young1.All.T1", ext="RDS")
-if (!file.exists(path)) {
-  download.file('https://figshare.com/ndownloader/files/41046020', path)
-}else {
-  print("Using cached")
-}
-```
 ## Load Single Cell
 ```{r}
-seurat_obj = readRDS(path)
-seurat_obj
-seurat_obj@meta.data
+data(processed_weng_2024_haematopoiesis, package="blase")
+processed_weng_2024_haematopoiesis
 
-DimPlot(seurat_obj, reduction = "wnn.umap", group.by = "STD.CellType", label=TRUE)
-DimPlot(seurat_obj, reduction = "wnn.umap", group.by = "STD_Cat")
-DimPlot(seurat_obj, reduction = "wnn.umap", group.by = "STD_Cat2")
-
-```
-
-```{r}
-table(seurat_obj$STD.CellType)
+plotUMAP(processed_weng_2024_haematopoiesis, color_by="STD.CellType")
+plotUMAP(processed_weng_2024_haematopoiesis, color_by="slingPseudotime_1")
 ```
 
 
 ```{r}
-#expected_trajectory = c(
-#    'Refined.HSC',
-#    'HSC',
-#    'MPP',
-#    'CMP',
-#    'MEP',
-#    'EryP'
-#    )
-
 expected_trajectory = c(
     'Refined.HSC',
     'HSC', # Haematopoeitic Stem Cell
@@ -95,145 +59,26 @@ expected_trajectory = c(
 
 start_cell_type = expected_trajectory[1]
 end_cell_type = expected_trajectory[length(expected_trajectory)]
-
-seurat_obj$STD.CellType <- factor(seurat_obj$STD.CellType, levels=expected_trajectory)
-
-s = subset(
-  seurat_obj,
-  STD.CellType %in% expected_trajectory
-)
-DefaultAssay(s) = 'RNA'
-s[['ATAC']] = NULL
-s[['SCT']] = NULL
-
-s <- NormalizeData(s, verbose = FALSE)
-s = subset(s, cells = sample(colnames(s), size=6000))
-s <- FindVariableFeatures(s, selection.method = "vst", nfeatures = 1500, verbose = FALSE)
-hvg = VariableFeatures(s)
-VariableFeaturePlot(s)
-```
-
-```{r}
-all.genes <- rownames(s)
-s <- ScaleData(s, features = all.genes, verbose = FALSE)
-s <- RunPCA(s, n_pcs=40, features = VariableFeatures(object = s), verbose = FALSE)
-ElbowPlot(s, ndims = 40)
-```
-
-```{r}
-N_PCS = 20
-s <- RunUMAP(s, dims = 1:N_PCS, verbose=FALSE)
-DimPlot(s, reduction = "umap", group.by = "STD.CellType", label = TRUE)
-```
-
-```{r}
-sce = as.SingleCellExperiment(s)
-rm(seurat_obj, s)
-gc()
-
-normcounts(sce) = exp(logcounts(sce))
-
-plotUMAP(sce, color_by="STD.CellType")
-```
-
-## Diffusion Pseudotime
-Destiny plots from:
-https://broadinstitute.github.io/2019_scWorkshop/functional-pseudotime-analysis.html#diffusion-map-pseudotime
-```{r}
-library(destiny)
-library(ggbeeswarm)
-
-# Make a diffusion map.
-dm <- DiffusionMap(sce, n_pcs=N_PCS)
-
-# Plot diffusion component 1 vs diffusion component 2 (DC1 vs DC2). 
-reducedDim(sce, "DiffusionMap") <- eigenvectors(dm)
-plotDiffusionMap(sce, color="STD.CellType")
-
-tmp <- data.frame(DC1 = eigenvectors(dm)[, 1],
-                  DC2 = eigenvectors(dm)[, 2],
-                  Timepoint = sce$STD.CellType)
-ggplot(tmp, aes(x = DC1, y = DC2, colour = Timepoint)) +
-    geom_point() + scale_color_viridis(discrete = TRUE) + 
-    xlab("Diffusion component 1") + 
-    ylab("Diffusion component 2") +
-    theme_classic()
-
-# Plot by dc 1
-sce$slingshot = NULL
-sce$pseudotime_diffusionmap <- rank(eigenvectors(dm)[,1])    # rank cells by their dpt
-cd <- as.data.frame(colData(sce))
-
-ggplot(as.data.frame(cd), 
-       aes(x = pseudotime_diffusionmap, 
-           y = STD.CellType, colour = STD.CellType)) +
-    geom_quasirandom(groupOnX = FALSE) +
-    scale_color_viridis(discrete = TRUE) + theme_classic() +
-    xlab("Diffusion component 1 (DC1)") + ylab("Timepoint") +
-    ggtitle("Cells ordered by DC1")
-
-# ----------------------------------------------------------
-sce$index = seq_len(ncol(sce))
-start = sce$index[sce$index[sce$STD.CellType == start_cell_type]][1]
-end = sce$index[sce$index[sce$STD.CellType == end_cell_type]][1]
-
-dpt <- DPT(dm, tips = c(start, end))
-
-sce$pseudotime_dpt <- rank(dpt$dpt) 
-ggplot(as.data.frame(colData(sce)), 
-       aes(x = pseudotime_dpt, 
-           y = STD.CellType, colour = STD.CellType)) +
-    geom_quasirandom(groupOnX = FALSE) +
-    scale_color_viridis(discrete=TRUE) + theme_classic() +
-    xlab("Diffusion map pseudotime (dpt)") +
-    ylab("Timepoint") +
-    ggtitle("Cells ordered by diffusion map pseudotime")
-
-plotUMAP(sce, color_by="pseudotime_dpt")
-plotDiffusionMap(sce, color="pseudotime_dpt")
-# ----------------------------------------------------------
-```
-### Run Slingshot
-```{r}
-sce$slingPseudotime_1 = NULL
-sce$slingPseudotime_2 = NULL
-sce$slingshot = NULL
-
-#sce <- slingshot(sce, reducedDim = 'DiffusionMap', clusterLabels="STD.CellType", start.clus=start_cell_type, end.clus=end_cell_type)
-sce <- slingshot(sce, reducedDim = 'UMAP', clusterLabels="STD.CellType", start.clus=start_cell_type, end.clus=end_cell_type)
-plotDiffusionMap(sce, color_by="slingPseudotime_1")
-plotUMAP(sce, color_by="slingPseudotime_1")
-```
-```{r}
-# subset out only highly variable genes for tradeseq
-sce = sce[hvg,]
 ```
 
 
-```{r}
-# evaluateK(sce, k=5:9, parallel=T, BPPARAM=MulticoreParam(2), nGenes=length(rownames(sce)))
-```
 
 ```{r}
-sce <- fitGAM(sce, parallel=T, BPPARAM=MulticoreParam(2), nknots=9)
-```
-
-```{r}
-associationTestResult <- associationTest(sce, lineages=T, global=F, contrastType="consecutive")
+associationTestResult <- associationTest(processed_weng_2024_haematopoiesis, lineages=T, global=F, contrastType="consecutive")
 head(associationTestResult)
 nrow(associationTestResult)
 ```
 ## Set up BLASE
 ```{r}
 genelist = blase::get_top_n_genes(associationTestResult, n_genes = 1000, lineage = 1)
-res = blase::find_best_params(sce, genelist, split_by="pseudotime_range", bins_count_range=c(10,12,14,16, 18),gene_count_range=c(10,20,40,80,160, 240, 320))
+res = blase::find_best_params(processed_weng_2024_haematopoiesis, genelist, split_by="pseudotime_range", bins_count_range=c(6, 7, 8,9, 10),gene_count_range=c(10,20,40, 60, 80, 100, 120, 160, 240, 480, 960))
 
 blase::plot_find_best_params_results(res)
 ```
 
 ```{r}
-blase_data = as.BlaseData(sce, n_bins=10)
-blase_data@genes = genelist[1:320]
+blase_data = as.BlaseData(processed_weng_2024_haematopoiesis, n_bins=9)
+blase_data@genes = genelist[1:480]
 evaluate_parameters(blase_data, make_plot = TRUE)
 ```
 
@@ -241,11 +86,11 @@ evaluate_parameters(blase_data, make_plot = TRUE)
 In this article we will pseudobulk the Single Cell data into bulk datasets to demonstrate that
 BLASE can map a given cluster back to itself.
 ```{r}
-bulks_df = DataFrame(row.names = rownames(counts(sce)))
-for (type in unique(sce$STD.CellType)) {
-  bulks_df = cbind(bulks_df, rowSums(normcounts(subset(sce, , STD.CellType==type))))
+bulks_df = DataFrame(row.names = rownames(counts(processed_weng_2024_haematopoiesis)))
+for (type in unique(processed_weng_2024_haematopoiesis$STD.CellType)) {
+  bulks_df = cbind(bulks_df, rowSums(normcounts(subset(processed_weng_2024_haematopoiesis, , STD.CellType==type))))
 }
-colnames(bulks_df) = as.character(unique(sce$STD.CellType))
+colnames(bulks_df) = as.character(unique(processed_weng_2024_haematopoiesis$STD.CellType))
 ```
 
 ## Run BLASE

@@ -1,0 +1,164 @@
+---
+title: "Generating Weng 2024 Haematopoiesis Test Dataset"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Generating Weng 2024 Haematopoiesis Test Dataset}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE, eval=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Generating Weng 2024 Haematopoiesis Test Dataset
+
+This article, which is not run for this website, shows how we prepare the Haematopoeisis Dataset (a subset of the total data in the paper) ([Weng et al 2024](https://www.nature.com/articles/s41586-024-07066-z) 10x single cell data. It can be used to generate it from scratch, but we provide the processed object with BLASE.
+
+```{r, setup, eval=FALSE}
+library(readxl)
+library(scran)
+library(slingshot)
+library(tradeSeq)
+library(BiocParallel)
+library(fs)
+library(gridExtra)
+library(scater)
+library(ami)
+```
+
+First configure R:
+```{r, randomseed, eval=FALSE}
+RNGversion("3.5.0")
+SEED = 7
+set.seed(SEED)
+```
+
+```{r, concurrency, eval=FALSE}
+N_CORES = 4
+if (ami::using_ci()) {
+  N_CORES = 2
+}
+```
+
+First download the data from the Malaria Cell Atlas
+```{r, getData, eval=FALSE}
+options(timeout=600) #10 mins
+
+root_dir = tools::R_user_dir("BLASE", "data")
+article_dir = fs::path(root_dir, "generate-weng-2024-haematopoiesis-object")
+article_dir
+if (!dir.exists(article_dir)) {
+  dir.create(article_dir, recursive = TRUE)
+}
+
+# https://figshare.com/articles/dataset/Annotated_Seurat_objects/23290004?file=41046020
+# Young1.All.T1.Seurat.RDS
+path = fs::path(article_dir, "Young1.All.T1", ext="RDS")
+if (!file.exists(path)) {
+  download.file('https://figshare.com/ndownloader/files/41046020', path)
+}else {
+  print("Using cached")
+}
+```
+
+## Prepare SC
+Now we read the files and create an SCE.
+
+```{r, loadSC, eval=FALSE}
+seurat_obj = readRDS(path)
+
+expected_trajectory = c(
+    'Refined.HSC',
+    'HSC', # Haematopoeitic Stem Cell
+    'MPP', # multipotent progenitors
+    'CMP', # common myeloid progenitor
+    'GMP', # granulocyte–monocyte progenitors
+    'MDP', # Monocyte-dendritic cell progenitor
+    'Mono' # Monocytes
+)
+
+start_cell_type = expected_trajectory[1]
+end_cell_type = expected_trajectory[length(expected_trajectory)]
+
+seurat_obj$STD.CellType <- factor(seurat_obj$STD.CellType, levels=expected_trajectory)
+
+s = subset(
+  seurat_obj,
+  STD.CellType %in% expected_trajectory
+)
+DefaultAssay(s) = 'RNA'
+s[['ATAC']] = NULL
+s[['SCT']] = NULL
+
+s <- NormalizeData(s, verbose = FALSE)
+s = subset(s, cells = sample(colnames(s), size=6000))
+s <- FindVariableFeatures(s, selection.method = "vst", nfeatures = 1500, verbose = FALSE)
+hvg = VariableFeatures(s)
+VariableFeaturePlot(s)
+```
+
+```{r, eval=FALSE}
+all.genes <- rownames(s)
+s <- ScaleData(s, features = all.genes, verbose = FALSE)
+s <- RunPCA(s, n_pcs=40, features = VariableFeatures(object = s), verbose = FALSE)
+ElbowPlot(s, ndims = 40)
+```
+
+```{r, eval=FALSE}
+N_PCS = 20
+s <- RunUMAP(s, dims = 1:N_PCS, verbose=FALSE)
+DimPlot(s, reduction = "umap", group.by = "STD.CellType", label = TRUE)
+```
+
+Now we can create a `SingleCellExperiment` object:
+```{r, sceCreation, eval=FALSE}
+sce = as.SingleCellExperiment(s)
+rm(seurat_obj, s)
+gc()
+normcounts(sce) = exp(logcounts(sce))
+plotUMAP(sce, color_by="STD.CellType")
+```
+
+## Running Trajectory Analysis
+
+Generate the pseudotime trajectory
+```{r, eval=FALSE}
+sce <- slingshot(sce, reducedDim = 'UMAP', clusterLabels="STD.CellType", start.clus=start_cell_type, end.clus=end_cell_type)
+plotUMAP(sce, color_by="slingPseudotime_1")
+```
+
+```{r, eval=FALSE}
+# subset out only highly variable genes for tradeseq
+sce = sce[hvg,]
+```
+
+```{r, eval=FALSE}
+evaluateK(sce, k=5:9, parallel=T, BPPARAM=MulticoreParam(2), nGenes=length(rownames(sce)))
+```
+
+```{r, eval=FALSE}
+sce <- fitGAM(sce, parallel=T, BPPARAM=MulticoreParam(2), nknots=9)
+```
+
+## Saving the SCE Object
+Now we save the RDS so we can distribute with BLASE.
+```{r, saveRDS, eval=FALSE}
+processed_weng_2024_haematopoiesis = sce
+usethis::use_data(processed_weng_2024_haematopoiesis, overwrite = TRUE, compress = "bzip2", package="blase")
+```
+
+## Loading the SCE Object
+You can load this SCE with:
+```{r, loadRDS}
+data(processed_weng_2024_haematopoiesis, package="blase")
+processed_weng_2024_haematopoiesis
+```
+
+## Session Info
+``` {r}
+sessionInfo()
+```

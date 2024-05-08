@@ -91,6 +91,7 @@ evaluate_parameters <- function(blase_data, make_plot=FALSE, plot_columns=4) {
 #' @param genelist The list of genes to use (ordered by descending goodness)
 #' @param bins_count_range The n_bins list to try out
 #' @param gene_count_range The n_genes list to try out
+#' @param verbose Whether to print the n_gene/n_bin combination in progress. Defaults to False.
 #' @param ... params to be passed to child functions, see [as.BlaseData()]
 #'
 #' @return A dataframe of the results.

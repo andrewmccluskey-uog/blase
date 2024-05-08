@@ -29,7 +29,6 @@ library(gridExtra)
 library(scater)
 library(utils)
 library(blase)
-library(utils)
 library(ami)
 ```
 
@@ -50,7 +49,7 @@ if (ami::using_ci()) {
 First download the data from the Malaria Cell Atlas
 ```{r, getData, eval=FALSE}
 root_dir = tools::R_user_dir("BLASE", "data")
-article_dir = path(root_dir, "Generate_MCA_PF_Object")
+article_dir = fs::path(root_dir, "Generate_MCA_PF_Object")
 
 if (!dir.exists(article_dir)) {
   dir.create(article_dir, recursive = TRUE)

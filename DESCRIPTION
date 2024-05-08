@@ -1,15 +1,15 @@
 Package: blase
-Title: Enhancing Single Cell RNA-seq data with bulk RNA-seq data
+Title: Bulk Linking Analysis for Single-cell Experiments
 Version: 0.0.0.9000
 Authors@R: c(
   person("Andrew", "McCluskey", , "2117532m@student.gla.ac.uk", role = c("aut", "cre"), 
     comment = c(ORCID = "0009-0004-4187-799X")),
-  person("Toby", "Kettlewell", , "???@student.gla.ac.uk", role = c("aut"), 
+  person("Toby", "Kettlewell", , "t.kettlewell.1@research.gla.ac.uk", role = c("aut"), 
     comment = c()),
   person("Thomas", "Otto", , "thomasdan.otto@glasgow.ac.uk", role=c("aut","ths"), 
     comment=c(ORCID = "0000-0002-1246-7404"))
   )
-Description: Use bulk RNA-Seq data to enhance knowledge about SCRNA-Seq.
+Description: Use bulk RNA-Seq data to enhance knowledge about scRNA-Seq.
 License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
 Encoding: UTF-8
@@ -49,10 +49,11 @@ Suggests:
     dplyr,
     plyr,
     Signac,
-    destiny
+    fs
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 URL: https://andrewmccluskey-uog.github.io/BLASE/
 Depends: 
     R (>= 2.10)
 LazyData: true
+LazyDataCompression: bzip2
