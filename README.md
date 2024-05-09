@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# BLASE <a href="man/figures/logo.png"><img src="man/figures/logo.png" align="right" height="138" /></a>
+# BLASE: Bulk Linking Analysis for Single-cell Experiments <a href="man/figures/logo.png"><img src="man/figures/logo.png" align="right" height="138" /></a>
 
 <!-- badges: start -->
 
@@ -10,7 +10,7 @@
 
 ## Overview
 
-The goal of Blase is to enable you to map bulk RNA-seq samples onto
+The goal of BLASE is to enable you to map bulk RNA-seq samples onto
 Single Cell RNA-seq for further analysis, with an emphasis on
 trajectories (but it can work for any continuous variable across your
 data!).
