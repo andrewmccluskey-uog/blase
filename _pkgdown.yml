@@ -28,11 +28,13 @@ navbar:
       - text: DE with Blase
         href: articles/DE_with_blase.html
       - text: -------
-      - text: Verifying BLASE Works ---
+      - text: Verifying BLASE Works
       - text: Simulated Data Workthrough
         href: articles/compare_simulated_data.html
       - text: Assign SC Pseudobulks To SC Pseudotime
         href: articles/assign-bulk-to-pseudotime.html
+      - text: Weng 2024 Haematopoiesis
+        href: articles/BLASE-for-Hematopoesis.html
       - text: -------
       - text: Selecting Genes for Plasmodium sp.
       - text: Comparing Gene Selection Methods In Depth

@@ -20,6 +20,7 @@ This article, which is not run for this website, shows how we prepare the Haemat
 
 ```{r, setup, eval=FALSE}
 library(readxl)
+library(Seurat)
 library(scran)
 library(slingshot)
 library(tradeSeq)
@@ -77,8 +78,8 @@ expected_trajectory = c(
     'MPP', # multipotent progenitors
     'CMP', # common myeloid progenitor
     'GMP', # granulocyte–monocyte progenitors
-    'MDP', # Monocyte-dendritic cell progenitor
-    'Mono' # Monocytes
+    'MDP' # Monocyte-dendritic cell progenitor
+    # 'Mono' # Monocytes - excluded as unclear if part of true haematopoiesis process or mature and BM resident
 )
 
 start_cell_type = expected_trajectory[1]
@@ -148,7 +149,7 @@ sce <- fitGAM(sce, parallel=T, BPPARAM=MulticoreParam(2), nknots=9)
 Now we save the RDS so we can distribute with BLASE.
 ```{r, saveRDS, eval=FALSE}
 processed_weng_2024_haematopoiesis = sce
-usethis::use_data(processed_weng_2024_haematopoiesis, overwrite = TRUE, compress = "bzip2", package="blase")
+usethis::use_data(processed_weng_2024_haematopoiesis, overwrite = TRUE, compress = "bzip2")
 ```
 
 ## Loading the SCE Object
