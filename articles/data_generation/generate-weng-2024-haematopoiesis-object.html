@@ -52,9 +52,10 @@
     <a class="dropdown-item" href="../../articles/How-Blase-Works.html">How BLASE Works</a>
     <a class="dropdown-item" href="../../articles/DE_with_blase.html">DE with Blase</a>
     <div class="dropdown-divider"></div>
-    <h6 class="dropdown-header" data-toc-skip>Verifying BLASE Works ---</h6>
+    <h6 class="dropdown-header" data-toc-skip>Verifying BLASE Works</h6>
     <a class="dropdown-item" href="../../articles/compare_simulated_data.html">Simulated Data Workthrough</a>
     <a class="dropdown-item" href="../../articles/assign-bulk-to-pseudotime.html">Assign SC Pseudobulks To SC Pseudotime</a>
+    <a class="dropdown-item" href="../../articles/BLASE-for-Hematopoesis.html">Weng 2024 Haematopoiesis</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Selecting Genes for Plasmodium sp.</h6>
     <a class="dropdown-item" href="../../articles/gene_selection_comparison.html">Comparing Gene Selection Methods In Depth</a>
@@ -103,6 +104,7 @@ the Haematopoeisis Dataset (a subset of the total data in the paper) (<a href="h
 scratch, but we provide the processed object with BLASE.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://readxl.tidyverse.org" class="external-link">readxl</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://satijalab.org/seurat" class="external-link">Seurat</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">scran</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">slingshot</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://statomics.github.io/tradeSeq/index.html" class="external-link">tradeSeq</a></span><span class="op">)</span></span>
@@ -153,8 +155,8 @@ scratch, but we provide the processed object with BLASE.</p>
 <span>    <span class="st">'MPP'</span>, <span class="co"># multipotent progenitors</span></span>
 <span>    <span class="st">'CMP'</span>, <span class="co"># common myeloid progenitor</span></span>
 <span>    <span class="st">'GMP'</span>, <span class="co"># granulocyte–monocyte progenitors</span></span>
-<span>    <span class="st">'MDP'</span>, <span class="co"># Monocyte-dendritic cell progenitor</span></span>
-<span>    <span class="st">'Mono'</span> <span class="co"># Monocytes</span></span>
+<span>    <span class="st">'MDP'</span> <span class="co"># Monocyte-dendritic cell progenitor</span></span>
+<span>    <span class="co"># 'Mono' # Monocytes - excluded as unclear if part of true haematopoiesis process or mature and BM resident</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">start_cell_type</span> <span class="op">=</span> <span class="va">expected_trajectory</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
@@ -213,7 +215,7 @@ scratch, but we provide the processed object with BLASE.</p>
 <p>Now we save the RDS so we can distribute with BLASE.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">processed_weng_2024_haematopoiesis</span> <span class="op">=</span> <span class="va">sce</span></span>
-<span><span class="fu">usethis</span><span class="fu">::</span><span class="fu">use_data</span><span class="op">(</span><span class="va">processed_weng_2024_haematopoiesis</span>, overwrite <span class="op">=</span> <span class="cn">TRUE</span>, compress <span class="op">=</span> <span class="st">"bzip2"</span>, package<span class="op">=</span><span class="st">"blase"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">usethis</span><span class="fu">::</span><span class="fu">use_data</span><span class="op">(</span><span class="va">processed_weng_2024_haematopoiesis</span>, overwrite <span class="op">=</span> <span class="cn">TRUE</span>, compress <span class="op">=</span> <span class="st">"bzip2"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="loading-the-sce-object">Loading the SCE Object<a class="anchor" aria-label="anchor" href="#loading-the-sce-object"></a>
@@ -290,10 +292,10 @@ scratch, but we provide the processed object with BLASE.</p>
 <span><span class="co">## dim: 1500 6000 </span></span>
 <span><span class="co">## metadata(1): tradeSeq</span></span>
 <span><span class="co">## assays(4): counts logcounts scaledata normcounts</span></span>
-<span><span class="co">## rownames(1500): EBF1 VCAN ... CDH8 ITPRID1</span></span>
+<span><span class="co">## rownames(1500): EBF1 LTBP1 ... MAK PPP2R3A</span></span>
 <span><span class="co">## rowData names(1): tradeSeq</span></span>
-<span><span class="co">## colnames(6000): AAACAGCCACAGGGAC-3 AAACAGCCAGGAAGCC-3 ...</span></span>
-<span><span class="co">##   TTTGTTGGTTAACGAT-3 TTTGTTGGTTAGGCGT-3</span></span>
+<span><span class="co">## colnames(6000): AAACAGCCACAGGGAC-3 AAACAGCCACTAAATC-3 ...</span></span>
+<span><span class="co">##   TTTGTTGGTAACTACG-3 TTTGTTGGTTAGGCGT-3</span></span>
 <span><span class="co">## colData names(39): orig.ident nCount_RNA ... tradeSeq crv</span></span>
 <span><span class="co">## reducedDimNames(6): PCA UMAP.RNA ... WNN.UMAP UMAP</span></span>
 <span><span class="co">## mainExpName: RNA</span></span>

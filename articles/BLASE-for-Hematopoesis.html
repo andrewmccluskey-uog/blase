@@ -45,16 +45,17 @@
 <li class="nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
-<li class="nav-item dropdown">
+<li class="active nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <h6 class="dropdown-header" data-toc-skip>Vignettes</h6>
     <a class="dropdown-item" href="../articles/How-Blase-Works.html">How BLASE Works</a>
     <a class="dropdown-item" href="../articles/DE_with_blase.html">DE with Blase</a>
     <div class="dropdown-divider"></div>
-    <h6 class="dropdown-header" data-toc-skip>Verifying BLASE Works ---</h6>
+    <h6 class="dropdown-header" data-toc-skip>Verifying BLASE Works</h6>
     <a class="dropdown-item" href="../articles/compare_simulated_data.html">Simulated Data Workthrough</a>
     <a class="dropdown-item" href="../articles/assign-bulk-to-pseudotime.html">Assign SC Pseudobulks To SC Pseudotime</a>
+    <a class="dropdown-item" href="../articles/BLASE-for-Hematopoesis.html">Weng 2024 Haematopoiesis</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Selecting Genes for Plasmodium sp.</h6>
     <a class="dropdown-item" href="../articles/gene_selection_comparison.html">Comparing Gene Selection Methods In Depth</a>
@@ -252,10 +253,10 @@
 <span><span class="co">#&gt; dim: 1500 6000 </span></span>
 <span><span class="co">#&gt; metadata(1): tradeSeq</span></span>
 <span><span class="co">#&gt; assays(4): counts logcounts scaledata normcounts</span></span>
-<span><span class="co">#&gt; rownames(1500): EBF1 VCAN ... CDH8 ITPRID1</span></span>
+<span><span class="co">#&gt; rownames(1500): EBF1 LTBP1 ... MAK PPP2R3A</span></span>
 <span><span class="co">#&gt; rowData names(1): tradeSeq</span></span>
-<span><span class="co">#&gt; colnames(6000): AAACAGCCACAGGGAC-3 AAACAGCCAGGAAGCC-3 ...</span></span>
-<span><span class="co">#&gt;   TTTGTTGGTTAACGAT-3 TTTGTTGGTTAGGCGT-3</span></span>
+<span><span class="co">#&gt; colnames(6000): AAACAGCCACAGGGAC-3 AAACAGCCACTAAATC-3 ...</span></span>
+<span><span class="co">#&gt;   TTTGTTGGTAACTACG-3 TTTGTTGGTTAGGCGT-3</span></span>
 <span><span class="co">#&gt; colData names(39): orig.ident nCount_RNA ... tradeSeq crv</span></span>
 <span><span class="co">#&gt; reducedDimNames(6): PCA UMAP.RNA ... WNN.UMAP UMAP</span></span>
 <span><span class="co">#&gt; mainExpName: RNA</span></span>
@@ -267,46 +268,49 @@
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plot_reddim.html" class="external-link">plotUMAP</a></span><span class="op">(</span><span class="va">processed_weng_2024_haematopoiesis</span>, color_by<span class="op">=</span><span class="st">"slingPseudotime_1"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="BLASE-for-Hematopoesis_files/figure-html/unnamed-chunk-2-2.png" width="700"></p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plot_reddim.html" class="external-link">plotUMAP</a></span><span class="op">(</span><span class="va">processed_weng_2024_haematopoiesis</span>, color_by<span class="op">=</span><span class="st">"STD_Cat2"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="BLASE-for-Hematopoesis_files/figure-html/unnamed-chunk-2-3.png" width="700"></p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">expected_trajectory</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>    <span class="st">'Refined.HSC'</span>,</span>
 <span>    <span class="st">'HSC'</span>, <span class="co"># Haematopoeitic Stem Cell</span></span>
 <span>    <span class="st">'MPP'</span>, <span class="co"># multipotent progenitors</span></span>
 <span>    <span class="st">'CMP'</span>, <span class="co"># common myeloid progenitor</span></span>
 <span>    <span class="st">'GMP'</span>, <span class="co"># granulocyte–monocyte progenitors</span></span>
-<span>    <span class="st">'MDP'</span>, <span class="co"># Monocyte-dendritic cell progenitor</span></span>
-<span>    <span class="st">'Mono'</span> <span class="co"># Monocytes</span></span>
+<span>    <span class="st">'MDP'</span> <span class="co"># Monocyte-dendritic cell progenitor</span></span>
+<span>    <span class="co"># 'Mono' # Monocytes - excluded as unclear if part of true haematopoiesis process or mature and BM resident</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">start_cell_type</span> <span class="op">=</span> <span class="va">expected_trajectory</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
 <span><span class="va">end_cell_type</span> <span class="op">=</span> <span class="va">expected_trajectory</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">expected_trajectory</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">associationTestResult</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/tradeSeq/man/associationTest.html" class="external-link">associationTest</a></span><span class="op">(</span><span class="va">processed_weng_2024_haematopoiesis</span>, lineages<span class="op">=</span><span class="cn">T</span>, global<span class="op">=</span><span class="cn">F</span>, contrastType<span class="op">=</span><span class="st">"consecutive"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">associationTestResult</span><span class="op">)</span></span>
-<span><span class="co">#&gt;           waldStat_1 df_1     pvalue_1          </span></span>
-<span><span class="co">#&gt; EBF1       524.83779    8 0.000000e+00 0.8142447</span></span>
-<span><span class="co">#&gt; VCAN      1846.64625    8 0.000000e+00 1.1905515</span></span>
-<span><span class="co">#&gt; XACT       490.60698    8 0.000000e+00 0.9296029</span></span>
-<span><span class="co">#&gt; CD247      211.49390    8 0.000000e+00 0.8223709</span></span>
-<span><span class="co">#&gt; LTBP1      199.18108    8 0.000000e+00 0.7631250</span></span>
-<span><span class="co">#&gt; LINC02109   92.71689    8 1.110223e-16 0.9045726</span></span>
+<span><span class="co">#&gt;           waldStat_1 df_1 pvalue_1          </span></span>
+<span><span class="co">#&gt; EBF1        579.2976    9        0 0.5087777</span></span>
+<span><span class="co">#&gt; LTBP1       278.0267    9        0 0.7489076</span></span>
+<span><span class="co">#&gt; XACT              NA   NA       NA 0.6707918</span></span>
+<span><span class="co">#&gt; LYZ        2087.4766    9        0 0.3033203</span></span>
+<span><span class="co">#&gt; LINC02109         NA   NA       NA 0.7437342</span></span>
+<span><span class="co">#&gt; MPO        4006.3656    9        0 0.4596214</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">associationTestResult</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 1500</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="set-up-blase">Set up BLASE<a class="anchor" aria-label="anchor" href="#set-up-blase"></a>
 </h2>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">genelist</span> <span class="op">=</span> <span class="fu">blase</span><span class="fu">::</span><span class="fu"><a href="../reference/get_top_n_genes.html">get_top_n_genes</a></span><span class="op">(</span><span class="va">associationTestResult</span>, n_genes <span class="op">=</span> <span class="fl">1000</span>, lineage <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
-<span><span class="va">res</span> <span class="op">=</span> <span class="fu">blase</span><span class="fu">::</span><span class="fu"><a href="../reference/find_best_params.html">find_best_params</a></span><span class="op">(</span><span class="va">processed_weng_2024_haematopoiesis</span>, <span class="va">genelist</span>, split_by<span class="op">=</span><span class="st">"pseudotime_range"</span>, bins_count_range<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fl">7</span>, <span class="fl">8</span>,<span class="fl">9</span>, <span class="fl">10</span><span class="op">)</span>,gene_count_range<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>,<span class="fl">20</span>,<span class="fl">40</span>, <span class="fl">60</span>, <span class="fl">80</span>, <span class="fl">100</span>, <span class="fl">120</span>, <span class="fl">160</span>, <span class="fl">240</span>, <span class="fl">480</span>, <span class="fl">960</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">res</span> <span class="op">=</span> <span class="fu">blase</span><span class="fu">::</span><span class="fu"><a href="../reference/find_best_params.html">find_best_params</a></span><span class="op">(</span><span class="va">processed_weng_2024_haematopoiesis</span>, <span class="va">genelist</span>, split_by<span class="op">=</span><span class="st">"pseudotime_range"</span>, bins_count_range<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fl">7</span>, <span class="fl">8</span>,<span class="fl">9</span>, <span class="fl">10</span><span class="op">)</span>,gene_count_range<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>,<span class="fl">20</span>,<span class="fl">40</span>, <span class="fl">60</span>, <span class="fl">80</span>, <span class="fl">100</span>, <span class="fl">120</span>, <span class="fl">160</span>, <span class="fl">240</span>, <span class="fl">360</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">blase</span><span class="fu">::</span><span class="fu"><a href="../reference/plot_find_best_params_results.html">plot_find_best_params_results</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span></code></pre></div>
 <p><img src="BLASE-for-Hematopoesis_files/figure-html/unnamed-chunk-5-1.png" width="700"></p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">blase_data</span> <span class="op">=</span> <span class="fu"><a href="../reference/as.BlaseData.html">as.BlaseData</a></span><span class="op">(</span><span class="va">processed_weng_2024_haematopoiesis</span>, n_bins<span class="op">=</span><span class="fl">9</span><span class="op">)</span></span>
-<span><span class="va">blase_data</span><span class="op">@</span><span class="va">genes</span> <span class="op">=</span> <span class="va">genelist</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">480</span><span class="op">]</span></span>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">blase_data</span> <span class="op">=</span> <span class="fu"><a href="../reference/as.BlaseData.html">as.BlaseData</a></span><span class="op">(</span><span class="va">processed_weng_2024_haematopoiesis</span>, n_bins<span class="op">=</span><span class="fl">7</span><span class="op">)</span></span>
+<span><span class="va">blase_data</span><span class="op">@</span><span class="va">genes</span> <span class="op">=</span> <span class="va">genelist</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">160</span><span class="op">]</span></span>
 <span><span class="fu"><a href="../reference/evaluate_parameters.html">evaluate_parameters</a></span><span class="op">(</span><span class="va">blase_data</span>, make_plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="BLASE-for-Hematopoesis_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
-<pre><code><span><span class="co">#&gt; [1] 0.03590 0.09215</span></span></code></pre>
+<pre><code><span><span class="co">#&gt; [1] 0.0322000 0.1417286</span></span></code></pre>
 </div>
 <div class="section level2">
 <h2 id="generate-bulk-datasets">Generate “bulk” datasets<a class="anchor" aria-label="anchor" href="#generate-bulk-datasets"></a>
@@ -314,7 +318,7 @@
 <p>In this article we will pseudobulk the Single Cell data into bulk
 datasets to demonstrate that BLASE can map a given cluster back to
 itself.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bulks_df</span> <span class="op">=</span> <span class="fu">DataFrame</span><span class="op">(</span>row.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/dge.html" class="external-link">counts</a></span><span class="op">(</span><span class="va">processed_weng_2024_haematopoiesis</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">type</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">processed_weng_2024_haematopoiesis</span><span class="op">$</span><span class="va">STD.CellType</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">bulks_df</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">bulks_df</span>, <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/SingleCellExperiment/man/assays.html" class="external-link">normcounts</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">processed_weng_2024_haematopoiesis</span>, , <span class="va">STD.CellType</span><span class="op">==</span><span class="va">type</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
@@ -326,7 +330,7 @@ itself.</p>
 </h2>
 <p>We will now verify that BLASE can accurately map these “bulk”
 datasets back to the SC clusters</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">results</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">type</span> <span class="kw">in</span> <span class="va">expected_trajectory</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">type</span><span class="op">)</span></span>
@@ -337,54 +341,47 @@ datasets back to the SC clusters</p>
 <span><span class="co">#&gt; [1] "MPP"</span></span>
 <span><span class="co">#&gt; [1] "CMP"</span></span>
 <span><span class="co">#&gt; [1] "GMP"</span></span>
-<span><span class="co">#&gt; [1] "MDP"</span></span>
-<span><span class="co">#&gt; [1] "Mono"</span></span></code></pre></div>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<span><span class="co">#&gt; [1] "MDP"</span></span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">results</span></span>
 <span><span class="co">#&gt; [[1]]</span></span>
-<span><span class="co">#&gt; MappingResult for 'Refined.HSC': best_bin=1 correlation=0.998165464729766 top_2_distance=0.0282</span></span>
-<span><span class="co">#&gt;   Confident Result: TRUE (next max upper  0.971694520176733 )</span></span>
-<span><span class="co">#&gt;   with history for scores against 8  bins</span></span>
+<span><span class="co">#&gt; MappingResult for 'Refined.HSC': best_bin=2 correlation=0.994670690261338 top_2_distance=0.0121</span></span>
+<span><span class="co">#&gt;   Confident Result: TRUE (next max upper  0.985556076409235 )</span></span>
+<span><span class="co">#&gt;   with history for scores against 7  bins</span></span>
 <span><span class="co">#&gt;   Bootstrapped with 200 iterations</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; [[2]]</span></span>
-<span><span class="co">#&gt; MappingResult for 'HSC': best_bin=2 correlation=0.98576644450517 top_2_distance=0.0275</span></span>
-<span><span class="co">#&gt;   Confident Result: TRUE (next max upper  0.9595758114434 )</span></span>
-<span><span class="co">#&gt;   with history for scores against 8  bins</span></span>
+<span><span class="co">#&gt; MappingResult for 'HSC': best_bin=3 correlation=0.985989687097152 top_2_distance=0.0273</span></span>
+<span><span class="co">#&gt;   Confident Result: TRUE (next max upper  0.961933083323567 )</span></span>
+<span><span class="co">#&gt;   with history for scores against 7  bins</span></span>
 <span><span class="co">#&gt;   Bootstrapped with 200 iterations</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; [[3]]</span></span>
-<span><span class="co">#&gt; MappingResult for 'MPP': best_bin=3 correlation=0.968681501236693 top_2_distance=0.0332</span></span>
-<span><span class="co">#&gt;   Confident Result: TRUE (next max upper  0.937869828986051 )</span></span>
-<span><span class="co">#&gt;   with history for scores against 8  bins</span></span>
+<span><span class="co">#&gt; MappingResult for 'MPP': best_bin=4 correlation=0.963380405484589 top_2_distance=0.0468</span></span>
+<span><span class="co">#&gt;   Confident Result: TRUE (next max upper  0.921806515879526 )</span></span>
+<span><span class="co">#&gt;   with history for scores against 7  bins</span></span>
 <span><span class="co">#&gt;   Bootstrapped with 200 iterations</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; [[4]]</span></span>
-<span><span class="co">#&gt; MappingResult for 'CMP': best_bin=3 correlation=0.927154395695362 top_2_distance=0.0367</span></span>
-<span><span class="co">#&gt;   Confident Result: TRUE (next max upper  0.904791543258175 )</span></span>
-<span><span class="co">#&gt;   with history for scores against 8  bins</span></span>
+<span><span class="co">#&gt; MappingResult for 'CMP': best_bin=4 correlation=0.912562990741826 top_2_distance=0.1004</span></span>
+<span><span class="co">#&gt;   Confident Result: TRUE (next max upper  0.824956052970819 )</span></span>
+<span><span class="co">#&gt;   with history for scores against 7  bins</span></span>
 <span><span class="co">#&gt;   Bootstrapped with 200 iterations</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; [[5]]</span></span>
-<span><span class="co">#&gt; MappingResult for 'GMP': best_bin=5 correlation=0.975725890904132 top_2_distance=0.0487</span></span>
-<span><span class="co">#&gt;   Confident Result: TRUE (next max upper  0.935877946295229 )</span></span>
-<span><span class="co">#&gt;   with history for scores against 8  bins</span></span>
+<span><span class="co">#&gt; MappingResult for 'GMP': best_bin=6 correlation=0.932995429508965 top_2_distance=0.0599</span></span>
+<span><span class="co">#&gt;   Confident Result: TRUE (next max upper  0.88220438298371 )</span></span>
+<span><span class="co">#&gt;   with history for scores against 7  bins</span></span>
 <span><span class="co">#&gt;   Bootstrapped with 200 iterations</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; [[6]]</span></span>
-<span><span class="co">#&gt; MappingResult for 'MDP': best_bin=4 correlation=0.914941550173329 top_2_distance=0.1964</span></span>
-<span><span class="co">#&gt;   Confident Result: TRUE (next max upper  0.739558154730456 )</span></span>
-<span><span class="co">#&gt;   with history for scores against 8  bins</span></span>
-<span><span class="co">#&gt;   Bootstrapped with 200 iterations</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; [[7]]</span></span>
-<span><span class="co">#&gt; MappingResult for 'Mono': best_bin=9 correlation=0.982210822328931 top_2_distance=0.0271</span></span>
-<span><span class="co">#&gt;   Confident Result: TRUE (next max upper  0.958466029021641 )</span></span>
-<span><span class="co">#&gt;   with history for scores against 8  bins</span></span>
+<span><span class="co">#&gt; MappingResult for 'MDP': best_bin=7 correlation=0.945441228172975 top_2_distance=0.1132</span></span>
+<span><span class="co">#&gt;   Confident Result: TRUE (next max upper  0.847770420719559 )</span></span>
+<span><span class="co">#&gt;   with history for scores against 7  bins</span></span>
 <span><span class="co">#&gt;   Bootstrapped with 200 iterations</span></span>
 <span><span class="fu"><a href="../reference/plot_mapping_result_heatmap.html">plot_mapping_result_heatmap</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">as.list</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="BLASE-for-Hematopoesis_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R version 4.4.0 (2024-04-24)</span></span>
 <span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu</span></span>
