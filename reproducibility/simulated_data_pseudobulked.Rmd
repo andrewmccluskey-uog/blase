@@ -1,5 +1,5 @@
 ---
-title: "BLASE on Simulated Data"
+title: "Simulated data pseudobulked"
 ---
 
 ```{r, include = FALSE}
@@ -84,9 +84,9 @@ sc_sce
 sc_sce <- slingshot(sc_sce, reducedDim = 'UMAP', clusterLabels='label', start.clus=START_CLUSTER)
 gridExtra::grid.arrange(
   plotPCA(sc_sce, colour_by="sim_time"),
-  plotPCA(sc_sce, colour_by="slingPseudotime_1"),
+  #plotPCA(sc_sce, colour_by="slingPseudotime_1"),
   plotUMAP(sc_sce, colour_by="sim_time"),
-  plotUMAP(sc_sce, colour_by="slingPseudotime_1"),
+  #plotUMAP(sc_sce, colour_by="slingPseudotime_1"),
   plotPCA(sc_sce, colour_by="label"),
   plotUMAP(sc_sce, colour_by="label"),
   ncol=2
@@ -209,8 +209,48 @@ gridExtra::grid.arrange(
   ncol=2
 )
 
+```
 
+## Test comparison tools
+```{r}
+getwd()
+source('comparison_functions.R')
+```
 
+### SCDC
+```{r SCDC}
+res = SCDC(sc_sce, 'pseudotime_bin', bulkified_bins)
+print(res$prop.est.mvw)
+
+to_plot = as.data.frame(res$prop.est.mvw)
+to_plot = to_plot[,sort(colnames(to_plot))]
+to_plot$BulkID <- rownames(to_plot)
+to_plot <- melt(to_plot)
+
+ggplot(to_plot, aes(variable, BulkID)) +
+  geom_tile(aes(fill = value), colour = "white") +
+  geom_text(aes(label = round(value, 2))) +
+  scale_fill_gradient(low = "white", high = "red")
+```
+### CibersortX
+
+```{r}
+sc_sce
+```
+
+```{r cibersort}
+max(normcounts(sc_sce))
+cibersort = CibersortX(sc_sce, 'pseudotime_bin', bulkified_bins, N_CORES)
+to_plot = as.data.frame(cibersort)
+to_plot = subset(to_plot, select = -c(P.value, Correlation, RMSE))
+to_plot = to_plot[,sort(colnames(to_plot))]
+to_plot$BulkID <- rownames(to_plot)
+to_plot <- melt(to_plot)
+
+ggplot(to_plot, aes(variable, BulkID)) +
+  geom_tile(aes(fill = value), colour = "white") +
+  geom_text(aes(label = round(value, 2))) +
+  scale_fill_gradient(low = "white", high = "red")
 ```
 
 ## Session Info

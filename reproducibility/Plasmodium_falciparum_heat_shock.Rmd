@@ -1,8 +1,8 @@
 ---
-title: "DE With BLASE"
+title: "Plasmodium falciparum heat shock"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{DE With BLASE}
+  %\VignetteIndexEntry{Plasmodium falciparum heat shock}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
@@ -18,6 +18,9 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup, results='hide', message=FALSE, warning=FALSE}
+# library(devtools)
+# load_all('code/PhD/R/BLASE')
+
 library(readxl)
 library(scran)
 library(slingshot)
@@ -198,8 +201,31 @@ gridExtra::grid.arrange(
   ggplot() + theme_void(), #2
   ncol=2
 )
-```
 
+processed_MCA_PF_SCE
+
+# SCATER color scheme 
+# https://github.com/jimhester/scater/blob/c0939b993fe054ceead5e623a646e1fb26ae8628/R/plotting.R#L1353
+tableau10medium = c("#729ECE", "#FF9E4A", "#67BF5C", "#ED665D", 
+                               "#AD8BC9", "#A8786E", "#ED97CA", "#A2A2A2", 
+                               "#CDCC5D", "#6DCCDA")
+
+annotations_by_bin = processed_MCA_PF_SCE@colData[c('pseudotime_bin', 'STAGE_LR')]
+annotations_by_bin[['pseudotime_bin']] = factor(annotations_by_bin[['pseudotime_bin']])
+ggplot(annotations_by_bin, aes(x = pseudotime_bin, fill = STAGE_LR)) + 
+    geom_bar(position = "fill") + 
+    scale_x_discrete() +
+    theme(axis.text.x = element_text(angle = 0, vjust = 0.5)) +
+  scale_fill_manual(values = tableau10medium) +
+    ylab('Proportion of Bin') +
+    xlab('Pseudotime Bin') +
+    ggtitle("scRNA Reference Population Proportions per Pseudotime Bin")
+
+```
+```{r}
+# Is the knockout gene being used to calculate blase rating?
+any(blaseData@genes == "PF3D7_1432400")
+```
 ## Cibersort Analysis for comparison
 
 Cibersortx is another tool which could be used for this kind of analysis. Let's see how it performs compared to BLASE. Below is code for producing the files we used to analyse with cibersortx.
@@ -224,37 +250,50 @@ cibersort_results = read.csv(path_to_cibersort_results, row.names=1)
 usethis::use_data(cibersort_results, overwrite = TRUE, compress = "bzip2")
 ```
 
+## Test comparison tools
 ```{r}
-data(cibersort_results, package="blase")
+getwd()
+source('comparison_functions.R')
+```
 
-cibersort_results_calls = cibersort_results[c('X1', 'X2', 'X3', 'X4', 'X5', 'X6', 'X7', 'X8')]
-cibersort_results_quality = cibersort_results[c('P.value', 'Correlation', 'RMSE')]
+### SCDC
+```{r SCDC}
+res = SCDC(processed_MCA_PF_SCE, 'pseudotime_bin', bulk)
+print(res$prop.est.mvw)
 
-to_plot = cibersort_results_calls
-to_plot$BulkID <- rownames(cibersort_results_calls)
+to_plot = as.data.frame(res$prop.est.mvw)
+to_plot = to_plot[,sort(colnames(to_plot))]
+to_plot$BulkID <- rownames(to_plot)
 to_plot <- melt(to_plot)
-p1=ggplot(to_plot, aes(variable, BulkID)) +
+
+scdc_results_plot = ggplot(to_plot, aes(variable, BulkID)) +
   geom_tile(aes(fill = value), colour = "white") +
   geom_text(aes(label = round(value, 2))) +
   scale_fill_gradient(low = "white", high = "red")
-
-cibersort_results_quality
-
-to_plot = cibersort_results_quality
-to_plot$BulkID <- rownames(cibersort_results_quality)
-to_plot <- melt(to_plot)
-to_plot <- ddply(to_plot, .(variable), transform, rescale = rescale(value))
-p2=ggplot(to_plot, aes(variable, BulkID)) +
-  geom_tile(aes(fill = rescale), colour = "white") +
-  geom_text(aes(label = round(value, 3))) +
-  scale_fill_gradient(low = "white", high = "red")
-
-p1
-p2
+scdc_results_plot
 ```
 
+### Cibersort
+```{r cibersort}
+cibersort = CibersortX(processed_MCA_PF_SCE, 'pseudotime_bin', bulk, N_CORES)
+to_plot = as.data.frame(cibersort)
+to_plot = subset(to_plot, select = -c(P.value, Correlation, RMSE))
+to_plot = to_plot[,sort(colnames(to_plot))]
+to_plot$BulkID <- rownames(to_plot)
+to_plot <- melt(to_plot)
 
-
+cibersort_results_plot = ggplot(to_plot, aes(variable, BulkID)) +
+  geom_tile(aes(fill = value), colour = "white") +
+  geom_text(aes(label = round(value, 2))) +
+  scale_fill_gradient(low = "white", high = "red")
+cibersort_results_plot
+```
+### Final Comparison
+```{r}
+blase::plot_mapping_result_heatmap(mapping_results, annotate = TRUE)
+cibersort_results_plot
+scdc_results_plot
+```
 
 ## Session Info
 ```{r sessionInfo}
