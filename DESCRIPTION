@@ -19,8 +19,8 @@ biocViews:
 Imports: 
   SingleCellExperiment,
   ggplot2,
-  gridExtra,
   viridis,
+  gridExtra,
   Matrix,
   scater,
   methods,

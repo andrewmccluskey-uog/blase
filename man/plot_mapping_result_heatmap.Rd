@@ -6,7 +6,7 @@
 \usage{
 plot_mapping_result_heatmap(
   mapping_result_list,
-  heatmap_fill_scale = viridis::scale_fill_viridis(option = "viridis", limits = c(-1, 1)),
+  heatmap_fill_scale = ggplot2::scale_fill_distiller(palette = "PRGn", limits = c(-1, 1)),
   annotate = TRUE
 )
 }

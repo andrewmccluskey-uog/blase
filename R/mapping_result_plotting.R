@@ -121,7 +121,7 @@ setMethod(
 #'
 #' @export
 #' @inherit MappingResult-class examples
-plot_mapping_result_heatmap = function(mapping_result_list, heatmap_fill_scale=viridis::scale_fill_viridis(option="viridis", limits=c(-1,1)), annotate=TRUE){
+plot_mapping_result_heatmap = function(mapping_result_list, heatmap_fill_scale=ggplot2::scale_fill_distiller(palette="RdYlBu", limits=c(-1,1)), annotate=TRUE){
   if( ! all(lapply(mapping_result_list, class) == "MappingResult")) {
     stop("You must provide a list of MappingResult objects only.")
   }
