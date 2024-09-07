@@ -114,14 +114,13 @@ setMethod(
 #' @concept mapping_plots
 #'
 #' @param mapping_result_list A list of [MappingResult] objects to include in the heatmap.
-#' @param heatmap_fill_scale The ggplot2 compatible fill scale to apply to the heatmap.
-#' @param limits Limits for the heatmap's colors. The maximum values will be between -1 and 1
-#' , which the default will show. Defaults to c(-1,1).
+#' @param heatmap_fill_scale The ggplot2 compatible fill gradient scale to apply to the heatmap.
 #' @param annotate Whether to annotate the heatmap with significant results or not, defaults to TRUE.
 #'
 #' @export
 #' @inherit MappingResult-class examples
-plot_mapping_result_heatmap = function(mapping_result_list, heatmap_fill_scale=ggplot2::scale_fill_distiller(palette="RdYlBu", limits=c(-1,1)), annotate=TRUE){
+plot_mapping_result_heatmap = function(mapping_result_list, heatmap_fill_scale=ggplot2::scale_fill_gradientn(colors = c("blue", "white", "red"),limits = c(-1, 1)), annotate=TRUE){
+
   if( ! all(lapply(mapping_result_list, class) == "MappingResult")) {
     stop("You must provide a list of MappingResult objects only.")
   }

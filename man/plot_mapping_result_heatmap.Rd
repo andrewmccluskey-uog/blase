@@ -6,19 +6,17 @@
 \usage{
 plot_mapping_result_heatmap(
   mapping_result_list,
-  heatmap_fill_scale = ggplot2::scale_fill_distiller(palette = "PRGn", limits = c(-1, 1)),
+  heatmap_fill_scale = ggplot2::scale_fill_gradientn(colors = c("blue", "white", "red"),
+    limits = c(-1, 1)),
   annotate = TRUE
 )
 }
 \arguments{
 \item{mapping_result_list}{A list of \link{MappingResult} objects to include in the heatmap.}
 
-\item{heatmap_fill_scale}{The ggplot2 compatible fill scale to apply to the heatmap.}
+\item{heatmap_fill_scale}{The ggplot2 compatible fill gradient scale to apply to the heatmap.}
 
 \item{annotate}{Whether to annotate the heatmap with significant results or not, defaults to TRUE.}
-
-\item{limits}{Limits for the heatmap's colors. The maximum values will be between -1 and 1
-, which the default will show. Defaults to c(-1,1).}
 }
 \description{
 Plots Spearman's Rho as the fill colour, and adds * if the \link{MappingResult} was confidently assigned.
