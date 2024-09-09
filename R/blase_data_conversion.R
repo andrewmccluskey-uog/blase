@@ -63,15 +63,11 @@ setMethod(
 
     pseudotime_sce = assign_pseudotime_bins(x, split_by, n_bins=n_bins, pseudotime_slot=pseudotime_slot)
 
-    # bin_ids = sort(unique(pseudotime_sce$pseudotime_bin)) historically
     bin_ids = sort(unique(pseudotime_sce@colData[["pseudotime_bin"]]))
     pseudobulks = list()
 
     for (i in bin_ids) {
-      bin_subset_sce = subset(pseudotime_sce, , pseudotime_bin == i)
-      # TODO below line does not work but we generate a note with the alternative (above).
-      # pseudotime_sym = ggplot2::sym("pseudotime_bin")
-      # bin_subset_sce = subset(pseudotime_sce, , {pseudotime_sym} == i)
+      bin_subset_sce = pseudotime_sce[,SingleCellExperiment::colData(pseudotime_sce)[["pseudotime_bin"]] == i]
       counts = SingleCellExperiment::normcounts(bin_subset_sce)
       pseudobulks[[i]] = SingleCellExperiment::normcounts(bin_subset_sce)
     }

@@ -169,7 +169,7 @@ plot_mapping_result_heatmap = function(mapping_result_list, heatmap_fill_scale=g
     ggplot2::guides(color = "none")
 
   if (annotate==TRUE) {
-    p = p + ggplot2::geom_tile(ggplot2::aes(width=0.975, height=0.975), size = 0.45) +
+    p = p + ggplot2::geom_tile(ggplot2::aes(width=0.975, height=0.975), linewidth = 0.45) +
     ggplot2::geom_text(fontface = "bold") +
     ggplot2::scale_color_manual(breaks = c(FALSE, TRUE), values=c("#ffffff", "#000000"))
   } else {
