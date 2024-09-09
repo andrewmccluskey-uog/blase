@@ -115,7 +115,6 @@ setMethod(
 #' @param force_spread_selection Whether or not to enforce selecting genes to give a good dispersion
 #' throughout the whole of pseudotime. When this is false, strong signals concentrated in one area can
 #' reduce Blase's efficacy. The default, and reccomended value, is TRUE.
-#' @param pseudotime_slot The slot in the object to use as the pseudotime value. Defaults to 'slingPseudotime_1'
 #' @param ... Parameters to pass to implementations.
 #'
 #' @concept gene-selection
@@ -139,10 +138,10 @@ setGeneric(name = "select_genes_by_fourier_method",
 setMethod(
   f = "select_genes_by_fourier_method",
   signature = c(x="Seurat"),
-  definition = function(x, waves, n_genes=100, n_groups=40, top_n_per_group=1, method="power", force_spread_selection=TRUE, pseudotime_slot="slingPseudotime_1"){
+  definition = function(x, waves, n_genes=100, n_groups=40, top_n_per_group=1, method="power", force_spread_selection=TRUE){
     rlang::check_installed("Seurat", reason = "to handle Seurat objects.")
     sce = Seurat::as.SingleCellExperiment(x)
-    return(select_genes_by_fourier_method(sce, waves, n_genes, n_groups, top_n_per_group, method, force_spread_selection, pseudotime_slot))
+    return(select_genes_by_fourier_method(sce, waves, n_genes, n_groups, top_n_per_group, method, force_spread_selection))
   }
 )
 
@@ -160,10 +159,10 @@ setMethod(
 setMethod(
   f = "select_genes_by_fourier_method",
   signature = c(x="SingleCellExperiment"),
-  definition = function(x, waves, n_genes=100, n_groups=40, top_n_per_group=1, method="power", force_spread_selection=TRUE, pseudotime_slot="slingPseudotime_1"){
+  definition = function(x, waves, n_genes=100, n_groups=40, top_n_per_group=1, method="power", force_spread_selection=TRUE){
 
     if(method != "power" & method != "amplitude" & method != "r2") {
-      stop("Requested method is not valud, must be one of ['power','amplitude','r2']")
+      stop("Requested method is not valid, must be one of ['power','amplitude','r2']")
     }
 
     if (force_spread_selection) {
