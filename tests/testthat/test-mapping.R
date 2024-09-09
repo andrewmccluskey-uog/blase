@@ -9,3 +9,24 @@ test_that("throws error if gene list is null", {
   expect_error(tmp1(), "No genes to map with. Please add something to the blase_data@genes slot.", fixed=TRUE)
   
 })
+
+test_that("mapping runs without errors", {
+  counts_matrix <- matrix(c(seq_len(120)/10, seq_len(120)/5), ncol=48, nrow=5)
+  sce <- SingleCellExperiment::SingleCellExperiment(assays=list(
+  normcounts=counts_matrix, logcounts=log(counts_matrix)))
+  colnames(sce) = seq_len(48)
+  rownames(sce) = as.character(seq_len(5))
+  sce$cell_type = c(rep("celltype_1", 24), rep("celltype_2", 24))
+  
+  sce$pseudotime = seq_len(48)
+  blase_data = as.BlaseData(sce, pseudotime_slot="pseudotime", n_bins=4)
+  blase_data@genes = as.character(seq_len(5))
+  
+  bulk_counts = matrix(seq_len(15)*10, ncol=3, nrow=5)
+  colnames(bulk_counts) = c("A", "B", "C")
+  rownames(bulk_counts) = as.character(seq_len(5))
+  
+  mapping = map_best_bin(blase_data, "A", bulk_counts, bootstrap_iterations=1)
+  
+  expect_equal(mapping@best_bin, 1)
+})
