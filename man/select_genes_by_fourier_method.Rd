@@ -15,8 +15,7 @@ select_genes_by_fourier_method(x, ...)
   n_groups = 40,
   top_n_per_group = 1,
   method = "power",
-  force_spread_selection = TRUE,
-  pseudotime_slot = "slingPseudotime_1"
+  force_spread_selection = TRUE
 )
 
 \S4method{select_genes_by_fourier_method}{SingleCellExperiment}(
@@ -26,8 +25,7 @@ select_genes_by_fourier_method(x, ...)
   n_groups = 40,
   top_n_per_group = 1,
   method = "power",
-  force_spread_selection = TRUE,
-  pseudotime_slot = "slingPseudotime_1"
+  force_spread_selection = TRUE
 )
 }
 \arguments{
@@ -54,8 +52,6 @@ the peak compared to the baseline.) Defaults to 'power'}
 \item{force_spread_selection}{Whether or not to enforce selecting genes to give a good dispersion
 throughout the whole of pseudotime. When this is false, strong signals concentrated in one area can
 reduce Blase's efficacy. The default, and reccomended value, is TRUE.}
-
-\item{pseudotime_slot}{The slot in the object to use as the pseudotime value. Defaults to 'slingPseudotime_1'}
 }
 \value{
 A dataframe with the fourier wave information for the list of
