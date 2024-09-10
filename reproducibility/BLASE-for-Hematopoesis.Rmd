@@ -51,8 +51,36 @@ gridExtra::grid.arrange(
   ncol = 1
 )
 ```
+## Split Dataset in half
+```{r}
+processed_weng_2024_haematopoiesis$traintestsplit = round(runif(ncol(processed_weng_2024_haematopoiesis), 0, 1))
+blase_train = processed_weng_2024_haematopoiesis[,processed_weng_2024_haematopoiesis$traintestsplit == 0]
+blase_test = processed_weng_2024_haematopoiesis[,processed_weng_2024_haematopoiesis$traintestsplit == 1]
+```
 
+```{r}
+table(processed_weng_2024_haematopoiesis$traintestsplit, processed_weng_2024_haematopoiesis$STD.CellType)
+```
 
+### Train Dataset
+```{r}
+gridExtra::grid.arrange(
+  plotUMAP(blase_train, color_by = "STD.CellType", text_by = "STD.CellType"),
+  plotUMAP(blase_train, color_by = "slingPseudotime_1"),
+  ncol = 1
+)
+```
+
+### Test Dataset 
+```{r}
+gridExtra::grid.arrange(
+  plotUMAP(blase_test, color_by = "STD.CellType", text_by = "STD.CellType"),
+  plotUMAP(blase_test, color_by = "slingPseudotime_1"),
+  ncol = 1
+)
+```
+
+## Set up BLASE
 ```{r}
 expected_trajectory = c(
   'Refined.HSC',
@@ -71,22 +99,23 @@ end_cell_type <- expected_trajectory[length(expected_trajectory)]
 
 
 ```{r}
-associationTestResult <- associationTest(processed_weng_2024_haematopoiesis, lineages = T, global = F, contrastType = "consecutive")
+associationTestResult <- associationTest(blase_train, lineages = T, global = F, contrastType = "consecutive")
 head(associationTestResult)
 nrow(associationTestResult)
 ```
 ## Set up BLASE
 ```{r}
 genelist <- blase::get_top_n_genes(associationTestResult, n_genes = 1000, lineage = 1)
-res <- blase::find_best_params(processed_weng_2024_haematopoiesis, genelist, split_by = "pseudotime_range", bins_count_range = c(4, 5, 6, 7, 8, 9, 10), gene_count_range = c(10, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 320, 340, 360))
+res <- blase::find_best_params(blase_train, genelist, split_by = "pseudotime_range", bins_count_range = c(4, 5, 6, 7, 8, 9, 10), gene_count_range = c(10, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 320, 340, 360))
 
 blase::plot_find_best_params_results(res)
 ```
 
 ```{r}
-blase_data = as.BlaseData(processed_weng_2024_haematopoiesis, n_bins = 7)
+blase_data = as.BlaseData(blase_train, n_bins = 7)
 blase_data@genes = genelist[1:160]
 evaluate_parameters(blase_data, make_plot = TRUE)
+blase_train = assign_pseudotime_bins(blase_train, n_bins=7)
 ```
 You can also inspect how the top genes change over each pseudotime bin:
 
@@ -94,15 +123,22 @@ You can also inspect how the top genes change over each pseudotime bin:
 evaluate_top_n_genes(blase_data)
 ```
 
+### View Dataset Following Assignation of bins
+```{r}
+plotUMAP(blase_train, color_by = "STD.CellType", text_by = "STD.CellType") + ggtitle("Cell Type")
+plotUMAP(blase_train, color_by = "slingPseudotime_1") + ggtitle("Slingshot Pseudotime")
+plotUMAP(blase_train, color_by = "pseudotime_bin") + ggtitle("BLASE Pseudotime Bin")
+```
+
 ## Generate "bulk" datasets
 In this article we will pseudobulk the Single Cell data into bulk datasets to demonstrate that
 BLASE can map a given cluster back to itself.
 ```{r}
-bulks_df = DataFrame(row.names = rownames(counts(processed_weng_2024_haematopoiesis)))
-for (type in unique(processed_weng_2024_haematopoiesis$STD.CellType)) {
-  bulks_df = cbind(bulks_df, rowSums(normcounts(subset(processed_weng_2024_haematopoiesis, , STD.CellType == type))))
+bulks_df = DataFrame(row.names = rownames(counts(blase_test)))
+for (type in unique(blase_test$STD.CellType)) {
+  bulks_df = cbind(bulks_df, rowSums(normcounts(subset(blase_test, , STD.CellType == type))))
 }
-colnames(bulks_df) = as.character(unique(processed_weng_2024_haematopoiesis$STD.CellType))
+colnames(bulks_df) = as.character(unique(blase_test$STD.CellType))
 ```
 
 ## Run BLASE
@@ -118,75 +154,86 @@ for (type in expected_trajectory) {
 
 ```{r}
 results
-plot_mapping_result_heatmap(as.list(results))
+plot_mapping_result_heatmap(as.list(results)) +
+  ggtitle("BLASE")
 ```
+
 ## Test comparison tools
 ```{r}
 getwd()
 source('comparison_functions.R')
+blase_train$s = round(runif(ncol(blase_train), 0, 1)) # Simulate 2 samples
 ```
 
 ### SCDC
 ```{r SCDC}
-res <- SCDC(processed_weng_2024_haematopoiesis, 'STD.CellType', bulks_df, 'Sample')
+# SCDC has issues when a cell type is only in one sample (https://github.com/meichendong/SCDC/issues/37)
+# See also `table (blase_train$STD.CellType, blase_train$Sample)`
+res <- SCDC(blase_train, 'STD.CellType', bulks_df, 's')
 print(res$prop.est.mvw)
 
 to_plot <- as.data.frame(res$prop.est.mvw)
-to_plot <- to_plot[, sort(colnames(to_plot))]
 to_plot$BulkID <- rownames(to_plot)
 to_plot <- melt(to_plot)
 
 ggplot(to_plot, aes(variable, BulkID)) +
   geom_tile(aes(fill = value), colour = "white") +
   geom_text(aes(label = round(value, 2))) +
-  scale_fill_gradient(low = "white", high = "red", limits=c(0,1))
+  scale_fill_gradient(low = "white", high = "red", limits=c(0,1)) +
+  scale_y_discrete(limits = expected_trajectory) +
+  scale_x_discrete(limits = expected_trajectory) +
+  ggtitle("SCDC")
 ```
 
 ### MuSiC
 ```{r music}
-resm <- MUSIC(processed_weng_2024_haematopoiesis, 'STD.CellType', bulks_df, 'Sample')
+# Music requires at least 2 samples, and all cells represented across all samples
+resm <- MUSIC(blase_train, 'STD.CellType', bulks_df, 's')
 print(resm$prop.est.mvw)
 
 to_plot <- as.data.frame(resm$Est.prop.weighted)
-to_plot <- to_plot[, sort(colnames(to_plot))]
 to_plot$BulkID <- rownames(to_plot)
 to_plot <- melt(to_plot)
 
 ggplot(to_plot, aes(variable, BulkID)) +
   geom_tile(aes(fill = value), colour = "white") +
   geom_text(aes(label = round(value, 2))) +
-  scale_fill_gradient(low = "white", high = "red", limits=c(0,1))
+  scale_fill_gradient(low = "white", high = "red", limits=c(0,1)) +
+  scale_y_discrete(limits = expected_trajectory) +
+  scale_x_discrete(limits = expected_trajectory) +
+  ggtitle("MuSiC")
 
-## TODO: WHY ARE SOME CELL TYPES MISSING?
+
 ```
 
 ### CibersortX
 
 ```{r cibersort}
-cibersort <- CibersortX(processed_weng_2024_haematopoiesis, 'STD.CellType', bulks_df, N_CORES)
+cibersort <- CibersortX(blase_train, 'STD.CellType', bulks_df, N_CORES)
 to_plot <- as.data.frame(cibersort)
 to_plot <- subset(to_plot, select = -c(P.value, Correlation, RMSE))
-to_plot <- to_plot[, sort(colnames(to_plot))]
 to_plot$BulkID <- rownames(to_plot)
 to_plot <- melt(to_plot)
 
-ggplot(to_plot, aes(variable, BulkID)) +
+ggplot(to_plot, aes(variable, Mixture)) +
   geom_tile(aes(fill = value), colour = "white") +
   geom_text(aes(label = round(value, 2))) +
-  scale_fill_gradient(low = "white", high = "red", limits=c(0,1))
-## TODO REORDER THIS PLOT TO MATCH EXPECTED ORDER - SHOULD BE CODE FOR THIS IN MCA/ZHANG FILE
+  scale_fill_gradient(low = "white", high = "red", limits=c(0,1)) +
+  scale_y_discrete(limits = expected_trajectory) +
+  scale_x_discrete(limits = paste0('c', expected_trajectory)) + 
+  ggtitle("CibersortX")
 ## TODO INCLUDE CONFIDENCE - SHOULD BE CODE FOR THIS IN MCA/ZHANG FILE
 ```
 
 ## Experiment with other parameter selections
 ```{r}
-res <- blase::find_best_params(processed_weng_2024_haematopoiesis, genelist, split_by = "pseudotime_range", bins_count_range = c(4, 5, 6, 7, 8, 9, 10), gene_count_range = c(10, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 320, 340, 360))
+res <- blase::find_best_params(blase_train, genelist, split_by = "pseudotime_range", bins_count_range = c(4, 5, 6, 7, 8, 9, 10), gene_count_range = c(10, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 320, 340, 360))
 blase::plot_find_best_params_results(res)
 ```
 
 ### Previous values
 ```{r}
-blase_data = as.BlaseData(processed_weng_2024_haematopoiesis, n_bins = 7)
+blase_data = as.BlaseData(blase_train, n_bins = 7)
 blase_data@genes = genelist[1:160]
 original_results = c()
 for (type in expected_trajectory) {
@@ -199,7 +246,7 @@ original_results_plot = plot_mapping_result_heatmap(as.list(original_results))
 
 #### Fewer Genes
 ```{r}
-blase_data = as.BlaseData(processed_weng_2024_haematopoiesis, n_bins = 7)
+blase_data = as.BlaseData(blase_train, n_bins = 7)
 blase_data@genes = genelist[1:20]
 low_genes_results = c()
 for (type in expected_trajectory) {
@@ -210,7 +257,7 @@ low_genes_results_plot = plot_mapping_result_heatmap(as.list(low_genes_results))
 
 #### More Genes
 ```{r}
-blase_data = as.BlaseData(processed_weng_2024_haematopoiesis, n_bins = 7)
+blase_data = as.BlaseData(blase_train, n_bins = 7)
 blase_data@genes = genelist[1:400]
 high_genes_results = c()
 for (type in expected_trajectory) {
@@ -234,7 +281,7 @@ Note that too few genes reduces signal, but too many genes increases noise.
 
 ### Fewer Bins
 ```{r}
-blase_data = as.BlaseData(processed_weng_2024_haematopoiesis, n_bins = 3)
+blase_data = as.BlaseData(blase_train, n_bins = 3)
 blase_data@genes = genelist[1:160]
 low_bins_results = c()
 for (type in expected_trajectory) {
@@ -244,7 +291,7 @@ low_bins_results_plot = plot_mapping_result_heatmap(as.list(low_bins_results))
 ```
 ### More Bins
 ```{r}
-blase_data = as.BlaseData(processed_weng_2024_haematopoiesis, n_bins = 20)
+blase_data = as.BlaseData(blase_train, n_bins = 20)
 blase_data@genes = genelist[1:160]
 high_bins_results = c()
 for (type in expected_trajectory) {
