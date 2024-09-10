@@ -94,6 +94,7 @@ setMethod(
     rlang::check_installed("Seurat", reason = "to handle Seurat objects.")
     sce = Seurat::as.SingleCellExperiment(x)
     sce = assign_pseudotime_bins(sce, split_by, n_bins, pseudotime_slot)
-    return(Seurat::as.Seurat(sce))
+    x$pseudotime_bin = sce$pseudotime_bin
+    return(x)
   }
 )
