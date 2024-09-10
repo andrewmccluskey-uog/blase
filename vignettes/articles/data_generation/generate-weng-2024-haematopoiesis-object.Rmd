@@ -29,6 +29,7 @@ library(fs)
 library(gridExtra)
 library(scater)
 library(ami)
+library(phateR)
 ```
 
 First configure R:
@@ -112,9 +113,9 @@ ElbowPlot(s, ndims = 40)
 ```{r, eval=FALSE}
 N_PCS = 20
 s <- RunUMAP(s, dims = 1:N_PCS, verbose=FALSE)
-DimPlot(s, reduction = "umap", group.by = "STD.CellType", label = TRUE)
 ```
 
+## Create SCE
 Now we can create a `SingleCellExperiment` object:
 ```{r, sceCreation, eval=FALSE}
 sce = as.SingleCellExperiment(s)
