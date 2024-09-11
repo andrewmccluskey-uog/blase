@@ -16,11 +16,13 @@ plot_bin_population(x, bin, ...)
 
 \item{...}{additional arguments passed to object-specific methods.}
 
-\item{group_by_slot}{The slot in the \link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment::SingleCellExperiment}
-to be used as the cell type labels.}
+\item{group_by_slot}{The slot in the
+\link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment::SingleCellExperiment} to be used as the cell
+type labels.}
 }
 \value{
-A ggplot2 object of a plot of population in the given object for this bin.
+A ggplot2 object of a plot of population in the given
+object for this bin.
 }
 \description{
 Plot the populations of a bin

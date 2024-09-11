@@ -11,7 +11,10 @@
 #'
 #' @export
 #' @examples
-#' counts_matrix <- matrix(c(seq_len(120) / 10, seq_len(120) / 5), ncol = 48, nrow = 5)
+#' counts_matrix <- matrix(
+#'     c(seq_len(120) / 10, seq_len(120) / 5),
+#'     ncol = 48, nrow = 5
+#' )
 #' sce <- SingleCellExperiment::SingleCellExperiment(assays = list(
 #'     normcounts = counts_matrix, logcounts = log(counts_matrix)
 #' ))
@@ -31,7 +34,10 @@
 #'
 #' # Plot bin
 #' sce <- scater::runUMAP(sce)
-#' sce <- assign_pseudotime_bins(sce, pseudotime_slot = "pseudotime", n_bins = 4)
+#' sce <- assign_pseudotime_bins(
+#'     sce,
+#'     pseudotime_slot = "pseudotime", n_bins = 4
+#' )
 #' plot_mapping_result(sce, result, group_by_slot = "cell_type")
 #'
 setGeneric(
@@ -42,10 +48,11 @@ setGeneric(
 
 #' @rdname plot_mapping_result
 #'
-#' @param group_by_slot The slot in the [SingleCellExperiment::SingleCellExperiment]
-#' to be used as the coloring for the output plot. Passed to [scater::plotUMAP()] as
-#' `colour_by`, and will be used to produce a bar chart of populations in the
-#' best mapped bin.
+#' @param group_by_slot The slot in the
+#' [SingleCellExperiment::SingleCellExperiment] to be used as the coloring
+#' for the output plot. Passed to [scater::plotUMAP()] as
+#' `colour_by`, and will be used to produce a bar chart of
+#' populations in the best mapped bin.
 #'
 #' @import scater
 #'
@@ -58,12 +65,29 @@ setMethod(
         gridExtra::grid.arrange(
             scater::plotUMAP(x, colour_by = "pseudotime_bin"),
             scater::plotUMAP(x, colour_by = group_by_slot),
-            scater::plotUMAP(x[, x$pseudotime_bin == y@best_bin], colour_by = "pseudotime_bin"),
-            scater::plotUMAP(x[, x$pseudotime_bin == y@best_bin], colour_by = group_by_slot),
+            scater::plotUMAP(
+                x[, x$pseudotime_bin == y@best_bin],
+                colour_by = "pseudotime_bin"
+            ),
+            scater::plotUMAP(
+                x[, x$pseudotime_bin == y@best_bin],
+                colour_by = group_by_slot
+            ),
             plot_mapping_result_corr(y),
             plot_bin_population(x, y@best_bin, group_by_slot = group_by_slot),
             ncol = 2,
-            top = grid::textGrob(paste0(y@bulk_name, ": Bin ", y@best_bin, ", Cor ", round(y@best_correlation, 4), ", distance ", y@top_2_distance), gp = grid::gpar(fontsize = 20, font = 3))
+            top = grid::textGrob(
+                paste0(
+                    y@bulk_name,
+                    ": Bin ",
+                    y@best_bin,
+                    ", Cor ",
+                    round(y@best_correlation, 4),
+                    ", distance ",
+                    y@top_2_distance
+                ),
+                gp = grid::gpar(fontsize = 20, font = 3)
+            )
         )
     }
 )
@@ -77,7 +101,8 @@ setMethod(
 #' @param bin The bin ID to plot
 #' @param ... additional arguments passed to object-specific methods.
 #'
-#' @returns A ggplot2 object of a plot of population in the given object for this bin.
+#' @returns A ggplot2 object of a plot of population in the given
+#' object for this bin.
 #'
 #' @export
 #' @inherit MappingResult-class examples
@@ -89,8 +114,9 @@ setGeneric(
 
 #' @rdname plot_bin_population
 #'
-#' @param group_by_slot The slot in the [SingleCellExperiment::SingleCellExperiment]
-#' to be used as the cell type labels.
+#' @param group_by_slot The slot in the
+#' [SingleCellExperiment::SingleCellExperiment] to be used as the cell
+#' type labels.
 #'
 #' @export
 setMethod(
@@ -100,9 +126,14 @@ setMethod(
         var1_sym <- ggplot2::sym("Var1")
         freq_sym <- ggplot2::sym("Freq")
 
-        best_bin_population_data <- as.data.frame(table(x[, x$pseudotime_bin == bin]@colData[[group_by_slot]]))
+        best_bin_population_data <- as.data.frame(
+            table(x[, x$pseudotime_bin == bin]@colData[[group_by_slot]])
+        )
 
-        return(ggplot2::ggplot(best_bin_population_data[best_bin_population_data$Freq > 0, ], ggplot2::aes(x = {{ var1_sym }}, y = {{ freq_sym }})) +
+        return(ggplot2::ggplot(
+            best_bin_population_data[best_bin_population_data$Freq > 0, ],
+            ggplot2::aes(x = {{ var1_sym }}, y = {{ freq_sym }})
+        ) +
             ggplot2::geom_bar(stat = "identity") +
             ggplot2::ggtitle(paste("Bin", bin)))
     }
@@ -135,7 +166,11 @@ plot_mapping_result_heatmap <- function(
         stop("You must provide a list of MappingResult objects only.")
     }
 
-    bulk_results <- data.frame(bulk_name = c(), pseudobin = c(), correlation = c())
+    bulk_results <- data.frame(
+        bulk_name = c(),
+        pseudobin = c(),
+        correlation = c()
+    )
 
     for (mappingResult in mapping_result_list) {
         history <- mappingResult@history
@@ -146,7 +181,11 @@ plot_mapping_result_heatmap <- function(
             correlation = history[, "correlation"],
             is_best_bin = history[, "bin"] == mappingResult@best_bin,
             confident_mapping = ifelse(
-                history[, "bin"] == mappingResult@best_bin & rep(mappingResult@confident_mapping, length(history[, "bin"])),
+                history[, "bin"] == mappingResult@best_bin &
+                    rep(
+                        mappingResult@confident_mapping,
+                        length(history[, "bin"])
+                    ),
                 "*",
                 ""
             )
@@ -179,12 +218,21 @@ plot_mapping_result_heatmap <- function(
         ggplot2::guides(color = "none")
 
     if (annotate == TRUE) {
-        p <- p + ggplot2::geom_tile(ggplot2::aes(width = 0.975, height = 0.975), linewidth = 0.45) +
+        p <- p + ggplot2::geom_tile(ggplot2::aes(
+            width = 0.975,
+            height = 0.975
+        ), linewidth = 0.45) +
             ggplot2::geom_text(fontface = "bold") +
-            ggplot2::scale_color_manual(breaks = c(FALSE, TRUE), values = c("#ffffff", "#000000"))
+            ggplot2::scale_color_manual(
+                breaks = c(FALSE, TRUE),
+                values = c("#ffffff", "#000000")
+            )
     } else {
         p <- p + ggplot2::geom_tile() +
-            ggplot2::scale_color_manual(breaks = c(FALSE, TRUE), values = c("transparent", "transparent"))
+            ggplot2::scale_color_manual(
+                breaks = c(FALSE, TRUE),
+                values = c("transparent", "transparent")
+            )
     }
 
     return(p)

@@ -33,11 +33,10 @@ setGeneric(
 setMethod(
     f = "assign_pseudotime_bins",
     signature = c(x = "SingleCellExperiment"),
-    definition = function(
-        x,
-        split_by,
-        n_bins,
-        pseudotime_slot = "slingPseudotime_1") {
+    definition = function(x,
+                          split_by,
+                          n_bins,
+                          pseudotime_slot = "slingPseudotime_1") {
         if (is.na(match(split_by, c("pseudotime_range", "cells")))) {
             stop("split_by must be 'pseudotime_range' or 'cells'")
         }
@@ -61,7 +60,9 @@ setMethod(
             ## Put cells into the right bins
             pseudotime_sce$pseudotime_bin <- ceiling(pseudotime / bin_size)
 
-            pseudotime_sce$pseudotime_bin[pseudotime_sce$pseudotime_bin == 0] <- 1
+            pseudotime_sce$pseudotime_bin[
+                pseudotime_sce$pseudotime_bin == 0
+            ] <- 1
         } else {
             pseudotime_order <- order(pseudotime, decreasing = FALSE)
 

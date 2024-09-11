@@ -23,7 +23,10 @@
 #' @seealso [map_best_bin()]
 #'
 #' @examples
-#' counts_matrix <- matrix(c(seq_len(120) / 10, seq_len(120) / 5), ncol = 48, nrow = 5)
+#' counts_matrix <- matrix(
+#'     c(seq_len(120) / 10, seq_len(120) / 5),
+#'     ncol = 48, nrow = 5
+#' )
 #' sce <- SingleCellExperiment::SingleCellExperiment(assays = list(
 #'     normcounts = counts_matrix, logcounts = log(counts_matrix)
 #' ))
@@ -50,7 +53,10 @@
 #' plot_mapping_result_corr(result)
 #'
 #' # Plot populations
-#' sce <- assign_pseudotime_bins(sce, pseudotime_slot = "pseudotime", n_bins = 4)
+#' sce <- assign_pseudotime_bins(
+#'     sce,
+#'     pseudotime_slot = "pseudotime", n_bins = 4
+#' )
 #' plot_bin_population(sce, result@best_bin, group_by_slot = "cell_type")
 MappingResult <- setClass(
     Class = "MappingResult",

@@ -16,16 +16,19 @@ plot_mapping_result(x, y, ...)
 
 \item{...}{additional arguments passed to object-specific methods.}
 
-\item{group_by_slot}{The slot in the \link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment::SingleCellExperiment}
-to be used as the coloring for the output plot. Passed to \code{\link[scater:plot_reddim]{scater::plotUMAP()}} as
-\code{colour_by}, and will be used to produce a bar chart of populations in the
-best mapped bin.}
+\item{group_by_slot}{The slot in the
+\link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment::SingleCellExperiment} to be used as the coloring
+for the output plot. Passed to \code{\link[scater:plot_reddim]{scater::plotUMAP()}} as
+\code{colour_by}, and will be used to produce a bar chart of
+populations in the best mapped bin.}
 }
 \description{
 Plot a summary of the mapping result
 }
 \examples{
-counts_matrix <- matrix(c(seq_len(120) / 10, seq_len(120) / 5), ncol = 48, nrow = 5)
+counts_matrix <- matrix(
+    c(seq_len(120) / 10, seq_len(120) / 5), ncol = 48, nrow = 5
+)
 sce <- SingleCellExperiment::SingleCellExperiment(assays = list(
     normcounts = counts_matrix, logcounts = log(counts_matrix)
 ))
@@ -45,7 +48,9 @@ result <- map_best_bin(blase_data, "B", bulk_counts)
 
 # Plot bin
 sce <- scater::runUMAP(sce)
-sce <- assign_pseudotime_bins(sce, pseudotime_slot = "pseudotime", n_bins = 4)
+sce <- assign_pseudotime_bins(
+    sce, pseudotime_slot = "pseudotime", n_bins = 4
+)
 plot_mapping_result(sce, result, group_by_slot = "cell_type")
 
 }

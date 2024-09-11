@@ -41,14 +41,20 @@ setMethod(
 setMethod(
     f = "as.BlaseData",
     signature = c(x = "Seurat"),
-    definition = function(
-        x,
-        pseudotime_slot = "slingPseudotime_1",
-        n_bins = 20,
-        split_by = "pseudotime_range") {
+    definition = function(x,
+                          pseudotime_slot = "slingPseudotime_1",
+                          n_bins = 20,
+                          split_by = "pseudotime_range") {
         rlang::check_installed("Seurat", reason = "to handle Seurat objects.")
         sce <- Seurat::as.SingleCellExperiment(x)
-        return(as.BlaseData(sce, pseudotime_slot = pseudotime_slot, n_bins = n_bins, split_by = split_by))
+        return(
+            as.BlaseData(
+                sce,
+                pseudotime_slot = pseudotime_slot,
+                n_bins = n_bins,
+                split_by = split_by
+            )
+        )
     }
 )
 
@@ -68,11 +74,10 @@ setMethod(
 setMethod(
     f = "as.BlaseData",
     signature = c(x = "SingleCellExperiment"),
-    definition = function(
-        x,
-        pseudotime_slot = "slingPseudotime_1",
-        n_bins = 20,
-        split_by = "pseudotime_range") {
+    definition = function(x,
+                          pseudotime_slot = "slingPseudotime_1",
+                          n_bins = 20,
+                          split_by = "pseudotime_range") {
         pseudotime_sce <- assign_pseudotime_bins(
             x,
             split_by,
@@ -85,7 +90,9 @@ setMethod(
 
         for (i in bin_ids) {
             bin_subset_sce <- pseudotime_sce[
-                , SingleCellExperiment::colData(pseudotime_sce)[["pseudotime_bin"]] == i
+                , SingleCellExperiment::colData(pseudotime_sce)[[
+                    "pseudotime_bin"
+                ]] == i
             ]
             counts <- SingleCellExperiment::normcounts(bin_subset_sce)
             pseudobulks[[i]] <- SingleCellExperiment::normcounts(bin_subset_sce)

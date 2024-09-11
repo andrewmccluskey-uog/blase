@@ -69,13 +69,12 @@ setMethod(
 setMethod(
     f = "gene_selection_matrix",
     signature = c(x = "SingleCellExperiment"),
-    definition = function(
-        x,
-        waves,
-        genes = c(),
-        pseudotime_slot = "slingPseudotime_1",
-        target_matrix_size = 1000,
-        n_cores = 1) {
+    definition = function(x,
+                          waves,
+                          genes = c(),
+                          pseudotime_slot = "slingPseudotime_1",
+                          target_matrix_size = 1000,
+                          n_cores = 1) {
         if (!any(colnames(x@colData) == pseudotime_slot)) {
             stop("Pseudotime slot '", pseudotime_slot, "' does not exist")
         }
@@ -89,7 +88,8 @@ setMethod(
 
         # Then get the normalised count matrix
         pseudotime <- x@colData[[pseudotime_slot]]
-        heatmap_counts <- SingleCellExperiment::logcounts(x)[, order(pseudotime)]
+        heatmap_counts <-
+            SingleCellExperiment::logcounts(x)[, order(pseudotime)]
         heatmap_counts <- heatmap_counts[order(waves$phase), ]
 
         small_heatmap_counts <- redim_matrix(
@@ -111,7 +111,11 @@ setMethod(
 
         plot <- ggplot2::ggplot(
             data = heatmap_counts_ordered.df,
-            ggplot2::aes(x = {{ cell_sym }}, y = {{ gene_sym }}, fill = {{ log_expr_sym }})
+            ggplot2::aes(
+                x = {{ cell_sym }},
+                y = {{ gene_sym }},
+                fill = {{ log_expr_sym }}
+            )
         ) +
             ggplot2::geom_tile() +
             ggplot2::theme(
@@ -213,16 +217,18 @@ setMethod(
 setMethod(
     f = "select_genes_by_fourier_method",
     signature = c(x = "SingleCellExperiment"),
-    definition = function(
-        x,
-        waves,
-        n_genes = 100,
-        n_groups = 40,
-        top_n_per_group = 1,
-        method = "power",
-        force_spread_selection = TRUE) {
+    definition = function(x,
+                          waves,
+                          n_genes = 100,
+                          n_groups = 40,
+                          top_n_per_group = 1,
+                          method = "power",
+                          force_spread_selection = TRUE) {
         if (method != "power" & method != "amplitude" & method != "r2") {
-            stop("Requested method is not valid, must be one of ['power','amplitude','r2']")
+            stop(
+                "Requested method is not valid, must be",
+                " one of ['power','amplitude','r2']"
+            )
         }
 
         if (force_spread_selection) {
@@ -232,19 +238,27 @@ setMethod(
 
             best_waves_in_spread <- data.frame()
             stepsize <- max(waves$phase) / n_groups
-            for (i in seq(from = 0, to = max(waves$phase), length.out = n_groups)) {
+            for (i in seq(
+                from = 0, to = max(waves$phase), length.out = n_groups
+            )
+            ) {
                 waves_in_block <- waves[
-                    waves$phase > i - (stepsize / 2) & waves$phase < i + (stepsize / 2),
+                    waves$phase > i - (stepsize / 2) &
+                        waves$phase < i + (stepsize / 2),
                 ]
                 # remove genes in `best_waves_in_spread` from `waves_in_block`
                 # and then select best
 
-                best_waves_in_block <- waves_in_block[order(-waves_in_block[, method]), ]
+                best_waves_in_block <- waves_in_block[
+                    order(-waves_in_block[, method]),
+                ]
 
                 # If there are more genes than we need, just take
                 # the top n, otherwise just all the remaining genes can be used.
                 if (nrow(best_waves_in_block) > top_n_per_group) {
-                    best_waves_in_block <- best_waves_in_block[seq_len(top_n_per_group), ]
+                    best_waves_in_block <- best_waves_in_block[
+                        seq_len(top_n_per_group),
+                    ]
                 }
 
                 best_waves_in_spread <- rbind(
@@ -375,8 +389,10 @@ redim_matrix <- function(
 
     # complicate way to write a double for loop
     # TODO AM rewrite with https://bioconductor.org/packages/release/bioc/vignettes/BiocParallel/inst/doc/Introduction_To_BiocParallel.html#single-machine
-    do.call(rbind, parallel::mclapply(seq_len(target_height), function(i) { # i is row
-        vapply(seq_len(target_width), function(j) { # j is column
+    # i is row
+    do.call(rbind, parallel::mclapply(seq_len(target_height), function(i) {
+        # j is column
+        vapply(seq_len(target_width), function(j) {
             summary_func(
                 mat[
                     seq(seq_height[i], seq_height[i + 1]),
