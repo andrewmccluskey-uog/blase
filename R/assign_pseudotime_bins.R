@@ -10,7 +10,12 @@
 #' @inherit MappingResult-class examples
 setGeneric(name = "assign_pseudotime_bins",
            signature = c(x="x"),
-           def = function(x, split_by="pseudotime_range", n_bins=20, ...) standardGeneric("assign_pseudotime_bins"))
+           def = function(
+              x, 
+              split_by="pseudotime_range", 
+              n_bins=20, 
+              ...
+            ) standardGeneric("assign_pseudotime_bins"))
 
 #' @rdname assign_pseudotime_bins
 #'
@@ -26,7 +31,12 @@ setGeneric(name = "assign_pseudotime_bins",
 setMethod(
   f = "assign_pseudotime_bins",
   signature = c(x="SingleCellExperiment"),
-  definition = function(x, split_by, n_bins, pseudotime_slot="slingPseudotime_1"){
+  definition = function(
+    x, 
+    split_by, 
+    n_bins, 
+    pseudotime_slot="slingPseudotime_1"
+  ){
 
     if (is.na(match(split_by, c("pseudotime_range", "cells")))) {
       stop("split_by must be 'pseudotime_range' or 'cells'")
@@ -57,12 +67,16 @@ setMethod(
 
       ncells <- ncol(SingleCellExperiment::normcounts(pseudotime_sce))
       cells_per_bin <- floor(ncells/n_bins)
-      pseudotime_ordered_cells <- rownames(pseudotime_sce@colData)[pseudotime_order]
+      pseudotime_ordered_cells <- rownames(pseudotime_sce@colData)[
+        pseudotime_order
+      ]
 
       pseudotime_sce$pseudotime_bin <- n_bins
 
       for (i in seq_len(n_bins)) {
-        cells_for_bin <- pseudotime_ordered_cells[(i*cells_per_bin-cells_per_bin+1) : (i*cells_per_bin)]
+        cells_for_bin <- pseudotime_ordered_cells[
+          (i*cells_per_bin-cells_per_bin+1) : (i*cells_per_bin)
+        ]
         pseudotime_sce[,cells_for_bin]$pseudotime_bin <- i
       }
     }
@@ -92,7 +106,12 @@ setMethod(
 setMethod(
   f = "assign_pseudotime_bins",
   signature = c(x="Seurat"),
-  definition = function(x, split_by, n_bins, pseudotime_slot="slingPseudotime_1"){
+  definition = function(
+    x, 
+    split_by, 
+    n_bins, 
+    pseudotime_slot="slingPseudotime_1"
+  ){
     rlang::check_installed("Seurat", reason = "to handle Seurat objects.")
     sce <- Seurat::as.SingleCellExperiment(x)
     sce <- assign_pseudotime_bins(sce, split_by, n_bins, pseudotime_slot)

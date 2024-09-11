@@ -109,17 +109,26 @@ setMethod(
 #' @title Plot a mapping result heatmap
 #'
 #' @description
-#' Plots Spearman's Rho as the fill colour, and adds * if the [MappingResult] was confidently assigned.
+#' Plots Spearman's Rho as the fill colour, and adds * if the [MappingResult]
+#'  was confidently assigned.
 #'
 #' @concept mapping_plots
 #'
-#' @param mapping_result_list A list of [MappingResult] objects to include in the heatmap.
-#' @param heatmap_fill_scale The ggplot2 compatible fill gradient scale to apply to the heatmap.
-#' @param annotate Whether to annotate the heatmap with significant results or not, defaults to TRUE.
+#' @param mapping_result_list A list of [MappingResult] objects to include
+#' in the heatmap.
+#' @param heatmap_fill_scale The ggplot2 compatible fill gradient scale to 
+#' apply to the heatmap.
+#' @param annotate Whether to annotate the heatmap with significant results
+#'or not, defaults to TRUE.
 #'
 #' @export
 #' @inherit MappingResult-class examples
-plot_mapping_result_heatmap <- function(mapping_result_list, heatmap_fill_scale=ggplot2::scale_fill_gradientn(colors = c("blue", "white", "red"),limits = c(-1, 1)), annotate=TRUE){
+plot_mapping_result_heatmap <- function(
+    mapping_result_list, 
+    heatmap_fill_scale=ggplot2::scale_fill_gradientn(
+      colors = c("blue", "white", "red"),limits = c(-1, 1)),
+    annotate=TRUE
+  ){
 
   if( ! all(lapply(mapping_result_list, class) == "MappingResult")) {
     stop("You must provide a list of MappingResult objects only.")
@@ -198,11 +207,22 @@ plot_mapping_result_corr <- function(mapping_result){
   correlation_sym <- ggplot2::sym("correlation")
   upper_bound_sym <- ggplot2::sym("upper_bound")
   lower_bound_sym <- ggplot2::sym("lower_bound")
-  return(ggplot2::ggplot(mapping_result@history, ggplot2::aes(x={{bin_sym}}, y={{correlation_sym}})) +
+  return(ggplot2::ggplot(mapping_result@history, ggplot2::aes(
+      x={{bin_sym}}, y={{correlation_sym}})
+    ) +
            ggplot2::geom_line() +
-           ggplot2::geom_hline(yintercept=mapping_result@best_correlation, linetype="dashed") +
-           ggplot2::geom_vline(xintercept=mapping_result@best_bin, linetype="dashed") +
-           ggplot2::geom_line(ggplot2::aes(y={{lower_bound_sym}}), linetype="dotted") +
-           ggplot2::geom_line(ggplot2::aes(y={{upper_bound_sym}}), linetype="dotted"))
+           ggplot2::geom_hline(
+             yintercept=mapping_result@best_correlation, 
+             linetype="dashed") +
+           ggplot2::geom_vline(
+             xintercept=mapping_result@best_bin, 
+             linetype="dashed") +
+           ggplot2::geom_line(
+             ggplot2::aes(y={{lower_bound_sym}}), 
+             linetype="dotted") +
+           ggplot2::geom_line(
+             ggplot2::aes(y={{upper_bound_sym}}),
+             linetype="dotted")
+        )
 
 }

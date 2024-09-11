@@ -6,11 +6,16 @@
 #'
 #' @slot bulk_name The name of the bulk sample being mapped.
 #' @slot best_bin The bin that best matched the bulk sample.
-#' @slot best_correlation The spearman's rho that the test geneset had between the winning bin and the bulk.
-#' @slot top_2_distance The absolute difference between the best and second best mapping buckets. Higher indicates a less doubtful mapping.
-#' @slot confident_mapping TRUE when the mapped bin's lower bound is higher than the maximum upper bound of the other bins.
-#' @slot history A dataframe of the correlation score and confidence bounds for each bin.
-#' @slot bootstrap_iterations The number of iterations used during the bootstrap.
+#' @slot best_correlation The spearman's rho that the test geneset had 
+#' between the winning bin and the bulk.
+#' @slot top_2_distance The absolute difference between the best and second 
+#' best mapping buckets. Higher indicates a less doubtful mapping.
+#' @slot confident_mapping TRUE when the mapped bin's lower bound is higher 
+#' than the maximum upper bound of the other bins.
+#' @slot history A dataframe of the correlation score and confidence bounds 
+#' for each bin.
+#' @slot bootstrap_iterations The number of iterations used during 
+#' the bootstrap.
 #'
 #' @return A [MappingResult] object
 #' @export
@@ -75,14 +80,22 @@ setMethod(f = "show",
             )
 
             output <- c(
-              paste0("MappingResult for '", object@bulk_name, "':",
-                    " best_bin=", object@best_bin,
+              paste0("MappingResult for '", 
+                     object@bulk_name,
+                     "': best_bin=", object@best_bin,
                      " correlation=", object@best_correlation,
                      " top_2_distance=", object@top_2_distance),
-              paste("\t Confident Result:", object@confident_mapping,
-                    "(next max upper ",  non_top_mapping_best_upper_bound, ")"),
-              paste("\t with history for scores against", nrow(object@history), " bins"),
-              paste("\t Bootstrapped with", object@bootstrap_iterations, "iterations\n")
+              paste("\t Confident Result:", 
+                    object@confident_mapping,
+                    "(next max upper ",  
+                    non_top_mapping_best_upper_bound, 
+                    ")"),
+              paste("\t with history for scores against", 
+                    nrow(object@history), 
+                    " bins"),
+              paste("\t Bootstrapped with",
+                    object@bootstrap_iterations, 
+                    "iterations\n")
             )
 
             cat(paste(output, collapse = '\n'))

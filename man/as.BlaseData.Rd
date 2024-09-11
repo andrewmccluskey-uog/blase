@@ -30,12 +30,15 @@ as.BlaseData(x, ...)
 
 \item{...}{additional arguments passed to object-specific methods.}
 
-\item{pseudotime_slot}{The \link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment::SingleCellExperiment} slot
-containing pseudotime values for each cell to be passed to \code{\link[=assign_pseudotime_bins]{assign_pseudotime_bins()}}.}
+\item{pseudotime_slot}{The \link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment::SingleCellExperiment}
+slot containing pseudotime values for each cell to be passed to
+\code{\link[=assign_pseudotime_bins]{assign_pseudotime_bins()}}.}
 
-\item{n_bins}{The number of bins to create, passed to \code{\link[=assign_pseudotime_bins]{assign_pseudotime_bins()}}.}
+\item{n_bins}{The number of bins to create, passed to
+\code{\link[=assign_pseudotime_bins]{assign_pseudotime_bins()}}.}
 
-\item{split_by}{The split_by method to be passed on to \code{\link[=assign_pseudotime_bins]{assign_pseudotime_bins()}}.}
+\item{split_by}{The split_by method to be passed on to
+\code{\link[=assign_pseudotime_bins]{assign_pseudotime_bins()}}.}
 }
 \value{
 An \link{BlaseData} object
@@ -45,7 +48,9 @@ Conversion to BlaseData
 }
 \examples{
 counts <- matrix(rpois(100, lambda = 10), ncol=10, nrow=10)
-sce <- SingleCellExperiment::SingleCellExperiment(assays = list(normcounts = counts))
+sce <- SingleCellExperiment::SingleCellExperiment(
+    assays = list(normcounts = counts)
+)
 sce$pseudotime = seq_len(10)
 as.BlaseData(sce, pseudotime_slot="pseudotime", n_bins=3)
 }

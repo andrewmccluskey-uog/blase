@@ -14,17 +14,21 @@ For creation details, see \code{\link[=as.BlaseData]{as.BlaseData()}}
 \section{Slots}{
 
 \describe{
-\item{\code{pseudobulk_bins}}{list of \link{data.frame}s. Each item is a normalised count
-matrix representing a bin, where a column is a cell in the bin and each row is a gene.}
+\item{\code{pseudobulk_bins}}{list of \link{data.frame}s. Each item is a normalised
+count matrix representing a bin, where a column is a cell in the bin
+and each row is a gene.}
 
 \item{\code{bins}}{list. A list of bin names for each timepoint.}
 
-\item{\code{genes}}{list. A list of the genes selected for discriminating timepoints.}
+\item{\code{genes}}{list. A list of the genes selected for
+discriminating timepoints.}
 }}
 
 \examples{
 counts <- matrix(rpois(100, lambda = 10), ncol=10, nrow=10)
-sce <- SingleCellExperiment::SingleCellExperiment(assays = list(normcounts = counts))
+sce <- SingleCellExperiment::SingleCellExperiment(
+    assays = list(normcounts = counts)
+)
 sce$pseudotime = seq_len(10)
 as.BlaseData(sce, pseudotime_slot="pseudotime", n_bins=3)
 }
