@@ -37,7 +37,7 @@ Suggests:
     scran,
     slingshot,
     BiocParallel,
-    Seurat,
+    Seurat (>= 4.0.0),
     dyngen,
     bluster,
     UpSetR,
@@ -56,6 +56,6 @@ Config/testthat/edition: 3
 VignetteBuilder: knitr
 URL: https://andrewmccluskey-uog.github.io/BLASE/
 Depends: 
-    R (>= 4.3.0)
+    R (>= 4.4.0)
 LazyData: true
 LazyDataCompression: bzip2
