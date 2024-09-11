@@ -82,7 +82,13 @@ gridExtra::grid.arrange(
   ncol=2
 )
 ```
-
+```{r}
+gridExtra::grid.arrange(
+  plotUMAP(processed_MCA_PF_SCE, colour_by="STAGE_LR"),
+  plotUMAP(processed_MCA_PF_SCE, colour_by="slingPseudotime_1"),
+  ncol=2
+)
+```
 ## Get Genes
 
 ### TradeSeq
@@ -168,6 +174,7 @@ gridExtra::grid.arrange(
 blaseData = as.BlaseData(processed_MCA_PF_SCE, pseudotime_slot="slingPseudotime_1", n_bins=bins, split_by="pseudotime_range")
 blaseData@genes = genelist[1:genes]
 evaluate_parameters(blaseData, make_plot = TRUE)
+processed_MCA_PF_SCE = assign_pseudotime_bins(processed_MCA_PF_SCE, pseudotime_slot="slingPseudotime_1", n_bins=bins, split_by="pseudotime_range")
 ```
 
 ```{r}
@@ -178,7 +185,8 @@ for (bulkname in colnames(bulk)) {
   mapping_results = c(mapping_results, res)
 }
 
-blase::plot_mapping_result_heatmap(rev(mapping_results), annotate = TRUE)
+blase_tradeseq_results_plot = blase::plot_mapping_result_heatmap(rev(mapping_results), annotate = TRUE)
+blase_tradeseq_results_plot + ggtitle('BLASE (TradeSeq)')
 ```
 
 ### Using Bozdech Genes
@@ -199,12 +207,100 @@ for (bulkname in colnames(bulk)) {
   mapping_results_fourier = c(mapping_results_fourier, res)
 }
 
-blase::plot_mapping_result_heatmap(rev(mapping_results_fourier), annotate = TRUE)
+blase_bozdech_results_plot = blase::plot_mapping_result_heatmap(rev(mapping_results_fourier), annotate = TRUE)
+blase_bozdech_results_plot + ggtitle('BLASE (Bozdech et al. adapted)')
+```
+
+## Comparison With Existing Tools
+```{r}
+getwd()
+source('comparison_functions.R')
+rownames(bulk) <- gsub("-", "_", rownames(bulk))
+rownames(processed_MCA_PF_SCE) <- gsub("-", "_", rownames(processed_MCA_PF_SCE))
+
+colnames(bulk) <- gsub(" ", "_", colnames(bulk))
+
+
+processed_MCA_PF_SCE$STAGE_HR <- droplevels(processed_MCA_PF_SCE$STAGE_HR) # Remove lifecycle stages that have been removed
+```
+
+```{r}
+processed_MCA_PF_SCE
+```
+
+### SCDC
+```{r SCDC}
+# SCDC has issues when a cell type is only in one sample (https://github.com/meichendong/SCDC/issues/37)
+# See also `table (processed_MCA_PF_SCE$STAGE_HR, processed_MCA_PF_SCE$DAY)`
+res <- SCDC(processed_MCA_PF_SCE, 'pseudotime_bin', bulk, 'DAY')
+print(res$prop.est.mvw)
+
+to_plot <- as.data.frame(res$prop.est.mvw)
+to_plot$BulkID <- rownames(to_plot)
+to_plot <- melt(to_plot)
+
+scdc_results_plot = ggplot(to_plot, aes(variable, BulkID)) +
+  geom_tile(aes(fill = value), colour = "white") +
+  scale_fill_gradient(low = "white", high = "red", limits=c(0,1)) +
+  scale_y_discrete(limits = paste0(0:47, "_hpi")) +
+  scale_x_discrete(limits = sort(unique(processed_MCA_PF_SCE$pseudotime_bin))) +
+  ggtitle("SCDC")
+scdc_results_plot + geom_text(aes(label = round(value, 2)))
+```
+
+### MuSiC
+```{r music}
+# Music requires at least 2 samples, and all cells represented across all samples
+resm <- MUSIC(processed_MCA_PF_SCE, 'pseudotime_bin', bulk, 'DAY')
+print(resm$prop.est.mvw)
+
+to_plot <- as.data.frame(resm$Est.prop.weighted)
+to_plot$BulkID <- rownames(to_plot)
+to_plot <- melt(to_plot)
+
+music_results_plot = ggplot(to_plot, aes(variable, BulkID)) +
+  geom_tile(aes(fill = value), colour = "white") +
+  scale_fill_gradient(low = "white", high = "red", limits=c(0,1)) +
+  scale_y_discrete(limits = paste0(0:47, "_hpi")) +
+  scale_x_discrete(limits = sort(unique(processed_MCA_PF_SCE$pseudotime_bin))) +
+  ggtitle("MuSiC")
+music_results_plot + geom_text(aes(label = round(value, 2)))
+```
+
+### CibersortX
+
+```{r cibersort}
+cibersort <- CibersortX(processed_MCA_PF_SCE, 'pseudotime_bin', bulk, N_CORES)
+to_plot <- as.data.frame(cibersort)
+to_plot <- subset(to_plot, select = -c(P.value, Correlation, RMSE))
+to_plot$BulkID <- rownames(to_plot)
+to_plot <- melt(to_plot)
+
+cibersortx_results_plot = ggplot(to_plot, aes(variable, Mixture)) +
+  geom_tile(aes(fill = value), colour = "white") +
+  scale_fill_gradient(low = "white", high = "red", limits=c(0,1)) +
+  scale_y_discrete(limits = paste0(0:47, "hpi")) +
+  scale_x_discrete(limits = paste0('c', as.character(sort(unique(processed_MCA_PF_SCE$pseudotime_bin))))) + 
+  ggtitle("CibersortX")
+cibersortx_results_plot + geom_text(aes(label = round(value, 2)))
+## TODO INCLUDE CONFIDENCE - SHOULD BE CODE FOR THIS IN MCA/ZHANG FILE
+```
+
+### Summary Plot
+```{r}
+gridExtra::grid.arrange(
+  blase_tradeseq_results_plot + scale_y_discrete(limits = paste(0:47, "hpi")),
+  blase_bozdech_results_plot + scale_y_discrete(limits = paste(0:47, "hpi")),
+  scdc_results_plot,
+  music_results_plot,
+  cibersortx_results_plot,
+  ncol=2
+)
 ```
 
 ## Analysing Accuracy
 
-The Bulk paper describes the following timepoints HPI matching to lifecycle stages, in figure 1:
+The Painter et al. paper describes the following timepoints HPI matching to lifecycle stages, in figure 1:
 
 -   5-15: Ring
 
@@ -229,6 +325,7 @@ table(processed_MCA_PF_SCE@colData[c("STAGE_LR", "pseudotime_bin")])
 Now we can check the accuracy of these techniques, according to prior knowledge.
 
 ```{r, include=FALSE}
+# TODO get calls outside of here so we can also get calls from MUSIC, SCDC and CibersortX
 called_ring_bins = sort(unique(processed_MCA_PF_SCE@colData[processed_MCA_PF_SCE@colData[["STAGE_LR"]] == "ring",][["pseudotime_bin"]]))
 called_troph_bins = sort(unique(processed_MCA_PF_SCE@colData[processed_MCA_PF_SCE@colData[["STAGE_LR"]] == "trophozoite",][["pseudotime_bin"]]))
 called_schizont_bins = sort(unique(processed_MCA_PF_SCE@colData[processed_MCA_PF_SCE@colData[["STAGE_LR"]] == "schizont",][["pseudotime_bin"]]))

@@ -98,26 +98,6 @@ plot_find_best_params_results(res)
 ```
 
 ```{r}
-#cat(gsub(x=paste0("", genelist), pattern="-", replacement = "_"), sep = "\n")
-
-#waves = blase::get_waves(processed_MCA_PF_SCE)
-
-#waves[c("PF3D7-0831700","PF3D7-1116800"),]
-
-#blase::gene_selection_matrix(processed_MCA_PF_SCE, genes=c(
-#  "PF3D7-0831700", 
-#  "PF3D7-1116800",
-#  "PF3D7-1014100",
-#  "PF3D7-0303200",
-#  "PF3D7-0701900"
-#  ), waves=waves, target_matrix_size=5)
-
-#length(genelist)
-#genelist = genelist[!(genelist %in% c("PF3D7-0831700","PF3D7-1116800"))]
-#length(genelist)
-```
-
-```{r}
 genes = 300
 bins = 8
 blaseData = as.BlaseData(processed_MCA_PF_SCE, pseudotime_slot="slingPseudotime_1", n_bins=bins, split_by="pseudotime_range")
@@ -130,20 +110,6 @@ gridExtra::grid.arrange(
   plotUMAP(processed_MCA_PF_SCE, color="pseudotime_bin"),
   ncol=2
 )
-```
-```{r}
-#waves = get_waves(processed_MCA_PF_SCE, n_cores = N_CORES)
-#fourier_genes = blase::select_genes_by_fourier_method(processed_MCA_PF_SCE, waves, n_groups=100, top_n_per_group=5)
-#fourier_genes
-#gene_selection_matrix(processed_MCA_PF_SCE, waves, genes=rownames(fourier_genes), target_matrix_size=90)
-
-#dim(fourier_genes)
-#fourier_genes = fourier_genes[ !(rownames(fourier_genes) %in%  c("PF3D7-0831700","PF3D7-1116800", "PF3D7_0201800")), ]
-#dim(fourier_genes)
-
-#blaseData@genes = rownames(fourier_genes)
-#cat(gsub(x=paste0("", rownames(fourier_genes)), pattern="-", replacement = "_"), sep = "\n")
-
 ```
 
 And we can see these genes arranged over pseudotime:

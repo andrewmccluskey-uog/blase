@@ -158,7 +158,7 @@ plot_mapping_result_heatmap(as.list(results)) +
   ggtitle("BLASE")
 ```
 
-## Test comparison tools
+## Comparison With Existing Tools
 ```{r}
 getwd()
 source('comparison_functions.R')

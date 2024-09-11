@@ -37,7 +37,7 @@ SCDC <- function(sce, groupby, bulk_df, sample_col = "") {
 
   sc_metadata <- as.data.frame(cbind(sce@colData[groupby], sce@colData[sample_col]))
   sc_eset <- Biobase::ExpressionSet(assayData = as.matrix(normcounts(sce)), phenoData = as(sc_metadata, "AnnotatedDataFrame"))
-
+  
   # Removed ct.sub = c("alpha","beta","delta","gamma","ductal","acinar")
   celltypes <- unique(sce@colData[[groupby]])
   samples <- unique(sce@colData[[sample_col]])
@@ -66,6 +66,8 @@ SCDC <- function(sce, groupby, bulk_df, sample_col = "") {
 
 }
 
+# BiocManager::install("TOAST")
+# devtools::install_github('xuranw/MuSiC')
 MUSIC <- function(sce, groupby, raw_bulk_df, sample_col="") {
   rlang::check_installed("MuSiC", reason = "to run MuSiC deconvolution.")
 
