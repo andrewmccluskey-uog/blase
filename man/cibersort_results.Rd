@@ -6,7 +6,8 @@
 \title{CIBERSORTx Results for P. Falciparum Heat Shock Bulks to MCA data}
 \format{
 The object contains a CIBERSORTx results table. This includes proportion
-estimations for pseudobins 1-8 (X1-X8), and quality scores (P.value, Correlation, RMSE)
+estimations for pseudobins 1-8 (X1-X8), and quality scores
+(P.value, Correlation, RMSE)
 }
 \source{
 DE with BLASE vignette & CIBERSORTx
@@ -15,8 +16,9 @@ DE with BLASE vignette & CIBERSORTx
 data(cibersort_results, package='blase')
 }
 \description{
-These are CIBERSORTx results for mapping Zhang et al.'s P. falciparum heat shock
-RNA-seq data to Howick et al.'s Malaria Cell Atlas P. Falciaprum scRNA-seq
+These are CIBERSORTx results for mapping Zhang et al.'s P. falciparum
+heat shock RNA-seq data to Howick et al.'s Malaria Cell Atlas
+P. Falciparum scRNA-seq
 }
 \details{
 Exact steps for generating this object are given in

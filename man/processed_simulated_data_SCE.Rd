@@ -5,8 +5,8 @@
 \alias{processed_simulated_data_SCE}
 \title{BLASE Simulation Test Dataset}
 \format{
-The object contains raw, normalized and log normalized counts, cluster names,
-and PCA and UMAP coordinates.
+The object contains raw, normalized and log normalized
+counts, cluster names, and PCA and UMAP coordinates.
 }
 \source{
 BLASE
@@ -15,8 +15,9 @@ BLASE
 data(processed_simulated_data_SCE, package='blase')
 }
 \description{
-This is a SingleCellExperiment object which contains 2000 cells and 455 genes.
-It is used to test BLASE in a dataset where the ground truth is known. It was
+This is a SingleCellExperiment object which contains
+2000 cells and 455 genes. It is used to test BLASE in a
+dataset where the ground truth is known. It was
 generated with the dyngen library.
 }
 \details{

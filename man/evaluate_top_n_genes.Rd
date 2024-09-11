@@ -20,21 +20,22 @@ identify if you have selected genes that vary over the pseudotime you have chose
 bins to exist over. Uses the normcounts of the SCE.
 }
 \examples{
-ncells = 70
-ngenes = 100
-counts_matrix <- matrix(c(seq_len(3500)/10, seq_len(3500)/5), ncol=ncells, nrow=ngenes)
-sce <- SingleCellExperiment::SingleCellExperiment(assays=list(
-  normcounts=counts_matrix, logcounts=log(counts_matrix)))
-colnames(sce) = seq_len(ncells)
-rownames(sce) = as.character(seq_len(ngenes))
-sce$cell_type = c(rep("celltype_1", ncells/2), rep("celltype_2", ncells/2))
+ncells <- 70
+ngenes <- 100
+counts_matrix <- matrix(c(seq_len(3500) / 10, seq_len(3500) / 5), ncol = ncells, nrow = ngenes)
+sce <- SingleCellExperiment::SingleCellExperiment(assays = list(
+    normcounts = counts_matrix, logcounts = log(counts_matrix)
+))
+colnames(sce) <- seq_len(ncells)
+rownames(sce) <- as.character(seq_len(ngenes))
+sce$cell_type <- c(rep("celltype_1", ncells / 2), rep("celltype_2", ncells / 2))
 
-sce$pseudotime = seq_len(ncells)
-genelist = as.character(seq_len(ngenes))
+sce$pseudotime <- seq_len(ncells)
+genelist <- as.character(seq_len(ngenes))
 
 # Evaluating created BlaseData
-blase_data = as.BlaseData(sce, pseudotime_slot="pseudotime", n_bins=10)
-blase_data@genes = genelist[1:20]
+blase_data <- as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 10)
+blase_data@genes <- genelist[1:20]
 
 # Check gene expression over pseudotime
 evaluate_top_n_genes(blase_data)

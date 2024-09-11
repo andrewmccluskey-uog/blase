@@ -5,8 +5,9 @@
 \alias{processed_weng_2024_haematopoiesis}
 \title{Weng et al. 2024 Haematopoiesis Dataset}
 \format{
-The object contains raw, normalized and log normalized counts, cluster names,
-and PCA and UMAP coordinates, and Slingshot and TradeSeq results.
+The object contains raw, normalized and log normalized counts,
+cluster names, and PCA and UMAP coordinates, and Slingshot and
+TradeSeq results.
 }
 \source{
 BLASE
@@ -15,8 +16,9 @@ BLASE
 data(processed_simulated_data_SCE, package='blase')
 }
 \description{
-This is a SingleCellExperiment object which contains 6000 cells and 1500 highly variable genes.
-It is used to test BLASE for a Haematopoietic dataset.
+This is a SingleCellExperiment object which contains 6000 cells
+and 1500 highly variable genes. It is used to test BLASE for a
+Haematopoietic dataset.
 }
 \details{
 Exact steps for generating this object are given in

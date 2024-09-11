@@ -38,19 +38,25 @@ select_genes_by_fourier_method(x, ...)
 \item{n_genes}{The number of genes to use when force_spread_selection=FALSE.
 Has no effect when force_spread_selection=TRUE. Defaults to 100.}
 
-\item{n_groups}{The number of divisions of pseudotime to use when force_spread_selection=TRUE.
-Has no effect when force_spread_selection=FALSE. Defaults to 40.}
+\item{n_groups}{The number of divisions of pseudotime to use when
+force_spread_selection=TRUE. Has no effect when
+force_spread_selection=FALSE. Defaults to 40.}
 
-\item{top_n_per_group}{The number of genes per group to use when force_spread_selection=TRUE.
+\item{top_n_per_group}{The number of genes per group to
+use when force_spread_selection=TRUE.
 Has no effect when force_spread_selection=FALSE. Defaults to 1.}
 
-\item{method}{The wave parameter to use for ordering genes. 'r2' maximises explained variance.
-'amplitdue' maximises wave amplitude. 'power' maximises the power parameter from Bozdech et al.
-2003 (https://doi.org/10.1371/journal.pbio.0000005, in short, the strength of signal near
+\item{method}{The wave parameter to use for ordering genes. 'r2'
+maximises explained variance.
+'amplitdue' maximises wave amplitude. 'power' maximises the power
+parameter from Bozdech et al.
+2003 (https://doi.org/10.1371/journal.pbio.0000005, in short,
+the strength of signal near
 the peak compared to the baseline.) Defaults to 'power'}
 
-\item{force_spread_selection}{Whether or not to enforce selecting genes to give a good dispersion
-throughout the whole of pseudotime. When this is false, strong signals concentrated in one area can
+\item{force_spread_selection}{Whether or not to enforce selecting
+genes to give a good dispersion throughout the whole of pseudotime.
+When this is false, strong signals concentrated in one area can
 reduce Blase's efficacy. The default, and reccomended value, is TRUE.}
 }
 \value{

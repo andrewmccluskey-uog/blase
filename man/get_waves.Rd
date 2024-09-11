@@ -11,7 +11,8 @@ get_waves(sce, pseudotime_slot = "slingPseudotime_1", n_cores = 1)
 
 \item{pseudotime_slot}{slot pseudotime is in.}
 
-\item{n_cores}{Number of cores to use for the fourier analysis. Defaults to 1.}
+\item{n_cores}{Number of cores to use for the fourier analysis.
+Defaults to 1.}
 }
 \value{
 Waves dataframe, used by \code{select_genes_by_fourier_method} and
@@ -22,7 +23,7 @@ using a window of +/- 5\% of the peak by pseudotime.
 }
 \description{
 Uses \code{metR} to perform fourier analysis on each gene to find the phase,
-amplitude, and r2 (explained variance) of the pattern in the gene. This function
-uses the normalised counts.
+amplitude, and r2 (explained variance) of the pattern in the gene. This
+function uses the normalised counts.
 }
 \concept{gene-selection}

@@ -13,11 +13,11 @@
 Show an BlaseData object
 }
 \examples{
-counts <- matrix(rpois(100, lambda = 10), ncol=10, nrow=10)
+counts <- matrix(rpois(100, lambda = 10), ncol = 10, nrow = 10)
 sce <- SingleCellExperiment::SingleCellExperiment(
     assays = list(normcounts = counts)
 )
-sce$pseudotime = seq_len(10)
-as.BlaseData(sce, pseudotime_slot="pseudotime", n_bins=3)
+sce$pseudotime <- seq_len(10)
+as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 3)
 }
 \concept{blase-object}

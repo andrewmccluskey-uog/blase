@@ -22,23 +22,24 @@ A \link{MappingResult} object.
 Map the best matching SC bin for a bulk sample
 }
 \examples{
-counts_matrix <- matrix(c(seq_len(120)/10, seq_len(120)/5), ncol=48, nrow=5)
-sce <- SingleCellExperiment::SingleCellExperiment(assays=list(
-  normcounts=counts_matrix, logcounts=log(counts_matrix)))
-colnames(sce) = seq_len(48)
-rownames(sce) = as.character(seq_len(5))
-sce$cell_type = c(rep("celltype_1", 24), rep("celltype_2", 24))
+counts_matrix <- matrix(c(seq_len(120) / 10, seq_len(120) / 5), ncol = 48, nrow = 5)
+sce <- SingleCellExperiment::SingleCellExperiment(assays = list(
+    normcounts = counts_matrix, logcounts = log(counts_matrix)
+))
+colnames(sce) <- seq_len(48)
+rownames(sce) <- as.character(seq_len(5))
+sce$cell_type <- c(rep("celltype_1", 24), rep("celltype_2", 24))
 
-sce$pseudotime = seq_len(48)
-blase_data = as.BlaseData(sce, pseudotime_slot="pseudotime", n_bins=4)
-blase_data@genes = as.character(seq_len(5))
+sce$pseudotime <- seq_len(48)
+blase_data <- as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 4)
+blase_data@genes <- as.character(seq_len(5))
 
-bulk_counts = matrix(seq_len(15)*10, ncol=3, nrow=5)
-colnames(bulk_counts) = c("A", "B", "C")
-rownames(bulk_counts) = as.character(seq_len(5))
+bulk_counts <- matrix(seq_len(15) * 10, ncol = 3, nrow = 5)
+colnames(bulk_counts) <- c("A", "B", "C")
+rownames(bulk_counts) <- as.character(seq_len(5))
 
 # Map to bin
-result = map_best_bin(blase_data, "B", bulk_counts)
+result <- map_best_bin(blase_data, "B", bulk_counts)
 result
 
 # Plot Heatmap
@@ -48,7 +49,7 @@ plot_mapping_result_heatmap(list(result))
 plot_mapping_result_corr(result)
 
 # Plot populations
-sce = assign_pseudotime_bins(sce, pseudotime_slot="pseudotime", n_bins=4)
-plot_bin_population(sce, result@best_bin, group_by_slot="cell_type")
+sce <- assign_pseudotime_bins(sce, pseudotime_slot = "pseudotime", n_bins = 4)
+plot_bin_population(sce, result@best_bin, group_by_slot = "cell_type")
 }
 \concept{mapping}
