@@ -46,7 +46,7 @@
 #' # Plot populations
 #' sce = assign_pseudotime_bins(sce, pseudotime_slot="pseudotime", n_bins=4)
 #' plot_bin_population(sce, result@best_bin, group_by_slot="cell_type")
-MappingResult = setClass(
+MappingResult <- setClass(
   Class = "MappingResult",
   slots = list(
     bulk_name = "ANY",
@@ -70,11 +70,11 @@ setMethod(f = "show",
           signature = "MappingResult",
           definition = function(object){
 
-            non_top_mapping_best_upper_bound = max(
+            non_top_mapping_best_upper_bound <- max(
               object@history[object@history$bin!=object@best_bin,]$upper_bound
             )
 
-            output = c(
+            output <- c(
               paste0("MappingResult for '", object@bulk_name, "':",
                     " best_bin=", object@best_bin,
                      " correlation=", object@best_correlation,

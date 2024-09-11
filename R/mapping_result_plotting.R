@@ -94,10 +94,10 @@ setMethod(
   signature = c(x="SingleCellExperiment"),
   definition = function(x, bin, group_by_slot){
 
-    var1_sym = ggplot2::sym("Var1")
-    freq_sym = ggplot2::sym("Freq")
+    var1_sym <- ggplot2::sym("Var1")
+    freq_sym <- ggplot2::sym("Freq")
 
-    best_bin_population_data = as.data.frame( table( x[,x$pseudotime_bin==bin]@colData[[group_by_slot]] ))
+    best_bin_population_data <- as.data.frame( table( x[,x$pseudotime_bin==bin]@colData[[group_by_slot]] ))
 
     return(ggplot2::ggplot(best_bin_population_data[best_bin_population_data$Freq>0,], ggplot2::aes(x={{var1_sym}}, y={{freq_sym}})) +
              ggplot2::geom_bar(stat="identity") +
@@ -119,22 +119,22 @@ setMethod(
 #'
 #' @export
 #' @inherit MappingResult-class examples
-plot_mapping_result_heatmap = function(mapping_result_list, heatmap_fill_scale=ggplot2::scale_fill_gradientn(colors = c("blue", "white", "red"),limits = c(-1, 1)), annotate=TRUE){
+plot_mapping_result_heatmap <- function(mapping_result_list, heatmap_fill_scale=ggplot2::scale_fill_gradientn(colors = c("blue", "white", "red"),limits = c(-1, 1)), annotate=TRUE){
 
   if( ! all(lapply(mapping_result_list, class) == "MappingResult")) {
     stop("You must provide a list of MappingResult objects only.")
   }
 
-  bulk_results = data.frame(bulk_name=c(), pseudobin=c(), correlation=c())
+  bulk_results <- data.frame(bulk_name=c(), pseudobin=c(), correlation=c())
 
   for (mappingResult in mapping_result_list) {
-    history = mappingResult@history
+    history <- mappingResult@history
 
-    this_bulk_results = data.frame(
-      bulk_name=rep(mappingResult@bulk_name, nrow(history)),
-      pseudobin=history[,"bin"],
-      correlation=history[,"correlation"],
-      is_best_bin=history[,"bin"] == mappingResult@best_bin,
+    this_bulk_results <- data.frame(
+      bulk_name = rep(mappingResult@bulk_name, nrow(history)),
+      pseudobin = history[,"bin"],
+      correlation = history[,"correlation"],
+      is_best_bin = history[,"bin"] == mappingResult@best_bin,
       confident_mapping = ifelse(
         history[,"bin"] == mappingResult@best_bin & rep(mappingResult@confident_mapping, length(history[,"bin"])),
         "*",
@@ -142,23 +142,23 @@ plot_mapping_result_heatmap = function(mapping_result_list, heatmap_fill_scale=g
       )
     )
 
-    bulk_results = rbind(bulk_results, this_bulk_results)
+    bulk_results <- rbind(bulk_results, this_bulk_results)
   }
 
-  bulk_results$bulk_name = factor(
+  bulk_results$bulk_name <- factor(
     bulk_results$bulk_name,
     levels=as.character(unique(bulk_results$bulk_name))
   )
-  bulk_results$pseudobin = as.factor(bulk_results$pseudobin)
+  bulk_results$pseudobin <- as.factor(bulk_results$pseudobin)
 
-  bulk_name_sym = ggplot2::sym("bulk_name")
-  pseudobin_sym = ggplot2::sym("pseudobin")
-  correlation_sym = ggplot2::sym("correlation")
-  confident_mapping_sym = ggplot2::sym("confident_mapping")
-  is_best_bin_sym = ggplot2::sym("is_best_bin")
+  bulk_name_sym <- ggplot2::sym("bulk_name")
+  pseudobin_sym <- ggplot2::sym("pseudobin")
+  correlation_sym <- ggplot2::sym("correlation")
+  confident_mapping_sym <- ggplot2::sym("confident_mapping")
+  is_best_bin_sym <- ggplot2::sym("is_best_bin")
 
  # Change elow here
-  p = ggplot2::ggplot(bulk_results, ggplot2::aes(
+  p <- ggplot2::ggplot(bulk_results, ggplot2::aes(
     x={{pseudobin_sym}},
     y={{bulk_name_sym}},
     fill={{correlation_sym}},
@@ -169,11 +169,11 @@ plot_mapping_result_heatmap = function(mapping_result_list, heatmap_fill_scale=g
     ggplot2::guides(color = "none")
 
   if (annotate==TRUE) {
-    p = p + ggplot2::geom_tile(ggplot2::aes(width=0.975, height=0.975), linewidth = 0.45) +
+    p <- p + ggplot2::geom_tile(ggplot2::aes(width=0.975, height=0.975), linewidth = 0.45) +
     ggplot2::geom_text(fontface = "bold") +
     ggplot2::scale_color_manual(breaks = c(FALSE, TRUE), values=c("#ffffff", "#000000"))
   } else {
-    p = p + ggplot2::geom_tile() +
+    p <- p + ggplot2::geom_tile() +
     ggplot2::scale_color_manual(breaks = c(FALSE, TRUE), values=c("transparent", "transparent"))
   }
 
@@ -193,11 +193,11 @@ plot_mapping_result_heatmap = function(mapping_result_list, heatmap_fill_scale=g
 #'
 #' @export
 #' @inherit MappingResult-class examples
-plot_mapping_result_corr = function(mapping_result){
-  bin_sym = ggplot2::sym("bin")
-  correlation_sym = ggplot2::sym("correlation")
-  upper_bound_sym = ggplot2::sym("upper_bound")
-  lower_bound_sym = ggplot2::sym("lower_bound")
+plot_mapping_result_corr <- function(mapping_result){
+  bin_sym <- ggplot2::sym("bin")
+  correlation_sym <- ggplot2::sym("correlation")
+  upper_bound_sym <- ggplot2::sym("upper_bound")
+  lower_bound_sym <- ggplot2::sym("lower_bound")
   return(ggplot2::ggplot(mapping_result@history, ggplot2::aes(x={{bin_sym}}, y={{correlation_sym}})) +
            ggplot2::geom_line() +
            ggplot2::geom_hline(yintercept=mapping_result@best_correlation, linetype="dashed") +

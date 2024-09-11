@@ -18,25 +18,25 @@
 #'   waldStat=c(25, 50, 100, 10),
 #'   pvalue=c(0.01, 0.5, 0.005, 0.13))
 #' get_top_n_genes(assoRes, n_genes=2)
-get_top_n_genes = function(association_test_results, n_genes=40, lineage=NA, p_cutoff=0.05) {
+get_top_n_genes <- function(association_test_results, n_genes=40, lineage=NA, p_cutoff=0.05) {
 
-  pvalue_slot_for_lineage = "pvalue"
-  wald_slot_for_lineage = "waldStat"
+  pvalue_slot_for_lineage <- "pvalue"
+  wald_slot_for_lineage <- "waldStat"
 
   if (!is.na(lineage)) {
-    pvalue_slot_for_lineage = paste0("pvalue_", lineage)
-    wald_slot_for_lineage = paste0("waldStat_", lineage)
+    pvalue_slot_for_lineage <- paste0("pvalue_", lineage)
+    wald_slot_for_lineage <- paste0("waldStat_", lineage)
   }
 
   # P Cutoff
-  asso_results_copy = association_test_results[association_test_results[,pvalue_slot_for_lineage] < p_cutoff,]
+  asso_results_copy <- association_test_results[association_test_results[,pvalue_slot_for_lineage] < p_cutoff,]
   # Remove NAs
-  asso_results_copy = asso_results_copy[!is.na(rownames(asso_results_copy)), ]
+  asso_results_copy <- asso_results_copy[!is.na(rownames(asso_results_copy)), ]
   # Sort by wald stat
-  asso_results_copy = asso_results_copy[order(-asso_results_copy[,wald_slot_for_lineage]), ]
+  asso_results_copy <- asso_results_copy[order(-asso_results_copy[,wald_slot_for_lineage]), ]
 
-  topPdtGenesNames <- rownames(asso_results_copy)[1:n_genes]
-  topPdtGenesNames = topPdtGenesNames[!is.na(topPdtGenesNames)]
+  topPdtGenesNames <- rownames(asso_results_copy)[seq_len(n_genes)]
+  topPdtGenesNames <- topPdtGenesNames[!is.na(topPdtGenesNames)]
   return(topPdtGenesNames)
 
 }
@@ -75,30 +75,30 @@ get_bins_as_bulk <- function(pseudotime_sce, min_cells_for_bulk=50, replicate_sl
 
   # TODO Generalize so we don't rely on subsetting with subset on a magic field (i.e. replicate, which is even listed as a param but isn't really)
 
-  output = data.frame()
+  output <- data.frame()
   for (bin_id in seq_len(max(pseudotime_sce$pseudotime_bin))) {
 
-    bin_specific_sce = subset(pseudotime_sce, , pseudotime_sce@colData[["pseudotime_bin"]] == bin_id)
+    bin_specific_sce <- subset(pseudotime_sce, , pseudotime_sce@colData[["pseudotime_bin"]] == bin_id)
 
-    counts = table(bin_specific_sce@colData[[replicate_slot]])
+    counts <- table(bin_specific_sce@colData[[replicate_slot]])
 
-    replicates_with_more_than_minimum = rownames(as.data.frame(counts[counts>min_cells_for_bulk]))
+    replicates_with_more_than_minimum <- rownames(as.data.frame(counts[counts>min_cells_for_bulk]))
 
     if (length(replicates_with_more_than_minimum) >= 2) {
 
-      pseudobulks = data.frame()
+      pseudobulks <- data.frame()
       for (rep_id in replicates_with_more_than_minimum) {
 
-        bin_specific_rep_specific_sce_pseudobulk = as.data.frame(rowSums(SingleCellExperiment::counts(subset(bin_specific_sce, , bin_specific_sce@colData[["replicate"]] == rep_id))))
+        bin_specific_rep_specific_sce_pseudobulk <- as.data.frame(rowSums(SingleCellExperiment::counts(subset(bin_specific_sce, , bin_specific_sce@colData[["replicate"]] == rep_id))))
 
         if (ncol(pseudobulks) == 0) {
-          pseudobulks = bin_specific_rep_specific_sce_pseudobulk
-          colnames(pseudobulks) = c(paste0("bin_",bin_id, "_rep_", rep_id))
+          pseudobulks <- bin_specific_rep_specific_sce_pseudobulk
+          colnames(pseudobulks) <- c(paste0("bin_",bin_id, "_rep_", rep_id))
         } else {
-          pseudobulks = merge(x=pseudobulks, y=bin_specific_rep_specific_sce_pseudobulk, by="row.names")
-          rownames(pseudobulks) = pseudobulks$Row.names
-          pseudobulks = pseudobulks[,c(-1)]
-          colnames(pseudobulks) = append(colnames(pseudobulks)[1:ncol(pseudobulks)-1], paste0("bin_",bin_id, "_rep_", rep_id))
+          pseudobulks <- merge(x=pseudobulks, y=bin_specific_rep_specific_sce_pseudobulk, by="row.names")
+          rownames(pseudobulks) <- pseudobulks$Row.names
+          pseudobulks <- pseudobulks[,c(-1)]
+          colnames(pseudobulks) <- append(colnames(pseudobulks)[seq_len(ncol(pseudobulks)-1)], paste0("bin_",bin_id, "_rep_", rep_id))
         }
 
       }
@@ -106,28 +106,28 @@ get_bins_as_bulk <- function(pseudotime_sce, min_cells_for_bulk=50, replicate_sl
 
     } else if (length(replicates_with_more_than_minimum) == 1) {
 
-      bin_specific_pseudobulk = subset(bin_specific_sce, , bin_specific_sce@colData[["replicate"]] == replicates_with_more_than_minimum[1])
+      bin_specific_pseudobulk <- subset(bin_specific_sce, , bin_specific_sce@colData[["replicate"]] == replicates_with_more_than_minimum[1])
 
-      cell_count_to_sample = ceiling((ncol(SingleCellExperiment::counts(bin_specific_pseudobulk)) * 0.75))
-      counts_for_bulk = SingleCellExperiment::counts(bin_specific_pseudobulk)
-      pseudobulks = merge(
+      cell_count_to_sample <- ceiling((ncol(SingleCellExperiment::counts(bin_specific_pseudobulk)) * 0.75))
+      counts_for_bulk <- SingleCellExperiment::counts(bin_specific_pseudobulk)
+      pseudobulks <- merge(
         x=as.data.frame(rowSums(counts_for_bulk[,sample(ncol(counts_for_bulk), size=cell_count_to_sample)])),
         y=as.data.frame(rowSums(counts_for_bulk[,sample(ncol(counts_for_bulk), size=cell_count_to_sample)])),
         by="row.names")
-      rownames(pseudobulks) = pseudobulks$Row.names
-      pseudobulks = pseudobulks[,c(-1)]
-      colnames(pseudobulks) = c(paste0("bin_",bin_id, "_rep_", replicates_with_more_than_minimum[1], "_1"), paste0("bin_",bin_id, "_rep_", replicates_with_more_than_minimum[1], "_2"))
+      rownames(pseudobulks) <- pseudobulks$Row.names
+      pseudobulks <- pseudobulks[,c(-1)]
+      colnames(pseudobulks) <- c(paste0("bin_",bin_id, "_rep_", replicates_with_more_than_minimum[1], "_1"), paste0("bin_",bin_id, "_rep_", replicates_with_more_than_minimum[1], "_2"))
     } else {
-      message(paste("Couldn't create pseudobulks due to too few cells in every replicate for bin", bin_id) )
+      message("Couldn't create pseudobulks due to too few cells in every replicate for bin", bin_id)
       next()
     }
 
     if (ncol(output) == 0) {
-      output = pseudobulks
+      output <- pseudobulks
     } else {
-      output = merge(output, pseudobulks, by="row.names")
-      rownames(output) = output$Row.names
-      output = output[,c(-1)]
+      output <- merge(output, pseudobulks, by="row.names")
+      rownames(output) <- output$Row.names
+      output <- output[,c(-1)]
     }
 
   }

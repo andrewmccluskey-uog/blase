@@ -82,3 +82,8 @@ final_res<-sticker(res, package="BLASE", p_size=28,
 plot(final_res)
 usethis::use_logo('blase_icon.png')
 ```
+
+## Session Info
+```{r}
+sessionInfo()
+```

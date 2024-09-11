@@ -36,3 +36,17 @@ devtools::install_github("andrewmccluskey-uog/BLASE")
 ## Getting Started
 
 Take a look at the Vignette for use with a Single Cell Experiment.
+
+## Development
+
+### Quality Checks
+
+We subscribe to the `R cmd check` and `BiocCheck` guides:
+
+```
+devtools::check()
+```
+
+```
+BiocCheck(`no-check-deprecated`=TRUE)
+```

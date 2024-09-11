@@ -18,7 +18,7 @@
 #' sce$pseudotime = seq_len(10)
 #' as.BlaseData(sce, pseudotime_slot="pseudotime", n_bins=3)
 # TODO make bins and genes hidden with . and then add setters/getters?
-BlaseData = setClass(
+BlaseData <- setClass(
   Class = "BlaseData",
   slots = list(
     pseudobulk_bins = "list",
@@ -40,7 +40,7 @@ setMethod(f = "show",
           signature = "BlaseData",
           definition = function(object){
 
-            output = c(
+            output <- c(
               "Blase Data with:",
               paste("\tbins:", list(object@bins)),
               paste("\tselected genes:", list(object@genes), "\n")

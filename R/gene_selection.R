@@ -35,7 +35,7 @@ setMethod(
   signature = c(x="Seurat"),
   definition = function(x, waves, genes=c(), pseudotime_slot="slingPseudotime_1", target_matrix_size=1000, n_cores=1){
     rlang::check_installed("Seurat", reason = "to handle Seurat objects.")
-    sce = Seurat::as.SingleCellExperiment(x)
+    sce <- Seurat::as.SingleCellExperiment(x)
     return(gene_selection_matrix(
       sce,
       waves,
@@ -59,22 +59,22 @@ setMethod(
   definition = function(x, waves, genes=c(), pseudotime_slot="slingPseudotime_1", target_matrix_size=1000, n_cores=1){
 
     if ( !any(colnames(x@colData) == pseudotime_slot)) {
-      stop(paste0("Pseudotime slot '", pseudotime_slot ,"' does not exist"))
+      stop("Pseudotime slot '", pseudotime_slot ,"' does not exist")
     }
 
     # First we need to subset only the requested genes
     if (length(genes) > 0) {
       # R passes parameters by value not reference so this is safe
-      x = x[rownames(x) %in% genes,]
-      waves = waves[rownames(waves) %in% genes,]
+      x <- x[rownames(x) %in% genes,]
+      waves <- waves[rownames(waves) %in% genes,]
     }
 
     # Then get the normalised count matrix
-    pseudotime = x@colData[[pseudotime_slot]]
-    heatmap_counts = SingleCellExperiment::logcounts(x)[,order(pseudotime)]
-    heatmap_counts = heatmap_counts[order(waves$phase),]
+    pseudotime <- x@colData[[pseudotime_slot]]
+    heatmap_counts <- SingleCellExperiment::logcounts(x)[,order(pseudotime)]
+    heatmap_counts <- heatmap_counts[order(waves$phase),]
 
-    small_heatmap_counts = redim_matrix(
+    small_heatmap_counts <- redim_matrix(
       heatmap_counts,
       target_height = target_matrix_size,
       target_width = target_matrix_size,
@@ -83,11 +83,11 @@ setMethod(
 
     heatmap_counts_ordered.df <- reshape2::melt(small_heatmap_counts, c("gene", "cell"), value.name = "log_expression")
 
-    cell_sym = ggplot2::sym("cell")
-    gene_sym = ggplot2::sym("gene")
-    log_expr_sym = ggplot2::sym("log_expression")
+    cell_sym <- ggplot2::sym("cell")
+    gene_sym <- ggplot2::sym("gene")
+    log_expr_sym <- ggplot2::sym("log_expression")
 
-    plot = ggplot2::ggplot(data=heatmap_counts_ordered.df,ggplot2::aes(x={{cell_sym}},y={{gene_sym}},fill={{log_expr_sym}})) +
+    plot <- ggplot2::ggplot(data=heatmap_counts_ordered.df,ggplot2::aes(x={{cell_sym}},y={{gene_sym}},fill={{log_expr_sym}})) +
       ggplot2::geom_tile() +
       ggplot2::theme(axis.text.x = ggplot2::element_blank(), axis.text.y = ggplot2::element_blank()) +
       ggplot2::scale_fill_gradient(low = "white",
@@ -140,7 +140,7 @@ setMethod(
   signature = c(x="Seurat"),
   definition = function(x, waves, n_genes=100, n_groups=40, top_n_per_group=1, method="power", force_spread_selection=TRUE){
     rlang::check_installed("Seurat", reason = "to handle Seurat objects.")
-    sce = Seurat::as.SingleCellExperiment(x)
+    sce <- Seurat::as.SingleCellExperiment(x)
     return(select_genes_by_fourier_method(sce, waves, n_genes, n_groups, top_n_per_group, method, force_spread_selection))
   }
 )
@@ -171,27 +171,27 @@ setMethod(
         warning("n_genes is not used when force_spread_selection==TRUE")
       }
 
-      best_waves_in_spread = data.frame()
-      stepsize = max(waves$phase)/n_groups
-      for(i in seq(from=0, to=max(waves$phase), length.out=n_groups)) {
-        waves_in_block = waves[waves$phase>i-(stepsize/2) & waves$phase<i+(stepsize/2),]
+      best_waves_in_spread <- data.frame()
+      stepsize <- max(waves$phase)/n_groups
+      for(i in seq(from = 0, to = max(waves$phase), length.out = n_groups)) {
+        waves_in_block <- waves[waves$phase > i - (stepsize/2) & waves$phase < i + (stepsize/2),]
         # remove genes in `best_waves_in_spread` from `waves_in_block` and then select best
-        # waves_in_block = best_wave_in_block[!(rownames(best_wave_in_block) %in% best_waves_in_spread)]
+        # waves_in_block <- best_wave_in_block[!(rownames(best_wave_in_block) %in% best_waves_in_spread)]
 
-        best_waves_in_block = waves_in_block[order(-waves_in_block[,method]),]
+        best_waves_in_block <- waves_in_block[order(-waves_in_block[,method]),]
 
-                # If there are more genes than we need, just take
+        # If there are more genes than we need, just take
         # the top n, otherwise just all the remaining genes can be used.
         if (nrow(best_waves_in_block) > top_n_per_group) {
-          best_waves_in_block = best_waves_in_block[1:top_n_per_group,]
+          best_waves_in_block <- best_waves_in_block[seq_len(top_n_per_group),]
         }
 
-        best_waves_in_spread = rbind(best_waves_in_spread, best_waves_in_block)
+        best_waves_in_spread <- rbind(best_waves_in_spread, best_waves_in_block)
       }
 
       if (nrow(best_waves_in_spread) < top_n_per_group*n_groups) {
-        warning(paste0("Fewer genes identified as good matches than requested. requested=",
-                       top_n_per_group*n_groups," found=",nrow(best_waves_in_spread)))
+        warning("Fewer genes identified as good matches than requested. requested=",
+                       top_n_per_group*n_groups," found=",nrow(best_waves_in_spread))
       }
 
       return(best_waves_in_spread)
@@ -201,7 +201,7 @@ setMethod(
         warning("n_groups and top_n_per_group are not used when force_spread_selection==FALSE")
       }
 
-      top_waves = waves[order(-waves[,method]),][0:n_genes,]
+      top_waves <- waves[order(-waves[,method]),][0:n_genes,]
       return(top_waves)
     }
 
@@ -237,36 +237,36 @@ get_waves <- function(
 ) {
 
   if ( !any(colnames(sce@colData) == pseudotime_slot)) {
-    stop(paste0("Pseudotime slot '", pseudotime_slot ,"' does not exist"))
+    stop("Pseudotime slot '", pseudotime_slot ,"' does not exist")
   }
-  pseudotime = sce@colData[[pseudotime_slot]]
+  pseudotime <- sce@colData[[pseudotime_slot]]
 
-  heatmap_counts = SingleCellExperiment::normcounts(sce)[,order(pseudotime)]
+  heatmap_counts <- SingleCellExperiment::normcounts(sce)[,order(pseudotime)]
 
   # TODO AM rewrite with https://bioconductor.org/packages/release/bioc/vignettes/BiocParallel/inst/doc/Introduction_To_BiocParallel.html#single-machine
-  waves_list = parallel::mclapply(rownames(heatmap_counts), function (gene) {
-    wave = as.data.frame(FitWave(as.matrix(heatmap_counts[gene,]), 1))
-    rownames(wave) = c(gene)
+  waves_list <- parallel::mclapply(rownames(heatmap_counts), function (gene) {
+    wave <- as.data.frame(FitWave(as.matrix(heatmap_counts[gene,]), 1))
+    rownames(wave) <- c(gene)
     return(wave)
   }, mc.cores=n_cores)
   waves <- do.call("rbind", waves_list)
 
-  waves = as.data.frame(waves)
-  waves$phase = waves$phase * (((180/3.141593)/360)*max(pseudotime)) # pseudotime
-  waves$gene = rownames(waves)
+  waves <- as.data.frame(waves)
+  waves$phase <- waves$phase * (((180/3.141593)/360)*max(pseudotime)) # pseudotime
+  waves$gene <- rownames(waves)
 
   # Add power to waves
-  waves$total_expression = rowSums(heatmap_counts[rownames(waves),])
+  waves$total_expression <- rowSums(heatmap_counts[rownames(waves),])
   # Bozdech et al. 2003 (https://doi.org/10.1371/journal.pbio.0000005) use plus
   # or minus 1/48 (i.e. one bulk either side of the peak, 6.25% window)
   # Here we use plus or minus 5% (i.e. a 10% window)
-  five_percent_of_pdt = 0.05*max(waves$phase)
-  waves$peak_expression = 0
+  five_percent_of_pdt <- 0.05*max(waves$phase)
+  waves$peak_expression <- 0
   for (gene in rownames(waves)) {
-    waves[gene,"peak_expression"] = sum(heatmap_counts[gene,pseudotime > waves[gene,]$phase-five_percent_of_pdt & pseudotime < waves[gene,]$phase+five_percent_of_pdt])
-    waves[gene,"cellcount_in_peak"] = length(heatmap_counts[gene,pseudotime > waves[gene,]$phase-five_percent_of_pdt & pseudotime < waves[gene,]$phase+five_percent_of_pdt])
+    waves[gene,"peak_expression"] <- sum(heatmap_counts[gene,pseudotime > waves[gene,]$phase-five_percent_of_pdt & pseudotime < waves[gene,]$phase+five_percent_of_pdt])
+    waves[gene,"cellcount_in_peak"] <- length(heatmap_counts[gene,pseudotime > waves[gene,]$phase-five_percent_of_pdt & pseudotime < waves[gene,]$phase+five_percent_of_pdt])
   }
-  waves$power = waves$amplitude / waves$peak_expression
+  waves$power <- waves$amplitude / waves$peak_expression
 
   return(waves)
 }
