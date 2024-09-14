@@ -116,9 +116,9 @@ plot_find_best_params_results(res)
 ```{r}
 genes = 30
 bins = 5
-blaseData = as.BlaseData(sc_sce, pseudotime_slot="slingPseudotime_1", n_bins=bins, split_by="pseudotime_range")
-blaseData@genes = genelist[1:genes]
-evaluate_parameters(blaseData, make_plot = TRUE)
+blase_data = as.blaseData(sc_sce, pseudotime_slot="slingPseudotime_1", n_bins=bins, split_by="pseudotime_range")
+genes(blase_data) = genelist[1:genes]
+evaluate_parameters(blase_data, make_plot = TRUE)
 ```
 ## Prepare Bulk
 
@@ -149,7 +149,7 @@ Now we'll map the bulk onto the single cell data with BLASE. We can see the bins
 ```{r}
 mapping_results = c()
 for (bulkname in colnames(bulkified_bins)) {
-  res = map_best_bin(blaseData, bulkname, bulkified_bins)
+  res = map_best_bin(blase_data, bulkname, bulkified_bins)
   mapping_results = c(mapping_results, res)
   print(res)
 }
@@ -215,42 +215,75 @@ gridExtra::grid.arrange(
 ```{r}
 getwd()
 source('comparison_functions.R')
+
+sample_order = c(
+  "bin_1_rep_1",
+  "bin_1_rep_2",
+  "bin_2_rep_1",
+  "bin_2_rep_2",
+  "bin_3_rep_1",
+  "bin_3_rep_2",
+  "bin_4_rep_1",
+  "bin_4_rep_2",
+  "bin_5_rep_1",
+  "bin_5_rep_2"
+)
+
+sc_sce$s = round(runif(ncol(sc_sce), 0, 1)) # Simulate 2 samples
 ```
 
 ### SCDC
-```{r SCDC}
-res = SCDC(sc_sce, 'pseudotime_bin', bulkified_bins)
-print(res$prop.est.mvw)
-
-to_plot = as.data.frame(res$prop.est.mvw)
-to_plot = to_plot[,sort(colnames(to_plot))]
-to_plot$BulkID <- rownames(to_plot)
-to_plot <- melt(to_plot)
-
-ggplot(to_plot, aes(variable, BulkID)) +
-  geom_tile(aes(fill = value), colour = "white") +
-  geom_text(aes(label = round(value, 2))) +
-  scale_fill_gradient(low = "white", high = "red")
-```
-### CibersortX
-
 ```{r}
-sc_sce
-```
+scdc_results = SCDC(sc_sce, 'pseudotime_bin', bulkified_bins, 's')
+print(scdc_results$prop.est.mvw)
 
-```{r cibersort}
-max(normcounts(sc_sce))
-cibersort = CibersortX(sc_sce, 'pseudotime_bin', bulkified_bins, N_CORES)
-to_plot = as.data.frame(cibersort)
-to_plot = subset(to_plot, select = -c(P.value, Correlation, RMSE))
-to_plot = to_plot[,sort(colnames(to_plot))]
+to_plot <- as.data.frame(scdc_results$prop.est.mvw)
 to_plot$BulkID <- rownames(to_plot)
 to_plot <- melt(to_plot)
 
-ggplot(to_plot, aes(variable, BulkID)) +
+scdc_results_plot = ggplot(to_plot, aes(variable, BulkID)) +
+  geom_tile(aes(fill = value), colour = "white") +
+  scale_fill_gradient(low = "white", high = "red", limits=c(0,1)) +
+  scale_y_discrete(limits = sample_order) +
+  scale_x_discrete(limits = seq_len(5)) +
+  ggtitle("SCDC")
+scdc_results_plot + geom_text(aes(label = round(value, 2)))
+```
+### MuSiC
+```{r}
+# Music requires at least 2 samples, and all cells represented across all samples
+music_results <- MUSIC(sc_sce, 'pseudotime_bin', bulkified_bins, 's')
+print(music_results$prop.est.mvw)
+
+to_plot <- as.data.frame(music_results$Est.prop.weighted)
+to_plot$BulkID <- rownames(to_plot)
+to_plot <- melt(to_plot)
+
+music_results_plot = ggplot(to_plot, aes(variable, BulkID)) +
+  geom_tile(aes(fill = value), colour = "white") +
+  scale_fill_gradient(low = "white", high = "red", limits=c(0,1)) +
+  scale_y_discrete(limits = sample_order) +
+  scale_x_discrete(limits = seq_len(5)) +
+  ggtitle("MuSiC")
+music_results_plot + geom_text(aes(label = round(value, 2)))
+```
+
+### CibersortX
+Does not complete, code provided for completeness.
+```{r, eval=FALSE cibersort}
+cibersort <- CibersortX(sc_sce, 'pseudotime_bin', bulkified_bins, N_CORES)
+to_plot <- as.data.frame(cibersort)
+to_plot <- subset(to_plot, select = -c(P.value, Correlation, RMSE))
+to_plot$BulkID <- rownames(to_plot)
+to_plot <- melt(to_plot)
+
+ggplot(to_plot, aes(variable, Mixture)) +
   geom_tile(aes(fill = value), colour = "white") +
   geom_text(aes(label = round(value, 2))) +
-  scale_fill_gradient(low = "white", high = "red")
+  scale_fill_gradient(low = "white", high = "red", limits=c(0,1)) +
+  scale_y_discrete(limits = expected_trajectory) +
+  scale_x_discrete(limits = paste0('c', seq_len(5))) + 
+  ggtitle("CibersortX")
 ```
 
 ## Session Info

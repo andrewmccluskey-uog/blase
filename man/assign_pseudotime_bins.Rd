@@ -44,7 +44,10 @@ slot containing the pseudotime values for each cell.}
 Assign Pseudotime Bins to a source object's metadata
 }
 \examples{
-counts_matrix <- matrix(c(seq_len(120) / 10, seq_len(120) / 5), ncol = 48, nrow = 5)
+counts_matrix <- matrix(
+    c(seq_len(120) / 10, seq_len(120) / 5),
+    ncol = 48, nrow = 5
+)
 sce <- SingleCellExperiment::SingleCellExperiment(assays = list(
     normcounts = counts_matrix, logcounts = log(counts_matrix)
 ))
@@ -54,7 +57,7 @@ sce$cell_type <- c(rep("celltype_1", 24), rep("celltype_2", 24))
 
 sce$pseudotime <- seq_len(48)
 blase_data <- as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 4)
-blase_data@genes <- as.character(seq_len(5))
+genes(blase_data) <- as.character(seq_len(5))
 
 bulk_counts <- matrix(seq_len(15) * 10, ncol = 3, nrow = 5)
 colnames(bulk_counts) <- c("A", "B", "C")
@@ -71,7 +74,10 @@ plot_mapping_result_heatmap(list(result))
 plot_mapping_result_corr(result)
 
 # Plot populations
-sce <- assign_pseudotime_bins(sce, pseudotime_slot = "pseudotime", n_bins = 4)
+sce <- assign_pseudotime_bins(
+    sce,
+    pseudotime_slot = "pseudotime", n_bins = 4
+)
 plot_bin_population(sce, result@best_bin, group_by_slot = "cell_type")
 }
 \concept{blase-object}

@@ -113,7 +113,7 @@ blase::plot_find_best_params_results(res)
 
 ```{r}
 blase_data = as.BlaseData(blase_train, n_bins = 7)
-blase_data@genes = genelist[1:160]
+genes(blase_data) = genelist[1:160]
 evaluate_parameters(blase_data, make_plot = TRUE)
 blase_train = assign_pseudotime_bins(blase_train, n_bins=7)
 ```
@@ -222,7 +222,6 @@ ggplot(to_plot, aes(variable, Mixture)) +
   scale_y_discrete(limits = expected_trajectory) +
   scale_x_discrete(limits = paste0('c', expected_trajectory)) + 
   ggtitle("CibersortX")
-## TODO INCLUDE CONFIDENCE - SHOULD BE CODE FOR THIS IN MCA/ZHANG FILE
 ```
 
 ## Experiment with other parameter selections
@@ -234,7 +233,7 @@ blase::plot_find_best_params_results(res)
 ### Previous values
 ```{r}
 blase_data = as.BlaseData(blase_train, n_bins = 7)
-blase_data@genes = genelist[1:160]
+genes(blase_data) = genelist[1:160]
 original_results = c()
 for (type in expected_trajectory) {
   original_results = c(original_results, map_best_bin(blase_data, type, bulks_df))
@@ -247,7 +246,7 @@ original_results_plot = plot_mapping_result_heatmap(as.list(original_results))
 #### Fewer Genes
 ```{r}
 blase_data = as.BlaseData(blase_train, n_bins = 7)
-blase_data@genes = genelist[1:20]
+genes(blase_data) = genelist[1:20]
 low_genes_results = c()
 for (type in expected_trajectory) {
   low_genes_results = c(low_genes_results, map_best_bin(blase_data, type, bulks_df))
@@ -258,7 +257,7 @@ low_genes_results_plot = plot_mapping_result_heatmap(as.list(low_genes_results))
 #### More Genes
 ```{r}
 blase_data = as.BlaseData(blase_train, n_bins = 7)
-blase_data@genes = genelist[1:400]
+genes(blase_data) = genelist[1:400]
 high_genes_results = c()
 for (type in expected_trajectory) {
   high_genes_results = c(high_genes_results, map_best_bin(blase_data, type, bulks_df))
@@ -282,7 +281,7 @@ Note that too few genes reduces signal, but too many genes increases noise.
 ### Fewer Bins
 ```{r}
 blase_data = as.BlaseData(blase_train, n_bins = 3)
-blase_data@genes = genelist[1:160]
+genes(blase_data) = genelist[1:160]
 low_bins_results = c()
 for (type in expected_trajectory) {
   low_bins_results = c(low_bins_results, map_best_bin(blase_data, type, bulks_df))
@@ -292,7 +291,7 @@ low_bins_results_plot = plot_mapping_result_heatmap(as.list(low_bins_results))
 ### More Bins
 ```{r}
 blase_data = as.BlaseData(blase_train, n_bins = 20)
-blase_data@genes = genelist[1:160]
+genes(blase_data) = genelist[1:160]
 high_bins_results = c()
 for (type in expected_trajectory) {
   high_bins_results = c(high_bins_results, map_best_bin(blase_data, type, bulks_df))

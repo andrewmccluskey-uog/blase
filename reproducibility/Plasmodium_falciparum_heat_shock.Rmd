@@ -100,9 +100,9 @@ plot_find_best_params_results(res)
 ```{r}
 genes = 300
 bins = 8
-blaseData = as.BlaseData(processed_MCA_PF_SCE, pseudotime_slot="slingPseudotime_1", n_bins=bins, split_by="pseudotime_range")
-blaseData@genes = genelist[1:genes]
-evaluate_parameters(blaseData, make_plot = TRUE)
+blase_data = as.blaseData(processed_MCA_PF_SCE, pseudotime_slot="slingPseudotime_1", n_bins=bins, split_by="pseudotime_range")
+genes(blase_data) = genelist[1:genes]
+evaluate_parameters(blase_data, make_plot = TRUE)
 processed_MCA_PF_SCE = assign_pseudotime_bins(processed_MCA_PF_SCE, pseudotime_slot="slingPseudotime_1", n_bins=bins, split_by="pseudotime_range")
 plotUMAP(processed_MCA_PF_SCE, color="pseudotime_bin")
 gridExtra::grid.arrange(
@@ -116,7 +116,7 @@ And we can see these genes arranged over pseudotime:
 
 ```{r}
 waves = get_waves(processed_MCA_PF_SCE)
-gene_selection_matrix(processed_MCA_PF_SCE, waves, genes=blaseData@genes, target_matrix_size=length(unique(blaseData@genes)))
+gene_selection_matrix(processed_MCA_PF_SCE, waves, genes=genes(blase_data), target_matrix_size=length(unique(genes(blase_data))))
 ```
 
 ## Map Bulk data onto Single Cell
@@ -125,11 +125,22 @@ Now we can map the bulk data onto the single cell.
 bulk
 mapping_results = c()
 for (bulkname in colnames(bulk)) {
-  res = map_best_bin(blaseData, bulkname, bulk)
+  res = map_best_bin(blase_data, bulkname, bulk)
   mapping_results = c(mapping_results, res)
 }
 
 blase::plot_mapping_result_heatmap(rev(mapping_results), annotate = TRUE)
+
+gridExtra::grid.arrange(
+  blase::plot_mapping_result_heatmap(rev(mapping_results[1:2]), annotate = TRUE) + ggtitle("WT Normal Conditions"),
+  blase::plot_mapping_result_heatmap(rev(mapping_results[3:4]), annotate = TRUE) + ggtitle("WT Heat Shock"),
+  ncol=1
+)
+gridExtra::grid.arrange(
+  blase::plot_mapping_result_heatmap(rev(mapping_results[9:10]), annotate = TRUE) + ggtitle("PB31 Normal Conditions"),
+  blase::plot_mapping_result_heatmap(rev(mapping_results[11:12]), annotate = TRUE) + ggtitle("PB31 Heat Shock"),
+  ncol=1
+)
 ```
 
 We can see the wild type develops more normally than the 2 knockouts, who show delayed growth generally, and less of a response to the heat shock (41 degrees).
@@ -190,7 +201,7 @@ ggplot(annotations_by_bin, aes(x = pseudotime_bin, fill = STAGE_LR)) +
 ```
 ```{r}
 # Is the knockout gene being used to calculate blase rating?
-any(blaseData@genes == "PF3D7_1432400")
+any(genes(blase_data) == "PF3D7_1432400")
 ```
 ## Cibersort Analysis for comparison
 
@@ -220,45 +231,80 @@ usethis::use_data(cibersort_results, overwrite = TRUE, compress = "bzip2")
 ```{r}
 getwd()
 source('comparison_functions.R')
+sample_order = rev(c(
+  "NF54_37_1",
+  "NF54_37_2",
+  "NF54_41_1",
+  "NF54_41_2",
+  "PB4_37_1",
+  "PB4_37_2",
+  "PB4_41_1",
+  "PB4_41_2",
+  "PB31_37_1",
+  "PB31_37_2",
+  "PB31_41_1",
+  "PB31_41_2"
+))
 ```
 
 ### SCDC
 ```{r SCDC}
-res = SCDC(processed_MCA_PF_SCE, 'pseudotime_bin', bulk)
-print(res$prop.est.mvw)
+scdc_results = SCDC(processed_MCA_PF_SCE, 'pseudotime_bin', bulk)
+print(scdc_results$prop.est.mvw)
 
-to_plot = as.data.frame(res$prop.est.mvw)
-to_plot = to_plot[,sort(colnames(to_plot))]
+to_plot <- as.data.frame(scdc_results$prop.est.mvw)
 to_plot$BulkID <- rownames(to_plot)
 to_plot <- melt(to_plot)
 
 scdc_results_plot = ggplot(to_plot, aes(variable, BulkID)) +
   geom_tile(aes(fill = value), colour = "white") +
-  geom_text(aes(label = round(value, 2))) +
-  scale_fill_gradient(low = "white", high = "red")
-scdc_results_plot
+  scale_fill_gradient(low = "white", high = "red", limits=c(0,1)) +
+  scale_y_discrete(limits = sample_order) +
+  scale_x_discrete(limits = seq_len(8)) +
+  ggtitle("SCDC")
+scdc_results_plot + geom_text(aes(label = round(value, 2)))
+```
+### MuSiC
+```{r music}
+# Music requires at least 2 samples, and all cells represented across all samples
+music_results <- MUSIC(processed_MCA_PF_SCE, 'pseudotime_bin', bulk, 'DAY')
+print(music_results$prop.est.mvw)
+
+to_plot <- as.data.frame(music_results$Est.prop.weighted)
+to_plot$BulkID <- rownames(to_plot)
+to_plot <- melt(to_plot)
+
+music_results_plot = ggplot(to_plot, aes(variable, BulkID)) +
+  geom_tile(aes(fill = value), colour = "white") +
+  scale_fill_gradient(low = "white", high = "red", limits=c(0,1)) +
+  scale_y_discrete(limits = sample_order) +
+  scale_x_discrete(limits = seq_len(8)) +
+  ggtitle("MuSiC")
+music_results_plot + geom_text(aes(label = round(value, 2)))
 ```
 
 ### Cibersort
 ```{r cibersort}
-cibersort = CibersortX(processed_MCA_PF_SCE, 'pseudotime_bin', bulk, N_CORES)
-to_plot = as.data.frame(cibersort)
-to_plot = subset(to_plot, select = -c(P.value, Correlation, RMSE))
-to_plot = to_plot[,sort(colnames(to_plot))]
+cibersort_results = CibersortX(processed_MCA_PF_SCE, 'pseudotime_bin', bulk, N_CORES)
+colnames(cibersort_results) = gsub(x=colnames(cibersort_results), pattern="c", replacement="", fixed=TRUE)
+to_plot <- as.data.frame(cibersort_results)
+to_plot <- subset(to_plot, select = -c(P.value, Correlation, RMSE))
 to_plot$BulkID <- rownames(to_plot)
 to_plot <- melt(to_plot)
 
-cibersort_results_plot = ggplot(to_plot, aes(variable, BulkID)) +
+cibersortx_results_plot = ggplot(to_plot, aes(variable, Mixture)) +
   geom_tile(aes(fill = value), colour = "white") +
-  geom_text(aes(label = round(value, 2))) +
-  scale_fill_gradient(low = "white", high = "red")
-cibersort_results_plot
+  scale_fill_gradient(low = "white", high = "red", limits=c(0,1)) +
+  scale_y_discrete(limits = gsub(x = sample_order, "_", "")) +
+  scale_x_discrete(limits = seq_len(8)) + 
+  ggtitle("CibersortX")
+cibersortx_results_plot + geom_text(aes(label = round(value, 2)))
 ```
 ### Final Comparison
 ```{r}
-blase::plot_mapping_result_heatmap(mapping_results, annotate = TRUE)
-cibersort_results_plot
-scdc_results_plot
+blase::plot_mapping_result_heatmap(mapping_results, annotate = TRUE) + ggtitle('BLASE')
+cibersort_results_plot + ggtitle('CibersortX')
+scdc_results_plot + ggtitle('ScDC')
 ```
 
 ## Session Info

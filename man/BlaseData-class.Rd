@@ -30,6 +30,9 @@ sce <- SingleCellExperiment::SingleCellExperiment(
     assays = list(normcounts = counts)
 )
 sce$pseudotime <- seq_len(10)
-as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 3)
+data <- as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 3)
+genes(data) <- as.character(seq_len(10))
+
+genes(data)
 }
 \concept{blase-object}

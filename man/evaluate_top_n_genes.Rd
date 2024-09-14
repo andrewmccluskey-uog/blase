@@ -15,27 +15,35 @@ evaluate_top_n_genes(blase_data, n_genes_to_plot = 16, plot_columns = 4)
 divisor of \code{n_genes_to_plot}.}
 }
 \description{
-Shows plots over bins of expression of the top n genes. This is designed to help
-identify if you have selected genes that vary over the pseudotime you have chosen
+Shows plots over bins of expression of the top n genes.
+This is designed to help identify if you have selected
+genes that vary over the pseudotime you have chosen
 bins to exist over. Uses the normcounts of the SCE.
 }
 \examples{
 ncells <- 70
 ngenes <- 100
-counts_matrix <- matrix(c(seq_len(3500) / 10, seq_len(3500) / 5), ncol = ncells, nrow = ngenes)
+counts_matrix <- matrix(
+    c(seq_len(3500) / 10, seq_len(3500) / 5),
+    ncol = ncells,
+    nrow = ngenes
+)
 sce <- SingleCellExperiment::SingleCellExperiment(assays = list(
     normcounts = counts_matrix, logcounts = log(counts_matrix)
 ))
 colnames(sce) <- seq_len(ncells)
 rownames(sce) <- as.character(seq_len(ngenes))
-sce$cell_type <- c(rep("celltype_1", ncells / 2), rep("celltype_2", ncells / 2))
+sce$cell_type <- c(
+    rep("celltype_1", ncells / 2),
+    rep("celltype_2", ncells / 2)
+)
 
 sce$pseudotime <- seq_len(ncells)
 genelist <- as.character(seq_len(ngenes))
 
 # Evaluating created BlaseData
 blase_data <- as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 10)
-blase_data@genes <- genelist[1:20]
+genes(blase_data) <- genelist[1:20]
 
 # Check gene expression over pseudotime
 evaluate_top_n_genes(blase_data)

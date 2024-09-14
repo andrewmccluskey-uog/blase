@@ -43,7 +43,7 @@
 #'
 #' # Evaluating created BlaseData
 #' blase_data <- as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 10)
-#' blase_data@genes <- genelist[1:20]
+#' genes(blase_data) <- genelist[1:20]
 #'
 #' # Check specificity of parameters
 #' evaluate_parameters(blase_data, make_plot = TRUE)
@@ -311,7 +311,7 @@ plot_find_best_params_results <- function(
 #'
 #' # Evaluating created BlaseData
 #' blase_data <- as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 10)
-#' blase_data@genes <- genelist[1:20]
+#' genes(blase_data) <- genelist[1:20]
 #'
 #' # Check gene expression over pseudotime
 #' evaluate_top_n_genes(blase_data)

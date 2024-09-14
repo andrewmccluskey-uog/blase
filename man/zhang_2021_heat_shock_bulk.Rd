@@ -7,7 +7,7 @@
 \format{
 The object contains FPKM normalised bulk RNA-seq counts.
 Each row is a gene,and each column is a sample. The column name format
-is: "${line}\emph{${heat_shock_temp}}${replciate_number}"
+is: "$\{line\}\emph{$\{heat_shock_temp\}}$\{replicate_number\}"
 }
 \source{
 \url{https://doi.org/10.1038/s41467-021-24814-1}

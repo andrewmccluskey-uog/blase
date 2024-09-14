@@ -106,7 +106,7 @@
 #' @format
 #' The object contains FPKM normalised bulk RNA-seq counts.
 #' Each row is a gene,and each column is a sample. The column name format
-#' is: "${line}_${heat_shock_temp}_${replciate_number}"
+#' is: "$\{line\}_$\{heat_shock_temp\}_$\{replicate_number\}"
 #'
 #' @source <https://doi.org/10.1038/s41467-021-24814-1>
 #' @usage data(zhang_2021_heat_shock_bulk, package='blase')

@@ -11,11 +11,14 @@ get_bins_as_bulk(
 )
 }
 \arguments{
-\item{pseudotime_sce}{The Single Cell Experiment object to get the bins from}
+\item{pseudotime_sce}{The Single Cell Experiment object to
+get the bins from}
 
-\item{min_cells_for_bulk}{The minimum cells to look for per replicate and bin.}
+\item{min_cells_for_bulk}{The minimum cells to look for per
+replicate and bin.}
 
-\item{replicate_slot}{The slot in the Single Cell Experiment that contains replicate information}
+\item{replicate_slot}{The slot in the Single Cell Experiment
+that contains replicate information}
 }
 \value{
 A dataframe pseudobulk counts matrix.
@@ -40,7 +43,11 @@ sce <- assign_pseudotime_bins(sce,
     pseudotime_slot = "pseudotime", split_by = "cells"
 )
 sce$replicate <- rep(c(1, 2), 50)
-result <- get_bins_as_bulk(sce, min_cells_for_bulk = 1, replicate_slot = "replicate")
+result <- get_bins_as_bulk(
+    sce,
+    min_cells_for_bulk = 1,
+    replicate_slot = "replicate"
+)
 result
 }
 \concept{util}

@@ -114,7 +114,7 @@ res <- find_best_params(processed_MCA_PB_SCE,
     gene_count_range = seq.int(20, 180, 3)
 )
 
-x <- as.BlaseData(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = 14, split_by = "pseudotime_range")
+x <- as.blaseData(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = 14, split_by = "pseudotime_range")
 
 tradeseq_tuning <- plot_find_best_params_results(res)
 ```
@@ -122,10 +122,10 @@ tradeseq_tuning <- plot_find_best_params_results(res)
 ```{r}
 BUCKETS_COUNT <- 12
 GENES_TO_USE_COUNT <- 120
-x <- as.BlaseData(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
-x@genes <- genelist[1:GENES_TO_USE_COUNT]
+x <- as.blaseData(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
+genes(x) <- genelist[1:GENES_TO_USE_COUNT]
 
-genes_tradeseq <- x@genes
+genes_tradeseq <- genes(x)
 
 processed_MCA_PB_SCE <- assign_pseudotime_bins(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
 
@@ -176,9 +176,9 @@ markergenes_tuning <- plot_find_best_params_results(res)
 ```{r}
 BUCKETS_COUNT <- 12
 GENES_TO_USE_COUNT <- 120
-x <- as.BlaseData(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
-x@genes <- genelist[1:GENES_TO_USE_COUNT]
-genes_markergenes <- x@genes
+x <- as.blaseData(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
+genes(x) <- genelist[1:GENES_TO_USE_COUNT]
+genes_markergenes <- genes(x)
 
 processed_MCA_PB_SCE <- assign_pseudotime_bins(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
 
@@ -229,10 +229,10 @@ markergenes_by_bin_tuning <- plot_find_best_params_results(res)
 ```{r}
 BUCKETS_COUNT <- 12
 GENES_TO_USE_COUNT <- 120
-x <- as.BlaseData(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
-x@genes <- genelist[1:GENES_TO_USE_COUNT]
+x <- as.blaseData(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
+genes(x) <- genelist[1:GENES_TO_USE_COUNT]
 
-genes_markergenes_by_bin <- x@genes
+genes_markergenes_by_bin <- genes(x)
 
 processed_MCA_PB_SCE <- assign_pseudotime_bins(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
 
@@ -330,8 +330,8 @@ ggplot2::ggplot(top_r2_waves, ggplot2::aes(phase, amplitude, color = r2)) +
 
 top_genes_fourier_top_r2 <- rownames(top_r2_waves)
 
-x <- as.BlaseData(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
-x@genes <- top_genes_fourier_top_r2
+x <- as.blaseData(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
+genes(x) <- top_genes_fourier_top_r2
 
 processed_MCA_PB_SCE <- assign_pseudotime_bins(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
 
@@ -358,8 +358,8 @@ ggplot2::ggplot(top_r2_waves_spread, ggplot2::aes(phase, amplitude, color = r2))
 
 top_genes_fourier_top_r2_spread <- rownames(top_r2_waves_spread)
 
-x <- as.BlaseData(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
-x@genes <- top_genes_fourier_top_r2_spread
+x <- as.blaseData(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
+genes(x) <- top_genes_fourier_top_r2_spread
 
 processed_MCA_PB_SCE <- assign_pseudotime_bins(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
 
@@ -387,8 +387,8 @@ ggplot2::ggplot(top_amp_waves, ggplot2::aes(phase, amplitude, color = r2)) +
 
 top_genes_fourier_top_amp <- rownames(top_amp_waves)
 
-x <- as.BlaseData(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
-x@genes <- top_genes_fourier_top_amp
+x <- as.blaseData(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
+genes(x) <- top_genes_fourier_top_amp
 
 processed_MCA_PB_SCE <- assign_pseudotime_bins(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
 
@@ -415,8 +415,8 @@ ggplot2::ggplot(top_amp_waves_spread, ggplot2::aes(phase, amplitude, color = r2)
 
 top_genes_fourier_top_amp_spread <- rownames(top_amp_waves_spread)
 
-x <- as.BlaseData(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
-x@genes <- top_genes_fourier_top_amp_spread
+x <- as.blaseData(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
+genes(x) <- top_genes_fourier_top_amp_spread
 
 processed_MCA_PB_SCE <- assign_pseudotime_bins(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
 
@@ -446,8 +446,8 @@ ggplot2::ggplot(top_power_waves, ggplot2::aes(phase, amplitude, color = r2)) +
 
 top_genes_fourier_top_power <- rownames(top_power_waves)
 
-x <- as.BlaseData(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
-x@genes <- top_genes_fourier_top_power
+x <- as.blaseData(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
+genes(x) <- top_genes_fourier_top_power
 
 processed_MCA_PB_SCE <- assign_pseudotime_bins(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
 
@@ -474,8 +474,8 @@ ggplot2::ggplot(top_power_waves_spread, ggplot2::aes(phase, amplitude, color = r
 
 top_genes_fourier_top_power_spread <- rownames(top_power_waves_spread)
 
-x <- as.BlaseData(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
-x@genes <- top_genes_fourier_top_power_spread
+x <- as.blaseData(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
+genes(x) <- top_genes_fourier_top_power_spread
 
 processed_MCA_PB_SCE <- assign_pseudotime_bins(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
 
@@ -646,7 +646,7 @@ top_bin_marker_phases_plot <- gene_selection_matrix(processed_MCA_PB_SCE, waves,
 
 fourier_top_r2_phases <- gene_selection_matrix(processed_MCA_PB_SCE, waves, genes = top_genes_fourier_top_r2, target_matrix_size = length(top_genes_fourier_top_r2), n_cores = N_CORES) + ggplot2::ggtitle("Top Fourier R2")
 
-fourier_top_r2_spread_phases <- gene_selection_matrix(processed_MCA_PB_SCE, waves, genes = top_genes_fourier_top_r2_spread, target_matrix_size = length(top_genes_fourier_top_r2_spread), n_cores = N_CORES) + ggplot2::ggtitle("Top Fourier R2")
+fourier_top_r2_spread_phases <- gene_selection_matrix(processed_MCA_PB_SCE, waves, genes = top_genes_fourier_top_r2_spread, target_matrix_size = length(top_genes_fourier_top_r2_spread), n_cores = N_CORES) + ggplot2::ggtitle("Top Fourier R2 Spread")
 
 fourier_top_amp_phases <- gene_selection_matrix(processed_MCA_PB_SCE, waves, genes = top_genes_fourier_top_amp, target_matrix_size = length(top_genes_fourier_top_amp), n_cores = N_CORES) + ggplot2::ggtitle("Top Fourier Amplitude")
 
@@ -675,6 +675,21 @@ gridExtra::grid.arrange(
     fourier_top_amp_spread_phases,
     fourier_top_power_spread_phases,
     ncol = 2
+)
+```
+### Summary Plot
+```{r}
+gridExtra::grid.arrange(
+    top_tradeseq_phases_plot,
+    top_marker_phases_plot,
+    top_bin_marker_phases_plot,
+    fourier_top_r2_phases,
+    fourier_top_amp_phases,
+    fourier_top_power_phases,
+    fourier_top_r2_spread_phases,
+    fourier_top_amp_spread_phases,
+    fourier_top_power_spread_phases,
+    ncol = 3
 )
 ```
 
@@ -734,6 +749,22 @@ gridExtra::grid.arrange(
     plotUMAP(processed_MCA_PB_SCE, colour_by = "STAGE_LR"),
     plotUMAP(processed_MCA_PB_SCE, colour_by = "pseudotime_bin"),
     ncol = 2
+)
+```
+
+### Summary Heatmaps
+```{r}
+gridExtra::grid.arrange(
+  tradeseq_heat,
+  markergenes_heat,
+  markergenes_by_bin_heat,
+  fourier_top_r2_heat,
+  fourier_top_amp_heat,
+  fourier_top_power_heat,
+  fourier_top_r2_spread_heat,
+  fourier_top_amp_spread_heat,
+  fourier_top_power_spread_heat,
+  ncol=3
 )
 ```
 

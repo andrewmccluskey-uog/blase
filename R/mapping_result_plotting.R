@@ -24,7 +24,7 @@
 #'
 #' sce$pseudotime <- seq_len(48)
 #' blase_data <- as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 4)
-#' blase_data@genes <- as.character(seq_len(5))
+#' genes(blase_data) <- as.character(seq_len(5))
 #'
 #' bulk_counts <- matrix(seq_len(15) * 10, ncol = 3, nrow = 5)
 #' colnames(bulk_counts) <- c("A", "B", "C")
@@ -168,7 +168,7 @@ plot_mapping_result_heatmap <- function(
 
     bulk_results <- data.frame(
         bulk_name = c(),
-        pseudobin = c(),
+        pseudotime_bin = c(),
         correlation = c()
     )
 
@@ -177,7 +177,7 @@ plot_mapping_result_heatmap <- function(
 
         this_bulk_results <- data.frame(
             bulk_name = rep(mappingResult@bulk_name, nrow(history)),
-            pseudobin = history[, "bin"],
+            pseudotime_bin = history[, "bin"],
             correlation = history[, "correlation"],
             is_best_bin = history[, "bin"] == mappingResult@best_bin,
             confident_mapping = ifelse(
@@ -198,17 +198,17 @@ plot_mapping_result_heatmap <- function(
         bulk_results$bulk_name,
         levels = as.character(unique(bulk_results$bulk_name))
     )
-    bulk_results$pseudobin <- as.factor(bulk_results$pseudobin)
+    bulk_results$pseudotime_bin <- as.factor(bulk_results$pseudotime_bin)
 
     bulk_name_sym <- ggplot2::sym("bulk_name")
-    pseudobin_sym <- ggplot2::sym("pseudobin")
+    pseudotime_bin_sym <- ggplot2::sym("pseudotime_bin")
     correlation_sym <- ggplot2::sym("correlation")
     confident_mapping_sym <- ggplot2::sym("confident_mapping")
     is_best_bin_sym <- ggplot2::sym("is_best_bin")
 
     # Change elow here
     p <- ggplot2::ggplot(bulk_results, ggplot2::aes(
-        x = {{ pseudobin_sym }},
+        x = {{ pseudotime_bin_sym }},
         y = {{ bulk_name_sym }},
         fill = {{ correlation_sym }},
         label = {{ confident_mapping_sym }},
@@ -241,7 +241,7 @@ plot_mapping_result_heatmap <- function(
 #' @title Plot a mapping result's correlation
 #'
 #' @description
-#' Plots the mapping results correlations with each pseudobin
+#' Plots the mapping results correlations with each pseudotime bin
 #'
 #' @concept mapping_plots
 #'

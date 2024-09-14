@@ -17,10 +17,12 @@ for each pseudobulk bin when we try to map the given bin.}
 \value{
 A vector of length 2:
 \itemize{
-\item "worst top 2 distance" containing the lowest difference between the absolute values of the
-top 2 most correlated bins for each bin. Higher is better for differentiating.
-\item "mean top 2 distance" containing the mean top 2 distance across the entire set of genes and bins.
-Higher is better for differentiation, but it should matter less than the worst value.
+\item "worst top 2 distance" containing the lowest difference between the
+absolute values of the top 2 most correlated bins for each bin.
+Higher is better for differentiating.
+\item "mean top 2 distance" containing the mean top 2 distance across the
+entire set of genes and bins. Higher is better for differentiation,
+but it should matter less than the worst value.
 }
 }
 \description{
@@ -31,20 +33,27 @@ an optional chart.
 \examples{
 ncells <- 70
 ngenes <- 100
-counts_matrix <- matrix(c(seq_len(3500) / 10, seq_len(3500) / 5), ncol = ncells, nrow = ngenes)
+counts_matrix <- matrix(
+    c(seq_len(3500) / 10, seq_len(3500) / 5),
+    ncol = ncells,
+    nrow = ngenes
+)
 sce <- SingleCellExperiment::SingleCellExperiment(assays = list(
     normcounts = counts_matrix, logcounts = log(counts_matrix)
 ))
 colnames(sce) <- seq_len(ncells)
 rownames(sce) <- as.character(seq_len(ngenes))
-sce$cell_type <- c(rep("celltype_1", ncells / 2), rep("celltype_2", ncells / 2))
+sce$cell_type <- c(
+    rep("celltype_1", ncells / 2),
+    rep("celltype_2", ncells / 2)
+)
 
 sce$pseudotime <- seq_len(ncells)
 genelist <- as.character(seq_len(ngenes))
 
 # Evaluating created BlaseData
 blase_data <- as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 10)
-blase_data@genes <- genelist[1:20]
+genes(blase_data) <- genelist[1:20]
 
 # Check specificity of parameters
 evaluate_parameters(blase_data, make_plot = TRUE)

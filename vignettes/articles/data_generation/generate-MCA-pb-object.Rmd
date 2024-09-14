@@ -85,11 +85,11 @@ sce <- SingleCellExperiment(assays = list(counts = as.matrix(sc_readcounts)), co
 rm(sc_annotations, sc_readcounts)
 gc()
 
-sce@colData$STAGE_LR <- factor(sce@colData$STAGE_LR)
-sce@colData$STAGE_HR <- factor(sce@colData$STAGE_HR)
-sce@colData$STRAIN <- factor(sce@colData$STRAIN)
-sce@colData$DAY <- factor(sce@colData$DAY)
-sce@colData$HOST <- factor(sce@colData$HOST)
+colData(sce)$STAGE_LR <- factor(colData(sce)$STAGE_LR)
+colData(sce)$STAGE_HR <- factor(colData(sce)$STAGE_HR)
+colData(sce)$STRAIN <- factor(colData(sce)$STRAIN)
+colData(sce)$DAY <- factor(colData(sce)$DAY)
+colData(sce)$HOST <- factor(colData(sce)$HOST)
 ```
 
 Now we start annotating and preprocessing the data.
@@ -97,7 +97,7 @@ Now we start annotating and preprocessing the data.
 sce <- computeSumFactors(sce)
 sce <- logNormCounts(sce)
 normcounts(sce) <- exp(logcounts(sce))
-reducedDim(sce, "PCA") <- as.matrix(cbind(sce@colData["PC_1"], sce@colData["PC_2"]))
+reducedDim(sce, "PCA") <- as.matrix(cbind(colData(sce)["PC_1"], colData(sce)["PC_2"]))
 sce <- runUMAP(sce)
 
 gridExtra::grid.arrange(

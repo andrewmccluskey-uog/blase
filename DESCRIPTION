@@ -61,7 +61,6 @@ Suggests:
     scales,
     dplyr,
     plyr,
-    Signac,
     fs
 Config/testthat/edition: 3
 VignetteBuilder: knitr

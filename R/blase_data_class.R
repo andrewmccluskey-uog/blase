@@ -20,8 +20,10 @@
 #'     assays = list(normcounts = counts)
 #' )
 #' sce$pseudotime <- seq_len(10)
-#' as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 3)
-# TODO make bins and genes hidden with . and then add setters/getters?
+#' data <- as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 3)
+#' genes(data) <- as.character(seq_len(10))
+#' 
+#' genes(data)
 BlaseData <- setClass(
     Class = "BlaseData",
     slots = list(
@@ -53,3 +55,41 @@ setMethod(
         cat(paste(output, collapse = "\n"))
     }
 )
+
+#' @title Get genes of a BLASE Data object.
+#'
+#' @concept blase-object
+#'
+#' @rdname genes-getter
+#' @param x a [BlaseData] object
+#' @export
+#' @inherit BlaseData-class examples
+setGeneric("genes", function(x) standardGeneric("genes"))
+
+#' @rdname genes-getter
+setMethod(
+  f = "genes", 
+  signature = "BlaseData", 
+  definition = function(x) x@genes)
+
+#' @title Set genes of a BLASE Data object.
+#'
+#' @concept blase-object
+#'
+#' @rdname genes-setter
+#' @param x a [BlaseData] object
+#' @param value new value for genes slot, should be a vector of strings
+#' @export
+#' @inherit BlaseData-class examples
+setGeneric("genes<-", function(x, value) standardGeneric("genes<-"))
+
+#' @rdname genes-setter
+setMethod(
+  f = "genes<-", 
+  signature = "BlaseData", 
+  definition = function(x, value) {
+    x@genes <- value
+    validObject(x)
+    x
+  })
+

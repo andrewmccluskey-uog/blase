@@ -116,13 +116,13 @@ Now we can create a `SingleCellExperiment` object:
 sce <- SingleCellExperiment(assays = list(counts = as.matrix(sc_readcounts)), colData = sc_annotations)
 rownames(sce) <- sub(x = rownames(sce), pattern = "\\.[0-9]", replacement = "")
 
-sce@colData$STAGE_LR <- factor(sce@colData$STAGE_LR)
-sce@colData$STAGE_HR <- factor(sce@colData$STAGE_HR)
-sce@colData$STRAIN <- factor(sce@colData$STRAIN)
-sce@colData$DAY <- factor(sce@colData$DAY)
-sce@colData$HOST <- factor(sce@colData$HOST)
-sce@colData$STAGE_HR2 <- factor(sce@colData$STAGE_HR2)
-sce@colData$CLUSTER <- factor(sce@colData$CLUSTER)
+colData(sce)$STAGE_LR <- factor(colData(sce)$STAGE_LR)
+colData(sce)$STAGE_HR <- factor(colData(sce)$STAGE_HR)
+colData(sce)$STRAIN <- factor(colData(sce)$STRAIN)
+colData(sce)$DAY <- factor(colData(sce)$DAY)
+colData(sce)$HOST <- factor(colData(sce)$HOST)
+colData(sce)$STAGE_HR2 <- factor(colData(sce)$STAGE_HR2)
+colData(sce)$CLUSTER <- factor(colData(sce)$CLUSTER)
 ```
 
 We also subset out gametocytes, since we focus on Plasmodium's asexual reproduction in these articles. Then we limit outselves to 10,000 cells, which is plenty for BLASE, and reduces the resource load of this file.
@@ -147,9 +147,9 @@ dec <- modelGeneVar(sce)
 hvg <- getTopHVGs(dec, prop = 0.3)
 sce <- sce[hvg, ]
 
-reducedDim(sce, "PCA") <- as.matrix(cbind(sce@colData["PC_1"], sce@colData["PC_2"], sce@colData["PC_3"]))
+reducedDim(sce, "PCA") <- as.matrix(cbind(colData(sce)["PC_1"], colData(sce)["PC_2"], colData(sce)["PC_3"]))
 # better separation in the 2nd and 3rd dimension for just asexual stages
-reducedDim(sce, "UMAP") <- as.matrix(cbind(sce@colData["UMAP_2"], sce@colData["UMAP_3"]))
+reducedDim(sce, "UMAP") <- as.matrix(cbind(colData(sce)["UMAP_2"], colData(sce)["UMAP_3"]))
 
 gridExtra::grid.arrange(
     plotPCA(sce, colour_by = "STAGE_HR"),

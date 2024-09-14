@@ -22,7 +22,8 @@ find_best_params(
 
 \item{gene_count_range}{The n_genes list to try out}
 
-\item{verbose}{Whether to print the n_gene/n_bin combination in progress. Defaults to False.}
+\item{verbose}{Whether to print the n_gene/n_bin combination in progress.
+Defaults to False.}
 
 \item{...}{params to be passed to child functions, see \code{\link[=as.BlaseData]{as.BlaseData()}}}
 }
@@ -41,13 +42,20 @@ Identify the Best Parameters For Your Dataset
 \examples{
 ncells <- 70
 ngenes <- 100
-counts_matrix <- matrix(c(seq_len(3500) / 10, seq_len(3500) / 5), ncol = ncells, nrow = ngenes)
+counts_matrix <- matrix(
+    c(seq_len(3500) / 10, seq_len(3500) / 5),
+    ncol = ncells,
+    nrow = ngenes
+)
 sce <- SingleCellExperiment::SingleCellExperiment(assays = list(
     normcounts = counts_matrix, logcounts = log(counts_matrix)
 ))
 colnames(sce) <- seq_len(ncells)
 rownames(sce) <- as.character(seq_len(ngenes))
-sce$cell_type <- c(rep("celltype_1", ncells / 2), rep("celltype_2", ncells / 2))
+sce$cell_type <- c(
+    rep("celltype_1", ncells / 2),
+    rep("celltype_2", ncells / 2)
+)
 
 sce$pseudotime <- seq_len(ncells)
 genelist <- as.character(seq_len(ngenes))
@@ -64,6 +72,7 @@ best_params
 plot_find_best_params_results(best_params)
 }
 \seealso{
-\code{\link[=plot_find_best_params_results]{plot_find_best_params_results()}} for plotting the results of this function.
+\code{\link[=plot_find_best_params_results]{plot_find_best_params_results()}} for plotting the
+results of this function.
 }
 \concept{tuning}

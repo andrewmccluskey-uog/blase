@@ -36,7 +36,7 @@
 #'
 #' sce$pseudotime <- seq_len(48)
 #' blase_data <- as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 4)
-#' blase_data@genes <- as.character(seq_len(5))
+#' genes(blase_data) <- as.character(seq_len(5))
 #'
 #' bulk_counts <- matrix(seq_len(15) * 10, ncol = 3, nrow = 5)
 #' colnames(bulk_counts) <- c("A", "B", "C")

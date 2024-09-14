@@ -15,6 +15,6 @@ generate_test_seurat <- function(cells = 100, genes = 50) {
 generate_test_blase_data <- function(cells = 100, genes = 50) {
     sce <- generate_test_sce(cells, genes)
     blase_data <- as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 5)
-    blase_data@genes <- as.character(seq_len(genes))
+    genes(blase_data) <- as.character(seq_len(genes))
     return(blase_data)
 }

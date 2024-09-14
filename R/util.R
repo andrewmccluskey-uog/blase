@@ -185,7 +185,7 @@ get_bins_as_bulk <- function(
         } else {
             message(
                 "Couldn't create pseudobulks due to",
-                "too few cells in every replicate for bin ",
+                " too few cells in every replicate for bin ",
                 bin_id
             )
             next()

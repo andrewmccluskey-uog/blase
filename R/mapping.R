@@ -18,7 +18,7 @@ map_best_bin <- function(
     if (any(is.na(blase_data@genes)) || length(blase_data@genes) == 0) {
         stop(
             "No genes to map with. ",
-            "Please add something to the blase_data@genes slot."
+            "Please add something to the genes(blase_data) slot."
         )
     }
 

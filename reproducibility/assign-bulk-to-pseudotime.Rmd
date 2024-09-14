@@ -130,7 +130,7 @@ specific, with a high "worst specificity".
 
 ```{r}
 blase_data = as.BlaseData(sce, pseudotime_slot="pseudotime", n_bins=10)
-blase_data@genes = genelist[1:80]
+genes(blase_data) = genelist[1:80]
 evaluate_parameters(blase_data, make_plot = TRUE)
 ```
 
@@ -145,8 +145,8 @@ We can see that the genes do not appear to especially differentially expressed o
 
 ```{r}
 waves = get_waves(sce, pseudotime_slot="pseudotime")
-gene_selection_matrix(sce, waves, pseudotime_slot="pseudotime", target_matrix_size=length(blase_data@genes))
-gene_selection_matrix(sce, waves, pseudotime_slot="pseudotime", genes=blase_data@genes, target_matrix_size=length(blase_data@genes))
+gene_selection_matrix(sce, waves, pseudotime_slot="pseudotime", target_matrix_size=length(genes(blase_data)))
+gene_selection_matrix(sce, waves, pseudotime_slot="pseudotime", genes=genes(blase_data), target_matrix_size=length(genes(blase_data)))
 ```
 
 You can also inspect how the top genes change over each pseudotime bin:
