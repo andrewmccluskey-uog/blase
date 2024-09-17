@@ -168,60 +168,72 @@ blase_train$s = round(runif(ncol(blase_train), 0, 1)) # Simulate 2 samples
 ### SCDC
 ```{r SCDC}
 # SCDC has issues when a cell type is only in one sample (https://github.com/meichendong/SCDC/issues/37)
-# See also `table (blase_train$STD.CellType, blase_train$Sample)`
-res <- SCDC(blase_train, 'STD.CellType', bulks_df, 's')
+# See also `table (blase_train$pseudotime_bin, blase_train$Sample)`
+res <- SCDC(blase_train, 'pseudotime_bin', bulks_df, 's')
 print(res$prop.est.mvw)
 
 to_plot <- as.data.frame(res$prop.est.mvw)
 to_plot$BulkID <- rownames(to_plot)
 to_plot <- melt(to_plot)
 
-ggplot(to_plot, aes(variable, BulkID)) +
+scdc_results_plot = ggplot(to_plot, aes(variable, BulkID)) +
   geom_tile(aes(fill = value), colour = "white") +
   geom_text(aes(label = round(value, 2))) +
   scale_fill_gradient(low = "white", high = "red", limits=c(0,1)) +
   scale_y_discrete(limits = expected_trajectory) +
-  scale_x_discrete(limits = expected_trajectory) +
+  scale_x_discrete(limits = seq_len(7)) +
   ggtitle("SCDC")
+scdc_results_plot
 ```
 
 ### MuSiC
 ```{r music}
 # Music requires at least 2 samples, and all cells represented across all samples
-resm <- MUSIC(blase_train, 'STD.CellType', bulks_df, 's')
+resm <- MUSIC(blase_train, 'pseudotime_bin', bulks_df, 's')
 print(resm$prop.est.mvw)
 
 to_plot <- as.data.frame(resm$Est.prop.weighted)
 to_plot$BulkID <- rownames(to_plot)
 to_plot <- melt(to_plot)
 
-ggplot(to_plot, aes(variable, BulkID)) +
+music_results_plot = ggplot(to_plot, aes(variable, BulkID)) +
   geom_tile(aes(fill = value), colour = "white") +
   geom_text(aes(label = round(value, 2))) +
   scale_fill_gradient(low = "white", high = "red", limits=c(0,1)) +
   scale_y_discrete(limits = expected_trajectory) +
-  scale_x_discrete(limits = expected_trajectory) +
+  scale_x_discrete(limits = seq_len(7)) +
   ggtitle("MuSiC")
 
-
+music_results_plot
 ```
 
 ### CibersortX
 
 ```{r cibersort}
-cibersort <- CibersortX(blase_train, 'STD.CellType', bulks_df, N_CORES)
+cibersort <- CibersortX(blase_train, 'pseudotime_bin', bulks_df, N_CORES)
 to_plot <- as.data.frame(cibersort)
 to_plot <- subset(to_plot, select = -c(P.value, Correlation, RMSE))
 to_plot$BulkID <- rownames(to_plot)
 to_plot <- melt(to_plot)
 
-ggplot(to_plot, aes(variable, Mixture)) +
+cibersortx_results_plot <- ggplot(to_plot, aes(variable, Mixture)) +
   geom_tile(aes(fill = value), colour = "white") +
   geom_text(aes(label = round(value, 2))) +
   scale_fill_gradient(low = "white", high = "red", limits=c(0,1)) +
   scale_y_discrete(limits = expected_trajectory) +
-  scale_x_discrete(limits = paste0('c', expected_trajectory)) + 
+  scale_x_discrete(limits = paste0('c', seq_len(7))) + 
   ggtitle("CibersortX")
+cibersortx_results_plot
+```
+
+### Summary
+```{r}
+gridExtra::grid.arrange(
+  scdc_results_plot,
+  music_results_plot,
+  cibersortx_results_plot,
+  ncol = 2
+)
 ```
 
 ## Experiment with other parameter selections

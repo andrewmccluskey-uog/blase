@@ -55,12 +55,12 @@ described in [Bozdech et al.
 ```{r getData}
 root_dir <- tools::R_user_dir("BLASE", "data")
 
-article_dir <- path(root_dir, "gene_selection_comparison")
+article_dir <- fs::path(root_dir, "gene_selection_comparison")
 if (!dir.exists(article_dir)) {
     dir.create(article_dir, recursive = TRUE)
 }
 
-bulk_path <- path(article_dir, "otto_pb_bulk_timepoints", ext = "xlsx")
+bulk_path <- fs::path(article_dir, "otto_pb_bulk_timepoints", ext = "xlsx")
 if (!file.exists(bulk_path)) {
     download.file("https://static-content.springer.com/esm/art%3A10.1186%2Fs12915-014-0086-0/MediaObjects/12915_2014_86_MOESM9_ESM.xlsx", bulk_path)
 } else {
@@ -114,7 +114,7 @@ res <- find_best_params(processed_MCA_PB_SCE,
     gene_count_range = seq.int(20, 180, 3)
 )
 
-x <- as.blaseData(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = 14, split_by = "pseudotime_range")
+x <- as.BlaseData(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = 14, split_by = "pseudotime_range")
 
 tradeseq_tuning <- plot_find_best_params_results(res)
 ```
@@ -122,7 +122,7 @@ tradeseq_tuning <- plot_find_best_params_results(res)
 ```{r}
 BUCKETS_COUNT <- 12
 GENES_TO_USE_COUNT <- 120
-x <- as.blaseData(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
+x <- as.BlaseData(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
 genes(x) <- genelist[1:GENES_TO_USE_COUNT]
 
 genes_tradeseq <- genes(x)
@@ -176,7 +176,7 @@ markergenes_tuning <- plot_find_best_params_results(res)
 ```{r}
 BUCKETS_COUNT <- 12
 GENES_TO_USE_COUNT <- 120
-x <- as.blaseData(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
+x <- as.BlaseData(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
 genes(x) <- genelist[1:GENES_TO_USE_COUNT]
 genes_markergenes <- genes(x)
 
@@ -229,7 +229,7 @@ markergenes_by_bin_tuning <- plot_find_best_params_results(res)
 ```{r}
 BUCKETS_COUNT <- 12
 GENES_TO_USE_COUNT <- 120
-x <- as.blaseData(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
+x <- as.BlaseData(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
 genes(x) <- genelist[1:GENES_TO_USE_COUNT]
 
 genes_markergenes_by_bin <- genes(x)
@@ -330,7 +330,7 @@ ggplot2::ggplot(top_r2_waves, ggplot2::aes(phase, amplitude, color = r2)) +
 
 top_genes_fourier_top_r2 <- rownames(top_r2_waves)
 
-x <- as.blaseData(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
+x <- as.BlaseData(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
 genes(x) <- top_genes_fourier_top_r2
 
 processed_MCA_PB_SCE <- assign_pseudotime_bins(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
@@ -358,7 +358,7 @@ ggplot2::ggplot(top_r2_waves_spread, ggplot2::aes(phase, amplitude, color = r2))
 
 top_genes_fourier_top_r2_spread <- rownames(top_r2_waves_spread)
 
-x <- as.blaseData(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
+x <- as.BlaseData(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
 genes(x) <- top_genes_fourier_top_r2_spread
 
 processed_MCA_PB_SCE <- assign_pseudotime_bins(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
@@ -387,7 +387,7 @@ ggplot2::ggplot(top_amp_waves, ggplot2::aes(phase, amplitude, color = r2)) +
 
 top_genes_fourier_top_amp <- rownames(top_amp_waves)
 
-x <- as.blaseData(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
+x <- as.BlaseData(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
 genes(x) <- top_genes_fourier_top_amp
 
 processed_MCA_PB_SCE <- assign_pseudotime_bins(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
@@ -415,7 +415,7 @@ ggplot2::ggplot(top_amp_waves_spread, ggplot2::aes(phase, amplitude, color = r2)
 
 top_genes_fourier_top_amp_spread <- rownames(top_amp_waves_spread)
 
-x <- as.blaseData(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
+x <- as.BlaseData(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
 genes(x) <- top_genes_fourier_top_amp_spread
 
 processed_MCA_PB_SCE <- assign_pseudotime_bins(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
@@ -446,7 +446,7 @@ ggplot2::ggplot(top_power_waves, ggplot2::aes(phase, amplitude, color = r2)) +
 
 top_genes_fourier_top_power <- rownames(top_power_waves)
 
-x <- as.blaseData(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
+x <- as.BlaseData(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
 genes(x) <- top_genes_fourier_top_power
 
 processed_MCA_PB_SCE <- assign_pseudotime_bins(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
@@ -474,7 +474,7 @@ ggplot2::ggplot(top_power_waves_spread, ggplot2::aes(phase, amplitude, color = r
 
 top_genes_fourier_top_power_spread <- rownames(top_power_waves_spread)
 
-x <- as.blaseData(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
+x <- as.BlaseData(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
 genes(x) <- top_genes_fourier_top_power_spread
 
 processed_MCA_PB_SCE <- assign_pseudotime_bins(processed_MCA_PB_SCE, pseudotime_slot = "slingPseudotime_1", n_bins = BUCKETS_COUNT, split_by = "pseudotime_range")
