@@ -1,6 +1,6 @@
 Package: blase
 Title: Bulk Linking Analysis for Single-cell Experiments
-Version: 0.0.0.9000
+Version: 0.99.0
 Authors@R: c(
   person("Andrew", "McCluskey", , "2117532m@student.gla.ac.uk", role = c("aut", "cre"), 
     comment = c(ORCID = "0009-0004-4187-799X")),
