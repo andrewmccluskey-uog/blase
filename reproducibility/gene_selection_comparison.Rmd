@@ -289,7 +289,7 @@ ggplot2::ggplot(toplot, ggplot2::aes(pdt, wave1)) +
 ```
 
 ```{r}
-waves <- get_waves(processed_MCA_PB_SCE, n_cores = N_CORES)
+waves <- get_waves(processed_MCA_PB_SCE, BPPARAM = BiocParallel::MulticoreParam(N_CORES))
 
 ggplot2::ggplot(waves, ggplot2::aes(phase, r2, color = amplitude)) +
     ggplot2::geom_point()
@@ -308,7 +308,7 @@ pseudotime respectively. This functionality is available as a part of
 BLASE, please see the `gene_selection_matrix()` function.
 
 ```{r}
-gene_selection_matrix(processed_MCA_PB_SCE, waves, target_matrix_size = 1000, n_cores = N_CORES)
+gene_selection_matrix(processed_MCA_PB_SCE, waves, target_matrix_size = 1000, BPPARAM = BiocParallel::MulticoreParam(N_CORES))
 ```
 
 Here we set the number of buckets and genes to use:
@@ -497,37 +497,6 @@ statistics.
 
 ### Earth Movers Distance for Gene Scoring (Coverage Scoring)
 
-#### Util
-
-```{r}
-# Snippet from: https://cansnippet.bioinfo-fr.net/details.php?id=3
-redim_matrix <- function(
-    mat,
-    target_height = 100,
-    target_width = 100,
-    summary_func = function(x) mean(x, na.rm = TRUE),
-    n_core = 1) {
-    if (target_height > nrow(mat) | target_width > ncol(mat)) {
-        stop("Input matrix must be bigger than target width and height.")
-    }
-
-    seq_height <- round(seq(1, nrow(mat), length.out = target_height + 1))
-    seq_width <- round(seq(1, ncol(mat), length.out = target_width + 1))
-
-    # complicate way to write a double for loop
-    do.call(rbind, parallel::mclapply(seq_len(target_height), function(i) { # i is row
-        vapply(seq_len(target_width), function(j) { # j is column
-            summary_func(
-                mat[
-                    seq(seq_height[i], seq_height[i + 1]),
-                    seq(seq_width[j], seq_width[j + 1])
-                ]
-            )
-        }, 0.0)
-    }, mc.cores = n_core))
-}
-```
-
 #### Goal State
 
 We can use the phase calculated for each gene to now score how well the
@@ -540,7 +509,7 @@ for (i in seq_len(nrow(sim_mat))) {
     sim_mat[i, i] <- 10 # Squish gene expression onto the place we think it should be
 }
 
-reduced_sim_mat <- redim_matrix(sim_mat, target_height = 100, target_width = 100, n_core = N_CORES)
+reduced_sim_mat <- redim_matrix(sim_mat, target_height = 100, target_width = 100, BPPARAM = BiocParallel::MulticoreParam(N_CORES))
 
 df <- reshape2::melt(reduced_sim_mat, c("x", "y"), value.name = "expression")
 
@@ -594,8 +563,8 @@ get_earthmovers_distance_from_diagonal <- function(expression_matrix, title) {
     sim_mat <- sim_mat / sum(sim_mat) * sum(expression_matrix)
 
     # redimension the matrices to speed up EMD approximation
-    reduced_mat <- redim_matrix(expression_matrix, target_height = 40, target_width = 40, n_core = N_CORES)
-    reduced_sim_mat <- redim_matrix(sim_mat, target_height = 40, target_width = 40, n_core = N_CORES)
+    reduced_mat <- redim_matrix(expression_matrix, target_height = 40, target_width = 40, BPPARAM = BiocParallel::MulticoreParam(N_CORES))
+    reduced_sim_mat <- redim_matrix(sim_mat, target_height = 40, target_width = 40, BPPARAM = BiocParallel::MulticoreParam(N_CORES))
 
     dist <- emd2d(reduced_mat, reduced_sim_mat, max.iter = 750)
 
@@ -635,26 +604,26 @@ print(paste("Power Spread:", get_earthmovers_distance_from_diagonal(top_genes_fo
 ### Fourier Phase Aligned Plotting (Log Expression)
 
 ```{r}
-top_tradeseq_phases_plot <- gene_selection_matrix(processed_MCA_PB_SCE, waves, genes = genes_tradeseq, target_matrix_size = length(genes_tradeseq), n_cores = N_CORES) + ggplot2::ggtitle("TradeSeq")
+top_tradeseq_phases_plot <- gene_selection_matrix(processed_MCA_PB_SCE, waves, genes = genes_tradeseq, target_matrix_size = length(genes_tradeseq), BPPARAM = BiocParallel::MulticoreParam(N_CORES)) + ggplot2::ggtitle("TradeSeq")
 
-top_marker_phases_plot <- gene_selection_matrix(processed_MCA_PB_SCE, waves, genes = genes_markergenes, target_matrix_size = length(genes_markergenes), n_cores = N_CORES) + ggplot2::ggtitle("Top Cluster Markers")
+top_marker_phases_plot <- gene_selection_matrix(processed_MCA_PB_SCE, waves, genes = genes_markergenes, target_matrix_size = length(genes_markergenes), BPPARAM = BiocParallel::MulticoreParam(N_CORES)) + ggplot2::ggtitle("Top Cluster Markers")
 
 length(genes_markergenes_by_bin)
 genes_markergenes_by_bin
 
-top_bin_marker_phases_plot <- gene_selection_matrix(processed_MCA_PB_SCE, waves, genes = genes_markergenes_by_bin, target_matrix_size = length(unique(genes_markergenes_by_bin)), n_cores = N_CORES) + ggplot2::ggtitle("Top Bin Markers")
+top_bin_marker_phases_plot <- gene_selection_matrix(processed_MCA_PB_SCE, waves, genes = genes_markergenes_by_bin, target_matrix_size = length(unique(genes_markergenes_by_bin)), BPPARAM = BiocParallel::MulticoreParam(N_CORES)) + ggplot2::ggtitle("Top Bin Markers")
 
-fourier_top_r2_phases <- gene_selection_matrix(processed_MCA_PB_SCE, waves, genes = top_genes_fourier_top_r2, target_matrix_size = length(top_genes_fourier_top_r2), n_cores = N_CORES) + ggplot2::ggtitle("Top Fourier R2")
+fourier_top_r2_phases <- gene_selection_matrix(processed_MCA_PB_SCE, waves, genes = top_genes_fourier_top_r2, target_matrix_size = length(top_genes_fourier_top_r2), BPPARAM = BiocParallel::MulticoreParam(N_CORES)) + ggplot2::ggtitle("Top Fourier R2")
 
-fourier_top_r2_spread_phases <- gene_selection_matrix(processed_MCA_PB_SCE, waves, genes = top_genes_fourier_top_r2_spread, target_matrix_size = length(top_genes_fourier_top_r2_spread), n_cores = N_CORES) + ggplot2::ggtitle("Top Fourier R2 Spread")
+fourier_top_r2_spread_phases <- gene_selection_matrix(processed_MCA_PB_SCE, waves, genes = top_genes_fourier_top_r2_spread, target_matrix_size = length(top_genes_fourier_top_r2_spread), BPPARAM = BiocParallel::MulticoreParam(N_CORES)) + ggplot2::ggtitle("Top Fourier R2 Spread")
 
-fourier_top_amp_phases <- gene_selection_matrix(processed_MCA_PB_SCE, waves, genes = top_genes_fourier_top_amp, target_matrix_size = length(top_genes_fourier_top_amp), n_cores = N_CORES) + ggplot2::ggtitle("Top Fourier Amplitude")
+fourier_top_amp_phases <- gene_selection_matrix(processed_MCA_PB_SCE, waves, genes = top_genes_fourier_top_amp, target_matrix_size = length(top_genes_fourier_top_amp), BPPARAM = BiocParallel::MulticoreParam(N_CORES)) + ggplot2::ggtitle("Top Fourier Amplitude")
 
-fourier_top_amp_spread_phases <- gene_selection_matrix(processed_MCA_PB_SCE, waves, genes = top_genes_fourier_top_amp_spread, target_matrix_size = length(top_genes_fourier_top_amp_spread), n_cores = N_CORES) + ggplot2::ggtitle("Top Fourier Amplitude Spread")
+fourier_top_amp_spread_phases <- gene_selection_matrix(processed_MCA_PB_SCE, waves, genes = top_genes_fourier_top_amp_spread, target_matrix_size = length(top_genes_fourier_top_amp_spread), BPPARAM = BiocParallel::MulticoreParam(N_CORES)) + ggplot2::ggtitle("Top Fourier Amplitude Spread")
 
-fourier_top_power_phases <- gene_selection_matrix(processed_MCA_PB_SCE, waves, genes = top_genes_fourier_top_power, target_matrix_size = length(top_genes_fourier_top_power), n_cores = N_CORES) + ggplot2::ggtitle("Top Fourier Power")
+fourier_top_power_phases <- gene_selection_matrix(processed_MCA_PB_SCE, waves, genes = top_genes_fourier_top_power, target_matrix_size = length(top_genes_fourier_top_power), BPPARAM = BiocParallel::MulticoreParam(N_CORES)) + ggplot2::ggtitle("Top Fourier Power")
 
-fourier_top_power_spread_phases <- gene_selection_matrix(processed_MCA_PB_SCE, waves, genes = top_genes_fourier_top_power_spread, target_matrix_size = length(top_genes_fourier_top_power_spread), n_cores = N_CORES) + ggplot2::ggtitle("Top Fourier Power Spread")
+fourier_top_power_spread_phases <- gene_selection_matrix(processed_MCA_PB_SCE, waves, genes = top_genes_fourier_top_power_spread, target_matrix_size = length(top_genes_fourier_top_power_spread), BPPARAM = BiocParallel::MulticoreParam(N_CORES)) + ggplot2::ggtitle("Top Fourier Power Spread")
 
 gridExtra::grid.arrange(
     top_tradeseq_phases_plot,

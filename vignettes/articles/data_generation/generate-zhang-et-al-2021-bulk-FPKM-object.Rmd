@@ -9,8 +9,8 @@ vignette: >
 
 ```{r, include = FALSE, eval=FALSE}
 knitr::opts_chunk$set(
-    collapse = TRUE,
-    comment = "#>"
+  collapse = TRUE,
+  comment = "#>"
 )
 ```
 
@@ -35,7 +35,7 @@ set.seed(SEED)
 ```{r, concurrency, eval=FALSE}
 N_CORES <- 4
 if (ami::using_ci()) {
-    N_CORES <- 2
+  N_CORES <- 2
 }
 ```
 
@@ -45,14 +45,14 @@ root_dir <- tools::R_user_dir("BLASE", "data")
 article_dir <- path(root_dir, "Generate_zhang_et_al_2021_bulk_fpkm_Object")
 
 if (!dir.exists(article_dir)) {
-    dir.create(article_dir, recursive = TRUE)
+  dir.create(article_dir, recursive = TRUE)
 }
 
 bulk_path <- path(article_dir, "heat_shock_bulks", ext = "xlsx")
 if (!file.exists(bulk_path)) {
-    download.file("https://static-content.springer.com/esm/art%3A10.1038%2Fs41467-021-24814-1/MediaObjects/41467_2021_24814_MOESM5_ESM.xlsx", bulk_path)
+  download.file("https://static-content.springer.com/esm/art%3A10.1038%2Fs41467-021-24814-1/MediaObjects/41467_2021_24814_MOESM5_ESM.xlsx", bulk_path)
 } else {
-    print("Using cached")
+  print("Using cached")
 }
 
 zhang_2021_heat_shock_bulk <- as.data.frame(read_excel(bulk_path, range = "S3A_RNAseq!A4:P2571"))
@@ -79,14 +79,14 @@ bulk_matrix <- data.matrix(zhang_2021_heat_shock_bulk)
 bulk_n <- ncol(bulk_matrix)
 
 for (gene in genes_to_fix_bulk) {
-    targetRowNames <- rownames(zhang_2021_heat_shock_bulk)[grep(x = rownames(zhang_2021_heat_shock_bulk), pattern = gene)]
-    rownames_to_remove <- c(rownames_to_remove, targetRowNames)
-    # N = col index, M = row index
-    counts <- .colSums(bulk_matrix[targetRowNames, ], m = length(targetRowNames), n = bulk_n)
-    counts <- t(data.frame(counts = counts))
-    rownames(counts) <- c(gene)
-    colnames(counts) <- colnames(zhang_2021_heat_shock_bulk)
-    new_rows <- rbind(new_rows, counts)
+  targetRowNames <- rownames(zhang_2021_heat_shock_bulk)[grep(x = rownames(zhang_2021_heat_shock_bulk), pattern = gene)]
+  rownames_to_remove <- c(rownames_to_remove, targetRowNames)
+  # N = col index, M = row index
+  counts <- .colSums(bulk_matrix[targetRowNames, ], m = length(targetRowNames), n = bulk_n)
+  counts <- t(data.frame(counts = counts))
+  rownames(counts) <- c(gene)
+  colnames(counts) <- colnames(zhang_2021_heat_shock_bulk)
+  new_rows <- rbind(new_rows, counts)
 }
 
 zhang_2021_heat_shock_bulk <- zhang_2021_heat_shock_bulk[!(rownames(zhang_2021_heat_shock_bulk) %in% rownames_to_remove), ]

@@ -12,8 +12,8 @@ editor_options:
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-    collapse = TRUE,
-    comment = "#>"
+  collapse = TRUE,
+  comment = "#>"
 )
 ```
 
@@ -34,7 +34,7 @@ is of course a constructed example and unlikely to be exactly repeated in
 real life, but hopefully demonstrates the principle BLASE works on.
 
 ```{r}
-# Adapted from 
+# Adapted from
 # https://codepal.ai/code-generator/query/n4dEA6I9/plot-sine-wave-ggplot2-r
 x <- seq(0, 2 * pi, length.out = 500)
 gene1_expr <- 10 * (sin(x + 0.1) + 1)
@@ -48,19 +48,19 @@ genes_melt$x <- as.numeric(genes_melt$x)
 
 # Create the plot using ggplot2
 ggplot(genes_melt, aes = aes()) +
-    geom_line(aes(x = x, y = value, color = gene)) +
-    geom_vline(xintercept = 0, linetype = "dashed") +
-    geom_vline(xintercept = 24, linetype = "dashed") +
-    geom_vline(xintercept = 181, linetype = "dashed") +
-    geom_vline(xintercept = 243, linetype = "dashed") +
-    geom_vline(xintercept = 315, linetype = "dashed") +
-    geom_vline(xintercept = 479, linetype = "dashed") +
-    geom_vline(xintercept = 500, linetype = "dashed") +
-    labs(
-      x = "pseudotime", 
-      y = "Gene Expression", 
-      title = "Variable Genes Over Pseudotime"
-    )
+  geom_line(aes(x = x, y = value, color = gene)) +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  geom_vline(xintercept = 24, linetype = "dashed") +
+  geom_vline(xintercept = 181, linetype = "dashed") +
+  geom_vline(xintercept = 243, linetype = "dashed") +
+  geom_vline(xintercept = 315, linetype = "dashed") +
+  geom_vline(xintercept = 479, linetype = "dashed") +
+  geom_vline(xintercept = 500, linetype = "dashed") +
+  labs(
+    x = "pseudotime",
+    y = "Gene Expression",
+    title = "Variable Genes Over Pseudotime"
+  )
 ```
 
 ## Generating Icon
@@ -80,17 +80,17 @@ svg <- fa(name = "fire", fill = logo_color)
 
 img <- image_read_svg(svg)
 img %>%
-    image_convert("png") %>%
-    image_fill(color = fill_color, point = "+50") -> res
+  image_convert("png") %>%
+  image_fill(color = fill_color, point = "+50") -> res
 
 final_res <- sticker(res,
-    package = "BLASE", p_size = 28,
-    p_y = 1,
-    s_x = 1, s_y = 1, s_width = 1.2,
-    s_height = 14,
-    filename = "blase_icon.png",
-    h_fill = fill_color,
-    h_color = border_color
+  package = "BLASE", p_size = 28,
+  p_y = 1,
+  s_x = 1, s_y = 1, s_width = 1.2,
+  s_height = 14,
+  filename = "blase_icon.png",
+  h_fill = fill_color,
+  h_color = border_color
 )
 
 plot(final_res)

@@ -4,14 +4,18 @@
 \alias{get_waves}
 \title{get_waves}
 \usage{
-get_waves(sce, pseudotime_slot = "slingPseudotime_1", n_cores = 1)
+get_waves(
+  sce,
+  pseudotime_slot = "slingPseudotime_1",
+  BPPARAM = BiocParallel::SerialParam()
+)
 }
 \arguments{
 \item{sce}{SCE to generate waves from.}
 
 \item{pseudotime_slot}{slot pseudotime is in.}
 
-\item{n_cores}{Number of cores to use for the fourier analysis.
+\item{BPPARAM}{The BiocParallel parameter for parallelisation
 Defaults to 1.}
 }
 \value{

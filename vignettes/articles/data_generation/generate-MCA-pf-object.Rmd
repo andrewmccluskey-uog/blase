@@ -9,8 +9,8 @@ vignette: >
 
 ```{r, include = FALSE, eval=FALSE}
 knitr::opts_chunk$set(
-    collapse = TRUE,
-    comment = "#>"
+  collapse = TRUE,
+  comment = "#>"
 )
 ```
 
@@ -42,7 +42,7 @@ set.seed(SEED)
 ```{r, concurrency, eval=FALSE}
 N_CORES <- 4
 if (ami::using_ci()) {
-    N_CORES <- 2
+  N_CORES <- 2
 }
 ```
 
@@ -52,15 +52,15 @@ root_dir <- tools::R_user_dir("BLASE", "data")
 article_dir <- fs::path(root_dir, "Generate_MCA_PF_Object")
 
 if (!dir.exists(article_dir)) {
-    dir.create(article_dir, recursive = TRUE)
+  dir.create(article_dir, recursive = TRUE)
 }
 
 mca_path <- path(article_dir, "MCA", ext = "zip")
 if (!file.exists(mca_path)) {
-    download.file("https://www.malariacellatlas.org/downloads/pf.zip", mca_path)
-    unzip(mca_path, exdir = paste0(article_dir, "/MCA"))
+  download.file("https://www.malariacellatlas.org/downloads/pf.zip", mca_path)
+  unzip(mca_path, exdir = paste0(article_dir, "/MCA"))
 } else {
-    print("Using cached")
+  print("Using cached")
 }
 ```
 
@@ -90,14 +90,14 @@ sc_readcounts_matrix <- data.matrix(sc_readcounts)
 sc_readcounts_n <- ncol(sc_readcounts_matrix)
 
 for (gene in genes_to_fix) {
-    targetRowNames <- rownames(sc_readcounts)[grep(x = rownames(sc_readcounts), pattern = gene)]
-    rownames_to_remove <- c(rownames_to_remove, targetRowNames)
-    # N = col index, M = row index
-    counts <- .colSums(sc_readcounts_matrix[targetRowNames, ], m = length(targetRowNames), n = sc_readcounts_n)
-    counts <- t(data.frame(counts = counts))
-    rownames(counts) <- c(gene)
-    colnames(counts) <- colnames(sc_readcounts)
-    new_rows <- rbind(new_rows, counts)
+  targetRowNames <- rownames(sc_readcounts)[grep(x = rownames(sc_readcounts), pattern = gene)]
+  rownames_to_remove <- c(rownames_to_remove, targetRowNames)
+  # N = col index, M = row index
+  counts <- .colSums(sc_readcounts_matrix[targetRowNames, ], m = length(targetRowNames), n = sc_readcounts_n)
+  counts <- t(data.frame(counts = counts))
+  rownames(counts) <- c(gene)
+  colnames(counts) <- colnames(sc_readcounts)
+  new_rows <- rbind(new_rows, counts)
 }
 
 sc_readcounts <- sc_readcounts[!(rownames(sc_readcounts) %in% rownames_to_remove), ]
@@ -152,13 +152,13 @@ reducedDim(sce, "PCA") <- as.matrix(cbind(colData(sce)["PC_1"], colData(sce)["PC
 reducedDim(sce, "UMAP") <- as.matrix(cbind(colData(sce)["UMAP_2"], colData(sce)["UMAP_3"]))
 
 gridExtra::grid.arrange(
-    plotPCA(sce, colour_by = "STAGE_HR"),
-    plotUMAP(sce, colour_by = "STAGE_HR"),
-    plotPCA(sce, colour_by = "DAY"),
-    plotUMAP(sce, colour_by = "DAY"),
-    plotPCA(sce, colour_by = "STRAIN"),
-    plotUMAP(sce, colour_by = "STRAIN"),
-    ncol = 2
+  plotPCA(sce, colour_by = "STAGE_HR"),
+  plotUMAP(sce, colour_by = "STAGE_HR"),
+  plotPCA(sce, colour_by = "DAY"),
+  plotUMAP(sce, colour_by = "DAY"),
+  plotPCA(sce, colour_by = "STRAIN"),
+  plotUMAP(sce, colour_by = "STRAIN"),
+  ncol = 2
 )
 ```
 

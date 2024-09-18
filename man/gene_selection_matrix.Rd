@@ -14,7 +14,7 @@ gene_selection_matrix(x, ...)
   genes = c(),
   pseudotime_slot = "slingPseudotime_1",
   target_matrix_size = 1000,
-  n_cores = 1
+  BPPARAM = BPPARAM
 )
 
 \S4method{gene_selection_matrix}{SingleCellExperiment}(
@@ -23,7 +23,7 @@ gene_selection_matrix(x, ...)
   genes = c(),
   pseudotime_slot = "slingPseudotime_1",
   target_matrix_size = 1000,
-  n_cores = 1
+  BPPARAM = BiocParallel::SerialParam()
 )
 }
 \arguments{
@@ -42,7 +42,7 @@ Defaults to slingPseudotime_1".}
 \item{target_matrix_size}{Matrix size to redimension to.
 Defaults to 1000.}
 
-\item{n_cores}{Number of cores for the matrix redimensioning}
+\item{BPPARAM}{The BiocParallel parameter for parallelisation}
 }
 \value{
 A plot of the genes and cells ordered by pseudotime

@@ -9,7 +9,7 @@ redim_matrix(
   target_height = 100,
   target_width = 100,
   summary_func = function(x) mean(x, na.rm = TRUE),
-  n_core = 1
+  BPPARAM = BiocParallel::SerialParam()
 )
 }
 \arguments{
@@ -21,7 +21,7 @@ redim_matrix(
 
 \item{summary_func}{How to reduce the cells. Defaults to the mean.}
 
-\item{n_core}{Number of cores to use in the redimensioning.}
+\item{BPPARAM}{The BiocParallel parameter for parallelisation}
 }
 \value{
 The matrix with reduced dimensions

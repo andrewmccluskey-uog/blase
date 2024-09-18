@@ -125,7 +125,7 @@ Bozdech's paper describes using a fourier transform on the gene expression of ce
 BLASE provides a convenience function to perform this analysis, and also allows you to select the top genes by amplitude and explained variance if preferred. See the documentation for `select_genes_by_fourier_method()` for more information. It is noteworthy that BLASE will force these genes to be selected to cover a wide range of pseudotime by default, instead of simply the top power genes.
 
 ```{r}
-waves = get_waves(processed_MCA_PF_SCE, "slingPseudotime_1", n_cores=N_CORES)
+waves = get_waves(processed_MCA_PF_SCE, "slingPseudotime_1", BPPARAM = BiocParallel::MulticoreParam(N_CORES))
 fourier_power_genes = select_genes_by_fourier_method(processed_MCA_PF_SCE, waves, n_groups=100, top_n_per_group=2)
 head(fourier_power_genes)
 ```
@@ -137,19 +137,19 @@ Here we generate a heatmap of log counts of the selected genes, ordered by pseud
 #### All Genes
 
 ```{r}
-gene_selection_matrix(processed_MCA_PF_SCE, waves, n_cores=N_CORES, target_matrix_size=nrow(waves))
+gene_selection_matrix(processed_MCA_PF_SCE, waves, BPPARAM = BiocParallel::MulticoreParam(N_CORES), target_matrix_size=nrow(waves))
 ```
 
 #### TradeSeq Genes
 
 ```{r}
-gene_selection_matrix(processed_MCA_PF_SCE, waves, genes=genelist[0:300], n_cores=N_CORES, target_matrix_size=300)
+gene_selection_matrix(processed_MCA_PF_SCE, waves, genes=genelist[0:300], BPPARAM = BiocParallel::MulticoreParam(N_CORES), target_matrix_size=300)
 ```
 
 #### Bozdech Genes
 
 ```{r}
-gene_selection_matrix(processed_MCA_PF_SCE, waves, genes=rownames(fourier_power_genes), n_cores=N_CORES, target_matrix_size=length(unique(rownames(fourier_power_genes))))
+gene_selection_matrix(processed_MCA_PF_SCE, waves, genes=rownames(fourier_power_genes), BPPARAM = BiocParallel::MulticoreParam(N_CORES), target_matrix_size=length(unique(rownames(fourier_power_genes))))
 ```
 
 ## Use each gene list

@@ -24,18 +24,18 @@
 #' ncells <- 70
 #' ngenes <- 100
 #' counts_matrix <- matrix(
-#'     c(seq_len(3500) / 10, seq_len(3500) / 5),
-#'     ncol = ncells,
-#'     nrow = ngenes
+#'   c(seq_len(3500) / 10, seq_len(3500) / 5),
+#'   ncol = ncells,
+#'   nrow = ngenes
 #' )
 #' sce <- SingleCellExperiment::SingleCellExperiment(assays = list(
-#'     normcounts = counts_matrix, logcounts = log(counts_matrix)
+#'   normcounts = counts_matrix, logcounts = log(counts_matrix)
 #' ))
 #' colnames(sce) <- seq_len(ncells)
 #' rownames(sce) <- as.character(seq_len(ngenes))
 #' sce$cell_type <- c(
-#'     rep("celltype_1", ncells / 2),
-#'     rep("celltype_2", ncells / 2)
+#'   rep("celltype_1", ncells / 2),
+#'   rep("celltype_2", ncells / 2)
 #' )
 #'
 #' sce$pseudotime <- seq_len(ncells)
@@ -51,63 +51,63 @@ evaluate_parameters <- function(
     blase_data,
     make_plot = FALSE,
     plot_columns = 4) {
-    bin_ids <- blase_data@bins
+  bin_ids <- blase_data@bins
 
-    results.best_bin <- c()
-    results.best_corr <- c()
-    results.history <- c()
-    results.specificity <- c()
+  results.best_bin <- c()
+  results.best_corr <- c()
+  results.history <- c()
+  results.specificity <- c()
 
-    pseudobulked_bins <- data.frame(lapply(blase_data@bins, function(i) {
-        x <- blase_data@pseudobulk_bins[[i]]
-        return(Matrix::rowMeans(x))
-    }))
+  pseudobulked_bins <- data.frame(lapply(blase_data@bins, function(i) {
+    x <- blase_data@pseudobulk_bins[[i]]
+    return(Matrix::rowMeans(x))
+  }))
 
-    colnames(pseudobulked_bins) <- blase_data@bins
+  colnames(pseudobulked_bins) <- blase_data@bins
 
-    for (i in bin_ids) {
-        res <- map_best_bin(
-            blase_data,
-            i,
-            pseudobulked_bins,
-            bootstrap_iterations = 0
-        )
-        results.best_bin <- append(results.best_bin, c(res@best_bin))
-        results.best_corr <- append(results.best_corr, c(res@best_correlation))
-        results.specificity <- append(
-            results.specificity, c(res@top_2_distance)
-        )
-        results.history <- append(results.history, c(res@history))
+  for (i in bin_ids) {
+    res <- map_best_bin(
+      blase_data,
+      i,
+      pseudobulked_bins,
+      bootstrap_iterations = 0
+    )
+    results.best_bin <- append(results.best_bin, c(res@best_bin))
+    results.best_corr <- append(results.best_corr, c(res@best_correlation))
+    results.specificity <- append(
+      results.specificity, c(res@top_2_distance)
+    )
+    results.history <- append(results.history, c(res@history))
+  }
+
+  worst_specificity <- min(results.specificity)
+  mean_specificity <- mean(results.specificity)
+
+  if (make_plot == TRUE) {
+    plots <- list()
+
+    for (i in seq_len(length(bin_ids))) {
+      plots[[i]] <- PRIVATE_plot_history(
+        i,
+        results.best_bin,
+        results.best_corr,
+        results.history,
+        results.specificity
+      )
     }
 
-    worst_specificity <- min(results.specificity)
-    mean_specificity <- mean(results.specificity)
+    gridExtra::grid.arrange(
+      top = grid::textGrob(paste(
+        length(blase_data@genes),
+        "genes and worst specificity:",
+        signif(worst_specificity, 2)
+      ), gp = grid::gpar(fontsize = 20, font = 3)),
+      grobs = plots,
+      ncol = plot_columns
+    )
+  }
 
-    if (make_plot == TRUE) {
-        plots <- list()
-
-        for (i in seq_len(length(bin_ids))) {
-            plots[[i]] <- PRIVATE_plot_history(
-                i,
-                results.best_bin,
-                results.best_corr,
-                results.history,
-                results.specificity
-            )
-        }
-
-        gridExtra::grid.arrange(
-            top = grid::textGrob(paste(
-                length(blase_data@genes),
-                "genes and worst specificity:",
-                signif(worst_specificity, 2)
-            ), gp = grid::gpar(fontsize = 20, font = 3)),
-            grobs = plots,
-            ncol = plot_columns
-        )
-    }
-
-    return(c(worst_specificity, mean_specificity))
+  return(c(worst_specificity, mean_specificity))
 }
 
 
@@ -138,18 +138,18 @@ evaluate_parameters <- function(
 #' ncells <- 70
 #' ngenes <- 100
 #' counts_matrix <- matrix(
-#'     c(seq_len(3500) / 10, seq_len(3500) / 5),
-#'     ncol = ncells,
-#'     nrow = ngenes
+#'   c(seq_len(3500) / 10, seq_len(3500) / 5),
+#'   ncol = ncells,
+#'   nrow = ngenes
 #' )
 #' sce <- SingleCellExperiment::SingleCellExperiment(assays = list(
-#'     normcounts = counts_matrix, logcounts = log(counts_matrix)
+#'   normcounts = counts_matrix, logcounts = log(counts_matrix)
 #' ))
 #' colnames(sce) <- seq_len(ncells)
 #' rownames(sce) <- as.character(seq_len(ngenes))
 #' sce$cell_type <- c(
-#'     rep("celltype_1", ncells / 2),
-#'     rep("celltype_2", ncells / 2)
+#'   rep("celltype_1", ncells / 2),
+#'   rep("celltype_2", ncells / 2)
 #' )
 #'
 #' sce$pseudotime <- seq_len(ncells)
@@ -157,11 +157,11 @@ evaluate_parameters <- function(
 #'
 #' # Finding the best params for the BlaseData
 #' best_params <- find_best_params(
-#'     sce, genelist,
-#'     bins_count_range = c(10, 20),
-#'     gene_count_range = c(20, 50),
-#'     pseudotime_slot = "pseudotime",
-#'     split_by = "pseudotime_range"
+#'   sce, genelist,
+#'   bins_count_range = c(10, 20),
+#'   gene_count_range = c(20, 50),
+#'   pseudotime_slot = "pseudotime",
+#'   split_by = "pseudotime_range"
 #' )
 #' best_params
 #' plot_find_best_params_results(best_params)
@@ -172,47 +172,46 @@ find_best_params <- function(
     gene_count_range = c(10, 20, 40, 80),
     verbose = FALSE,
     ...) {
-    if (length(genelist) < max(gene_count_range)) {
-        stop(
-            "Not enough genes provided to meet tuning requests. Provided=",
-            length(genelist),
-            " wanted=",
-            max(gene_count_range)
-        )
-    }
-
-    results <- data.frame(
-        gene_count = c(),
-        bin_count = c(),
-        worst_specificity = c(),
-        mean_specificity = c()
+  if (length(genelist) < max(gene_count_range)) {
+    stop(
+      "Not enough genes provided to meet tuning requests. Provided=",
+      length(genelist),
+      " wanted=",
+      max(gene_count_range)
     )
-    # TODO consider parallelising this https://www.bioconductor.org/packages/devel/bioc/vignettes/BiocParallel/inst/doc/Introduction_To_BiocParallel.html#parallel-looping-vectorized-and-aggregate-operations
-    # https://cran.r-project.org/web/packages/foreach/index.html
-    for (bin_count in bins_count_range) {
-        blase_data <- as.BlaseData(x = x, n_bins = bin_count, ...)
+  }
 
-        for (genes_count in gene_count_range) {
-            blase_data@genes <- genelist[seq_len(genes_count)]
+  results <- data.frame(
+    gene_count = c(),
+    bin_count = c(),
+    worst_specificity = c(),
+    mean_specificity = c()
+  )
+  # TODO consider parallelising this https://www.bioconductor.org/packages/devel/bioc/vignettes/BiocParallel/inst/doc/Introduction_To_BiocParallel.html#parallel-looping-vectorized-and-aggregate-operations
+  for (bin_count in bins_count_range) {
+    blase_data <- as.BlaseData(x = x, n_bins = bin_count, ...)
 
-            if (verbose) {
-                message("Bins=", bin_count, " genes=", genes_count)
-            }
+    for (genes_count in gene_count_range) {
+      blase_data@genes <- genelist[seq_len(genes_count)]
 
-            res <- evaluate_parameters(blase_data, make_plot = FALSE)
-            results <- rbind(
-                results,
-                data.frame(
-                    bin_count = c(bin_count),
-                    gene_count = c(genes_count),
-                    worst_specificity = c(res[1]),
-                    mean_specificity = c(res[2])
-                )
-            )
-        }
+      if (verbose) {
+        message("Bins=", bin_count, " genes=", genes_count)
+      }
+
+      res <- evaluate_parameters(blase_data, make_plot = FALSE)
+      results <- rbind(
+        results,
+        data.frame(
+          bin_count = c(bin_count),
+          gene_count = c(genes_count),
+          worst_specificity = c(res[1]),
+          mean_specificity = c(res[2])
+        )
+      )
     }
+  }
 
-    return(results)
+  return(results)
 }
 
 #' Plot the results of the search for good parameters
@@ -234,42 +233,42 @@ plot_find_best_params_results <- function(
     find_best_params_results,
     bin_count_colors = viridis::scale_color_viridis(option = "viridis"),
     gene_count_colors = viridis::scale_color_viridis(option = "magma")) {
-    gene_count <- ggplot2::sym("gene_count")
-    bin_count <- ggplot2::sym("bin_count")
-    worst_specificity <- ggplot2::sym("worst_specificity")
-    mean_specificity <- ggplot2::sym("mean_specificity")
+  gene_count <- ggplot2::sym("gene_count")
+  bin_count <- ggplot2::sym("bin_count")
+  worst_specificity <- ggplot2::sym("worst_specificity")
+  mean_specificity <- ggplot2::sym("mean_specificity")
 
-    gridExtra::grid.arrange(
-        ggplot2::ggplot(find_best_params_results, ggplot2::aes(
-            x = {{ gene_count }},
-            y = {{ worst_specificity }},
-            color = {{ bin_count }}
-        )) +
-            ggplot2::geom_point() +
-            bin_count_colors,
-        ggplot2::ggplot(find_best_params_results, ggplot2::aes(
-            x = {{ bin_count }},
-            y = {{ worst_specificity }},
-            color = {{ gene_count }}
-        )) +
-            ggplot2::geom_point() +
-            gene_count_colors,
-        ggplot2::ggplot(find_best_params_results, ggplot2::aes(
-            x = {{ gene_count }},
-            y = {{ mean_specificity }},
-            color = {{ bin_count }}
-        )) +
-            ggplot2::geom_point() +
-            bin_count_colors,
-        ggplot2::ggplot(find_best_params_results, ggplot2::aes(
-            x = {{ bin_count }},
-            y = {{ mean_specificity }},
-            color = {{ gene_count }}
-        )) +
-            ggplot2::geom_point() +
-            gene_count_colors,
-        ncol = 2
-    )
+  gridExtra::grid.arrange(
+    ggplot2::ggplot(find_best_params_results, ggplot2::aes(
+      x = {{ gene_count }},
+      y = {{ worst_specificity }},
+      color = {{ bin_count }}
+    )) +
+      ggplot2::geom_point() +
+      bin_count_colors,
+    ggplot2::ggplot(find_best_params_results, ggplot2::aes(
+      x = {{ bin_count }},
+      y = {{ worst_specificity }},
+      color = {{ gene_count }}
+    )) +
+      ggplot2::geom_point() +
+      gene_count_colors,
+    ggplot2::ggplot(find_best_params_results, ggplot2::aes(
+      x = {{ gene_count }},
+      y = {{ mean_specificity }},
+      color = {{ bin_count }}
+    )) +
+      ggplot2::geom_point() +
+      bin_count_colors,
+    ggplot2::ggplot(find_best_params_results, ggplot2::aes(
+      x = {{ bin_count }},
+      y = {{ mean_specificity }},
+      color = {{ gene_count }}
+    )) +
+      ggplot2::geom_point() +
+      gene_count_colors,
+    ncol = 2
+  )
 }
 
 #' Evaluate Top Genes
@@ -292,18 +291,18 @@ plot_find_best_params_results <- function(
 #' ncells <- 70
 #' ngenes <- 100
 #' counts_matrix <- matrix(
-#'     c(seq_len(3500) / 10, seq_len(3500) / 5),
-#'     ncol = ncells,
-#'     nrow = ngenes
+#'   c(seq_len(3500) / 10, seq_len(3500) / 5),
+#'   ncol = ncells,
+#'   nrow = ngenes
 #' )
 #' sce <- SingleCellExperiment::SingleCellExperiment(assays = list(
-#'     normcounts = counts_matrix, logcounts = log(counts_matrix)
+#'   normcounts = counts_matrix, logcounts = log(counts_matrix)
 #' ))
 #' colnames(sce) <- seq_len(ncells)
 #' rownames(sce) <- as.character(seq_len(ngenes))
 #' sce$cell_type <- c(
-#'     rep("celltype_1", ncells / 2),
-#'     rep("celltype_2", ncells / 2)
+#'   rep("celltype_1", ncells / 2),
+#'   rep("celltype_2", ncells / 2)
 #' )
 #'
 #' sce$pseudotime <- seq_len(ncells)
@@ -319,70 +318,70 @@ evaluate_top_n_genes <- function(
     blase_data,
     n_genes_to_plot = 16,
     plot_columns = 4) {
-    if (n_genes_to_plot > length(blase_data@genes)) {
-        n_genes_to_plot <- length(blase_data@genes)
-    }
+  if (n_genes_to_plot > length(blase_data@genes)) {
+    n_genes_to_plot <- length(blase_data@genes)
+  }
 
-    pseudobulked_bins <- data.frame(
-        lapply(seq_len(length(blase_data@pseudobulk_bins)), function(i) {
-            x <- blase_data@pseudobulk_bins[[i]]
-            return(Matrix::rowMeans(x))
-        })
+  pseudobulked_bins <- data.frame(
+    lapply(seq_len(length(blase_data@pseudobulk_bins)), function(i) {
+      x <- blase_data@pseudobulk_bins[[i]]
+      return(Matrix::rowMeans(x))
+    })
+  )
+  colnames(pseudobulked_bins) <- blase_data@bins
+
+  plots <- list()
+  for (i in seq_len(n_genes_to_plot)) {
+    plots[[i]] <- PRIVATE_plot_gene_over_bins(
+      pseudobulked_bins,
+      blase_data@genes[i]
     )
-    colnames(pseudobulked_bins) <- blase_data@bins
+  }
 
-    plots <- list()
-    for (i in seq_len(n_genes_to_plot)) {
-        plots[[i]] <- PRIVATE_plot_gene_over_bins(
-            pseudobulked_bins,
-            blase_data@genes[i]
-        )
-    }
-
-    gridExtra::grid.arrange(
-        top = grid::textGrob(
-            paste(length(blase_data@genes), "genes"),
-            gp = grid::gpar(fontsize = 20, font = 3)
-        ),
-        grobs = plots,
-        ncol = plot_columns
-    )
+  gridExtra::grid.arrange(
+    top = grid::textGrob(
+      paste(length(blase_data@genes), "genes"),
+      gp = grid::gpar(fontsize = 20, font = 3)
+    ),
+    grobs = plots,
+    ncol = plot_columns
+  )
 }
 
 PRIVATE_plot_history <- function(i, bin, corr, history, specificity) {
-    bin_sym <- ggplot2::sym("bin")
-    corr_sym <- ggplot2::sym("correlation")
+  bin_sym <- ggplot2::sym("bin")
+  corr_sym <- ggplot2::sym("correlation")
 
-    return(ggplot2::ggplot(
-        as.data.frame(history[(i * 4 - 3):(i * 4)]),
-        ggplot2::aes(x = {{ bin_sym }}, y = {{ corr_sym }})
-    ) +
-        ggplot2::ylim(-1, 1) +
-        ggplot2::ggtitle(paste0(
-            bin[i],
-            " (",
-            signif(corr[i], 2),
-            ",",
-            signif(specificity[i], 2),
-            ")"
-        )) +
-        ggplot2::geom_line() +
-        ggplot2::geom_hline(yintercept = corr[i], linetype = "dashed") +
-        ggplot2::geom_vline(xintercept = bin[i], linetype = "dashed"))
+  return(ggplot2::ggplot(
+    as.data.frame(history[(i * 4 - 3):(i * 4)]),
+    ggplot2::aes(x = {{ bin_sym }}, y = {{ corr_sym }})
+  ) +
+    ggplot2::ylim(-1, 1) +
+    ggplot2::ggtitle(paste0(
+      bin[i],
+      " (",
+      signif(corr[i], 2),
+      ",",
+      signif(specificity[i], 2),
+      ")"
+    )) +
+    ggplot2::geom_line() +
+    ggplot2::geom_hline(yintercept = corr[i], linetype = "dashed") +
+    ggplot2::geom_vline(xintercept = bin[i], linetype = "dashed"))
 }
 
 PRIVATE_plot_gene_over_bins <- function(pseudobulks, gene) {
-    bin_sym <- ggplot2::sym("bin")
-    expr_sym <- ggplot2::sym("expr")
+  bin_sym <- ggplot2::sym("bin")
+  expr_sym <- ggplot2::sym("expr")
 
-    expression <- as.data.frame(t(pseudobulks[gene, ]))
-    colnames(expression) <- "expr"
-    expression$bin <- seq_len(nrow(expression))
+  expression <- as.data.frame(t(pseudobulks[gene, ]))
+  colnames(expression) <- "expr"
+  expression$bin <- seq_len(nrow(expression))
 
-    return(ggplot2::ggplot(expression, ggplot2::aes(
-        x = {{ bin_sym }},
-        y = {{ expr_sym }}
-    )) +
-        ggplot2::ggtitle(gene) +
-        ggplot2::geom_line())
+  return(ggplot2::ggplot(expression, ggplot2::aes(
+    x = {{ bin_sym }},
+    y = {{ expr_sym }}
+  )) +
+    ggplot2::ggtitle(gene) +
+    ggplot2::geom_line())
 }

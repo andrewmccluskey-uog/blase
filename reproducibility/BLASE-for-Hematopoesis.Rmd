@@ -34,7 +34,7 @@ set.seed(SEED)
 ```
 
 ```{r, concurrency}
-# N_CORES = 4
+N_CORES = 4
 if (ami::using_ci()) {
   N_CORES <- 2
 }
