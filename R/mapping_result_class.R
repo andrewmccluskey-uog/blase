@@ -58,7 +58,7 @@
 #'   pseudotime_slot = "pseudotime", n_bins = 4
 #' )
 #' plot_bin_population(sce, best_bin(result), group_by_slot = "cell_type")
-#' 
+#'
 #' # Getters
 #' bulk_name(result)
 #' best_bin(result)
@@ -211,7 +211,7 @@ setMethod(
   definition = function(x) x@history
 )
 
-#' @title Get the number of bootstrap iterations 
+#' @title Get the number of bootstrap iterations
 #' performed for a BLASE Mapping Results object.
 #'
 #' @concept mapping-result-object
