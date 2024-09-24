@@ -205,6 +205,14 @@ plot_mapping_result_heatmap <- function(
     )
     bulk_results$pseudotime_bin <- as.factor(bulk_results$pseudotime_bin)
 
+    return(PRIVATE_mapping_result_heatmap_plot(
+        bulk_results, heatmap_fill_scale, annotate
+    ))
+}
+
+PRIVATE_mapping_result_heatmap_plot <- function(
+    bulk_results, fill_scale, annotate) {
+  
     bulk_name_sym <- ggplot2::sym("bulk_name")
     pseudotime_bin_sym <- ggplot2::sym("pseudotime_bin")
     correlation_sym <- ggplot2::sym("correlation")
@@ -219,7 +227,7 @@ plot_mapping_result_heatmap <- function(
         label = {{ confident_mapping_sym }},
         color = {{ is_best_bin_sym }}
     )) +
-        heatmap_fill_scale +
+        fill_scale +
         ggplot2::guides(color = "none")
 
     if (annotate == TRUE) {
@@ -239,8 +247,6 @@ plot_mapping_result_heatmap <- function(
                 values = c("transparent", "transparent")
             )
     }
-
-    return(p)
 }
 
 #' @title Plot a mapping result's correlation
