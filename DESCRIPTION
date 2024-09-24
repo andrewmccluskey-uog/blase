@@ -39,7 +39,7 @@ Imports:
   methods,
   rlang,
   metR,
-  parallel
+  BiocParallel
 Suggests: 
     knitr,
     rmarkdown,
@@ -47,7 +47,6 @@ Suggests:
     tradeSeq,
     scran,
     slingshot,
-    BiocParallel,
     Seurat (>= 4.0.0),
     dyngen,
     bluster,
@@ -69,4 +68,3 @@ BugReports: https://andrewmccluskey-uog.github.io/BLASE/issues
 Depends: 
     R (>= 4.4.0)
 LazyData: false
-LazyDataCompression: bzip2

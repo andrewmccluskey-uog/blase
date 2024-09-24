@@ -11,6 +11,7 @@
 #' @param n_bins The number of bins to split the cells into.
 #' @param pseudotime_slot The [SingleCellExperiment::SingleCellExperiment]
 #' slot containing the pseudotime values for each cell.
+#' @param ... For arguments passed to other functions. Unused.
 #'
 #' @returns A copy of x where cells are annotated with their
 #' pseudotime bin.
@@ -23,6 +24,7 @@ setGeneric(
     def = function(x,
                    split_by = "pseudotime_range",
                    n_bins = 20,
+                   pseudotime_slot = "slingPseudotime_1",
                    ...) {
         standardGeneric("assign_pseudotime_bins")
     }

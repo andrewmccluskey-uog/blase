@@ -7,7 +7,13 @@
 \alias{assign_pseudotime_bins,Seurat-method}
 \title{Assign Pseudotime Bins to a source object's metadata}
 \usage{
-assign_pseudotime_bins(x, split_by = "pseudotime_range", n_bins = 20, ...)
+assign_pseudotime_bins(
+  x,
+  split_by = "pseudotime_range",
+  n_bins = 20,
+  pseudotime_slot = "slingPseudotime_1",
+  ...
+)
 
 \S4method{assign_pseudotime_bins}{SingleCellExperiment}(
   x,
@@ -42,6 +48,8 @@ cells per bin.}
 
 \item{pseudotime_slot}{The \link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment::SingleCellExperiment}
 slot containing the pseudotime values for each cell.}
+
+\item{...}{For arguments passed to other functions. Unused.}
 }
 \value{
 A copy of x where cells are annotated with their

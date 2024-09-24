@@ -311,6 +311,7 @@ setMethod(
 #' @export
 #'
 #' @concept gene-selection
+#' @import BiocParallel
 #'
 #' @examples
 get_waves <- function(
@@ -372,6 +373,8 @@ get_waves <- function(
 #' @concept gene-selection
 #'
 #' @return The matrix with reduced dimensions
+#' 
+#' @import BiocParallel
 #'
 #' @description
 #' Snippet from: https://cansnippet.bioinfo-fr.net/details.php?id=3
