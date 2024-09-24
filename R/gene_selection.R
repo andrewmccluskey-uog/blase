@@ -21,11 +21,11 @@
 #'
 #' @examples
 setGeneric(
-  name = "gene_selection_matrix",
-  signature = c("x"),
-  def = function(x, ...) {
-    standardGeneric("gene_selection_matrix")
-  }
+    name = "gene_selection_matrix",
+    signature = c("x"),
+    def = function(x, ...) {
+        standardGeneric("gene_selection_matrix")
+    }
 )
 
 #' @rdname gene_selection_matrix
@@ -37,25 +37,25 @@ setGeneric(
 #'
 #' @export
 setMethod(
-  f = "gene_selection_matrix",
-  signature = c(x = "Seurat"),
-  definition = function(x,
-                        waves,
-                        genes = c(),
-                        pseudotime_slot = "slingPseudotime_1",
-                        target_matrix_size = 1000,
-                        BPPARAM = BPPARAM) {
-    rlang::check_installed("Seurat", reason = "to handle Seurat objects.")
-    sce <- Seurat::as.SingleCellExperiment(x)
-    return(gene_selection_matrix(
-      sce,
-      waves,
-      genes = genes,
-      pseudotime_slot = pseudotime_slot,
-      target_matrix_size = target_matrix_size,
-      BPPARAM = BiocParallel::SerialParam()
-    ))
-  }
+    f = "gene_selection_matrix",
+    signature = c(x = "Seurat"),
+    definition = function(x,
+                          waves,
+                          genes = c(),
+                          pseudotime_slot = "slingPseudotime_1",
+                          target_matrix_size = 1000,
+                          BPPARAM = BPPARAM) {
+        rlang::check_installed("Seurat", reason = "to handle Seurat objects.")
+        sce <- Seurat::as.SingleCellExperiment(x)
+        return(gene_selection_matrix(
+            sce,
+            waves,
+            genes = genes,
+            pseudotime_slot = pseudotime_slot,
+            target_matrix_size = target_matrix_size,
+            BPPARAM = BiocParallel::SerialParam()
+        ))
+    }
 )
 
 #' @rdname gene_selection_matrix
@@ -66,69 +66,69 @@ setMethod(
 #' @import metR
 #' @export
 setMethod(
-  f = "gene_selection_matrix",
-  signature = c(x = "SingleCellExperiment"),
-  definition = function(x,
-                        waves,
-                        genes = c(),
-                        pseudotime_slot = "slingPseudotime_1",
-                        target_matrix_size = 1000,
-                        BPPARAM = BiocParallel::SerialParam()) {
-    if (!any(colnames(x@colData) == pseudotime_slot)) {
-      stop("Pseudotime slot '", pseudotime_slot, "' does not exist")
+    f = "gene_selection_matrix",
+    signature = c(x = "SingleCellExperiment"),
+    definition = function(x,
+                          waves,
+                          genes = c(),
+                          pseudotime_slot = "slingPseudotime_1",
+                          target_matrix_size = 1000,
+                          BPPARAM = BiocParallel::SerialParam()) {
+        if (!any(colnames(x@colData) == pseudotime_slot)) {
+            stop("Pseudotime slot '", pseudotime_slot, "' does not exist")
+        }
+
+        # First we need to subset only the requested genes
+        if (length(genes) > 0) {
+            # R passes parameters by value not reference so this is safe
+            x <- x[rownames(x) %in% genes, ]
+            waves <- waves[rownames(waves) %in% genes, ]
+        }
+
+        # Then get the normalised count matrix
+        pseudotime <- x@colData[[pseudotime_slot]]
+        heatmap_counts <-
+            SingleCellExperiment::logcounts(x)[, order(pseudotime)]
+        heatmap_counts <- heatmap_counts[order(waves$phase), ]
+
+        small_heatmap_counts <- redim_matrix(
+            heatmap_counts,
+            target_height = target_matrix_size,
+            target_width = target_matrix_size,
+            BPPARAM = BPPARAM
+        )
+
+        heatmap_counts_ordered.df <- reshape2::melt(
+            small_heatmap_counts,
+            c("gene", "cell"),
+            value.name = "log_expression"
+        )
+
+        cell_sym <- ggplot2::sym("cell")
+        gene_sym <- ggplot2::sym("gene")
+        log_expr_sym <- ggplot2::sym("log_expression")
+
+        plot <- ggplot2::ggplot(
+            data = heatmap_counts_ordered.df,
+            ggplot2::aes(
+                x = {{ cell_sym }},
+                y = {{ gene_sym }},
+                fill = {{ log_expr_sym }}
+            )
+        ) +
+            ggplot2::geom_tile() +
+            ggplot2::theme(
+                axis.text.x = ggplot2::element_blank(),
+                axis.text.y = ggplot2::element_blank()
+            ) +
+            ggplot2::scale_fill_gradient(
+                low = "white",
+                high = "red",
+                guide = "colorbar"
+            )
+
+        return(plot)
     }
-
-    # First we need to subset only the requested genes
-    if (length(genes) > 0) {
-      # R passes parameters by value not reference so this is safe
-      x <- x[rownames(x) %in% genes, ]
-      waves <- waves[rownames(waves) %in% genes, ]
-    }
-
-    # Then get the normalised count matrix
-    pseudotime <- x@colData[[pseudotime_slot]]
-    heatmap_counts <-
-      SingleCellExperiment::logcounts(x)[, order(pseudotime)]
-    heatmap_counts <- heatmap_counts[order(waves$phase), ]
-
-    small_heatmap_counts <- redim_matrix(
-      heatmap_counts,
-      target_height = target_matrix_size,
-      target_width = target_matrix_size,
-      BPPARAM = BPPARAM
-    )
-
-    heatmap_counts_ordered.df <- reshape2::melt(
-      small_heatmap_counts,
-      c("gene", "cell"),
-      value.name = "log_expression"
-    )
-
-    cell_sym <- ggplot2::sym("cell")
-    gene_sym <- ggplot2::sym("gene")
-    log_expr_sym <- ggplot2::sym("log_expression")
-
-    plot <- ggplot2::ggplot(
-      data = heatmap_counts_ordered.df,
-      ggplot2::aes(
-        x = {{ cell_sym }},
-        y = {{ gene_sym }},
-        fill = {{ log_expr_sym }}
-      )
-    ) +
-      ggplot2::geom_tile() +
-      ggplot2::theme(
-        axis.text.x = ggplot2::element_blank(),
-        axis.text.y = ggplot2::element_blank()
-      ) +
-      ggplot2::scale_fill_gradient(
-        low = "white",
-        high = "red",
-        guide = "colorbar"
-      )
-
-    return(plot)
-  }
 )
 
 #' select_genes_by_fourier_method
@@ -161,11 +161,11 @@ setMethod(
 #' @export
 #'
 setGeneric(
-  name = "select_genes_by_fourier_method",
-  signature = c("x"),
-  def = function(x, ...) {
-    standardGeneric("select_genes_by_fourier_method")
-  }
+    name = "select_genes_by_fourier_method",
+    signature = c("x"),
+    def = function(x, ...) {
+        standardGeneric("select_genes_by_fourier_method")
+    }
 )
 
 #' @rdname select_genes_by_fourier_method
@@ -178,27 +178,27 @@ setGeneric(
 #' @export
 #'
 setMethod(
-  f = "select_genes_by_fourier_method",
-  signature = c(x = "Seurat"),
-  definition = function(x,
-                        waves,
-                        n_genes = 100,
-                        n_groups = 40,
-                        top_n_per_group = 1,
-                        method = "power",
-                        force_spread_selection = TRUE) {
-    rlang::check_installed("Seurat", reason = "to handle Seurat objects.")
-    sce <- Seurat::as.SingleCellExperiment(x)
-    return(select_genes_by_fourier_method(
-      sce,
-      waves,
-      n_genes,
-      n_groups,
-      top_n_per_group,
-      method,
-      force_spread_selection
-    ))
-  }
+    f = "select_genes_by_fourier_method",
+    signature = c(x = "Seurat"),
+    definition = function(x,
+                          waves,
+                          n_genes = 100,
+                          n_groups = 40,
+                          top_n_per_group = 1,
+                          method = "power",
+                          force_spread_selection = TRUE) {
+        rlang::check_installed("Seurat", reason = "to handle Seurat objects.")
+        sce <- Seurat::as.SingleCellExperiment(x)
+        return(select_genes_by_fourier_method(
+            sce,
+            waves,
+            n_genes,
+            n_groups,
+            top_n_per_group,
+            method,
+            force_spread_selection
+        ))
+    }
 )
 
 #' @rdname select_genes_by_fourier_method
@@ -213,81 +213,81 @@ setMethod(
 #'
 #' @examples
 setMethod(
-  f = "select_genes_by_fourier_method",
-  signature = c(x = "SingleCellExperiment"),
-  definition = function(x,
-                        waves,
-                        n_genes = 100,
-                        n_groups = 40,
-                        top_n_per_group = 1,
-                        method = "power",
-                        force_spread_selection = TRUE) {
-    if (method != "power" & method != "amplitude" & method != "r2") {
-      stop(
-        "Requested method is not valid, must be",
-        " one of ['power','amplitude','r2']"
-      )
-    }
-
-    if (force_spread_selection) {
-      if (n_genes != 100) {
-        warning("n_genes is not used when force_spread_selection==TRUE")
-      }
-
-      best_waves_in_spread <- data.frame()
-      stepsize <- max(waves$phase) / n_groups
-      for (i in seq(
-        from = 0, to = max(waves$phase), length.out = n_groups
-      )
-      ) {
-        waves_in_block <- waves[
-          waves$phase > i - (stepsize / 2) &
-            waves$phase < i + (stepsize / 2),
-        ]
-        # remove genes in `best_waves_in_spread` from `waves_in_block`
-        # and then select best
-
-        best_waves_in_block <- waves_in_block[
-          order(-waves_in_block[, method]),
-        ]
-
-        # If there are more genes than we need, just take
-        # the top n, otherwise just all the remaining genes can be used.
-        if (nrow(best_waves_in_block) > top_n_per_group) {
-          best_waves_in_block <- best_waves_in_block[
-            seq_len(top_n_per_group),
-          ]
+    f = "select_genes_by_fourier_method",
+    signature = c(x = "SingleCellExperiment"),
+    definition = function(x,
+                          waves,
+                          n_genes = 100,
+                          n_groups = 40,
+                          top_n_per_group = 1,
+                          method = "power",
+                          force_spread_selection = TRUE) {
+        if (method != "power" & method != "amplitude" & method != "r2") {
+            stop(
+                "Requested method is not valid, must be",
+                " one of ['power','amplitude','r2']"
+            )
         }
 
-        best_waves_in_spread <- rbind(
-          best_waves_in_spread,
-          best_waves_in_block
-        )
-      }
+        if (force_spread_selection) {
+            if (n_genes != 100) {
+                warning("n_genes is not used when force_spread_selection==TRUE")
+            }
 
-      if (nrow(best_waves_in_spread) < top_n_per_group * n_groups) {
-        warning(
-          "Fewer genes identified as good matches",
-          " than requested. requested=",
-          top_n_per_group * n_groups,
-          " found=",
-          nrow(best_waves_in_spread)
-        )
-      }
+            best_waves_in_spread <- data.frame()
+            stepsize <- max(waves$phase) / n_groups
+            for (i in seq(
+                from = 0, to = max(waves$phase), length.out = n_groups
+            )
+            ) {
+                waves_in_block <- waves[
+                    waves$phase > i - (stepsize / 2) &
+                        waves$phase < i + (stepsize / 2),
+                ]
+                # remove genes in `best_waves_in_spread` from `waves_in_block`
+                # and then select best
 
-      return(best_waves_in_spread)
-    } else {
-      if (n_groups != 10 | top_n_per_group != 1) {
-        warning(
-          "n_groups and top_n_per_group are not",
-          " used when force_spread_selection==FALSE"
-        )
-      }
+                best_waves_in_block <- waves_in_block[
+                    order(-waves_in_block[, method]),
+                ]
 
-      top_waves <- waves[order(-waves[, method]), ][0:n_genes, ]
-      return(top_waves)
+                # If there are more genes than we need, just take
+                # the top n, otherwise just all the remaining genes can be used.
+                if (nrow(best_waves_in_block) > top_n_per_group) {
+                    best_waves_in_block <- best_waves_in_block[
+                        seq_len(top_n_per_group),
+                    ]
+                }
+
+                best_waves_in_spread <- rbind(
+                    best_waves_in_spread,
+                    best_waves_in_block
+                )
+            }
+
+            if (nrow(best_waves_in_spread) < top_n_per_group * n_groups) {
+                warning(
+                    "Fewer genes identified as good matches",
+                    " than requested. requested=",
+                    top_n_per_group * n_groups,
+                    " found=",
+                    nrow(best_waves_in_spread)
+                )
+            }
+
+            return(best_waves_in_spread)
+        } else {
+            if (n_groups != 10 | top_n_per_group != 1) {
+                warning(
+                    "n_groups and top_n_per_group are not",
+                    " used when force_spread_selection==FALSE"
+                )
+            }
+
+            top_waves <- waves[order(-waves[, method]), ][0:n_genes, ]
+            return(top_waves)
+        }
     }
-  }
 )
 
 
@@ -317,48 +317,48 @@ get_waves <- function(
     sce,
     pseudotime_slot = "slingPseudotime_1",
     BPPARAM = BiocParallel::SerialParam()) {
-  if (!any(colnames(sce@colData) == pseudotime_slot)) {
-    stop("Pseudotime slot '", pseudotime_slot, "' does not exist")
-  }
-  pseudotime <- sce@colData[[pseudotime_slot]]
+    if (!any(colnames(sce@colData) == pseudotime_slot)) {
+        stop("Pseudotime slot '", pseudotime_slot, "' does not exist")
+    }
+    pseudotime <- sce@colData[[pseudotime_slot]]
 
-  heatmap_counts <- SingleCellExperiment::normcounts(sce)[, order(pseudotime)]
+    heatmap_counts <- SingleCellExperiment::normcounts(sce)[, order(pseudotime)]
 
-  waves_list <- BiocParallel::bplapply(
-    rownames(heatmap_counts),
-    function(gene) {
-      wave <- as.data.frame(FitWave(as.matrix(heatmap_counts[gene, ]), 1))
-      rownames(wave) <- c(gene)
-      return(wave)
-    },
-    BPPARAM = BPPARAM
-  )
-  waves <- do.call("rbind", waves_list)
+    waves_list <- BiocParallel::bplapply(
+        rownames(heatmap_counts),
+        function(gene) {
+            wave <- as.data.frame(FitWave(as.matrix(heatmap_counts[gene, ]), 1))
+            rownames(wave) <- c(gene)
+            return(wave)
+        },
+        BPPARAM = BPPARAM
+    )
+    waves <- do.call("rbind", waves_list)
 
-  waves <- as.data.frame(waves)
+    waves <- as.data.frame(waves)
 
-  waves$phase <- waves$phase * (((180 / 3.141593) / 360) * max(pseudotime))
-  waves$gene <- rownames(waves)
+    waves$phase <- waves$phase * (((180 / 3.141593) / 360) * max(pseudotime))
+    waves$gene <- rownames(waves)
 
-  # Add power to waves
-  waves$total_expression <- rowSums(heatmap_counts[rownames(waves), ])
-  # Bozdech et al. 2003 (https://doi.org/10.1371/journal.pbio.0000005) use
-  # plus or minus 1/48 (i.e. one bulk either side of the peak, 6.25% window)
-  # Here we use plus or minus 5% (i.e. a 10% window)
-  five_percent_of_pdt <- 0.05 * max(waves$phase)
-  waves$peak_expression <- 0
-  for (gene in rownames(waves)) {
-    counts_in_scan_range <- heatmap_counts[
-      gene, pseudotime > waves[gene, ]$phase - five_percent_of_pdt &
-        pseudotime < waves[gene, ]$phase + five_percent_of_pdt
-    ]
+    # Add power to waves
+    waves$total_expression <- rowSums(heatmap_counts[rownames(waves), ])
+    # Bozdech et al. 2003 (https://doi.org/10.1371/journal.pbio.0000005) use
+    # plus or minus 1/48 (i.e. one bulk either side of the peak, 6.25% window)
+    # Here we use plus or minus 5% (i.e. a 10% window)
+    five_percent_of_pdt <- 0.05 * max(waves$phase)
+    waves$peak_expression <- 0
+    for (gene in rownames(waves)) {
+        counts_in_scan_range <- heatmap_counts[
+            gene, pseudotime > waves[gene, ]$phase - five_percent_of_pdt &
+                pseudotime < waves[gene, ]$phase + five_percent_of_pdt
+        ]
 
-    waves[gene, "peak_expression"] <- sum(counts_in_scan_range)
-    waves[gene, "cellcount_in_peak"] <- length(counts_in_scan_range)
-  }
-  waves$power <- waves$amplitude / waves$peak_expression
+        waves[gene, "peak_expression"] <- sum(counts_in_scan_range)
+        waves[gene, "cellcount_in_peak"] <- length(counts_in_scan_range)
+    }
+    waves$power <- waves$amplitude / waves$peak_expression
 
-  return(waves)
+    return(waves)
 }
 
 #' redim_matrix
@@ -381,24 +381,24 @@ redim_matrix <- function(
     target_width = 100,
     summary_func = function(x) mean(x, na.rm = TRUE),
     BPPARAM = BiocParallel::SerialParam()) {
-  if (target_height > nrow(mat) | target_width > ncol(mat)) {
-    stop("Input matrix must be bigger than target width and height.")
-  }
+    if (target_height > nrow(mat) | target_width > ncol(mat)) {
+        stop("Input matrix must be bigger than target width and height.")
+    }
 
-  seq_height <- round(seq(1, nrow(mat), length.out = target_height + 1))
-  seq_width <- round(seq(1, ncol(mat), length.out = target_width + 1))
+    seq_height <- round(seq(1, nrow(mat), length.out = target_height + 1))
+    seq_width <- round(seq(1, ncol(mat), length.out = target_width + 1))
 
-  # complicate way to write a double for loop
-  # i is row
-  do.call(rbind, BiocParallel::bplapply(seq_len(target_height), function(i) {
-    # j is column
-    vapply(seq_len(target_width), function(j) {
-      summary_func(
-        mat[
-          seq(seq_height[i], seq_height[i + 1]),
-          seq(seq_width[j], seq_width[j + 1])
-        ]
-      )
-    }, 0.0)
-  }, BPPARAM = BPPARAM))
+    # complicate way to write a double for loop
+    # i is row
+    do.call(rbind, BiocParallel::bplapply(seq_len(target_height), function(i) {
+        # j is column
+        vapply(seq_len(target_width), function(j) {
+            summary_func(
+                mat[
+                    seq(seq_height[i], seq_height[i + 1]),
+                    seq(seq_width[j], seq_width[j + 1])
+                ]
+            )
+        }, 0.0)
+    }, BPPARAM = BPPARAM))
 }

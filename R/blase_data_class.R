@@ -17,7 +17,7 @@
 #' @examples
 #' counts <- matrix(rpois(100, lambda = 10), ncol = 10, nrow = 10)
 #' sce <- SingleCellExperiment::SingleCellExperiment(
-#'   assays = list(normcounts = counts)
+#'     assays = list(normcounts = counts)
 #' )
 #' sce$pseudotime <- seq_len(10)
 #' data <- as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 3)
@@ -25,12 +25,12 @@
 #'
 #' genes(data)
 BlaseData <- setClass(
-  Class = "BlaseData",
-  slots = list(
-    pseudobulk_bins = "list",
-    bins = "numeric",
-    genes = "character"
-  )
+    Class = "BlaseData",
+    slots = list(
+        pseudobulk_bins = "list",
+        bins = "numeric",
+        genes = "character"
+    )
 )
 
 # TODO validation of pseudobulk bins being a list of matrices
@@ -43,17 +43,17 @@ BlaseData <- setClass(
 #' @export
 #' @inherit BlaseData-class examples
 setMethod(
-  f = "show",
-  signature = "BlaseData",
-  definition = function(object) {
-    output <- c(
-      "Blase Data with:",
-      paste("\tbins:", list(object@bins)),
-      paste("\tselected genes:", list(object@genes), "\n")
-    )
+    f = "show",
+    signature = "BlaseData",
+    definition = function(object) {
+        output <- c(
+            "Blase Data with:",
+            paste("\tbins:", list(object@bins)),
+            paste("\tselected genes:", list(object@genes), "\n")
+        )
 
-    cat(paste(output, collapse = "\n"))
-  }
+        cat(paste(output, collapse = "\n"))
+    }
 )
 
 #' @title Get genes of a BLASE Data object.
@@ -68,9 +68,9 @@ setGeneric("genes", function(x) standardGeneric("genes"))
 
 #' @rdname genes-getter
 setMethod(
-  f = "genes",
-  signature = "BlaseData",
-  definition = function(x) x@genes
+    f = "genes",
+    signature = "BlaseData",
+    definition = function(x) x@genes
 )
 
 #' @title Set genes of a BLASE Data object.
@@ -86,11 +86,11 @@ setGeneric("genes<-", function(x, value) standardGeneric("genes<-"))
 
 #' @rdname genes-setter
 setMethod(
-  f = "genes<-",
-  signature = "BlaseData",
-  definition = function(x, value) {
-    x@genes <- value
-    validObject(x)
-    x
-  }
+    f = "genes<-",
+    signature = "BlaseData",
+    definition = function(x, value) {
+        x@genes <- value
+        validObject(x)
+        x
+    }
 )

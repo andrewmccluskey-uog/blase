@@ -9,8 +9,8 @@ vignette: >
 
 ```{r, include = FALSE, eval=FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
+    collapse = TRUE,
+    comment = "#>"
 )
 ```
 
@@ -43,7 +43,7 @@ set.seed(SEED)
 ```{r, concurrency, eval=FALSE}
 N_CORES <- 4
 if (ami::using_ci()) {
-  N_CORES <- 2
+    N_CORES <- 2
 }
 ```
 
@@ -53,15 +53,15 @@ root_dir <- tools::R_user_dir("BLASE", "data")
 article_dir <- path(root_dir, "Generate_MCA_PB_Object")
 
 if (!dir.exists(article_dir)) {
-  dir.create(article_dir, recursive = TRUE)
+    dir.create(article_dir, recursive = TRUE)
 }
 
 mca_path <- path(article_dir, "MCA-pb", ext = "zip")
 if (!file.exists(mca_path)) {
-  download.file("https://www.malariacellatlas.org/downloads/pb-ch10x-set1.zip", mca_path)
-  unzip(mca_path, exdir = path(article_dir, "MCA-pb"))
+    download.file("https://www.malariacellatlas.org/downloads/pb-ch10x-set1.zip", mca_path)
+    unzip(mca_path, exdir = path(article_dir, "MCA-pb"))
 } else {
-  print("Using cached")
+    print("Using cached")
 }
 ```
 
@@ -101,9 +101,9 @@ reducedDim(sce, "PCA") <- as.matrix(cbind(colData(sce)["PC_1"], colData(sce)["PC
 sce <- runUMAP(sce)
 
 gridExtra::grid.arrange(
-  plotPCA(sce, colour_by = "STAGE_LR"),
-  plotUMAP(sce, colour_by = "STAGE_LR"),
-  ncol = 2
+    plotPCA(sce, colour_by = "STAGE_LR"),
+    plotUMAP(sce, colour_by = "STAGE_LR"),
+    ncol = 2
 )
 ```
 
@@ -115,11 +115,11 @@ sce <- slingshot(sce, reducedDim = "UMAP", clusterLabels = "STAGE_LR", start.clu
 sce <- assign_pseudotime_bins(sce, pseudotime_slot = "slingPseudotime_1", n_bins = 12, split_by = "pseudotime_range")
 
 gridExtra::grid.arrange(
-  plotPCA(sce, colour_by = "slingPseudotime_1"),
-  plotUMAP(sce, colour_by = "slingPseudotime_1"),
-  plotPCA(sce, colour_by = "pseudotime_bin"),
-  plotUMAP(sce, colour_by = "pseudotime_bin"),
-  ncol = 2
+    plotPCA(sce, colour_by = "slingPseudotime_1"),
+    plotUMAP(sce, colour_by = "slingPseudotime_1"),
+    plotPCA(sce, colour_by = "pseudotime_bin"),
+    plotUMAP(sce, colour_by = "pseudotime_bin"),
+    ncol = 2
 )
 ```
 

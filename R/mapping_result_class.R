@@ -24,11 +24,11 @@
 #'
 #' @examples
 #' counts_matrix <- matrix(
-#'   c(seq_len(120) / 10, seq_len(120) / 5),
-#'   ncol = 48, nrow = 5
+#'     c(seq_len(120) / 10, seq_len(120) / 5),
+#'     ncol = 48, nrow = 5
 #' )
 #' sce <- SingleCellExperiment::SingleCellExperiment(assays = list(
-#'   normcounts = counts_matrix, logcounts = log(counts_matrix)
+#'     normcounts = counts_matrix, logcounts = log(counts_matrix)
 #' ))
 #' colnames(sce) <- seq_len(48)
 #' rownames(sce) <- as.character(seq_len(5))
@@ -54,8 +54,8 @@
 #'
 #' # Plot populations
 #' sce <- assign_pseudotime_bins(
-#'   sce,
-#'   pseudotime_slot = "pseudotime", n_bins = 4
+#'     sce,
+#'     pseudotime_slot = "pseudotime", n_bins = 4
 #' )
 #' plot_bin_population(sce, best_bin(result), group_by_slot = "cell_type")
 #'
@@ -67,16 +67,16 @@
 #' mapping_history(result)
 #' bootstrap_iterations(result)
 MappingResult <- setClass(
-  Class = "MappingResult",
-  slots = list(
-    bulk_name = "ANY",
-    best_bin = "numeric",
-    best_correlation = "numeric",
-    top_2_distance = "numeric",
-    confident_mapping = "logical",
-    history = "data.frame",
-    bootstrap_iterations = "numeric"
-  )
+    Class = "MappingResult",
+    slots = list(
+        bulk_name = "ANY",
+        best_bin = "numeric",
+        best_correlation = "numeric",
+        top_2_distance = "numeric",
+        confident_mapping = "logical",
+        history = "data.frame",
+        bootstrap_iterations = "numeric"
+    )
 )
 
 #' @title Show an MappingResult object
@@ -87,42 +87,42 @@ MappingResult <- setClass(
 #' @export
 #' @inherit MappingResult-class examples
 setMethod(
-  f = "show",
-  signature = "MappingResult",
-  definition = function(object) {
-    non_top_mapping_best_upper_bound <- max(
-      object@history[object@history$bin != object@best_bin, ]$upper_bound
-    )
+    f = "show",
+    signature = "MappingResult",
+    definition = function(object) {
+        non_top_mapping_best_upper_bound <- max(
+            object@history[object@history$bin != object@best_bin, ]$upper_bound
+        )
 
-    output <- c(
-      paste0(
-        "MappingResult for '",
-        object@bulk_name,
-        "': best_bin=", object@best_bin,
-        " correlation=", object@best_correlation,
-        " top_2_distance=", object@top_2_distance
-      ),
-      paste(
-        "\t Confident Result:",
-        object@confident_mapping,
-        "(next max upper ",
-        non_top_mapping_best_upper_bound,
-        ")"
-      ),
-      paste(
-        "\t with history for scores against",
-        nrow(object@history),
-        " bins"
-      ),
-      paste(
-        "\t Bootstrapped with",
-        object@bootstrap_iterations,
-        "iterations\n"
-      )
-    )
+        output <- c(
+            paste0(
+                "MappingResult for '",
+                object@bulk_name,
+                "': best_bin=", object@best_bin,
+                " correlation=", object@best_correlation,
+                " top_2_distance=", object@top_2_distance
+            ),
+            paste(
+                "\t Confident Result:",
+                object@confident_mapping,
+                "(next max upper ",
+                non_top_mapping_best_upper_bound,
+                ")"
+            ),
+            paste(
+                "\t with history for scores against",
+                nrow(object@history),
+                " bins"
+            ),
+            paste(
+                "\t Bootstrapped with",
+                object@bootstrap_iterations,
+                "iterations\n"
+            )
+        )
 
-    cat(paste(output, collapse = "\n"))
-  }
+        cat(paste(output, collapse = "\n"))
+    }
 )
 
 #' @title Get name of bulk of a BLASE Mapping Results object.
@@ -137,9 +137,9 @@ setGeneric("bulk_name", function(x) standardGeneric("bulk_name"))
 
 #' @rdname mapping-result-bulk-name-getter
 setMethod(
-  f = "bulk_name",
-  signature = "MappingResult",
-  definition = function(x) x@bulk_name
+    f = "bulk_name",
+    signature = "MappingResult",
+    definition = function(x) x@bulk_name
 )
 
 
@@ -155,9 +155,9 @@ setGeneric("best_bin", function(x) standardGeneric("best_bin"))
 
 #' @rdname mapping-result-best-bin-getter
 setMethod(
-  f = "best_bin",
-  signature = "MappingResult",
-  definition = function(x) x@best_bin
+    f = "best_bin",
+    signature = "MappingResult",
+    definition = function(x) x@best_bin
 )
 
 #' @title Get best correlation of a BLASE Mapping Results object.
@@ -172,9 +172,9 @@ setGeneric("best_correlation", function(x) standardGeneric("best_correlation"))
 
 #' @rdname mapping-result-best-correlation-getter
 setMethod(
-  f = "best_correlation",
-  signature = "MappingResult",
-  definition = function(x) x@best_correlation
+    f = "best_correlation",
+    signature = "MappingResult",
+    definition = function(x) x@best_correlation
 )
 
 #' @title Get if the result is confident for a BLASE Mapping Results object.
@@ -189,9 +189,9 @@ setGeneric("confident_mapping", function(x) standardGeneric("confident_mapping")
 
 #' @rdname mapping-result-confident-mapping-getter
 setMethod(
-  f = "confident_mapping",
-  signature = "MappingResult",
-  definition = function(x) x@confident_mapping
+    f = "confident_mapping",
+    signature = "MappingResult",
+    definition = function(x) x@confident_mapping
 )
 
 #' @title Get the mapping history for a BLASE Mapping Results object.
@@ -206,9 +206,9 @@ setGeneric("mapping_history", function(x) standardGeneric("mapping_history"))
 
 #' @rdname mapping-result-history-getter
 setMethod(
-  f = "mapping_history",
-  signature = "MappingResult",
-  definition = function(x) x@history
+    f = "mapping_history",
+    signature = "MappingResult",
+    definition = function(x) x@history
 )
 
 #' @title Get the number of bootstrap iterations
@@ -224,7 +224,7 @@ setGeneric("bootstrap_iterations", function(x) standardGeneric("bootstrap_iterat
 
 #' @rdname mapping-result-bootstrap-iterations-getter
 setMethod(
-  f = "bootstrap_iterations",
-  signature = "MappingResult",
-  definition = function(x) x@bootstrap_iterations
+    f = "bootstrap_iterations",
+    signature = "MappingResult",
+    definition = function(x) x@bootstrap_iterations
 )

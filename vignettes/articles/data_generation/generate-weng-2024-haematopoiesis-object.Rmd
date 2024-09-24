@@ -9,8 +9,8 @@ vignette: >
 
 ```{r, include = FALSE, eval=FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
+    collapse = TRUE,
+    comment = "#>"
 )
 ```
 
@@ -42,7 +42,7 @@ set.seed(SEED)
 ```{r, concurrency, eval=FALSE}
 N_CORES <- 4
 if (ami::using_ci()) {
-  N_CORES <- 2
+    N_CORES <- 2
 }
 ```
 
@@ -54,16 +54,16 @@ root_dir <- tools::R_user_dir("BLASE", "data")
 article_dir <- fs::path(root_dir, "generate-weng-2024-haematopoiesis-object")
 article_dir
 if (!dir.exists(article_dir)) {
-  dir.create(article_dir, recursive = TRUE)
+    dir.create(article_dir, recursive = TRUE)
 }
 
 # https://figshare.com/articles/dataset/Annotated_Seurat_objects/23290004?file=41046020
 # Young1.All.T1.Seurat.RDS
 path <- fs::path(article_dir, "Young1.All.T1", ext = "RDS")
 if (!file.exists(path)) {
-  download.file("https://figshare.com/ndownloader/files/41046020", path)
+    download.file("https://figshare.com/ndownloader/files/41046020", path)
 } else {
-  print("Using cached")
+    print("Using cached")
 }
 ```
 
@@ -74,13 +74,13 @@ Now we read the files and create an SCE.
 seurat_obj <- readRDS(path)
 
 expected_trajectory <- c(
-  "Refined.HSC",
-  "HSC", # Haematopoeitic Stem Cell
-  "MPP", # multipotent progenitors
-  "CMP", # common myeloid progenitor
-  "GMP", # granulocyte–monocyte progenitors
-  "MDP" # Monocyte-dendritic cell progenitor
-  # 'Mono' # Monocytes - excluded as unclear if part of true haematopoiesis process or mature and BM resident
+    "Refined.HSC",
+    "HSC", # Haematopoeitic Stem Cell
+    "MPP", # multipotent progenitors
+    "CMP", # common myeloid progenitor
+    "GMP", # granulocyte–monocyte progenitors
+    "MDP" # Monocyte-dendritic cell progenitor
+    # 'Mono' # Monocytes - excluded as unclear if part of true haematopoiesis process or mature and BM resident
 )
 
 start_cell_type <- expected_trajectory[1]
@@ -89,8 +89,8 @@ end_cell_type <- expected_trajectory[length(expected_trajectory)]
 seurat_obj$STD.CellType <- factor(seurat_obj$STD.CellType, levels = expected_trajectory)
 
 s <- subset(
-  seurat_obj,
-  STD.CellType %in% expected_trajectory
+    seurat_obj,
+    STD.CellType %in% expected_trajectory
 )
 DefaultAssay(s) <- "RNA"
 s[["ATAC"]] <- NULL
