@@ -51,7 +51,6 @@ evaluate_parameters <- function(
     blase_data,
     make_plot = FALSE,
     plot_columns = 4) {
-
     results.best_bin <- c()
     results.best_corr <- c()
     results.history <- c()
@@ -107,7 +106,6 @@ PRIVATE_evaluate_parameters_plots <- function(
     results.specificity,
     plot_columns,
     worst_specificity) {
-  
     plots <- list()
 
     for (i in seq_len(length(bin_ids))) {

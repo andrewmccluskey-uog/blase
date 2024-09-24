@@ -217,12 +217,8 @@ setMethod(
 setMethod(
     f = "select_genes_by_fourier_method",
     signature = c(x = "SingleCellExperiment"),
-    definition = function(x,
-                          waves,
-                          n_genes = 100,
-                          n_groups = 40,
-                          top_n_per_group = 1,
-                          method = "power",
+    definition = function(x, waves, n_genes = 100, n_groups = 40,
+                          top_n_per_group = 1, method = "power",
                           force_spread_selection = TRUE) {
         if (method != "power" & method != "amplitude" & method != "r2") {
             stop(
@@ -235,49 +231,10 @@ setMethod(
             if (n_genes != 100) {
                 warning("n_genes is not used when force_spread_selection==TRUE")
             }
-
-            best_waves_in_spread <- data.frame()
-            stepsize <- max(waves$phase) / n_groups
-            for (i in seq(
-                from = 0, to = max(waves$phase), length.out = n_groups
-            )
-            ) {
-                waves_in_block <- waves[
-                    waves$phase > i - (stepsize / 2) &
-                        waves$phase < i + (stepsize / 2),
-                ]
-                # remove genes in `best_waves_in_spread` from `waves_in_block`
-                # and then select best
-
-                best_waves_in_block <- waves_in_block[
-                    order(-waves_in_block[, method]),
-                ]
-
-                # If there are more genes than we need, just take
-                # the top n, otherwise just all the remaining genes can be used.
-                if (nrow(best_waves_in_block) > top_n_per_group) {
-                    best_waves_in_block <- best_waves_in_block[
-                        seq_len(top_n_per_group),
-                    ]
-                }
-
-                best_waves_in_spread <- rbind(
-                    best_waves_in_spread,
-                    best_waves_in_block
-                )
-            }
-
-            if (nrow(best_waves_in_spread) < top_n_per_group * n_groups) {
-                warning(
-                    "Fewer genes identified as good matches",
-                    " than requested. requested=",
-                    top_n_per_group * n_groups,
-                    " found=",
-                    nrow(best_waves_in_spread)
-                )
-            }
-
-            return(best_waves_in_spread)
+            return(PRIVATE_select_genes_spread(
+                x, waves, n_groups,
+                top_n_per_group, method
+            ))
         } else {
             if (n_groups != 10 | top_n_per_group != 1) {
                 warning(
@@ -286,13 +243,62 @@ setMethod(
                 )
             }
 
-            top_waves <- waves[order(-waves[, method]), ][0:n_genes, ]
-            return(top_waves)
+            return(PRIVATE_select_genes(waves, n_genes, method))
         }
     }
 )
 
+PRIVATE_select_genes_spread <- function(x, waves, n_groups,
+                                        top_n_per_group, method) {
+    best_waves_in_spread <- data.frame()
+    stepsize <- max(waves$phase) / n_groups
+    for (i in seq(
+        from = 0, to = max(waves$phase), length.out = n_groups
+    )
+    ) {
+        waves_in_block <- waves[
+            waves$phase > i - (stepsize / 2) &
+                waves$phase < i + (stepsize / 2),
+        ]
+        # remove genes in `best_waves_in_spread` from `waves_in_block`
+        # and then select best
 
+        best_waves_in_block <- waves_in_block[
+            order(-waves_in_block[, method]),
+        ]
+
+        # If there are more genes than we need, just take
+        # the top n, otherwise just all the remaining genes can be used.
+        if (nrow(best_waves_in_block) > top_n_per_group) {
+            best_waves_in_block <- best_waves_in_block[
+                seq_len(top_n_per_group),
+            ]
+        }
+
+        best_waves_in_spread <- rbind(
+            best_waves_in_spread,
+            best_waves_in_block
+        )
+    }
+
+    if (nrow(best_waves_in_spread) < top_n_per_group * n_groups) {
+        warning(
+            "Fewer genes identified as good matches",
+            " than requested. requested=",
+            top_n_per_group * n_groups,
+            " found=",
+            nrow(best_waves_in_spread)
+        )
+    }
+
+    return(best_waves_in_spread)
+}
+
+
+PRIVATE_select_genes <- function(waves, n_genes, method) {
+    top_waves <- waves[order(-waves[, method]), ][0:n_genes, ]
+    return(top_waves)
+}
 #' get_waves
 #'
 #' @description
