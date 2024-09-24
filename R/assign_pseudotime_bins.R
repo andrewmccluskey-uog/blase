@@ -36,19 +36,12 @@ setGeneric(
 setMethod(
     f = "assign_pseudotime_bins",
     signature = c(x = "SingleCellExperiment"),
-    definition = function(x,
-                          split_by,
-                          n_bins,
+    definition = function(x, split_by, n_bins,
                           pseudotime_slot = "slingPseudotime_1") {
-        if (is.na(match(split_by, c("pseudotime_range", "cells")))) {
-            stop("split_by must be 'pseudotime_range' or 'cells'")
-        }
-
-        if (!any(colnames(x@colData) == pseudotime_slot)) {
-            stop("Pseudotime slot '", pseudotime_slot, "' does not exist")
-        }
-
-        # TODO check for rownames and colnames existing
+        PRIVATE_assign_pseudotime_bins_validate_inputs(
+            x, split_by,
+            pseudotime_slot
+        )
 
         pseudotime_sce <- subset(x, , !is.na(
             SummarizedExperiment::colData(x)[pseudotime_slot]
@@ -123,3 +116,18 @@ setMethod(
         return(x)
     }
 )
+
+PRIVATE_assign_pseudotime_bins_validate_inputs <- function(
+    x,
+    split_by,
+    pseudotime_slot) {
+    if (is.na(match(split_by, c("pseudotime_range", "cells")))) {
+        stop("split_by must be 'pseudotime_range' or 'cells'")
+    }
+
+    if (!any(colnames(x@colData) == pseudotime_slot)) {
+        stop("Pseudotime slot '", pseudotime_slot, "' does not exist")
+    }
+
+    # TODO check for rownames and colnames existing
+}

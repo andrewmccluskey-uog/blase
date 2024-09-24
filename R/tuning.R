@@ -51,7 +51,6 @@ evaluate_parameters <- function(
     blase_data,
     make_plot = FALSE,
     plot_columns = 4) {
-    bin_ids <- blase_data@bins
 
     results.best_bin <- c()
     results.best_corr <- c()
@@ -65,7 +64,7 @@ evaluate_parameters <- function(
 
     colnames(pseudobulked_bins) <- blase_data@bins
 
-    for (i in bin_ids) {
+    for (i in blase_data@bins) {
         res <- map_best_bin(
             blase_data,
             i,
@@ -84,30 +83,52 @@ evaluate_parameters <- function(
     mean_specificity <- mean(results.specificity)
 
     if (make_plot == TRUE) {
-        plots <- list()
-
-        for (i in seq_len(length(bin_ids))) {
-            plots[[i]] <- PRIVATE_plot_history(
-                i,
-                results.best_bin,
-                results.best_corr,
-                results.history,
-                results.specificity
-            )
-        }
-
-        gridExtra::grid.arrange(
-            top = grid::textGrob(paste(
-                length(blase_data@genes),
-                "genes and worst specificity:",
-                signif(worst_specificity, 2)
-            ), gp = grid::gpar(fontsize = 20, font = 3)),
-            grobs = plots,
-            ncol = plot_columns
+        PRIVATE_evaluate_parameters_plots(
+            blase_data,
+            blase_data@bins,
+            results.best_bin,
+            results.best_corr,
+            results.history,
+            results.specificity,
+            plot_columns,
+            worst_specificity
         )
     }
 
     return(c(worst_specificity, mean_specificity))
+}
+
+PRIVATE_evaluate_parameters_plots <- function(
+    blase_data,
+    bin_ids,
+    results.best_bin,
+    results.best_corr,
+    results.history,
+    results.specificity,
+    plot_columns,
+    worst_specificity) {
+  
+    plots <- list()
+
+    for (i in seq_len(length(bin_ids))) {
+        plots[[i]] <- PRIVATE_plot_history(
+            i,
+            results.best_bin,
+            results.best_corr,
+            results.history,
+            results.specificity
+        )
+    }
+
+    gridExtra::grid.arrange(
+        top = grid::textGrob(paste(
+            length(blase_data@genes),
+            "genes and worst specificity:",
+            signif(worst_specificity, 2)
+        ), gp = grid::gpar(fontsize = 20, font = 3)),
+        grobs = plots,
+        ncol = plot_columns
+    )
 }
 
 

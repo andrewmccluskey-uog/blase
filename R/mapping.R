@@ -17,57 +17,45 @@ map_best_bin <- function(
     blase_data, bulk_id, bulk_data, bootstrap_iterations = 200) {
     PRIVATE_quality_check_blase_object(blase_data)
 
-    correlations_history <- data.frame()
+    results <- data.frame()
     for (i in blase_data@bins) {
-        results <- PRIVATE_map_bin(
+        results <- rbind(results, PRIVATE_map_bin(
             blase_data,
             i,
             bulk_data,
             bulk_id,
             bootstrap_iterations
-        )
-
-        correlations_history <- rbind(
-            correlations_history,
-            results
-        )
+        ))
     }
 
-    colnames(correlations_history) <- c(
-        "bin",
-        "correlation",
-        "lower_bound",
-        "upper_bound"
-    )
+    colnames(results) <- c("bin", "correlation", "lower_bound", "upper_bound")
 
-    best_cor <- max(correlations_history$correlation)
-    best_i <- which.max(correlations_history$correlation)
+    best_cor <- max(results$correlation)
+    best_i <- which.max(results$correlation)
 
     top2 <- utils::head(
-        sort(correlations_history$correlation, decreasing = TRUE),
+        sort(results$correlation, decreasing = TRUE),
         n = 2
     )
     distance_between_top_2_corrs <- round(top2[1] - top2[2], 4)
 
-    confident_mapping <- FALSE
-    non_top_mapping_best_upper_bound <- max(
-        correlations_history[correlations_history$bin != best_i, ]$upper_bound
+    second_best_high_bound <- max(
+        results[results$bin != best_i, ]$upper_bound
     )
-    top_mapping_lower_bound <- correlations_history[
-        correlations_history$bin == best_i,
+
+    best_low_bound <- results[
+        results$bin == best_i,
     ]$lower_bound
 
-    confident_mapping <-
-        non_top_mapping_best_upper_bound < top_mapping_lower_bound &&
-            top_mapping_lower_bound > 0
+    confident <- second_best_high_bound < best_low_bound && best_low_bound > 0
 
     return(methods::new("MappingResult",
         bulk_name = bulk_id,
         best_bin = best_i,
         best_correlation = best_cor,
         top_2_distance = distance_between_top_2_corrs,
-        confident_mapping = confident_mapping,
-        history = correlations_history,
+        confident_mapping = confident,
+        history = results,
         bootstrap_iterations = bootstrap_iterations
     ))
 }

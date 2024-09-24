@@ -113,7 +113,7 @@ PRIVATE_gene_selection_matrix_make_plot <- function(data) {
     log_expr_sym <- ggplot2::sym("log_expression")
 
     plot <- ggplot2::ggplot(
-        data = heatmap_counts_ordered.df,
+        data = data,
         ggplot2::aes(
             x = {{ cell_sym }},
             y = {{ gene_sym }},
