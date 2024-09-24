@@ -19,20 +19,18 @@ map_best_bin <- function(
 
     correlations_history <- data.frame()
     for (i in blase_data@bins) {
-      
         results <- PRIVATE_map_bin(
-          blase_data, 
-          i, 
-          bulk_data, 
-          bulk_id, 
-          bootstrap_iterations
-        )
-      
-        correlations_history <- rbind(
-          correlations_history,
-          results
+            blase_data,
+            i,
+            bulk_data,
+            bulk_id,
+            bootstrap_iterations
         )
 
+        correlations_history <- rbind(
+            correlations_history,
+            results
+        )
     }
 
     colnames(correlations_history) <- c(
@@ -41,7 +39,7 @@ map_best_bin <- function(
         "lower_bound",
         "upper_bound"
     )
-    
+
     best_cor <- max(correlations_history$correlation)
     best_i <- which.max(correlations_history$correlation)
 
@@ -104,36 +102,35 @@ PRIVATE_quality_check_bin <- function(blase_data, i, genes_present) {
 }
 
 PRIVATE_map_bin <- function(
-    blase_data, 
-    i, 
-    bulk_data, 
-    bulk_id, 
-    bootstrap_iterations
-  ) {
-  genes_present <- blase_data@genes[
-    blase_data@genes %in% rownames(blase_data@pseudobulk_bins[[i]])
-  ]
-  counts_for_top_genes <- bulk_data[genes_present, as.character(bulk_id)]
-  
-  PRIVATE_quality_check_bin(blase_data, i, genes_present)
-  
-  bin_ratios <- blase_data@pseudobulk_bins[[i]][genes_present, ]
-  
-  all_info_correlation <- stats::cor.test(
-    unname(Matrix::rowMeans(bin_ratios)),
-    counts_for_top_genes,
-    method = "spearman",
-    exact = FALSE
-  )
-  corr_estimate <- unname(all_info_correlation$estimate)
-  
-  bounds <- PRIVATE_bootstrap_bin(
-    bootstrap_iterations,
-    bin_ratios,
-    counts_for_top_genes
-  )
+    blase_data,
+    i,
+    bulk_data,
+    bulk_id,
+    bootstrap_iterations) {
+    genes_present <- blase_data@genes[
+        blase_data@genes %in% rownames(blase_data@pseudobulk_bins[[i]])
+    ]
+    counts_for_top_genes <- bulk_data[genes_present, as.character(bulk_id)]
 
-  return(c(i, corr_estimate, bounds$lower_bound, bounds$upper_bound))
+    PRIVATE_quality_check_bin(blase_data, i, genes_present)
+
+    bin_ratios <- blase_data@pseudobulk_bins[[i]][genes_present, ]
+
+    all_info_correlation <- stats::cor.test(
+        unname(Matrix::rowMeans(bin_ratios)),
+        counts_for_top_genes,
+        method = "spearman",
+        exact = FALSE
+    )
+    corr_estimate <- unname(all_info_correlation$estimate)
+
+    bounds <- PRIVATE_bootstrap_bin(
+        bootstrap_iterations,
+        bin_ratios,
+        counts_for_top_genes
+    )
+
+    return(c(i, corr_estimate, bounds$lower_bound, bounds$upper_bound))
 }
 
 PRIVATE_bootstrap_bin <- function(

@@ -86,9 +86,8 @@ setMethod(
         }
 
         # Then get the normalised count matrix
-        pseudotime <- x@colData[[pseudotime_slot]]
-        heatmap_counts <-
-            SingleCellExperiment::logcounts(x)[, order(pseudotime)]
+        pseudotime_order <- order(x@colData[[pseudotime_slot]])
+        heatmap_counts <- SingleCellExperiment::logcounts(x)[, pseudotime_order]
         heatmap_counts <- heatmap_counts[order(waves$phase), ]
 
         small_heatmap_counts <- redim_matrix(
@@ -98,38 +97,41 @@ setMethod(
             BPPARAM = BPPARAM
         )
 
-        heatmap_counts_ordered.df <- reshape2::melt(
+        small_heatmap_counts <- reshape2::melt(
             small_heatmap_counts,
             c("gene", "cell"),
             value.name = "log_expression"
         )
 
-        cell_sym <- ggplot2::sym("cell")
-        gene_sym <- ggplot2::sym("gene")
-        log_expr_sym <- ggplot2::sym("log_expression")
-
-        plot <- ggplot2::ggplot(
-            data = heatmap_counts_ordered.df,
-            ggplot2::aes(
-                x = {{ cell_sym }},
-                y = {{ gene_sym }},
-                fill = {{ log_expr_sym }}
-            )
-        ) +
-            ggplot2::geom_tile() +
-            ggplot2::theme(
-                axis.text.x = ggplot2::element_blank(),
-                axis.text.y = ggplot2::element_blank()
-            ) +
-            ggplot2::scale_fill_gradient(
-                low = "white",
-                high = "red",
-                guide = "colorbar"
-            )
-
-        return(plot)
+        return(PRIVATE_gene_selection_matrix_make_plot(small_heatmap_counts))
     }
 )
+
+PRIVATE_gene_selection_matrix_make_plot <- function(data) {
+    cell_sym <- ggplot2::sym("cell")
+    gene_sym <- ggplot2::sym("gene")
+    log_expr_sym <- ggplot2::sym("log_expression")
+
+    plot <- ggplot2::ggplot(
+        data = heatmap_counts_ordered.df,
+        ggplot2::aes(
+            x = {{ cell_sym }},
+            y = {{ gene_sym }},
+            fill = {{ log_expr_sym }}
+        )
+    ) +
+        ggplot2::geom_tile() +
+        ggplot2::theme(
+            axis.text.x = ggplot2::element_blank(),
+            axis.text.y = ggplot2::element_blank()
+        ) +
+        ggplot2::scale_fill_gradient(
+            low = "white",
+            high = "red",
+            guide = "colorbar"
+        )
+    return(plot)
+}
 
 #' select_genes_by_fourier_method
 #'
