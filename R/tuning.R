@@ -288,7 +288,7 @@ plot_find_best_params_results <- function(
 #' @param plot_columns The number of columns to plot the grid with. Best as a
 #' divisor of `n_genes_to_plot`.
 #'
-#' @returns A plot showing the normalised expression of the top genes 
+#' @returns A plot showing the normalised expression of the top genes
 #' over pseudotime bins.
 #'
 #' @export

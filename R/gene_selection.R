@@ -373,7 +373,7 @@ get_waves <- function(
 #' @concept gene-selection
 #'
 #' @return The matrix with reduced dimensions
-#' 
+#'
 #' @import BiocParallel
 #'
 #' @description

@@ -193,7 +193,7 @@ plot_mapping_result_heatmap(list(
 
 ### Plotting Detailed Correlation Maps
 
-To look into the GMP mapping, we can plot the correlation over each bin.
+To look into the Basophils mapping, we can plot the correlation over each bin.
 Because the the lower boundary of the best selection (bin 3) is higher
 than the higher bounds of the next-best bin (bin 4), BLASE makes a
 confident call.
@@ -220,12 +220,6 @@ To view the bin population chart in full, use:
 ```{r}
 plot_bin_population(binned_sce, 1, group_by_slot="celltype")
 ```
-
-We can see here that both of these bins have high proportions of the GMP
-cell type, which is why Blase could not make a convincing call on either
-of these being the true "best" mapping. In this case, since Bin 3 has a
-larger proportion and number of GMP cells, it is likely the best
-mapping, and this is reflected in Blase's correlation score.
 
 ## Session Info
 
