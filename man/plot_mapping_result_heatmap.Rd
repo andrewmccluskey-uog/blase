@@ -60,6 +60,14 @@ sce <- assign_pseudotime_bins(
   sce,
   pseudotime_slot = "pseudotime", n_bins = 4
 )
-plot_bin_population(sce, result@best_bin, group_by_slot = "cell_type")
+plot_bin_population(sce, best_bin(result), group_by_slot = "cell_type")
+
+# Getters
+bulk_name(result)
+best_bin(result)
+best_correlation(result)
+confident_mapping(result)
+mapping_history(result)
+bootstrap_iterations(result)
 }
 \concept{mapping_plots}

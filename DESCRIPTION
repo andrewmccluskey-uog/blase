@@ -68,5 +68,5 @@ URL: https://andrewmccluskey-uog.github.io/BLASE/
 BugReports: https://andrewmccluskey-uog.github.io/BLASE/issues
 Depends: 
     R (>= 4.4.0)
-LazyData: true
+LazyData: false
 LazyDataCompression: bzip2

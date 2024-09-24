@@ -324,11 +324,15 @@ get_waves <- function(
 
   heatmap_counts <- SingleCellExperiment::normcounts(sce)[, order(pseudotime)]
 
-  waves_list <- BiocParallel::bplapply(rownames(heatmap_counts), function(gene) {
-    wave <- as.data.frame(FitWave(as.matrix(heatmap_counts[gene, ]), 1))
-    rownames(wave) <- c(gene)
-    return(wave)
-  }, BPPARAM = BPPARAM)
+  waves_list <- BiocParallel::bplapply(
+    rownames(heatmap_counts),
+    function(gene) {
+      wave <- as.data.frame(FitWave(as.matrix(heatmap_counts[gene, ]), 1))
+      rownames(wave) <- c(gene)
+      return(wave)
+    },
+    BPPARAM = BPPARAM
+  )
   waves <- do.call("rbind", waves_list)
 
   waves <- as.data.frame(waves)

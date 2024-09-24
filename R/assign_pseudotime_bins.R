@@ -47,8 +47,12 @@ setMethod(
 
     # TODO check for rownames and colnames existing
 
-    pseudotime_sce <- subset(x, , !is.na(x@colData[pseudotime_slot]))
-    pseudotime <- pseudotime_sce@colData[[pseudotime_slot]]
+    pseudotime_sce <- subset(x, , !is.na(
+      SummarizedExperiment::colData(x)[pseudotime_slot]
+    ))
+    pseudotime <- (
+      SummarizedExperiment::colData(pseudotime_sce)[[pseudotime_slot]]
+    )
 
     if (split_by == "pseudotime_range") {
       min_pdt <- 0
