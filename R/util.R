@@ -94,12 +94,8 @@ get_top_n_genes <- function(
 #' )
 #' result
 get_bins_as_bulk <- function(
-    pseudotime_sce,
-    min_cells_for_bulk = 50,
+    pseudotime_sce, min_cells_for_bulk = 50,
     replicate_slot = "replicate") {
-    # TODO Generalize so we don't rely on subsetting with subset on a magic
-    # field (i.e. replicate, which is even listed as a param but isn't really)
-
     output <- data.frame()
     for (bin_id in seq_len(max(pseudotime_sce$pseudotime_bin))) {
         bin_specific_sce <- subset(
@@ -114,73 +110,18 @@ get_bins_as_bulk <- function(
         )
 
         if (length(replicates_with_more_than_minimum) >= 2) {
-            pseudobulks <- data.frame()
-            for (rep_id in replicates_with_more_than_minimum) {
-                bin_specific_rep_specific_sce_pseudobulk <- as.data.frame(
-                    rowSums(SingleCellExperiment::counts(subset(
-                        bin_specific_sce, ,
-                        bin_specific_sce@colData[["replicate"]] == rep_id
-                    )))
-                )
-
-                if (ncol(pseudobulks) == 0) {
-                    pseudobulks <- bin_specific_rep_specific_sce_pseudobulk
-                    colnames(pseudobulks) <- c(
-                        paste0("bin_", bin_id, "_rep_", rep_id)
-                    )
-                } else {
-                    pseudobulks <- merge(
-                        x = pseudobulks,
-                        y = bin_specific_rep_specific_sce_pseudobulk,
-                        by = "row.names"
-                    )
-                    rownames(pseudobulks) <- pseudobulks$Row.names
-                    pseudobulks <- pseudobulks[, c(-1)]
-                    colnames(pseudobulks) <- append(
-                        colnames(pseudobulks)[seq_len(ncol(pseudobulks) - 1)],
-                        paste0("bin_", bin_id, "_rep_", rep_id)
-                    )
-                }
-            }
+            pseudobulks <- PRIVATE_get_bins_as_bulk_bin_has_replicates(
+                replicates_with_more_than_minimum,
+                bin_specific_sce,
+                replicate_slot,
+                bin_id
+            )
         } else if (length(replicates_with_more_than_minimum) == 1) {
-            bin_specific_pseudobulk <- subset(
-                bin_specific_sce, ,
-                bin_specific_sce@colData[["replicate"]] ==
-                    replicates_with_more_than_minimum[1]
-            )
-
-            cell_count_to_sample <- ceiling((ncol(
-                SingleCellExperiment::counts(bin_specific_pseudobulk)
-            ) * 0.75))
-            counts_for_bulk <- SingleCellExperiment::counts(
-                bin_specific_pseudobulk
-            )
-            pseudobulks <- merge(
-                x = as.data.frame(rowSums(counts_for_bulk[
-                    , sample(ncol(counts_for_bulk), size = cell_count_to_sample)
-                ])),
-                y = as.data.frame(rowSums(counts_for_bulk[
-                    , sample(ncol(counts_for_bulk), size = cell_count_to_sample)
-                ])),
-                by = "row.names"
-            )
-            rownames(pseudobulks) <- pseudobulks$Row.names
-            pseudobulks <- pseudobulks[, c(-1)]
-            colnames(pseudobulks) <- c(
-                paste0(
-                    "bin_",
-                    bin_id,
-                    "_rep_",
-                    replicates_with_more_than_minimum[1],
-                    "_1"
-                ),
-                paste0(
-                    "bin_",
-                    bin_id,
-                    "_rep_",
-                    replicates_with_more_than_minimum[1],
-                    "_2"
-                )
+            pseudobulks <- PRIVATE_get_bins_as_bulk_bin_without_replicates(
+                replicates_with_more_than_minimum,
+                bin_specific_sce,
+                replicate_slot,
+                bin_id
             )
         } else {
             message(
@@ -201,4 +142,87 @@ get_bins_as_bulk <- function(
     }
 
     return(output)
+}
+
+PRIVATE_get_bins_as_bulk_bin_has_replicates <- function(
+    replicates_with_more_than_minimum,
+    bin_specific_sce,
+    replicate_slot,
+    bin_id) {
+    pseudobulks <- data.frame()
+    for (rep_id in replicates_with_more_than_minimum) {
+        bin_specific_rep_specific_sce_pseudobulk <- as.data.frame(
+            rowSums(SingleCellExperiment::counts(subset(
+                bin_specific_sce, ,
+                bin_specific_sce@colData[[replicate_slot]] == rep_id
+            )))
+        )
+
+        if (ncol(pseudobulks) == 0) {
+            pseudobulks <- bin_specific_rep_specific_sce_pseudobulk
+            colnames(pseudobulks) <- c(
+                paste0("bin_", bin_id, "_rep_", rep_id)
+            )
+        } else {
+            pseudobulks <- merge(
+                x = pseudobulks,
+                y = bin_specific_rep_specific_sce_pseudobulk,
+                by = "row.names"
+            )
+            rownames(pseudobulks) <- pseudobulks$Row.names
+            pseudobulks <- pseudobulks[, c(-1)]
+            colnames(pseudobulks) <- append(
+                colnames(pseudobulks)[seq_len(ncol(pseudobulks) - 1)],
+                paste0("bin_", bin_id, "_rep_", rep_id)
+            )
+        }
+    }
+    return(pseudobulks)
+}
+
+PRIVATE_get_bins_as_bulk_bin_without_replicates <- function(
+    replicates_with_more_than_minimum,
+    bin_specific_sce,
+    replicate_slot,
+    bin_id) {
+    bin_specific_pseudobulk <- subset(
+        bin_specific_sce, ,
+        bin_specific_sce@colData[[replicate_slot]] ==
+            replicates_with_more_than_minimum[1]
+    )
+
+    cell_count_to_sample <- ceiling((ncol(
+        SingleCellExperiment::counts(bin_specific_pseudobulk)
+    ) * 0.75))
+    counts_for_bulk <- SingleCellExperiment::counts(
+        bin_specific_pseudobulk
+    )
+    pseudobulks <- merge(
+        x = as.data.frame(rowSums(counts_for_bulk[
+            , sample(ncol(counts_for_bulk), size = cell_count_to_sample)
+        ])),
+        y = as.data.frame(rowSums(counts_for_bulk[
+            , sample(ncol(counts_for_bulk), size = cell_count_to_sample)
+        ])),
+        by = "row.names"
+    )
+    rownames(pseudobulks) <- pseudobulks$Row.names
+    pseudobulks <- pseudobulks[, c(-1)]
+    colnames(pseudobulks) <- c(
+        paste0(
+            "bin_",
+            bin_id,
+            "_rep_",
+            replicates_with_more_than_minimum[1],
+            "_1"
+        ),
+        paste0(
+            "bin_",
+            bin_id,
+            "_rep_",
+            replicates_with_more_than_minimum[1],
+            "_2"
+        )
+    )
+    return(pseudobulks)
 }

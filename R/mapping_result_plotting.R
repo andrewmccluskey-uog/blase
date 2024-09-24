@@ -212,7 +212,6 @@ plot_mapping_result_heatmap <- function(
 
 PRIVATE_mapping_result_heatmap_plot <- function(
     bulk_results, fill_scale, annotate) {
-  
     bulk_name_sym <- ggplot2::sym("bulk_name")
     pseudotime_bin_sym <- ggplot2::sym("pseudotime_bin")
     correlation_sym <- ggplot2::sym("correlation")

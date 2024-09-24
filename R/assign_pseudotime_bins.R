@@ -21,11 +21,8 @@
 setGeneric(
     name = "assign_pseudotime_bins",
     signature = c(x = "x"),
-    def = function(x,
-                   split_by = "pseudotime_range",
-                   n_bins = 20,
-                   pseudotime_slot = "slingPseudotime_1",
-                   ...) {
+    def = function(x, split_by = "pseudotime_range", n_bins = 20,
+                   pseudotime_slot = "slingPseudotime_1", ...) {
         standardGeneric("assign_pseudotime_bins")
     }
 )
@@ -92,7 +89,8 @@ setMethod(
 setMethod(
     f = "assign_pseudotime_bins",
     signature = c(x = "data.frame"),
-    definition = function(x, split_by, n_bins, pseudotime_slot = "slingPseudotime_1") {
+    definition = function(x, split_by, n_bins,
+                          pseudotime_slot = "slingPseudotime_1") {
         stop("Can't update bulk data, using each sample as bins.")
     }
 )
@@ -105,9 +103,7 @@ setMethod(
 setMethod(
     f = "assign_pseudotime_bins",
     signature = c(x = "Seurat"),
-    definition = function(x,
-                          split_by,
-                          n_bins,
+    definition = function(x, split_by, n_bins,
                           pseudotime_slot = "slingPseudotime_1") {
         rlang::check_installed("Seurat", reason = "to handle Seurat objects.")
         sce <- Seurat::as.SingleCellExperiment(x)

@@ -41,10 +41,8 @@ setMethod(
 setMethod(
     f = "as.BlaseData",
     signature = c(x = "Seurat"),
-    definition = function(x,
-                          pseudotime_slot = "slingPseudotime_1",
-                          n_bins = 20,
-                          split_by = "pseudotime_range") {
+    definition = function(x, pseudotime_slot = "slingPseudotime_1",
+                          n_bins = 20, split_by = "pseudotime_range") {
         rlang::check_installed("Seurat", reason = "to handle Seurat objects.")
         sce <- Seurat::as.SingleCellExperiment(x)
         return(
@@ -74,10 +72,8 @@ setMethod(
 setMethod(
     f = "as.BlaseData",
     signature = c(x = "SingleCellExperiment"),
-    definition = function(x,
-                          pseudotime_slot = "slingPseudotime_1",
-                          n_bins = 20,
-                          split_by = "pseudotime_range") {
+    definition = function(x, pseudotime_slot = "slingPseudotime_1",
+                          n_bins = 20, split_by = "pseudotime_range") {
         pseudotime_sce <- assign_pseudotime_bins(
             x,
             split_by,

@@ -39,12 +39,9 @@ setGeneric(
 setMethod(
     f = "gene_selection_matrix",
     signature = c(x = "Seurat"),
-    definition = function(x,
-                          waves,
-                          genes = c(),
+    definition = function(x, waves, genes = c(),
                           pseudotime_slot = "slingPseudotime_1",
-                          target_matrix_size = 1000,
-                          BPPARAM = BPPARAM) {
+                          target_matrix_size = 1000, BPPARAM = BPPARAM) {
         rlang::check_installed("Seurat", reason = "to handle Seurat objects.")
         sce <- Seurat::as.SingleCellExperiment(x)
         return(gene_selection_matrix(
@@ -68,9 +65,7 @@ setMethod(
 setMethod(
     f = "gene_selection_matrix",
     signature = c(x = "SingleCellExperiment"),
-    definition = function(x,
-                          waves,
-                          genes = c(),
+    definition = function(x, waves, genes = c(),
                           pseudotime_slot = "slingPseudotime_1",
                           target_matrix_size = 1000,
                           BPPARAM = BiocParallel::SerialParam()) {
@@ -182,12 +177,8 @@ setGeneric(
 setMethod(
     f = "select_genes_by_fourier_method",
     signature = c(x = "Seurat"),
-    definition = function(x,
-                          waves,
-                          n_genes = 100,
-                          n_groups = 40,
-                          top_n_per_group = 1,
-                          method = "power",
+    definition = function(x, waves, n_genes = 100, n_groups = 40,
+                          top_n_per_group = 1, method = "power",
                           force_spread_selection = TRUE) {
         rlang::check_installed("Seurat", reason = "to handle Seurat objects.")
         sce <- Seurat::as.SingleCellExperiment(x)
@@ -323,8 +314,7 @@ PRIVATE_select_genes <- function(waves, n_genes, method) {
 #'
 #' @examples
 get_waves <- function(
-    sce,
-    pseudotime_slot = "slingPseudotime_1",
+    sce, pseudotime_slot = "slingPseudotime_1",
     BPPARAM = BiocParallel::SerialParam()) {
     if (!any(colnames(sce@colData) == pseudotime_slot)) {
         stop("Pseudotime slot '", pseudotime_slot, "' does not exist")
@@ -387,9 +377,7 @@ get_waves <- function(
 #' @description
 #' Snippet from: https://cansnippet.bioinfo-fr.net/details.php?id=3
 redim_matrix <- function(
-    mat,
-    target_height = 100,
-    target_width = 100,
+    mat, target_height = 100, target_width = 100,
     summary_func = function(x) mean(x, na.rm = TRUE),
     BPPARAM = BiocParallel::SerialParam()) {
     if (target_height > nrow(mat) | target_width > ncol(mat)) {

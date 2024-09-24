@@ -206,7 +206,7 @@ find_best_params <- function(
         worst_specificity = c(),
         mean_specificity = c()
     )
-    # TODO consider parallelising this https://www.bioconductor.org/packages/devel/bioc/vignettes/BiocParallel/inst/doc/Introduction_To_BiocParallel.html#parallel-looping-vectorized-and-aggregate-operations
+
     for (bin_count in bins_count_range) {
         blase_data <- as.BlaseData(x = x, n_bins = bin_count, ...)
 
