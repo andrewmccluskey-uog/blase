@@ -29,11 +29,11 @@ Plot the populations of a bin
 }
 \examples{
 counts_matrix <- matrix(
-  c(seq_len(120) / 10, seq_len(120) / 5),
-  ncol = 48, nrow = 5
+    c(seq_len(120) / 10, seq_len(120) / 5),
+    ncol = 48, nrow = 5
 )
 sce <- SingleCellExperiment::SingleCellExperiment(assays = list(
-  normcounts = counts_matrix, logcounts = log(counts_matrix)
+    normcounts = counts_matrix, logcounts = log(counts_matrix)
 ))
 colnames(sce) <- seq_len(48)
 rownames(sce) <- as.character(seq_len(5))
@@ -59,8 +59,8 @@ plot_mapping_result_corr(result)
 
 # Plot populations
 sce <- assign_pseudotime_bins(
-  sce,
-  pseudotime_slot = "pseudotime", n_bins = 4
+    sce,
+    pseudotime_slot = "pseudotime", n_bins = 4
 )
 plot_bin_population(sce, best_bin(result), group_by_slot = "cell_type")
 

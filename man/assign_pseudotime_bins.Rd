@@ -16,7 +16,12 @@ assign_pseudotime_bins(x, split_by = "pseudotime_range", n_bins = 20, ...)
   pseudotime_slot = "slingPseudotime_1"
 )
 
-\S4method{assign_pseudotime_bins}{data.frame}(x, split_by, n_bins)
+\S4method{assign_pseudotime_bins}{data.frame}(
+  x,
+  split_by,
+  n_bins,
+  pseudotime_slot = "slingPseudotime_1"
+)
 
 \S4method{assign_pseudotime_bins}{Seurat}(
   x,
@@ -35,21 +40,23 @@ cells per bin.}
 
 \item{n_bins}{The number of bins to split the cells into.}
 
-\item{...}{additional arguments passed to object-specific methods.}
-
 \item{pseudotime_slot}{The \link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment::SingleCellExperiment}
 slot containing the pseudotime values for each cell.}
+}
+\value{
+A copy of x where cells are annotated with their
+pseudotime bin.
 }
 \description{
 Assign Pseudotime Bins to a source object's metadata
 }
 \examples{
 counts_matrix <- matrix(
-  c(seq_len(120) / 10, seq_len(120) / 5),
-  ncol = 48, nrow = 5
+    c(seq_len(120) / 10, seq_len(120) / 5),
+    ncol = 48, nrow = 5
 )
 sce <- SingleCellExperiment::SingleCellExperiment(assays = list(
-  normcounts = counts_matrix, logcounts = log(counts_matrix)
+    normcounts = counts_matrix, logcounts = log(counts_matrix)
 ))
 colnames(sce) <- seq_len(48)
 rownames(sce) <- as.character(seq_len(5))
@@ -75,8 +82,8 @@ plot_mapping_result_corr(result)
 
 # Plot populations
 sce <- assign_pseudotime_bins(
-  sce,
-  pseudotime_slot = "pseudotime", n_bins = 4
+    sce,
+    pseudotime_slot = "pseudotime", n_bins = 4
 )
 plot_bin_population(sce, best_bin(result), group_by_slot = "cell_type")
 

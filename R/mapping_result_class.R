@@ -84,6 +84,9 @@ MappingResult <- setClass(
 #' @concept mapping-result-object
 #'
 #' @param object an [MappingResult] object
+#'
+#' @returns A character vector describing the Mapping Result object
+#'
 #' @export
 #' @inherit MappingResult-class examples
 setMethod(
@@ -131,6 +134,7 @@ setMethod(
 #'
 #' @rdname mapping-result-bulk-name-getter
 #' @param x a [MappingResult] object
+#' @returns The name of the bulk used to map against.
 #' @export
 #' @inherit MappingResult-class examples
 setGeneric("bulk_name", function(x) standardGeneric("bulk_name"))
@@ -149,6 +153,7 @@ setMethod(
 #'
 #' @rdname mapping-result-best-bin-getter
 #' @param x a [MappingResult] object
+#' @returns The best bin ID of this mapping
 #' @export
 #' @inherit MappingResult-class examples
 setGeneric("best_bin", function(x) standardGeneric("best_bin"))
@@ -166,6 +171,7 @@ setMethod(
 #'
 #' @rdname mapping-result-best-correlation-getter
 #' @param x a [MappingResult] object
+#' @returns The highest correlation value of this mapping
 #' @export
 #' @inherit MappingResult-class examples
 setGeneric("best_correlation", function(x) standardGeneric("best_correlation"))
@@ -183,9 +189,13 @@ setMethod(
 #'
 #' @rdname mapping-result-confident-mapping-getter
 #' @param x a [MappingResult] object
+#' @returns TRUE if the result is confident, otherwise FALSE
 #' @export
 #' @inherit MappingResult-class examples
-setGeneric("confident_mapping", function(x) standardGeneric("confident_mapping"))
+setGeneric(
+    "confident_mapping",
+    function(x) standardGeneric("confident_mapping")
+)
 
 #' @rdname mapping-result-confident-mapping-getter
 setMethod(
@@ -200,6 +210,7 @@ setMethod(
 #'
 #' @rdname mapping-result-history-getter
 #' @param x a [MappingResult] object
+#' @returns The mapping history of this mapping, in a data frame.
 #' @export
 #' @inherit MappingResult-class examples
 setGeneric("mapping_history", function(x) standardGeneric("mapping_history"))
@@ -218,9 +229,13 @@ setMethod(
 #'
 #' @rdname mapping-result-bootstrap-iterations-getter
 #' @param x a [MappingResult] object
+#' @returns The number of iterations performed for this mapping.
 #' @export
 #' @inherit MappingResult-class examples
-setGeneric("bootstrap_iterations", function(x) standardGeneric("bootstrap_iterations"))
+setGeneric(
+    "bootstrap_iterations",
+    function(x) standardGeneric("bootstrap_iterations")
+)
 
 #' @rdname mapping-result-bootstrap-iterations-getter
 setMethod(

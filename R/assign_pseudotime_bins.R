@@ -4,7 +4,16 @@
 #'
 #' @rdname assign_pseudotime_bins
 #' @param x An object to add metadata to.
-#' @param ... additional arguments passed to object-specific methods.
+#' @param split_by The technique used to split the bins. The default
+#' `pseudotime_range` picks the bin for a cell based on a constant range of
+#' pseudotime. `cells` picks the bin for a cell based on an even number of
+#' cells per bin.
+#' @param n_bins The number of bins to split the cells into.
+#' @param pseudotime_slot The [SingleCellExperiment::SingleCellExperiment]
+#' slot containing the pseudotime values for each cell.
+#'
+#' @returns A copy of x where cells are annotated with their
+#' pseudotime bin.
 #'
 #' @export
 #' @inherit MappingResult-class examples
@@ -20,14 +29,6 @@ setGeneric(
 )
 
 #' @rdname assign_pseudotime_bins
-#'
-#' @param split_by The technique used to split the bins. The default
-#' `pseudotime_range` picks the bin for a cell based on a constant range of
-#' pseudotime. `cells` picks the bin for a cell based on an even number of
-#' cells per bin.
-#' @param n_bins The number of bins to split the cells into.
-#' @param pseudotime_slot The [SingleCellExperiment::SingleCellExperiment]
-#' slot containing the pseudotime values for each cell.
 #'
 #' @export
 setMethod(
@@ -96,7 +97,7 @@ setMethod(
 setMethod(
     f = "assign_pseudotime_bins",
     signature = c(x = "data.frame"),
-    definition = function(x, split_by, n_bins) {
+    definition = function(x, split_by, n_bins, pseudotime_slot = "slingPseudotime_1") {
         stop("Can't update bulk data, using each sample as bins.")
     }
 )

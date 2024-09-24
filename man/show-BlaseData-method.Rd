@@ -9,13 +9,16 @@
 \arguments{
 \item{object}{an \link{BlaseData} object}
 }
+\value{
+A character vector describing the BLASE object
+}
 \description{
 Show an BlaseData object
 }
 \examples{
 counts <- matrix(rpois(100, lambda = 10), ncol = 10, nrow = 10)
 sce <- SingleCellExperiment::SingleCellExperiment(
-  assays = list(normcounts = counts)
+    assays = list(normcounts = counts)
 )
 sce$pseudotime <- seq_len(10)
 data <- as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 3)

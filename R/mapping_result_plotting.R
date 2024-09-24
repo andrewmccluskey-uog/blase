@@ -7,6 +7,8 @@
 #' @param y The [MappingResult] object to plot
 #' @param ... additional arguments passed to object-specific methods.
 #'
+#' @returns A set of plots describing the mapping.
+#'
 #' @seealso [plot_mapping_result_corr()], [plot_bin_population()]
 #'
 #' @export
@@ -62,7 +64,7 @@ setMethod(
     signature = c(x = "SingleCellExperiment", y = "MappingResult"),
     definition = function(x, y, group_by_slot) {
         # TODO offer this with more than just umaps
-        gridExtra::grid.arrange(
+        return(gridExtra::grid.arrange(
             scater::plotUMAP(x, colour_by = "pseudotime_bin"),
             scater::plotUMAP(x, colour_by = group_by_slot),
             scater::plotUMAP(
@@ -88,7 +90,7 @@ setMethod(
                 ),
                 gp = grid::gpar(fontsize = 20, font = 3)
             )
-        )
+        ))
     }
 )
 
@@ -153,6 +155,9 @@ setMethod(
 #' apply to the heatmap.
 #' @param annotate Whether to annotate the heatmap with significant results
 #' or not, defaults to TRUE.
+#'
+#' @returns A heatmap showing the correlations of each mapping result across
+#' every pseudotime bin.
 #'
 #' @export
 #' @inherit MappingResult-class examples

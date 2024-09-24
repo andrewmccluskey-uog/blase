@@ -40,6 +40,9 @@ BlaseData <- setClass(
 #' @concept blase-object
 #'
 #' @param object an [BlaseData] object
+#' 
+#' @returns A character vector describing the BLASE object
+#' 
 #' @export
 #' @inherit BlaseData-class examples
 setMethod(
@@ -62,6 +65,9 @@ setMethod(
 #'
 #' @rdname genes-getter
 #' @param x a [BlaseData] object
+#' 
+#' @returns The vector of genes a BLASE object will use for mappings.
+#' 
 #' @export
 #' @inherit BlaseData-class examples
 setGeneric("genes", function(x) standardGeneric("genes"))
@@ -80,6 +86,9 @@ setMethod(
 #' @rdname genes-setter
 #' @param x a [BlaseData] object
 #' @param value new value for genes slot, should be a vector of strings
+#'
+#' @returns Nothing 
+#'
 #' @export
 #' @inherit BlaseData-class examples
 setGeneric("genes<-", function(x, value) standardGeneric("genes<-"))

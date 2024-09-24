@@ -222,6 +222,9 @@ find_best_params <- function(
 #' @param bin_count_colors Optional, custom bin count color scheme.
 #' @param gene_count_colors Optional, custom gene count color scheme.
 #'
+#' @returns A plot showing how specificity changes as n_bins and n_genes
+#' are changed. See [find_best_params()] for details on how to interpret.
+#'
 #' @seealso [find_best_params()]
 #'
 #' @import viridis
@@ -238,7 +241,7 @@ plot_find_best_params_results <- function(
     worst_specificity <- ggplot2::sym("worst_specificity")
     mean_specificity <- ggplot2::sym("mean_specificity")
 
-    gridExtra::grid.arrange(
+    return(gridExtra::grid.arrange(
         ggplot2::ggplot(find_best_params_results, ggplot2::aes(
             x = {{ gene_count }},
             y = {{ worst_specificity }},
@@ -268,7 +271,7 @@ plot_find_best_params_results <- function(
             ggplot2::geom_point() +
             gene_count_colors,
         ncol = 2
-    )
+    ))
 }
 
 #' Evaluate Top Genes
@@ -284,6 +287,9 @@ plot_find_best_params_results <- function(
 #' @param n_genes_to_plot The number of genes to plot.
 #' @param plot_columns The number of columns to plot the grid with. Best as a
 #' divisor of `n_genes_to_plot`.
+#'
+#' @returns A plot showing the normalised expression of the top genes 
+#' over pseudotime bins.
 #'
 #' @export
 #'
@@ -338,14 +344,14 @@ evaluate_top_n_genes <- function(
         )
     }
 
-    gridExtra::grid.arrange(
+    return(gridExtra::grid.arrange(
         top = grid::textGrob(
             paste(length(blase_data@genes), "genes"),
             gp = grid::gpar(fontsize = 20, font = 3)
         ),
         grobs = plots,
         ncol = plot_columns
-    )
+    ))
 }
 
 PRIVATE_plot_history <- function(i, bin, corr, history, specificity) {

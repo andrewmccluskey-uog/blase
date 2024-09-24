@@ -14,6 +14,10 @@ evaluate_top_n_genes(blase_data, n_genes_to_plot = 16, plot_columns = 4)
 \item{plot_columns}{The number of columns to plot the grid with. Best as a
 divisor of \code{n_genes_to_plot}.}
 }
+\value{
+A plot showing the normalised expression of the top genes
+over pseudotime bins.
+}
 \description{
 Shows plots over bins of expression of the top n genes.
 This is designed to help identify if you have selected
@@ -24,18 +28,18 @@ bins to exist over. Uses the normcounts of the SCE.
 ncells <- 70
 ngenes <- 100
 counts_matrix <- matrix(
-  c(seq_len(3500) / 10, seq_len(3500) / 5),
-  ncol = ncells,
-  nrow = ngenes
+    c(seq_len(3500) / 10, seq_len(3500) / 5),
+    ncol = ncells,
+    nrow = ngenes
 )
 sce <- SingleCellExperiment::SingleCellExperiment(assays = list(
-  normcounts = counts_matrix, logcounts = log(counts_matrix)
+    normcounts = counts_matrix, logcounts = log(counts_matrix)
 ))
 colnames(sce) <- seq_len(ncells)
 rownames(sce) <- as.character(seq_len(ngenes))
 sce$cell_type <- c(
-  rep("celltype_1", ncells / 2),
-  rep("celltype_2", ncells / 2)
+    rep("celltype_1", ncells / 2),
+    rep("celltype_2", ncells / 2)
 )
 
 sce$pseudotime <- seq_len(ncells)
