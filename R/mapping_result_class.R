@@ -46,6 +46,9 @@
 #' result <- map_best_bin(blase_data, "B", bulk_counts)
 #' result
 #'
+#' # Map all bulks to bin
+#' results <- map_all_best_bins(blase_data, bulk_counts)
+#'
 #' # Plot Heatmap
 #' plot_mapping_result_heatmap(list(result))
 #'
