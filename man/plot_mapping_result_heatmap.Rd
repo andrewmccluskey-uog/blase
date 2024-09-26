@@ -73,8 +73,12 @@ plot_bin_population(sce, best_bin(result), group_by_slot = "cell_type")
 bulk_name(result)
 best_bin(result)
 best_correlation(result)
+top_2_distance(result)
 confident_mapping(result)
 mapping_history(result)
 bootstrap_iterations(result)
+
+# Convert to dataframe
+as.data.frame(result)
 }
 \concept{mapping_plots}

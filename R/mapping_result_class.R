@@ -66,9 +66,13 @@
 #' bulk_name(result)
 #' best_bin(result)
 #' best_correlation(result)
+#' top_2_distance(result)
 #' confident_mapping(result)
 #' mapping_history(result)
 #' bootstrap_iterations(result)
+#'
+#' # Convert to dataframe
+#' as.data.frame(result)
 MappingResult <- setClass(
     Class = "MappingResult",
     slots = list(
@@ -186,6 +190,29 @@ setMethod(
     definition = function(x) x@best_correlation
 )
 
+#' @title Get the difference in correlation between the top 2 most correlated
+#'bins for a BLASE Mapping Results object.
+#'
+#' @concept mapping-result-object
+#'
+#' @rdname mapping-result-top-2-distance-getter
+#' @param x a [MappingResult] object
+#' @returns the difference in correlation between the top 2 most correlated
+#' bins for this mapping.
+#' @export
+#' @inherit MappingResult-class examples
+setGeneric(
+  "top_2_distance",
+  function(x) standardGeneric("top_2_distance")
+)
+
+#' @rdname mapping-result-top-2-distance-getter
+setMethod(
+  f = "top_2_distance",
+  signature = "MappingResult",
+  definition = function(x) x@top_2_distance
+)
+
 #' @title Get if the result is confident for a BLASE Mapping Results object.
 #'
 #' @concept mapping-result-object
@@ -245,4 +272,36 @@ setMethod(
     f = "bootstrap_iterations",
     signature = "MappingResult",
     definition = function(x) x@bootstrap_iterations
+)
+
+#' @title Get the number of bootstrap iterations
+#' performed for a BLASE Mapping Results object.
+#'
+#' @description
+#' This dataframe could be joined to others using rbind if you would like to
+#' generate your own plots from the mapping result data.
+#'
+#' @concept mapping-result-object
+#'
+#' @rdname mapping-result-as-dataframe
+#' @param x a [MappingResult] object
+#' @returns A dataframe of the data held within the results, excluding the full
+#' mapping history. To access this, please use `mapping_history(x)`
+#' @export
+#' @inherit MappingResult-class examples
+setMethod(
+  f = "as.data.frame",
+  signature = "MappingResult",
+  definition = function(x) {
+
+      return(data.frame(
+        bulk_name=bulk_name(x),
+        best_bin=best_bin(x),
+        best_correlation=best_correlation(x),
+        top_2_distance=top_2_distance(x),
+        confident_mapping=confident_mapping(x),
+        bootstrap_iterations(x)
+      ))
+
+  }
 )
