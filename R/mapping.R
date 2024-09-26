@@ -105,8 +105,8 @@ PRIVATE_quality_check_blase_object <- function(blase_data, bulk) {
     }
 
     if (length(intersect(genes(blase_data), rownames(bulk))) == 0) {
-        stop(paste0("No genes in genes(blase_data) exist in " +
-            "the rows of the bulk dataframe, exiting."))
+        stop("No genes in genes(blase_data) exist in ",
+            "the rows of the bulk dataframe, exiting.")
     }
 }
 
