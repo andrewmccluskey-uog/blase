@@ -11,7 +11,8 @@ map_best_bin(blase_data, bulk_id, bulk_data, bootstrap_iterations = 200)
 
 \item{bulk_id}{The sample id of the bulk to analyse.}
 
-\item{bulk_data}{The whole bulk read matrix.}
+\item{bulk_data}{The whole bulk read matrix as a dataframe. Each row should
+represent a gene, and each column a sample.}
 
 \item{bootstrap_iterations}{The number of bootstrapping iterations to run.}
 }

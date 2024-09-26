@@ -1,10 +1,46 @@
+#' Map many bulk samples in the same dataframe
+#'
+#' @concept mapping
+#'
+#' @param blase_data The [BlaseData] holding the bins.
+#' @param bulk_data The whole bulk read matrix as a dataframe. Each row should
+#' represent a gene, and each column a sample.
+#' @param bootstrap_iterations The number of bootstrapping iterations to run.
+#' @param BPPARAM The BiocParallel param for multithreading if desired.
+#' Defaults to [BiocParallel::SerialParam()]
+#'
+#' @import methods
+#' @import BiocParallel
+#'
+#' @return A vector of [MappingResult] objects.
+#' @seealso [map_best_bin()]
+#' @export
+#'
+#' @inherit MappingResult-class examples
+map_all_best_bins <- function(blase_data, bulk_data,
+                              bootstrap_iterations = 200,
+                              BPPARAM = BiocParallel::SerialParam()) {
+    results <- BiocParallel::bplapply(
+        colnames(bulk_data),
+        function(bulk_id) {
+            return(map_best_bin(blase_data, bulk_id, bulk_data,
+                bootstrap_iterations = bootstrap_iterations
+            ))
+        },
+        BPPARAM = BPPARAM
+    )
+    return(results)
+}
+
+
 #' Map the best matching SC bin for a bulk sample
 #'
 #' @concept mapping
 #'
 #' @param blase_data The [BlaseData] holding the bins.
 #' @param bulk_id The sample id of the bulk to analyse.
-#' @param bulk_data The whole bulk read matrix.
+#' @param bulk_data The whole bulk read matrix as a dataframe. Each row should
+#' represent a gene, and each column a sample.
 #' @param bootstrap_iterations The number of bootstrapping iterations to run.
 #'
 #' @import methods
@@ -15,7 +51,7 @@
 #' @inherit MappingResult-class examples
 map_best_bin <- function(
     blase_data, bulk_id, bulk_data, bootstrap_iterations = 200) {
-    PRIVATE_quality_check_blase_object(blase_data)
+    PRIVATE_quality_check_blase_object(blase_data, bulk_data)
 
     results <- data.frame()
     for (i in blase_data@bins) {
@@ -60,12 +96,17 @@ map_best_bin <- function(
     ))
 }
 
-PRIVATE_quality_check_blase_object <- function(blase_data) {
+PRIVATE_quality_check_blase_object <- function(blase_data, bulk) {
     if (any(is.na(genes(blase_data))) || length(genes(blase_data)) == 0) {
         stop(
             "No genes to map with. ",
             "Please add something to the genes(blase_data) slot."
         )
+    }
+
+    if (length(intersect(genes(blase_data), rownames(bulk))) == 0) {
+        stop(paste0("No genes in genes(blase_data) exist in " +
+            "the rows of the bulk dataframe, exiting."))
     }
 }
 
