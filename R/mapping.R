@@ -20,6 +20,12 @@
 map_all_best_bins <- function(blase_data, bulk_data,
                               bootstrap_iterations = 200,
                               BPPARAM = BiocParallel::SerialParam()) {
+
+    # TODO can we make this faster by not sending the whole bulk_data through?
+    # Seems that a lot of time is taken transferring unused data. Would a
+    # named list be a good route? Or can we refactor map_best_bin to take one sample's
+    # data?
+
     results <- BiocParallel::bplapply(
         colnames(bulk_data),
         function(bulk_id) {
@@ -112,9 +118,9 @@ PRIVATE_quality_check_blase_object <- function(blase_data, bulk) {
 
 PRIVATE_quality_check_bin <- function(blase_data, i, genes_present) {
     if (any(length(genes_present) != length(blase_data@genes))) {
-        warn(
+        warning(
             "Not all genes present in bucket ",
-            i,
+            as.character(i),
             " continuing without checking correlation for these genes.\n"
         )
     }
@@ -122,7 +128,7 @@ PRIVATE_quality_check_bin <- function(blase_data, i, genes_present) {
     if (ncol(blase_data@pseudobulk_bins[[i]]) <= 1) {
         stop(
             "Not enough cells in bin ",
-            i,
+            as.character(i),
             " to map against, please reduce number of bins (currently ",
             length(blase_data@pseudobulk_bins),
             ") or split by cells"
@@ -136,14 +142,33 @@ PRIVATE_map_bin <- function(
     bulk_data,
     bulk_id,
     bootstrap_iterations) {
-    genes_present <- blase_data@genes[
+
+    genes_present_in_ref <- blase_data@genes[
         blase_data@genes %in% rownames(blase_data@pseudobulk_bins[[i]])
     ]
-    counts_for_top_genes <- bulk_data[genes_present, as.character(bulk_id)]
 
-    PRIVATE_quality_check_bin(blase_data, i, genes_present)
+    genes_present_in_both <- genes_present_in_ref[
+      genes_present_in_ref %in% rownames(bulk_data)
+    ]
 
-    bin_ratios <- blase_data@pseudobulk_bins[[i]][genes_present, ]
+    if (length(blase_data@genes) != length(genes_present_in_both)) {
+      warning(
+        "Genes for mapping not all in bulk, using ",
+        length(genes_present_in_both),
+        " genes available in both reference and bulk."
+      )
+    }
+
+    if (any(blase_data@genes == bulk_id)) {
+      warning("Bulk ID matches a gene, if this fails then check you are",
+              "using bulk name and not geneIds:",bulk_id)
+    }
+
+    counts_for_top_genes <- bulk_data[genes_present_in_both, as.character(bulk_id)]
+
+    PRIVATE_quality_check_bin(blase_data, i, genes_present_in_both)
+
+    bin_ratios <- blase_data@pseudobulk_bins[[i]][genes_present_in_both, ]
 
     all_info_correlation <- stats::cor.test(
         unname(Matrix::rowMeans(bin_ratios)),
