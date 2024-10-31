@@ -21,20 +21,24 @@ map_all_best_bins <- function(blase_data, bulk_data,
                               bootstrap_iterations = 200,
                               BPPARAM = BiocParallel::SerialParam()) {
 
-    # TODO can we make this faster by not sending the whole bulk_data through?
-    # Seems that a lot of time is taken transferring unused data. Would a
-    # named list be a good route? Or can we refactor map_best_bin to take one sample's
-    # data?
+    dataframes = list()
+    for (col_id in colnames(bulk_data)) {
+      df = as.data.frame(bulk_data[,col_id])
+      colnames(df) <- col_id
+      dataframes[[length(dataframes)+1]] = df
+    }
 
     results <- BiocParallel::bplapply(
-        colnames(bulk_data),
-        function(bulk_id) {
-            return(map_best_bin(blase_data, bulk_id, bulk_data,
+        dataframes,
+        function(df) {
+            id = colnames(df)[1]
+            return(map_best_bin(blase_data, id, df,
                 bootstrap_iterations = bootstrap_iterations
             ))
         },
         BPPARAM = BPPARAM
     )
+
     return(results)
 }
 
@@ -195,6 +199,7 @@ PRIVATE_bootstrap_bin <- function(
     upper_bound <- 1
     if (bootstrap_iterations > 0) {
         correlations <- c()
+        # TODO AM can we speed this up by using apply?
         for (j in seq_len(bootstrap_iterations)) {
             pseudobulk_sample_names <- sample(
                 colnames(bin_ratios), ncol(bin_ratios),
