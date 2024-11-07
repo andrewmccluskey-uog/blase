@@ -21,12 +21,25 @@ map_all_best_bins <- function(blase_data, bulk_data,
                               bootstrap_iterations = 200,
                               BPPARAM = BiocParallel::SerialParam()) {
 
+    bulk_data_blase_genes_only = bulk_data[
+      rownames(bulk_data) %in% blase_data@genes,
+    ]
     dataframes = list()
     for (col_id in colnames(bulk_data)) {
-      df = as.data.frame(bulk_data[,col_id])
+      df = as.data.frame(bulk_data_blase_genes_only[, col_id])
+      rownames(df) <- rownames(bulk_data_blase_genes_only)
       colnames(df) <- col_id
       dataframes[[length(dataframes)+1]] = df
     }
+
+    blase_data@pseudobulk_bins = lapply(
+      blase_data@pseudobulk_bins,
+      function(x) {
+        return(x[blase_data@genes,])
+      })
+
+    # force execution of lapply
+    force(blase_data@pseudobulk_bins)
 
     results <- BiocParallel::bplapply(
         dataframes,
@@ -54,6 +67,8 @@ map_all_best_bins <- function(blase_data, bulk_data,
 #' @param bootstrap_iterations The number of bootstrapping iterations to run.
 #'
 #' @import methods
+#' @import RVAideMemoire
+#' @import dqrng
 #'
 #' @return A [MappingResult] object.
 #' @export
@@ -61,6 +76,7 @@ map_all_best_bins <- function(blase_data, bulk_data,
 #' @inherit MappingResult-class examples
 map_best_bin <- function(
     blase_data, bulk_id, bulk_data, bootstrap_iterations = 200) {
+
     PRIVATE_quality_check_blase_object(blase_data, bulk_data)
 
     results <- data.frame()
@@ -121,13 +137,6 @@ PRIVATE_quality_check_blase_object <- function(blase_data, bulk) {
 }
 
 PRIVATE_quality_check_bin <- function(blase_data, i, genes_present) {
-    if (any(length(genes_present) != length(blase_data@genes))) {
-        warning(
-            "Not all genes present in bucket ",
-            as.character(i),
-            " continuing without checking correlation for these genes.\n"
-        )
-    }
 
     if (ncol(blase_data@pseudobulk_bins[[i]]) <= 1) {
         stop(
@@ -174,21 +183,40 @@ PRIVATE_map_bin <- function(
 
     bin_ratios <- blase_data@pseudobulk_bins[[i]][genes_present_in_both, ]
 
-    all_info_correlation <- stats::cor.test(
-        unname(Matrix::rowMeans(bin_ratios)),
-        counts_for_top_genes,
-        method = "spearman",
-        exact = FALSE
-    )
-    corr_estimate <- unname(all_info_correlation$estimate)
+    # all_info_correlation <- stats::cor.test(
+    #     unname(Matrix::rowSums(bin_ratios)),
+    #     counts_for_top_genes,
+    #     method = "spearman",
+    #     exact = FALSE
+    # )
+    # corr_estimate <- unname(all_info_correlation$estimate)
+    #
+    # bounds <- PRIVATE_bootstrap_bin(
+    #     bootstrap_iterations,
+    #     bin_ratios,
+    #     counts_for_top_genes
+    # )
+    #
+    # return(c(
+    #   i,
+    #   corr_estimate,
+    #   bounds$lower_bound,
+    #   bounds$upper_bound
+    # ))
 
-    bounds <- PRIVATE_bootstrap_bin(
-        bootstrap_iterations,
-        bin_ratios,
-        counts_for_top_genes
+    corr = RVAideMemoire::spearman.ci(
+      unname(Matrix::rowSums(bin_ratios)),
+      counts_for_top_genes,
+      nrep = bootstrap_iterations,
+      conf.level = 0.95
     )
 
-    return(c(i, corr_estimate, bounds$lower_bound, bounds$upper_bound))
+    return(c(
+      i,
+      corr$estimate,
+      unname(corr$conf.int[1]),
+      unname(corr$conf.int[2])
+    ))
 }
 
 PRIVATE_bootstrap_bin <- function(
@@ -198,32 +226,70 @@ PRIVATE_bootstrap_bin <- function(
     lower_bound <- 0
     upper_bound <- 1
     if (bootstrap_iterations > 0) {
-        correlations <- c()
-        # TODO AM can we speed this up by using apply?
-        for (j in seq_len(bootstrap_iterations)) {
-            pseudobulk_sample_names <- sample(
-                colnames(bin_ratios), ncol(bin_ratios),
-                replace = TRUE
-            )
-            pseudobulk_sample_means <- unname(
-                Matrix::rowMeans(bin_ratios[, pseudobulk_sample_names])
-            )
+    #    correlations <- c()
+    #    # TODO AM can we speed this up by using apply?
+    #     for (j in seq_len(bootstrap_iterations)) {
+    #         pseudobulk_sample_names <- sample(
+    #             colnames(bin_ratios), ncol(bin_ratios),
+    #             replace = TRUE
+    #         )
+    #         pseudobulk_sample_means <- unname(
+    #             Matrix::rowSums(bin_ratios[, pseudobulk_sample_names])
+    #         )
+    #
+    #         corr <- stats::cor.test(
+    #             pseudobulk_sample_means,
+    #             counts_for_top_genes,
+    #             method = "spearman",
+    #             exact = FALSE
+    #         )
+    #         correlations <- c(correlations, unname(corr$estimate))
+    #     }
+    #
+    #     middle_90 <- correlations[{
+    #         q <- rank(correlations) / length(correlations)
+    #         q < 0.05 | q >= 0.95
+    #     }]
+    #     lower_bound <- min(middle_90)
+    #     upper_bound <- max(middle_90)
+    # }
 
-            corr <- stats::cor.test(
-                pseudobulk_sample_means,
-                counts_for_top_genes,
-                method = "spearman",
-                exact = FALSE
-            )
-            correlations <- c(correlations, unname(corr$estimate))
-        }
+      samples = matrix(colnames(bin_ratios)[
+        dqsample.int(
+          ncol(bin_ratios),
+          ncol(bin_ratios)*bootstrap_iterations,
+          replace=TRUE
+        )
+      ], nrow=bootstrap_iterations)
 
-        middle_90 <- correlations[{
+      speeds = data.frame(getSampleNames=c(), getSampleMeans=c(), corr=c())
+
+      correlations = lapply(seq_len(bootstrap_iterations), function(j) {
+        pseudobulk_sample_names = as.vector(samples[j,])
+
+        pseudobulk_sample_means <- unname(
+          Matrix::rowSums(bin_ratios[, pseudobulk_sample_names])
+        )
+
+        corr <- stats::cor.test(
+          pseudobulk_sample_means,
+          counts_for_top_genes,
+          method = "spearman",
+          exact = FALSE
+        )
+
+        return(unname(corr$estimate))
+      })
+
+        correlations=unlist(correlations, use.names = FALSE)
+
+        middle_95 <- correlations[{
             q <- rank(correlations) / length(correlations)
-            q < 0.05 | q >= 0.95
+            q < 0.025 | q >= 0.975
         }]
-        lower_bound <- min(middle_90)
-        upper_bound <- max(middle_90)
+        lower_bound <- min(middle_95)
+        upper_bound <- max(middle_95)
     }
+
     return(list("lower_bound" = lower_bound, "upper_bound" = upper_bound))
 }

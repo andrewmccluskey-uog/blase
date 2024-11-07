@@ -246,6 +246,7 @@ PRIVATE_mapping_result_heatmap_plot <- function(
                 values = c("transparent", "transparent")
             )
     }
+    return(p)
 }
 
 #' @title Plot a mapping result's correlation

@@ -28,7 +28,8 @@ biocViews:
   TimeCourse,
   CellBiology,
   Software,
-  CellBasedAssays
+  CellBasedAssays,
+  RVAideMemoire
 Imports: 
   SingleCellExperiment,
   ggplot2,
@@ -39,7 +40,8 @@ Imports:
   methods,
   rlang,
   metR,
-  BiocParallel
+  BiocParallel,
+  RVAideMemoire
 Suggests: 
     knitr,
     rmarkdown,
