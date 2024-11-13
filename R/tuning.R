@@ -7,17 +7,22 @@
 #' @concept tuning
 #'
 #' @param blase_data The [BlaseData] object to use.
+#' @param bootstrap_iterations Iterations for bootstrapping when calculating
+#' confident mappings.
+#' @param BPPARAM The BiocParallel configuration. Defaults to SerialParam.
 #' @param make_plot Whether or not to render the plot showing the correlations
 #' for each pseudobulk bin when we try to map the given bin.
 #' @param plot_columns How many columns to use in the plot.
 #'
-#' @return A vector of length 2:
+#' @return A vector of length 3:
 #' * "worst top 2 distance" containing the lowest difference between the
 #'  absolute values of the top 2 most correlated bins for each bin.
 #'  Higher is better for differentiating.
 #' * "mean top 2 distance" containing the mean top 2 distance across the
 #'  entire set of genes and bins. Higher is better for differentiation,
 #'  but it should matter less than the worst value.
+#' * "confident_mapping_pct" - The percent of mappings for this setup which
+#'  were annotated as confident by BLASE
 #' @export
 #'
 #' @examples
@@ -49,37 +54,55 @@
 #' evaluate_parameters(blase_data, make_plot = TRUE)
 evaluate_parameters <- function(
     blase_data,
+    bootstrap_iterations = 200,
+    BPPARAM = BiocParallel::SerialParam(),
     make_plot = FALSE,
     plot_columns = 4) {
     results.best_bin <- c()
     results.best_corr <- c()
     results.history <- c()
     results.specificity <- c()
+    results.confident_mapping <- c()
 
-    pseudobulked_bins <- data.frame(lapply(blase_data@bins, function(i) {
-        x <- blase_data@pseudobulk_bins[[i]]
-        return(Matrix::rowMeans(x))
-    }))
+    # TODO AM This just pseudobulks every cell
+    # pseudobulked_bins <- data.frame(lapply(blase_data@bins, function(i) {
+    #     return(Matrix::rowSums(blase_data@pseudobulk_bins[[i]]))
+    # }))
+
+    # TODO AM This randomly selects 50% of cells for use on each side
+    pseudobulked_bins = NULL
+    for (i in blase_data@bins) {
+      x <- blase_data@pseudobulk_bins[[i]]
+      split = round(runif(ncol(x), 0, 1))
+      test = as.matrix(x[,split==1])
+      train = as.matrix(x[,split==0])
+      test_pseudobulk = Matrix::rowSums(test)
+      pseudobulked_bins = cbind(pseudobulked_bins, test_pseudobulk)
+      blase_data@pseudobulk_bins[[i]] = train
+    }
 
     colnames(pseudobulked_bins) <- blase_data@bins
 
-    for (i in blase_data@bins) {
-        res <- map_best_bin(
-            blase_data,
-            i,
-            pseudobulked_bins,
-            bootstrap_iterations = 0
-        )
+    results = map_all_best_bins(blase_data = blase_data,
+                                bulk_data = pseudobulked_bins,
+                                bootstrap_iterations = bootstrap_iterations,
+                                BPPARAM = BPPARAM)
+
+    for (res in results) {
         results.best_bin <- append(results.best_bin, c(res@best_bin))
         results.best_corr <- append(results.best_corr, c(res@best_correlation))
         results.specificity <- append(
             results.specificity, c(res@top_2_distance)
         )
         results.history <- append(results.history, c(res@history))
+        results.confident_mapping <- append(results.confident_mapping, c(res@confident_mapping))
     }
 
     worst_specificity <- min(results.specificity)
     mean_specificity <- mean(results.specificity)
+
+    # TRUE evaluated as 1
+    confident_mapping_pct <- (sum(results.confident_mapping) / length(blase_data@bins)) * 100
 
     if (make_plot == TRUE) {
         PRIVATE_evaluate_parameters_plots(
@@ -94,7 +117,7 @@ evaluate_parameters <- function(
         )
     }
 
-    return(c(worst_specificity, mean_specificity))
+    return(c(worst_specificity, mean_specificity, confident_mapping_pct))
 }
 
 PRIVATE_evaluate_parameters_plots <- function(
@@ -138,6 +161,9 @@ PRIVATE_evaluate_parameters_plots <- function(
 #' @param genelist The list of genes to use (ordered by descending goodness)
 #' @param bins_count_range The n_bins list to try out
 #' @param gene_count_range The n_genes list to try out
+#' @param bootstrap_iterations Iterations for bootstrapping when calculating
+#' confident mappings.
+#' @param BPPARAM The BiocParallel configuration. Defaults to SerialParam.
 #' @param verbose Whether to print the n_gene/n_bin combination in progress.
 #' Defaults to False.
 #' @param ... params to be passed to child functions, see [as.BlaseData()]
@@ -147,6 +173,9 @@ PRIVATE_evaluate_parameters_plots <- function(
 #' * gene_count: The top n genes to use for this attempt
 #' * worst_specificity: The worst specificity for these parameters
 #' * mean_specificity: The mean specificity for these parameters
+#' * confident_mapping_pct: The percent of bins which were confidently mapped
+#'   to themselves for these parameters. If this value is low, then it is
+#'   likely that in real use, few or no results will be confidently mapped.
 #'
 #' @seealso [plot_find_best_params_results()] for plotting the
 #' results of this function.
@@ -189,6 +218,8 @@ find_best_params <- function(
     genelist,
     bins_count_range = c(5, 10, 20, 40),
     gene_count_range = c(10, 20, 40, 80),
+    bootstrap_iterations = 200,
+    BPPARAM = BiocParallel::SerialParam(),
     verbose = FALSE,
     ...) {
     if (length(genelist) < max(gene_count_range)) {
@@ -204,7 +235,8 @@ find_best_params <- function(
         gene_count = c(),
         bin_count = c(),
         worst_specificity = c(),
-        mean_specificity = c()
+        mean_specificity = c(),
+        confident_mapping_pct = c()
     )
 
     for (bin_count in bins_count_range) {
@@ -217,14 +249,20 @@ find_best_params <- function(
                 message("Bins=", bin_count, " genes=", genes_count)
             }
 
-            res <- evaluate_parameters(blase_data, make_plot = FALSE)
+            res <- evaluate_parameters(
+              blase_data,
+              bootstrap_iterations,
+              BPPARAM,
+              make_plot = FALSE
+            )
             results <- rbind(
                 results,
                 data.frame(
                     bin_count = c(bin_count),
                     gene_count = c(genes_count),
                     worst_specificity = c(res[1]),
-                    mean_specificity = c(res[2])
+                    mean_specificity = c(res[2]),
+                    confident_mapping_pct = c(res[3])
                 )
             )
         }
@@ -259,8 +297,10 @@ plot_find_best_params_results <- function(
     bin_count <- ggplot2::sym("bin_count")
     worst_specificity <- ggplot2::sym("worst_specificity")
     mean_specificity <- ggplot2::sym("mean_specificity")
+    confident_mapping_pct <- ggplot2::sym("confident_mapping_pct")
 
     return(gridExtra::grid.arrange(
+        # Worst Specificity
         ggplot2::ggplot(find_best_params_results, ggplot2::aes(
             x = {{ gene_count }},
             y = {{ worst_specificity }},
@@ -275,6 +315,7 @@ plot_find_best_params_results <- function(
         )) +
             ggplot2::geom_point() +
             gene_count_colors,
+        # Mean Specificity
         ggplot2::ggplot(find_best_params_results, ggplot2::aes(
             x = {{ gene_count }},
             y = {{ mean_specificity }},
@@ -289,6 +330,21 @@ plot_find_best_params_results <- function(
         )) +
             ggplot2::geom_point() +
             gene_count_colors,
+        # Confident mappings pct
+        ggplot2::ggplot(find_best_params_results, ggplot2::aes(
+          x = {{ gene_count }},
+          y = {{ confident_mapping_pct }},
+          color = {{ bin_count }}
+        )) +
+          ggplot2::geom_point() +
+          bin_count_colors,
+        ggplot2::ggplot(find_best_params_results, ggplot2::aes(
+          x = {{ bin_count }},
+          y = {{ confident_mapping_pct }},
+          color = {{ gene_count }}
+        )) +
+          ggplot2::geom_point() +
+          bin_count_colors,
         ncol = 2
     ))
 }

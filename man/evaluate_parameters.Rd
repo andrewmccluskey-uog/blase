@@ -4,10 +4,21 @@
 \alias{evaluate_parameters}
 \title{Evaluate n_bins and n_genes for bin mapping}
 \usage{
-evaluate_parameters(blase_data, make_plot = FALSE, plot_columns = 4)
+evaluate_parameters(
+  blase_data,
+  bootstrap_iterations = 200,
+  BPPARAM = BiocParallel::SerialParam(),
+  make_plot = FALSE,
+  plot_columns = 4
+)
 }
 \arguments{
 \item{blase_data}{The \link{BlaseData} object to use.}
+
+\item{bootstrap_iterations}{Iterations for bootstrapping when calculating
+confident mappings.}
+
+\item{BPPARAM}{The BiocParallel configuration. Defaults to SerialParam.}
 
 \item{make_plot}{Whether or not to render the plot showing the correlations
 for each pseudobulk bin when we try to map the given bin.}
@@ -15,7 +26,7 @@ for each pseudobulk bin when we try to map the given bin.}
 \item{plot_columns}{How many columns to use in the plot.}
 }
 \value{
-A vector of length 2:
+A vector of length 3:
 \itemize{
 \item "worst top 2 distance" containing the lowest difference between the
 absolute values of the top 2 most correlated bins for each bin.
@@ -23,6 +34,8 @@ Higher is better for differentiating.
 \item "mean top 2 distance" containing the mean top 2 distance across the
 entire set of genes and bins. Higher is better for differentiation,
 but it should matter less than the worst value.
+\item "confident_mapping_pct" - The percent of mappings for this setup which
+were annotated as confident by BLASE
 }
 }
 \description{

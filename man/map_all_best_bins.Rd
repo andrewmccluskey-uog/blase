@@ -8,6 +8,7 @@ map_all_best_bins(
   blase_data,
   bulk_data,
   bootstrap_iterations = 200,
+  confidence_level = 0.9,
   BPPARAM = BiocParallel::SerialParam()
 )
 }
@@ -18,6 +19,9 @@ map_all_best_bins(
 represent a gene, and each column a sample.}
 
 \item{bootstrap_iterations}{The number of bootstrapping iterations to run.}
+
+\item{confidence_level}{The confidence interval to calculate for mappings.
+Defaults to 90\%.}
 
 \item{BPPARAM}{The BiocParallel param for multithreading if desired.
 Defaults to \code{\link[BiocParallel:SerialParam-class]{BiocParallel::SerialParam()}}}

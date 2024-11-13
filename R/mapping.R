@@ -6,6 +6,8 @@
 #' @param bulk_data The whole bulk read matrix as a dataframe. Each row should
 #' represent a gene, and each column a sample.
 #' @param bootstrap_iterations The number of bootstrapping iterations to run.
+#' @param confidence_level The confidence interval to calculate for mappings.
+#' Defaults to 90%.
 #' @param BPPARAM The BiocParallel param for multithreading if desired.
 #' Defaults to [BiocParallel::SerialParam()]
 #'
@@ -19,6 +21,7 @@
 #' @inherit MappingResult-class examples
 map_all_best_bins <- function(blase_data, bulk_data,
                               bootstrap_iterations = 200,
+                              confidence_level = 0.90,
                               BPPARAM = BiocParallel::SerialParam()) {
 
     bulk_data_blase_genes_only = bulk_data[
@@ -46,7 +49,8 @@ map_all_best_bins <- function(blase_data, bulk_data,
         function(df) {
             id = colnames(df)[1]
             return(map_best_bin(blase_data, id, df,
-                bootstrap_iterations = bootstrap_iterations
+                bootstrap_iterations = bootstrap_iterations,
+                confidence_level = confidence_level
             ))
         },
         BPPARAM = BPPARAM
@@ -65,6 +69,8 @@ map_all_best_bins <- function(blase_data, bulk_data,
 #' @param bulk_data The whole bulk read matrix as a dataframe. Each row should
 #' represent a gene, and each column a sample.
 #' @param bootstrap_iterations The number of bootstrapping iterations to run.
+#' @param confidence_level The confidence interval to calculate for mappings.
+#' Defaults to 90%.
 #'
 #' @import methods
 #' @import RVAideMemoire
@@ -75,7 +81,12 @@ map_all_best_bins <- function(blase_data, bulk_data,
 #'
 #' @inherit MappingResult-class examples
 map_best_bin <- function(
-    blase_data, bulk_id, bulk_data, bootstrap_iterations = 200) {
+    blase_data,
+    bulk_id,
+    bulk_data,
+    bootstrap_iterations = 200,
+    confidence_level = 0.90
+  ) {
 
     PRIVATE_quality_check_blase_object(blase_data, bulk_data)
 
@@ -86,7 +97,8 @@ map_best_bin <- function(
             i,
             bulk_data,
             bulk_id,
-            bootstrap_iterations
+            bootstrap_iterations,
+            confidence_level
         ))
     }
 
@@ -154,7 +166,8 @@ PRIVATE_map_bin <- function(
     i,
     bulk_data,
     bulk_id,
-    bootstrap_iterations) {
+    bootstrap_iterations,
+    confidence_level) {
 
     genes_present_in_ref <- blase_data@genes[
         blase_data@genes %in% rownames(blase_data@pseudobulk_bins[[i]])
@@ -208,7 +221,7 @@ PRIVATE_map_bin <- function(
       unname(Matrix::rowSums(bin_ratios)),
       counts_for_top_genes,
       nrep = bootstrap_iterations,
-      conf.level = 0.95
+      conf.level = confidence_level
     )
 
     return(c(

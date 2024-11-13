@@ -9,6 +9,8 @@ find_best_params(
   genelist,
   bins_count_range = c(5, 10, 20, 40),
   gene_count_range = c(10, 20, 40, 80),
+  bootstrap_iterations = 200,
+  BPPARAM = BiocParallel::SerialParam(),
   verbose = FALSE,
   ...
 )
@@ -22,6 +24,11 @@ find_best_params(
 
 \item{gene_count_range}{The n_genes list to try out}
 
+\item{bootstrap_iterations}{Iterations for bootstrapping when calculating
+confident mappings.}
+
+\item{BPPARAM}{The BiocParallel configuration. Defaults to SerialParam.}
+
 \item{verbose}{Whether to print the n_gene/n_bin combination in progress.
 Defaults to False.}
 
@@ -34,6 +41,9 @@ A dataframe of the results.
 \item gene_count: The top n genes to use for this attempt
 \item worst_specificity: The worst specificity for these parameters
 \item mean_specificity: The mean specificity for these parameters
+\item confident_mapping_pct: The percent of bins which were confidently mapped
+to themselves for these parameters. If this value is low, then it is
+likely that in real use, few or no results will be confidently mapped.
 }
 }
 \description{

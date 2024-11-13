@@ -4,7 +4,13 @@
 \alias{map_best_bin}
 \title{Map the best matching SC bin for a bulk sample}
 \usage{
-map_best_bin(blase_data, bulk_id, bulk_data, bootstrap_iterations = 200)
+map_best_bin(
+  blase_data,
+  bulk_id,
+  bulk_data,
+  bootstrap_iterations = 200,
+  confidence_level = 0.9
+)
 }
 \arguments{
 \item{blase_data}{The \link{BlaseData} holding the bins.}
@@ -15,6 +21,9 @@ map_best_bin(blase_data, bulk_id, bulk_data, bootstrap_iterations = 200)
 represent a gene, and each column a sample.}
 
 \item{bootstrap_iterations}{The number of bootstrapping iterations to run.}
+
+\item{confidence_level}{The confidence interval to calculate for mappings.
+Defaults to 90\%.}
 }
 \value{
 A \link{MappingResult} object.
