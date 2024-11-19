@@ -344,7 +344,7 @@ get_waves <- function(
     # Bozdech et al. 2003 (https://doi.org/10.1371/journal.pbio.0000005) use
     # plus or minus 1/48 (i.e. one bulk either side of the peak, 6.25% window)
     # Here we use plus or minus 5% (i.e. a 10% window)
-    five_percent_of_pdt <- 0.05 * max(waves$phase)
+    five_percent_of_pdt <- 0.05 * max(pseudotime)
     waves$peak_expression <- 0
     for (gene in rownames(waves)) {
         counts_in_scan_range <- heatmap_counts[
