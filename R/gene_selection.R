@@ -401,3 +401,199 @@ redim_matrix <- function(
         }, 0.0)
     }, BPPARAM = BPPARAM))
 }
+
+#' calculate_gene_power
+#'
+#' @description
+#' Calculate the power of a gene. The power is the ratio of the mean of reads
+#' 5% either side of the smoothed peak of the gene's expression over pseudotime
+#' against the mean of the reads outside of this.
+#'
+#' @param sce SCE to do the calculations on.
+#' @param window_pct the size of the window to consider, as a percentage
+#' of the maximum pseudotime value.
+#' @param BPPARAM The BiocParallel parameter for parallelisation
+#' Defaults to [BiocParallel::SerialParam].
+#'
+#' @return Dataframe, where each row is a gene, and the following columns:
+#' mean_expression_in_window, mean_expression_out_window, power
+#' @export
+#'
+#' @concept gene-selection
+#' @import BiocParallel
+#' @import mgcv
+#'
+#' @examples
+calculate_gene_power <- function(
+    sce,
+    window_pct = 10,
+    pseudotime_slot="slingPseudotime_1",
+    knots = 10,
+    BPPARAM = BiocParallel::SerialParam()) {
+
+  pseudotime <- sce@colData[[pseudotime_slot]]
+  normalised_counts = normcounts(sce)
+
+  results <- BiocParallel::bplapply(
+    rownames(sce),
+    function(gene) {
+
+      to_smooth = data.frame(nc=normalised_counts[gene,], pdt=pseudotime)
+
+      gam = PRIVATE_create_GAM(to_smooth, knots)
+      smoothed = PRIVATE_smooth_GAM(gam, pseudotime)
+
+      peak_index = which.max(smoothed)
+      peak_pseudotime = max(pseudotime) * (peak_index/100)
+
+      window_start = peak_index-(window_pct/2)
+      window_end = peak_index+(window_pct/2)
+
+      # if (window_start < 0) {
+      #   window_start = 0
+      #   # window_end = 10
+      # }
+      #
+      # if (window_end > 100) {
+      #   # window_start = 90
+      #   window_end = 100
+      # }
+      #
+      # mean_in = mean(smoothed[window_start:window_end])
+      #
+      # mean_out = mean(
+      #   c(
+      #       smoothed[1:window_start],
+      #       smoothed[window_end:100]
+      #   )
+      # )
+
+      window_start = (window_start/100)*max(pseudotime)
+      window_end = (window_end/100)*max(pseudotime)
+      mean_in = mean(to_smooth[
+        to_smooth$pdt>=window_start & to_smooth$pdt <= window_end,
+      ]$nc)
+      mean_out = mean(to_smooth[
+        to_smooth$pdt<window_start | to_smooth$pdt > window_end,
+      ]$nc)
+
+
+      result = data.frame(
+        gene=gene,
+        peak_pseudotime=peak_pseudotime,
+        mean_in_window=mean_in,
+        mean_out_window=mean_out,
+        ratio=mean_in/mean_out,
+        window_start=window_start,
+        window_end=window_end,
+        deviance_explained = summary(gam)$dev.expl
+      )
+
+      return(result)
+    },
+    BPPARAM = BPPARAM
+  )
+
+  return(do.call("rbind", results))
+}
+
+#' smooth_gene
+#'
+#' @description
+#' ...
+#'
+#' @param sce SCE to do the calculations on.
+#' @param lineage lineage to obtain TradeSeq smoothers from.
+#' @param window_pct the size of the window to consider, as a percentage
+#' of the maximum pseudotime value.
+#'
+#' @return ...
+#' @export
+#'
+#' @concept gene-selection
+#' @import mgcv
+#'
+#' @examples
+smooth_gene = function(sce, gene, lineage = 1,
+                     window_pct = 10,
+                     pseudotime_slot="slingPseudotime_1",
+                     knots = 10) {
+
+  pseudotime <- sce@colData[[pseudotime_slot]]
+  normalised_counts = normcounts(sce)
+  to_smooth = data.frame(nc=normalised_counts[gene,], pdt=pseudotime)
+
+  gam = PRIVATE_create_GAM(to_smooth, knots)
+  smoothed = PRIVATE_smooth_GAM(gam, pseudotime)
+
+  # print(mgcv::gam.check(gam))
+  # print(mgcv::plot.gam(gam))
+
+  return(smoothed)
+}
+
+
+#' plot_gene_power
+#'
+#' @param sce
+#' @param gene_power_df
+#' @param gene
+#' @param pseudotime_slot
+#'
+#' @return
+#' @export
+#'
+#' @examples
+plot_gene_power = function(sce, gene_power_df, gene, pseudotime_slot="slingPseudotime_1") {
+
+  pseudotime <- sce@colData[[pseudotime_slot]]
+
+  target = gene_power_df[gene,]
+
+  expression = as.data.frame(SingleCellExperiment::normcounts(sce))
+  expression = as.data.frame(t(expression))
+  expression$pseudotime = c(sce@colData$slingPseudotime_1)
+  expression = expression[order(expression$pseudotime),]
+
+  smooth_df = data.frame(
+    pdt=((1:100)/100)*max(expression$pseudotime),
+    smooth_val=smooth_gene(
+      sce = sce,
+      gene = gene,
+      pseudotime_slot = "slingPseudotime_1",
+      knots = 10)
+  )
+  colnames(smooth_df) = c("pseudotime", target$gene)
+
+  y = ggplot2::sym(target$gene)
+  p = ggplot(NULL, aes(x=pseudotime, y= {{ y }} )) +
+    geom_point(data=expression) +
+    geom_vline(xintercept=target$peak_pseudotime) +
+    geom_vline(xintercept=target$window_start, linetype='dashed') +
+    geom_vline(xintercept=target$window_end, linetype='dashed') +
+    geom_hline(yintercept=target$mean_in_window, linetype='dashed', color="red") +
+    geom_hline(yintercept=target$mean_out_window, linetype='dashed', color="blue") +ggtitle(paste0(target$gene, " (Ratio:", target$ratio, ")")) +
+    geom_line(data=smooth_df, color="green")
+
+  print(p)
+}
+
+PRIVATE_create_GAM = function(to_smooth, knots) {
+  # to_smooth$nc = to_smooth$nc - 1 # zero inflation instead of one inflation
+
+  return(
+    mgcv::gam(
+      nc ~ s(pdt, bs='cr', k=knots),
+      data = to_smooth,
+      family = "nb"
+    )
+  )
+}
+
+PRIVATE_smooth_GAM = function(gam, pseudotime) {
+  return(mgcv::predict.gam(
+    gam,
+    newdata=data.frame(pdt=((1:100)/100)*max(pseudotime)),
+    type="response"
+  ))
+}

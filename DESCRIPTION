@@ -29,7 +29,8 @@ biocViews:
   CellBiology,
   Software,
   CellBasedAssays,
-  RVAideMemoire
+  RVAideMemoire,
+  ks
 Imports: 
   SingleCellExperiment,
   ggplot2,
