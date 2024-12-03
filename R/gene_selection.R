@@ -434,11 +434,24 @@ calculate_gene_power <- function(
   pseudotime <- sce@colData[[pseudotime_slot]]
   normalised_counts = normcounts(sce)
 
-  results <- BiocParallel::bplapply(
-    rownames(sce),
-    function(gene) {
 
-      to_smooth = data.frame(nc=normalised_counts[gene,], pdt=pseudotime)
+
+
+  dataframes = list()
+  for (gene_id in rownames(normalised_counts)) {
+    df = as.data.frame(normalised_counts[gene_id,])
+    colnames(df) <- c(gene_id)
+    rownames(df) <- colnames(normalised_counts)
+    dataframes[[length(dataframes)+1]] = df
+  }
+
+  results <- BiocParallel::bplapply(
+    dataframes,
+    function(df) {
+
+      gene = colnames(df)[1]
+      # to_smooth = data.frame(nc=normalised_counts[gene,], pdt=pseudotime)
+      to_smooth = data.frame(nc=df[,gene], pdt=pseudotime)
 
       gam = PRIVATE_create_GAM(to_smooth, knots)
       smoothed = PRIVATE_smooth_GAM(gam, pseudotime)
@@ -449,25 +462,6 @@ calculate_gene_power <- function(
       window_start = peak_index-(window_pct/2)
       window_end = peak_index+(window_pct/2)
 
-      # if (window_start < 0) {
-      #   window_start = 0
-      #   # window_end = 10
-      # }
-      #
-      # if (window_end > 100) {
-      #   # window_start = 90
-      #   window_end = 100
-      # }
-      #
-      # mean_in = mean(smoothed[window_start:window_end])
-      #
-      # mean_out = mean(
-      #   c(
-      #       smoothed[1:window_start],
-      #       smoothed[window_end:100]
-      #   )
-      # )
-
       window_start = (window_start/100)*max(pseudotime)
       window_end = (window_end/100)*max(pseudotime)
       mean_in = mean(to_smooth[
@@ -476,7 +470,6 @@ calculate_gene_power <- function(
       mean_out = mean(to_smooth[
         to_smooth$pdt<window_start | to_smooth$pdt > window_end,
       ]$nc)
-
 
       result = data.frame(
         gene=gene,
