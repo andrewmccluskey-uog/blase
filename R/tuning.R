@@ -50,7 +50,7 @@
 #' blase_data <- as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 10)
 #' genes(blase_data) <- genelist[1:20]
 #'
-#' # Check specificity of parameters
+#' # Check convexity of parameters
 #' evaluate_parameters(blase_data, make_plot = TRUE)
 evaluate_parameters <- function(
     blase_data,
@@ -61,7 +61,7 @@ evaluate_parameters <- function(
     results.best_bin <- c()
     results.best_corr <- c()
     results.history <- c()
-    results.specificity <- c()
+    results.convexity <- c()
     results.confident_mapping <- c()
 
     # TODO AM This just pseudobulks every cell
@@ -91,15 +91,15 @@ evaluate_parameters <- function(
     for (res in results) {
         results.best_bin <- append(results.best_bin, c(res@best_bin))
         results.best_corr <- append(results.best_corr, c(res@best_correlation))
-        results.specificity <- append(
-            results.specificity, c(res@top_2_distance)
+        results.convexity <- append(
+            results.convexity, c(res@top_2_distance)
         )
         results.history <- append(results.history, c(res@history))
         results.confident_mapping <- append(results.confident_mapping, c(res@confident_mapping))
     }
 
-    worst_specificity <- min(results.specificity)
-    mean_specificity <- mean(results.specificity)
+    minimum_convexity <- min(results.convexity)
+    mean_convexity <- mean(results.convexity)
 
     # TRUE evaluated as 1
     confident_mapping_pct <- (sum(results.confident_mapping) / length(blase_data@bins)) * 100
@@ -111,13 +111,13 @@ evaluate_parameters <- function(
             results.best_bin,
             results.best_corr,
             results.history,
-            results.specificity,
+            results.convexity,
             plot_columns,
-            worst_specificity
+            minimum_convexity
         )
     }
 
-    return(c(worst_specificity, mean_specificity, confident_mapping_pct))
+    return(c(minimum_convexity, mean_convexity, confident_mapping_pct))
 }
 
 PRIVATE_evaluate_parameters_plots <- function(
@@ -126,9 +126,9 @@ PRIVATE_evaluate_parameters_plots <- function(
     results.best_bin,
     results.best_corr,
     results.history,
-    results.specificity,
+    results.convexity,
     plot_columns,
-    worst_specificity) {
+    minimum_convexity) {
     plots <- list()
 
     for (i in seq_len(length(bin_ids))) {
@@ -137,15 +137,15 @@ PRIVATE_evaluate_parameters_plots <- function(
             results.best_bin,
             results.best_corr,
             results.history,
-            results.specificity
+            results.convexity
         )
     }
 
     gridExtra::grid.arrange(
         top = grid::textGrob(paste(
             length(blase_data@genes),
-            "genes and worst specificity:",
-            signif(worst_specificity, 2)
+            "genes and worst convexity:",
+            signif(minimum_convexity, 2)
         ), gp = grid::gpar(fontsize = 20, font = 3)),
         grobs = plots,
         ncol = plot_columns
@@ -171,8 +171,8 @@ PRIVATE_evaluate_parameters_plots <- function(
 #' @return A dataframe of the results.
 #' * bin_count: The bin count for this attempt
 #' * gene_count: The top n genes to use for this attempt
-#' * worst_specificity: The worst specificity for these parameters
-#' * mean_specificity: The mean specificity for these parameters
+#' * minimum_convexity: The worst convexity for these parameters
+#' * mean_convexity: The mean convexity for these parameters
 #' * confident_mapping_pct: The percent of bins which were confidently mapped
 #'   to themselves for these parameters. If this value is low, then it is
 #'   likely that in real use, few or no results will be confidently mapped.
@@ -234,8 +234,8 @@ find_best_params <- function(
     results <- data.frame(
         gene_count = c(),
         bin_count = c(),
-        worst_specificity = c(),
-        mean_specificity = c(),
+        minimum_convexity = c(),
+        mean_convexity = c(),
         confident_mapping_pct = c()
     )
 
@@ -260,8 +260,8 @@ find_best_params <- function(
                 data.frame(
                     bin_count = c(bin_count),
                     gene_count = c(genes_count),
-                    worst_specificity = c(res[1]),
-                    mean_specificity = c(res[2]),
+                    minimum_convexity = c(res[1]),
+                    mean_convexity = c(res[2]),
                     confident_mapping_pct = c(res[3])
                 )
             )
@@ -279,7 +279,7 @@ find_best_params <- function(
 #' @param bin_count_colors Optional, custom bin count color scheme.
 #' @param gene_count_colors Optional, custom gene count color scheme.
 #'
-#' @returns A plot showing how specificity changes as n_bins and n_genes
+#' @returns A plot showing how convexity changes as n_bins and n_genes
 #' are changed. See [find_best_params()] for details on how to interpret.
 #'
 #' @seealso [find_best_params()]
@@ -295,37 +295,37 @@ plot_find_best_params_results <- function(
     gene_count_colors = viridis::scale_color_viridis(option = "magma")) {
     gene_count <- ggplot2::sym("gene_count")
     bin_count <- ggplot2::sym("bin_count")
-    worst_specificity <- ggplot2::sym("worst_specificity")
-    mean_specificity <- ggplot2::sym("mean_specificity")
+    minimum_convexity <- ggplot2::sym("minimum_convexity")
+    mean_convexity <- ggplot2::sym("mean_convexity")
     confident_mapping_pct <- ggplot2::sym("confident_mapping_pct")
 
     return(gridExtra::grid.arrange(
-        # Worst Specificity
+        # Worst convexity
         ggplot2::ggplot(find_best_params_results, ggplot2::aes(
             x = {{ gene_count }},
-            y = {{ worst_specificity }},
+            y = {{ minimum_convexity }},
             color = {{ bin_count }}
         )) +
             ggplot2::geom_point() +
             bin_count_colors,
         ggplot2::ggplot(find_best_params_results, ggplot2::aes(
             x = {{ bin_count }},
-            y = {{ worst_specificity }},
+            y = {{ minimum_convexity }},
             color = {{ gene_count }}
         )) +
             ggplot2::geom_point() +
             gene_count_colors,
-        # Mean Specificity
+        # Mean convexity
         ggplot2::ggplot(find_best_params_results, ggplot2::aes(
             x = {{ gene_count }},
-            y = {{ mean_specificity }},
+            y = {{ mean_convexity }},
             color = {{ bin_count }}
         )) +
             ggplot2::geom_point() +
             bin_count_colors,
         ggplot2::ggplot(find_best_params_results, ggplot2::aes(
             x = {{ bin_count }},
-            y = {{ mean_specificity }},
+            y = {{ mean_convexity }},
             color = {{ gene_count }}
         )) +
             ggplot2::geom_point() +
@@ -344,7 +344,7 @@ plot_find_best_params_results <- function(
           color = {{ gene_count }}
         )) +
           ggplot2::geom_point() +
-          bin_count_colors,
+          gene_count_colors,
         ncol = 2
     ))
 }
@@ -429,7 +429,7 @@ evaluate_top_n_genes <- function(
     ))
 }
 
-PRIVATE_plot_history <- function(i, bin, corr, history, specificity) {
+PRIVATE_plot_history <- function(i, bin, corr, history, convexity) {
     bin_sym <- ggplot2::sym("bin")
     corr_sym <- ggplot2::sym("correlation")
 
@@ -443,7 +443,7 @@ PRIVATE_plot_history <- function(i, bin, corr, history, specificity) {
             " (",
             signif(corr[i], 2),
             ",",
-            signif(specificity[i], 2),
+            signif(convexity[i], 2),
             ")"
         )) +
         ggplot2::geom_line() +

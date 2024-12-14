@@ -39,8 +39,8 @@ A dataframe of the results.
 \itemize{
 \item bin_count: The bin count for this attempt
 \item gene_count: The top n genes to use for this attempt
-\item worst_specificity: The worst specificity for these parameters
-\item mean_specificity: The mean specificity for these parameters
+\item minimum_convexity: The worst convexity for these parameters
+\item mean_convexity: The mean convexity for these parameters
 \item confident_mapping_pct: The percent of bins which were confidently mapped
 to themselves for these parameters. If this value is low, then it is
 likely that in real use, few or no results will be confidently mapped.

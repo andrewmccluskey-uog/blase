@@ -29,7 +29,6 @@ biocViews:
   CellBiology,
   Software,
   CellBasedAssays,
-  RVAideMemoire,
   ks
 Imports: 
   SingleCellExperiment,
@@ -40,9 +39,8 @@ Imports:
   scater,
   methods,
   rlang,
-  metR,
   BiocParallel,
-  RVAideMemoire
+  boot
 Suggests: 
     knitr,
     rmarkdown,

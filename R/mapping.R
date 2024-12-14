@@ -73,7 +73,6 @@ map_all_best_bins <- function(blase_data, bulk_data,
 #' Defaults to 90%.
 #'
 #' @import methods
-#' @import RVAideMemoire
 #' @import dqrng
 #'
 #' @return A [MappingResult] object.
@@ -196,28 +195,7 @@ PRIVATE_map_bin <- function(
 
     bin_ratios <- blase_data@pseudobulk_bins[[i]][genes_present_in_both, ]
 
-    # all_info_correlation <- stats::cor.test(
-    #     unname(Matrix::rowSums(bin_ratios)),
-    #     counts_for_top_genes,
-    #     method = "spearman",
-    #     exact = FALSE
-    # )
-    # corr_estimate <- unname(all_info_correlation$estimate)
-    #
-    # bounds <- PRIVATE_bootstrap_bin(
-    #     bootstrap_iterations,
-    #     bin_ratios,
-    #     counts_for_top_genes
-    # )
-    #
-    # return(c(
-    #   i,
-    #   corr_estimate,
-    #   bounds$lower_bound,
-    #   bounds$upper_bound
-    # ))
-
-    corr = RVAideMemoire::spearman.ci(
+    corr = PRIVATE_spearman.ci(
       unname(Matrix::rowSums(bin_ratios)),
       counts_for_top_genes,
       nrep = bootstrap_iterations,
@@ -232,77 +210,65 @@ PRIVATE_map_bin <- function(
     ))
 }
 
-PRIVATE_bootstrap_bin <- function(
-    bootstrap_iterations,
-    bin_ratios,
-    counts_for_top_genes) {
-    lower_bound <- 0
-    upper_bound <- 1
-    if (bootstrap_iterations > 0) {
-    #    correlations <- c()
-    #    # TODO AM can we speed this up by using apply?
-    #     for (j in seq_len(bootstrap_iterations)) {
-    #         pseudobulk_sample_names <- sample(
-    #             colnames(bin_ratios), ncol(bin_ratios),
-    #             replace = TRUE
-    #         )
-    #         pseudobulk_sample_means <- unname(
-    #             Matrix::rowSums(bin_ratios[, pseudobulk_sample_names])
-    #         )
-    #
-    #         corr <- stats::cor.test(
-    #             pseudobulk_sample_means,
-    #             counts_for_top_genes,
-    #             method = "spearman",
-    #             exact = FALSE
-    #         )
-    #         correlations <- c(correlations, unname(corr$estimate))
-    #     }
-    #
-    #     middle_90 <- correlations[{
-    #         q <- rank(correlations) / length(correlations)
-    #         q < 0.05 | q >= 0.95
-    #     }]
-    #     lower_bound <- min(middle_90)
-    #     upper_bound <- max(middle_90)
-    # }
-
-      samples = matrix(colnames(bin_ratios)[
-        dqsample.int(
-          ncol(bin_ratios),
-          ncol(bin_ratios)*bootstrap_iterations,
-          replace=TRUE
-        )
-      ], nrow=bootstrap_iterations)
-
-      speeds = data.frame(getSampleNames=c(), getSampleMeans=c(), corr=c())
-
-      correlations = lapply(seq_len(bootstrap_iterations), function(j) {
-        pseudobulk_sample_names = as.vector(samples[j,])
-
-        pseudobulk_sample_means <- unname(
-          Matrix::rowSums(bin_ratios[, pseudobulk_sample_names])
-        )
-
-        corr <- stats::cor.test(
-          pseudobulk_sample_means,
-          counts_for_top_genes,
-          method = "spearman",
-          exact = FALSE
-        )
-
-        return(unname(corr$estimate))
-      })
-
-        correlations=unlist(correlations, use.names = FALSE)
-
-        middle_95 <- correlations[{
-            q <- rank(correlations) / length(correlations)
-            q < 0.025 | q >= 0.975
-        }]
-        lower_bound <- min(middle_95)
-        upper_bound <- max(middle_95)
+#' Confidence interval of a Spearman's rank correlation coefficient
+#'
+#' Computes the confidence interval of a Spearman's rank correlation
+#' coefficient by bootstraping. Originally implemented in RVAidemoire
+#' Version 0.9-83-7.
+#'
+#' @param var1 numeric vector (first variable).
+#' @param var2 nuermic verctor (second variable).
+#' @param nrep number of replicates for bootstraping.
+#' @param conf.level confidence level of the interval.
+#'
+#' @returns description method name of the test.
+#' @returns data.name 	a character string giving the name(s) of the data.
+#' @returns conf.level 	confidence level.
+#' @returns rep 	number of replicates.
+#' @returns estimate 	Spearman's rank correlation coefficient.
+#' @returns conf.int 	confidence interval.
+#'
+#' @import boot
+#'
+#'
+PRIVATE_spearman.ci <-
+  function(var1,var2,nrep=1000,conf.level=0.95){
+    if (length(var1)!=length(var2)) {stop(paste("'",deparse(substitute(var1)),"' and '",
+                                                deparse(substitute(var2)),"' lengths differ",sep=""))}
+    data.name <- paste(deparse(substitute(var1))," and ",deparse(substitute(var2)),"\n",nrep," replicates",sep="")
+    nul <- as.numeric(row.names(table(c(which(is.na(var1)),which(is.na(var2))))))
+    var1.2 <- if(length(nul)>0) {var1[-nul]} else {var1}
+    var2.2 <- if(length(nul)>0) {var2[-nul]} else {var2}
+    cor.fun <- function(data,ind) {
+      as.numeric(suppressWarnings(cor.test(data[ind,1],data[ind,2],method="spearman")$estimate))
     }
+    simul <- boot::boot(data.frame(var1.2,var2.2),cor.fun,R=nrep)
+    interval <- PRIVATE_.ci(simul$t,conf.level=conf.level)
+    attr(interval,"conf.level") <- conf.level
+    coeff <- as.numeric(suppressWarnings(cor.test(var1,var2,method="spearman")$estimate))
+    names(coeff) <- "rho"
+    result <- list(method="Spearman's rank correlation",conf.level=conf.level,rep=nrep,data.name=data.name,
+                   estimate=coeff,conf.int=interval)
+    class(result) <- "htest"
+    return(result)
+  }
 
-    return(list("lower_bound" = lower_bound, "upper_bound" = upper_bound))
+#' .ci
+#'
+#' Originally implemented in RVAidemoire
+#' Version 0.9-83-7.
+PRIVATE_.ci <- function(x,conf.level=0.95) {
+  tri <- sort(na.omit(x))
+  if (any(!is.finite(tri))) {tri <- tri[-which(!is.finite(tri))]}
+  repet <- length(tri)
+  int <- (1-conf.level)/2
+  if(repet*int<1) {
+    int.inf <- ceiling(repet*int)
+  } else {
+    int.inf <- floor(repet*int)
+  }
+  int.sup <- ceiling(repet*(1-int))
+  result <- c("Inf"=tri[int.inf],"Sup"=tri[int.sup])
+  return(result)
 }
+

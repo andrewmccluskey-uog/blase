@@ -18,7 +18,7 @@ plot_find_best_params_results(
 \item{gene_count_colors}{Optional, custom gene count color scheme.}
 }
 \value{
-A plot showing how specificity changes as n_bins and n_genes
+A plot showing how convexity changes as n_bins and n_genes
 are changed. See \code{\link[=find_best_params]{find_best_params()}} for details on how to interpret.
 }
 \description{
