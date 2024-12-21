@@ -98,7 +98,7 @@ evaluate_parameters <- function(
         results.confident_mapping <- append(results.confident_mapping, c(res@confident_mapping))
     }
 
-    minimum_convexity <- min(results.convexity)
+    min_convexity <- min(results.convexity)
     mean_convexity <- mean(results.convexity)
 
     # TRUE evaluated as 1
@@ -113,11 +113,11 @@ evaluate_parameters <- function(
             results.history,
             results.convexity,
             plot_columns,
-            minimum_convexity
+            min_convexity
         )
     }
 
-    return(c(minimum_convexity, mean_convexity, confident_mapping_pct))
+    return(c(min_convexity, mean_convexity, confident_mapping_pct))
 }
 
 PRIVATE_evaluate_parameters_plots <- function(
@@ -128,7 +128,7 @@ PRIVATE_evaluate_parameters_plots <- function(
     results.history,
     results.convexity,
     plot_columns,
-    minimum_convexity) {
+    min_convexity) {
     plots <- list()
 
     for (i in seq_len(length(bin_ids))) {
@@ -145,7 +145,7 @@ PRIVATE_evaluate_parameters_plots <- function(
         top = grid::textGrob(paste(
             length(blase_data@genes),
             "genes and worst convexity:",
-            signif(minimum_convexity, 2)
+            signif(min_convexity, 2)
         ), gp = grid::gpar(fontsize = 20, font = 3)),
         grobs = plots,
         ncol = plot_columns
@@ -164,14 +164,12 @@ PRIVATE_evaluate_parameters_plots <- function(
 #' @param bootstrap_iterations Iterations for bootstrapping when calculating
 #' confident mappings.
 #' @param BPPARAM The BiocParallel configuration. Defaults to SerialParam.
-#' @param verbose Whether to print the n_gene/n_bin combination in progress.
-#' Defaults to False.
 #' @param ... params to be passed to child functions, see [as.BlaseData()]
 #'
 #' @return A dataframe of the results.
 #' * bin_count: The bin count for this attempt
 #' * gene_count: The top n genes to use for this attempt
-#' * minimum_convexity: The worst convexity for these parameters
+#' * min_convexity: The worst convexity for these parameters
 #' * mean_convexity: The mean convexity for these parameters
 #' * confident_mapping_pct: The percent of bins which were confidently mapped
 #'   to themselves for these parameters. If this value is low, then it is
@@ -220,7 +218,6 @@ find_best_params <- function(
     gene_count_range = c(10, 20, 40, 80),
     bootstrap_iterations = 200,
     BPPARAM = BiocParallel::SerialParam(),
-    verbose = FALSE,
     ...) {
     if (length(genelist) < max(gene_count_range)) {
         stop(
@@ -234,7 +231,7 @@ find_best_params <- function(
     results <- data.frame(
         gene_count = c(),
         bin_count = c(),
-        minimum_convexity = c(),
+        min_convexity = c(),
         mean_convexity = c(),
         confident_mapping_pct = c()
     )
@@ -242,30 +239,32 @@ find_best_params <- function(
     for (bin_count in bins_count_range) {
         blase_data <- as.BlaseData(x = x, n_bins = bin_count, ...)
 
-        for (genes_count in gene_count_range) {
-            blase_data@genes <- genelist[seq_len(genes_count)]
+            bin_results = BiocParallel::bplapply(
+              X = gene_count_range,
+              BPPARAM = BPPARAM,
+              FUN = function(genes_count) {
+                blase_data@genes <- genelist[seq_len(genes_count)]
 
-            if (verbose) {
-                message("Bins=", bin_count, " genes=", genes_count)
-            }
-
-            res <- evaluate_parameters(
-              blase_data,
-              bootstrap_iterations,
-              BPPARAM,
-              make_plot = FALSE
-            )
-            results <- rbind(
-                results,
-                data.frame(
-                    bin_count = c(bin_count),
-                    gene_count = c(genes_count),
-                    minimum_convexity = c(res[1]),
-                    mean_convexity = c(res[2]),
-                    confident_mapping_pct = c(res[3])
+                res <- evaluate_parameters(
+                  blase_data,
+                  bootstrap_iterations,
+                  BiocParallel::SerialParam(),
+                  make_plot = FALSE
                 )
+
+                return(data.frame(
+                  bin_count = c(bin_count),
+                  gene_count = c(genes_count),
+                  min_convexity = c(res[1]),
+                  mean_convexity = c(res[2]),
+                  confident_mapping_pct = c(res[3])
+                ))
+
+              }
             )
-        }
+
+            bin_results = bind_rows(bin_results, .id = "column_label")
+            results = rbind(results, bin_results)
     }
 
     return(results)
@@ -295,7 +294,7 @@ plot_find_best_params_results <- function(
     gene_count_colors = viridis::scale_color_viridis(option = "magma")) {
     gene_count <- ggplot2::sym("gene_count")
     bin_count <- ggplot2::sym("bin_count")
-    minimum_convexity <- ggplot2::sym("minimum_convexity")
+    min_convexity <- ggplot2::sym("min_convexity")
     mean_convexity <- ggplot2::sym("mean_convexity")
     confident_mapping_pct <- ggplot2::sym("confident_mapping_pct")
 
@@ -303,14 +302,14 @@ plot_find_best_params_results <- function(
         # Worst convexity
         ggplot2::ggplot(find_best_params_results, ggplot2::aes(
             x = {{ gene_count }},
-            y = {{ minimum_convexity }},
+            y = {{ min_convexity }},
             color = {{ bin_count }}
         )) +
             ggplot2::geom_point() +
             bin_count_colors,
         ggplot2::ggplot(find_best_params_results, ggplot2::aes(
             x = {{ bin_count }},
-            y = {{ minimum_convexity }},
+            y = {{ min_convexity }},
             color = {{ gene_count }}
         )) +
             ggplot2::geom_point() +
