@@ -178,6 +178,7 @@ PRIVATE_evaluate_parameters_plots <- function(
 #' @seealso [plot_find_best_params_results()] for plotting the
 #' results of this function.
 #'
+#' @import dplyr
 #' @export
 #'
 #' @examples
@@ -263,7 +264,7 @@ find_best_params <- function(
               }
             )
 
-            bin_results = bind_rows(bin_results, .id = "column_label")
+            bin_results = dplyr::bind_rows(bin_results, .id = "column_label")
             results = rbind(results, bin_results)
     }
 

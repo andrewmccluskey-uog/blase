@@ -73,7 +73,6 @@ map_all_best_bins <- function(blase_data, bulk_data,
 #' Defaults to 90%.
 #'
 #' @import methods
-#' @import dqrng
 #'
 #' @return A [MappingResult] object.
 #' @export

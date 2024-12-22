@@ -40,7 +40,9 @@ Imports:
   methods,
   rlang,
   BiocParallel,
-  boot
+  boot,
+  dplyr,
+  mgcv
 Suggests: 
     knitr,
     rmarkdown,
@@ -58,7 +60,6 @@ Suggests:
     ggplotify,
     reshape2,
     scales,
-    dplyr,
     plyr,
     fs
 Config/testthat/edition: 3

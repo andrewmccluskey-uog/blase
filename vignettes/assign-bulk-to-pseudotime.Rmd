@@ -95,6 +95,8 @@ assoRes = associationTest(sce, lineages=T, global=F, contrastType="consecutive")
 genelist = blase::get_top_n_genes(assoRes, n_genes = 200, lineage = 1)
 ```
 
+TODO: Add the custom BLASE genes method here
+
 ## Parameter Tuning for BLASE
 
 When using BLASE, it can be a good idea to tune the number of genes and
@@ -136,20 +138,8 @@ evaluate_parameters(blase_data, make_plot = TRUE)
 
 ### Inspect Genes Choice
 
-We can also see how the genes change over pseudotime, by: 1. Using a
-fourier transformation to find the phase of the peak of a gene's
-expression (see Bozdech) 2. Plotting expression in cells over
-pseudotime, and genes ordered by their phase in pseudotime.
-
-We can see that the genes do not appear to especially differentially expressed over pseudotime, but this is just a heuristic, so we will move on to see how they perform.
-
-```{r}
-waves = get_waves(sce, pseudotime_slot="pseudotime")
-gene_selection_matrix(sce, waves, pseudotime_slot="pseudotime", target_matrix_size=length(genes(blase_data)))
-gene_selection_matrix(sce, waves, pseudotime_slot="pseudotime", genes=genes(blase_data), target_matrix_size=length(genes(blase_data)))
-```
-
-You can also inspect how the top genes change over each pseudotime bin:
+We can also see how the genes change over pseudotime, by plotting expression 
+of the top genes changing over each pseudotime bin.
 
 ```{r}
 evaluate_top_n_genes(blase_data)
@@ -167,6 +157,7 @@ bulks_df = DataFrame(row.names = rownames(counts(sce)))
 for (type in unique(sce$celltype)) {
   bulks_df = cbind(bulks_df, rowSums(normcounts(subset(sce, , celltype==type))))
 }
+
 colnames(bulks_df) = unique(sce$celltype)
 
 multipotent_progenitors_result = map_best_bin(blase_data, "Multipotent progenitors", bulks_df)
@@ -175,6 +166,12 @@ basophils_result = map_best_bin(blase_data, "Basophils", bulks_df)
 basophils_result
 neutrophils_result = map_best_bin(blase_data, "Neutrophils", bulks_df)
 neutrophils_result
+```
+
+We can also generate this result with `map_all_best_bins`, which can also 
+allow for parallelisation of the process for large numbers of bulks:
+```{r}
+map_all_best_bins(blase_data, bulks_df)
 ```
 
 ### Plotting Heatmap of Mappings

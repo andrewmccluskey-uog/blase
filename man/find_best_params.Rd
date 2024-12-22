@@ -11,7 +11,6 @@ find_best_params(
   gene_count_range = c(10, 20, 40, 80),
   bootstrap_iterations = 200,
   BPPARAM = BiocParallel::SerialParam(),
-  verbose = FALSE,
   ...
 )
 }
@@ -29,9 +28,6 @@ confident mappings.}
 
 \item{BPPARAM}{The BiocParallel configuration. Defaults to SerialParam.}
 
-\item{verbose}{Whether to print the n_gene/n_bin combination in progress.
-Defaults to False.}
-
 \item{...}{params to be passed to child functions, see \code{\link[=as.BlaseData]{as.BlaseData()}}}
 }
 \value{
@@ -39,7 +35,7 @@ A dataframe of the results.
 \itemize{
 \item bin_count: The bin count for this attempt
 \item gene_count: The top n genes to use for this attempt
-\item minimum_convexity: The worst convexity for these parameters
+\item min_convexity: The worst convexity for these parameters
 \item mean_convexity: The mean convexity for these parameters
 \item confident_mapping_pct: The percent of bins which were confidently mapped
 to themselves for these parameters. If this value is low, then it is
