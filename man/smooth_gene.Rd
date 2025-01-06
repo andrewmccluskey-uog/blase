@@ -16,10 +16,16 @@ smooth_gene(
 \arguments{
 \item{sce}{SCE to do the calculations on.}
 
+\item{gene}{The name of the gene to smooth}
+
 \item{lineage}{lineage to obtain TradeSeq smoothers from.}
 
 \item{window_pct}{the size of the window to consider, as a percentage
 of the maximum pseudotime value.}
+
+\item{pseudotime_slot}{The slot in the SCE object containing pseudotime}
+
+\item{knots}{The number of knots to use when fitting the GAM}
 }
 \value{
 ...

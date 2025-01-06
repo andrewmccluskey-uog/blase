@@ -28,8 +28,7 @@ biocViews:
   TimeCourse,
   CellBiology,
   Software,
-  CellBasedAssays,
-  ks
+  CellBasedAssays
 Imports: 
   SingleCellExperiment,
   ggplot2,

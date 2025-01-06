@@ -6,6 +6,14 @@
 \usage{
 PRIVATE_.ci(x, conf.level = 0.95)
 }
+\arguments{
+\item{x}{data to calculate ci for}
+
+\item{conf.level}{confidence level to calculate}
+}
+\value{
+confidence interval results
+}
 \description{
 Originally implemented in RVAidemoire
 Version 0.9-83-7.

@@ -62,7 +62,7 @@ test_that("get_bins_as_bulk will handle happy case", {
         bin_5_rep_1 = rep(150, 50),
         bin_5_rep_2 = rep(300, 50)
     )
-    rownames(expected_result) <- as.character(rownames(expected_result))
+    rownames(expected_result) <- paste0("G", rownames(expected_result))
     expected_result <- expected_result[order(rownames(expected_result)), ]
 
     expect_equal(result, expected_result)
@@ -91,7 +91,7 @@ test_that("get_bins_as_bulk will sample from replicates with small numbers of a 
         bin_5_rep_1_1 = rep(225, 50),
         bin_5_rep_1_2 = rep(225, 50)
     )
-    rownames(expected_result) <- as.character(rownames(expected_result))
+    rownames(expected_result) <- paste0("G", rownames(expected_result))
     expected_result <- expected_result[order(rownames(expected_result)), ]
 
     expect_equal(result, expected_result)
@@ -125,7 +125,7 @@ test_that("get_bins_as_bulk will skip a bin if there aren't enough cells accordi
     )
 
     # No bin 5 in this result
-    rownames(expected_result) <- as.character(rownames(expected_result))
+    rownames(expected_result) <- paste0("G", rownames(expected_result))
     expected_result <- expected_result[order(rownames(expected_result)), ]
 
     expect_equal(result, expected_result)

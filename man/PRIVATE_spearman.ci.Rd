@@ -18,15 +18,15 @@ PRIVATE_spearman.ci(var1, var2, nrep = 1000, conf.level = 0.95)
 \value{
 description method name of the test.
 
-data.name 	a character string giving the name(s) of the data.
+data.name a character string giving the name(s) of the data.
 
-conf.level 	confidence level.
+conf.level confidence level.
 
-rep 	number of replicates.
+rep number of replicates.
 
-estimate 	Spearman's rank correlation coefficient.
+estimate Spearman's rank correlation coefficient.
 
-conf.int 	confidence interval.
+conf.int confidence interval.
 }
 \description{
 Computes the confidence interval of a Spearman's rank correlation

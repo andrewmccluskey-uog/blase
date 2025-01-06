@@ -1,19 +1,19 @@
 ## evaluate_parameters
-test_that("evaluate_parameters() generates tuple of worst and mean specifcity for parameters", {
+test_that("evaluate_parameters() generates tuple of minimum and mean specifcity, pct confident mappings for parameters", {
     cells <- 100
     genes <- 20
     counts_matrix <- matrix(seq_len(cells * genes), ncol = cells, nrow = genes)
     sce <- SingleCellExperiment::SingleCellExperiment(assays = list(counts = counts_matrix * 3, normcounts = counts_matrix, logcounts = counts_matrix / 2))
     sce$pseudotime <- (1:cells) / cells
-    colnames(sce) <- seq_len(cells)
-    rownames(sce) <- seq_len(genes)
+    colnames(sce) <- paste0("C", seq_len(cells))
+    rownames(sce) <- paste0("G", seq_len(genes))
 
     blase_data <- as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 5)
-    blase_data@genes <- as.character(seq_len(genes))
+    blase_data@genes <- paste0("G", seq_len(genes))
 
     result <- evaluate_parameters(blase_data)
 
-    expect_equal(result, c(0, 0))
+    expect_equal(result, c(0, 0, 0))
 })
 
 ## find_best_params

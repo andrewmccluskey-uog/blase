@@ -12,7 +12,22 @@ plot_gene_peakedness(
 )
 }
 \arguments{
-\item{pseudotime_slot}{}
+\item{sce}{Single Cell Experiment to plot gene from. Must contain pseudotime,
+and normcounts}
+
+\item{gene_peakedness_df}{The DataFrame Result of \code{calculate_gene_peakedness}}
+
+\item{gene}{The gene to plot. Must be present in the SCE and
+gene_peakedness_df}
+
+\item{pseudotime_slot}{The pseudotime slot in the SCE object.}
+}
+\value{
+A \link{ggplot2} plot showing: in black points, expression of the gene
+over pseudotime, in a green line, the fitted expression of the gene over
+pseudotime, the inside and outside of window means of smoothed expression
+(red and blue dotted horizotal lines respectively), and the bounds of the
+window (in black dotted vertical lines).
 }
 \description{
 plot_gene_peakedness
