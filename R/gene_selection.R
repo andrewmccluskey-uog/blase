@@ -203,15 +203,20 @@ plot_gene_peakedness <- function(sce,
     expression <- as.data.frame(t(expression))
     expression$pseudotime <- c(sce@colData$slingPseudotime_1)
     expression <- expression[order(expression$pseudotime), ]
+    expression <- expression[,c("pseudotime", target$gene)]
 
     smooth_df <- data.frame(
         pdt = (seq(100) / 100) * max(expression$pseudotime),
         smooth_val = smooth_gene(sce = sce, gene = gene,
-            pseudotime_slot = "slingPseudotime_1", knots = 10))
+            pseudotime_slot = pseudotime_slot, knots = 10))
     colnames(smooth_df) <- c("pseudotime", target$gene)
 
-    p <- ggplot2::ggplot(NULL, ggplot2::aes_string(
-        x = "pseudotime", y = target$gene)) +
+    # Rename to expression because gene name might be invalid for ggplot2
+    names(expression)[names(expression) == target$gene] <- 'expression'
+    names(smooth_df)[names(smooth_df) == target$gene] <- 'expression'
+
+    p <- ggplot2::ggplot(NULL, ggplot2::aes(
+        x = pseudotime, y = expression)) +
         ggplot2::geom_point(data = expression) +
         ggplot2::geom_vline(xintercept = target$peak_pseudotime) +
         ggplot2::geom_vline(xintercept = target$window_start,
