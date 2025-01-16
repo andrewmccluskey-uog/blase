@@ -16,10 +16,6 @@ reference:
   - contents: has_concept("gene-selection")
   - title: Utilities
   - contents: has_concept("util")
-  - title: Gene Selection
-  - contents: has_concept("gene-selection")
-  - title: Datasets
-  - contents: has_concept("blase-data")
 
 navbar:
  components:
