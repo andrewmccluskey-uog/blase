@@ -12,12 +12,10 @@ reference:
   - contents: has_concept("mapping_plots")
   - title: Parameter Tuning
   - contents: has_concept("tuning")
-  - title: Utilities
-  - contents: has_concept("util")
   - title: Gene Selection
   - contents: has_concept("gene-selection")
-  - title: Datasets
-  - contents: has_concept("blase-data")
+  - title: Utilities
+  - contents: has_concept("util")
 
 navbar:
  components:

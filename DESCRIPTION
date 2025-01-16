@@ -13,8 +13,7 @@ Description: Find where bulk RNA-seq data lies on a single-cell pseudotime
   trajectory. Uses a fast, understandable correlation based approach. Can be 
   used to improve bulk DE, or understand real timepoints in SC from 
   timeseries bulk data.
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
@@ -28,8 +27,7 @@ biocViews:
   TimeCourse,
   CellBiology,
   Software,
-  CellBasedAssays,
-  RVAideMemoire
+  CellBasedAssays
 Imports: 
   SingleCellExperiment,
   ggplot2,
@@ -39,9 +37,10 @@ Imports:
   scater,
   methods,
   rlang,
-  metR,
   BiocParallel,
-  RVAideMemoire
+  boot,
+  dplyr,
+  mgcv
 Suggests: 
     knitr,
     rmarkdown,
@@ -59,7 +58,6 @@ Suggests:
     ggplotify,
     reshape2,
     scales,
-    dplyr,
     plyr,
     fs
 Config/testthat/edition: 3

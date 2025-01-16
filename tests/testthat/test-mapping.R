@@ -18,7 +18,6 @@ test_that("mapping all bulks runs without errors", {
 
     mappings <- map_all_best_bins(blase_data, bulk_counts, bootstrap_iterations = 1)
 
-    print(mappings)
     expect_equal(length(mappings), 3)
 
     expect_equal(mappings[[1]]@bulk_name, "A")

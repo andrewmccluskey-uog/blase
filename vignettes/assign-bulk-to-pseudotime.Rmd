@@ -12,8 +12,8 @@ editor_options:
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
+    collapse = TRUE,
+    comment = "#>"
 )
 ```
 
@@ -30,14 +30,14 @@ library(ami)
 
 ```{r randomseed}
 RNGversion("3.5.0")
-SEED = 7
+SEED <- 7
 set.seed(SEED)
 ```
 
 ```{r concurrency}
-N_CORES = 4
+N_CORES <- 4
 if (ami::using_ci()) {
-  N_CORES = 2
+    N_CORES <- 2
 }
 ```
 
@@ -64,24 +64,26 @@ data(celltype, package = "tradeSeq")
 
 pseudotime <- slingPseudotime(crv, na = FALSE)
 cellWeights <- slingCurveWeights(crv)
-sce <- fitGAM(counts = counts, pseudotime = pseudotime, cellWeights = cellWeights,
-                 nknots = 6, verbose = FALSE, BPPARAM=MulticoreParam(N_CORES))
-sce$pseudotime = pseudotime[,"curve1"]
-sce$celltype = celltype
+sce <- fitGAM(
+    counts = counts, pseudotime = pseudotime, cellWeights = cellWeights,
+    nknots = 6, verbose = FALSE, BPPARAM = MulticoreParam(N_CORES)
+)
+sce$pseudotime <- pseudotime[, "curve1"]
+sce$celltype <- celltype
 
-sce = subset(sce, , celltype != 'Erythrocyte')
+sce <- subset(sce, , celltype != "Erythrocyte")
 
-#sce <- computeSumFactors(sce, clusters=quickCluster(sce))
+# sce <- computeSumFactors(sce, clusters=quickCluster(sce))
 sce <- computeSumFactors(sce)
 sce <- logNormCounts(sce)
 normcounts(sce) <- exp(logcounts(sce))
-sce = runUMAP(sce)
+sce <- runUMAP(sce)
 
 gridExtra::grid.arrange(
-      plotUMAP(sce, text_by="celltype", colour_by="celltype"),
-      plotUMAP(sce, colour_by="pseudotime"),
-      ncol=1
-    )
+    plotUMAP(sce, text_by = "celltype", colour_by = "celltype"),
+    plotUMAP(sce, colour_by = "pseudotime"),
+    ncol = 1
+)
 ```
 
 ## Finding the most descriptive genes with tradeSeq
@@ -91,9 +93,16 @@ we can do some parameter tuning below.
 
 ```{r}
 # Use consecutive for genes that change over time
-assoRes = associationTest(sce, lineages=T, global=F, contrastType="consecutive")
-genelist = blase::get_top_n_genes(assoRes, n_genes = 200, lineage = 1)
+assoRes <- associationTest(
+    sce,
+    lineages = TRUE,
+    global = FALSE,
+    contrastType = "consecutive"
+)
+genelist <- blase::get_top_n_genes(assoRes, n_genes = 200, lineage = 1)
 ```
+
+TODO: Add the custom BLASE genes method here
 
 ## Parameter Tuning for BLASE
 
@@ -110,7 +119,12 @@ bins used.
 We can do this using the following commands, provided by BLASE:
 
 ```{r}
-res = blase::find_best_params(sce, genelist, split_by="pseudotime_range", pseudotime_slot="pseudotime")
+res <- blase::find_best_params(
+    sce,
+    genelist,
+    split_by = "pseudotime_range",
+    pseudotime_slot = "pseudotime"
+)
 blase::plot_find_best_params_results(res)
 ```
 
@@ -129,27 +143,15 @@ the SC dataset map using these genes. Ideally, each bin is very
 specific, with a high "worst specificity".
 
 ```{r}
-blase_data = as.BlaseData(sce, pseudotime_slot="pseudotime", n_bins=10)
-genes(blase_data) = genelist[1:80]
+blase_data <- as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 10)
+genes(blase_data) <- genelist[1:80]
 evaluate_parameters(blase_data, make_plot = TRUE)
 ```
 
 ### Inspect Genes Choice
 
-We can also see how the genes change over pseudotime, by: 1. Using a
-fourier transformation to find the phase of the peak of a gene's
-expression (see Bozdech) 2. Plotting expression in cells over
-pseudotime, and genes ordered by their phase in pseudotime.
-
-We can see that the genes do not appear to especially differentially expressed over pseudotime, but this is just a heuristic, so we will move on to see how they perform.
-
-```{r}
-waves = get_waves(sce, pseudotime_slot="pseudotime")
-gene_selection_matrix(sce, waves, pseudotime_slot="pseudotime", target_matrix_size=length(genes(blase_data)))
-gene_selection_matrix(sce, waves, pseudotime_slot="pseudotime", genes=genes(blase_data), target_matrix_size=length(genes(blase_data)))
-```
-
-You can also inspect how the top genes change over each pseudotime bin:
+We can also see how the genes change over pseudotime, by plotting expression 
+of the top genes changing over each pseudotime bin.
 
 ```{r}
 evaluate_top_n_genes(blase_data)
@@ -163,18 +165,30 @@ SingleCellExperiment but in reality you should use a real bulk dataset.
 See some of our other articles for examples.
 
 ```{r}
-bulks_df = DataFrame(row.names = rownames(counts(sce)))
+bulks_df <- DataFrame(row.names = rownames(counts(sce)))
 for (type in unique(sce$celltype)) {
-  bulks_df = cbind(bulks_df, rowSums(normcounts(subset(sce, , celltype==type))))
+    bulks_df <- cbind(
+        bulks_df,
+        rowSums(normcounts(subset(sce, , celltype == type)))
+    )
 }
-colnames(bulks_df) = unique(sce$celltype)
 
-multipotent_progenitors_result = map_best_bin(blase_data, "Multipotent progenitors", bulks_df)
+colnames(bulks_df) <- unique(sce$celltype)
+
+multipotent_progenitors_result <- map_best_bin(
+    blase_data, "Multipotent progenitors", bulks_df
+)
 multipotent_progenitors_result
-basophils_result = map_best_bin(blase_data, "Basophils", bulks_df)
+basophils_result <- map_best_bin(blase_data, "Basophils", bulks_df)
 basophils_result
-neutrophils_result = map_best_bin(blase_data, "Neutrophils", bulks_df)
+neutrophils_result <- map_best_bin(blase_data, "Neutrophils", bulks_df)
 neutrophils_result
+```
+
+We can also generate this result with `map_all_best_bins`, which can also 
+allow for parallelisation of the process for large numbers of bulks:
+```{r}
+map_all_best_bins(blase_data, bulks_df)
 ```
 
 ### Plotting Heatmap of Mappings
@@ -186,9 +200,10 @@ as well.
 
 ```{r}
 plot_mapping_result_heatmap(list(
-  multipotent_progenitors_result, 
-  basophils_result, 
-  neutrophils_result))
+    multipotent_progenitors_result,
+    basophils_result,
+    neutrophils_result
+))
 ```
 
 ### Plotting Detailed Correlation Maps
@@ -211,14 +226,23 @@ see that the true proportions of cell types in the mapped bin do indeed
 map to the cell type we expect.
 
 ```{r}
-binned_sce = assign_pseudotime_bins(sce, split_by="pseudotime_range", n_bins=10, pseudotime_slot="pseudotime")
-plot_mapping_result(binned_sce, multipotent_progenitors_result, group_by_slot="celltype")
+binned_sce <- assign_pseudotime_bins(
+    sce,
+    split_by = "pseudotime_range",
+    n_bins = 10,
+    pseudotime_slot = "pseudotime"
+)
+plot_mapping_result(
+    binned_sce,
+    multipotent_progenitors_result,
+    group_by_slot = "celltype"
+)
 ```
 
 To view the bin population chart in full, use:
 
 ```{r}
-plot_bin_population(binned_sce, 1, group_by_slot="celltype")
+plot_bin_population(binned_sce, 1, group_by_slot = "celltype")
 ```
 
 ## Session Info

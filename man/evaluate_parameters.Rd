@@ -68,7 +68,7 @@ genelist <- as.character(seq_len(ngenes))
 blase_data <- as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 10)
 genes(blase_data) <- genelist[1:20]
 
-# Check specificity of parameters
+# Check convexity of parameters
 evaluate_parameters(blase_data, make_plot = TRUE)
 }
 \concept{tuning}

@@ -35,15 +35,15 @@ counts_matrix <- matrix(
 sce <- SingleCellExperiment::SingleCellExperiment(assays = list(
     normcounts = counts_matrix, logcounts = log(counts_matrix)
 ))
-colnames(sce) <- seq_len(ncells)
-rownames(sce) <- as.character(seq_len(ngenes))
+colnames(sce) <- paste0("cell", seq_len(ncells))
+rownames(sce) <- paste0("gene", seq_len(ngenes))
 sce$cell_type <- c(
     rep("celltype_1", ncells / 2),
     rep("celltype_2", ncells / 2)
 )
 
 sce$pseudotime <- seq_len(ncells)
-genelist <- as.character(seq_len(ngenes))
+genelist <- rownames(sce)
 
 # Evaluating created BlaseData
 blase_data <- as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 10)

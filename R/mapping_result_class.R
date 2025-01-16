@@ -191,7 +191,7 @@ setMethod(
 )
 
 #' @title Get the difference in correlation between the top 2 most correlated
-#'bins for a BLASE Mapping Results object.
+#' bins for a BLASE Mapping Results object.
 #'
 #' @concept mapping-result-object
 #'
@@ -202,15 +202,15 @@ setMethod(
 #' @export
 #' @inherit MappingResult-class examples
 setGeneric(
-  "top_2_distance",
-  function(x) standardGeneric("top_2_distance")
+    "top_2_distance",
+    function(x) standardGeneric("top_2_distance")
 )
 
 #' @rdname mapping-result-top-2-distance-getter
 setMethod(
-  f = "top_2_distance",
-  signature = "MappingResult",
-  definition = function(x) x@top_2_distance
+    f = "top_2_distance",
+    signature = "MappingResult",
+    definition = function(x) x@top_2_distance
 )
 
 #' @title Get if the result is confident for a BLASE Mapping Results object.
@@ -290,18 +290,16 @@ setMethod(
 #' @export
 #' @inherit MappingResult-class examples
 setMethod(
-  f = "as.data.frame",
-  signature = "MappingResult",
-  definition = function(x) {
-
-      return(data.frame(
-        bulk_name=bulk_name(x),
-        best_bin=best_bin(x),
-        best_correlation=best_correlation(x),
-        top_2_distance=top_2_distance(x),
-        confident_mapping=confident_mapping(x),
-        bootstrap_iterations(x)
-      ))
-
-  }
+    f = "as.data.frame",
+    signature = "MappingResult",
+    definition = function(x) {
+        return(data.frame(
+            bulk_name = bulk_name(x),
+            best_bin = best_bin(x),
+            best_correlation = best_correlation(x),
+            top_2_distance = top_2_distance(x),
+            confident_mapping = confident_mapping(x),
+            bootstrap_iterations(x)
+        ))
+    }
 )
