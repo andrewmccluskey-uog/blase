@@ -34,4 +34,40 @@ Calculate the peakedness of a gene. The power is the ratio of the mean of
 reads 5\% either side of the smoothed peak of the gene's expression over
 pseudotime against the mean of the reads outside of this.
 }
+\examples{
+ncells <- 70
+ngenes <- 100
+counts_matrix <- matrix(
+  c(seq_len(3500) / 10, seq_len(3500) / 5),
+  ncol = ncells,
+  nrow = ngenes
+)
+sce <- SingleCellExperiment::SingleCellExperiment(assays = list(
+  normcounts = counts_matrix, logcounts = log(counts_matrix)
+))
+colnames(sce) <- paste0("cell", seq_len(ncells))
+rownames(sce) <- paste0("gene", seq_len(ngenes))
+sce$cell_type <- c(
+  rep("celltype_1", ncells / 2),
+  rep("celltype_2", ncells / 2)
+)
+
+sce$pseudotime <- seq_len(ncells)
+genelist <- rownames(sce)
+
+# calculate_gene_peakedness
+gene_peakedness <- calculate_gene_peakedness(
+  sce, pseudotime_slot="pseudotime")
+
+head(gene_peakedness)
+
+# plot_gene_peakedness
+plot_gene_peakedness(sce, gene_peakedness, "gene20",
+  pseudotime_slot = "pseudotime")
+
+# smooth_gene
+smoothed_gene20 <- smooth_gene(
+  sce, "gene20", pseudotime_slot = "pseudotime")
+head(smoothed_gene20)
+}
 \concept{gene-selection}

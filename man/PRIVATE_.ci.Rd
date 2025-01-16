@@ -18,3 +18,4 @@ confidence interval results
 Originally implemented in RVAidemoire
 Version 0.9-83-7.
 }
+\keyword{internal}

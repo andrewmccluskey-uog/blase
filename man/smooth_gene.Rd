@@ -4,33 +4,58 @@
 \alias{smooth_gene}
 \title{smooth_gene}
 \usage{
-smooth_gene(
-  sce,
-  gene,
-  lineage = 1,
-  window_pct = 10,
-  pseudotime_slot = "slingPseudotime_1",
-  knots = 10
-)
+smooth_gene(sce, gene, pseudotime_slot = "slingPseudotime_1", knots = 10)
 }
 \arguments{
 \item{sce}{SCE to do the calculations on.}
 
 \item{gene}{The name of the gene to smooth}
 
-\item{lineage}{lineage to obtain TradeSeq smoothers from.}
-
-\item{window_pct}{the size of the window to consider, as a percentage
-of the maximum pseudotime value.}
-
 \item{pseudotime_slot}{The slot in the SCE object containing pseudotime}
 
 \item{knots}{The number of knots to use when fitting the GAM}
 }
 \value{
-...
+Smoothed Gene Expression over pseudotime
 }
 \description{
-...
+Returns the smoothed expression of the given gene, based on a GAM fit to
+the normalised expression.
+}
+\examples{
+ncells <- 70
+ngenes <- 100
+counts_matrix <- matrix(
+  c(seq_len(3500) / 10, seq_len(3500) / 5),
+  ncol = ncells,
+  nrow = ngenes
+)
+sce <- SingleCellExperiment::SingleCellExperiment(assays = list(
+  normcounts = counts_matrix, logcounts = log(counts_matrix)
+))
+colnames(sce) <- paste0("cell", seq_len(ncells))
+rownames(sce) <- paste0("gene", seq_len(ngenes))
+sce$cell_type <- c(
+  rep("celltype_1", ncells / 2),
+  rep("celltype_2", ncells / 2)
+)
+
+sce$pseudotime <- seq_len(ncells)
+genelist <- rownames(sce)
+
+# calculate_gene_peakedness
+gene_peakedness <- calculate_gene_peakedness(
+  sce, pseudotime_slot="pseudotime")
+
+head(gene_peakedness)
+
+# plot_gene_peakedness
+plot_gene_peakedness(sce, gene_peakedness, "gene20",
+  pseudotime_slot = "pseudotime")
+
+# smooth_gene
+smoothed_gene20 <- smooth_gene(
+  sce, "gene20", pseudotime_slot = "pseudotime")
+head(smoothed_gene20)
 }
 \concept{gene-selection}

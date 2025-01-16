@@ -123,6 +123,7 @@ map_best_bin <- function(
     ))
 }
 
+#' @keywords internal
 PRIVATE_quality_check_blase_object <- function(blase_data, bulk) {
     if (any(is.na(genes(blase_data))) || length(genes(blase_data)) == 0) {
         stop(
@@ -139,6 +140,7 @@ PRIVATE_quality_check_blase_object <- function(blase_data, bulk) {
     }
 }
 
+#' @keywords internal
 PRIVATE_quality_check_bin <- function(blase_data, i, genes_present) {
     if (ncol(blase_data@pseudobulk_bins[[i]]) <= 1) {
         stop(
@@ -151,6 +153,7 @@ PRIVATE_quality_check_bin <- function(blase_data, i, genes_present) {
     }
 }
 
+#' @keywords internal
 PRIVATE_map_bin <- function(
     blase_data,
     i,
@@ -209,7 +212,7 @@ PRIVATE_map_bin <- function(
 #'
 #' @param var1 numeric vector (first variable).
 #' @param var2 nuermic verctor (second variable).
-#' @param nrep number of replicates for bootstraping.
+#' @param nrep number of replicates for bootstrapping.
 #' @param conf.level confidence level of the interval.
 #'
 #' @returns description method name of the test.
@@ -220,6 +223,7 @@ PRIVATE_map_bin <- function(
 #' @returns conf.int confidence interval.
 #'
 #' @import boot
+#' @keywords internal
 #'
 PRIVATE_spearman.ci <-
     function(var1, var2, nrep = 1000, conf.level = 0.95) {
@@ -273,6 +277,7 @@ PRIVATE_spearman.ci <-
 #' @param x data to calculate ci for
 #' @param conf.level confidence level to calculate
 #'
+#' @keywords internal
 #' @returns confidence interval results
 PRIVATE_.ci <- function(x, conf.level = 0.95) {
     tri <- sort(stats::na.omit(x))

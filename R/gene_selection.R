@@ -79,6 +79,40 @@ get_top_n_genes <- function(
 #' @import mgcv
 #'
 #' @examples
+#' ncells <- 70
+#' ngenes <- 100
+#' counts_matrix <- matrix(
+#'   c(seq_len(3500) / 10, seq_len(3500) / 5),
+#'   ncol = ncells,
+#'   nrow = ngenes
+#' )
+#' sce <- SingleCellExperiment::SingleCellExperiment(assays = list(
+#'   normcounts = counts_matrix, logcounts = log(counts_matrix)
+#' ))
+#' colnames(sce) <- paste0("cell", seq_len(ncells))
+#' rownames(sce) <- paste0("gene", seq_len(ngenes))
+#' sce$cell_type <- c(
+#'   rep("celltype_1", ncells / 2),
+#'   rep("celltype_2", ncells / 2)
+#' )
+#'
+#' sce$pseudotime <- seq_len(ncells)
+#' genelist <- rownames(sce)
+#'
+#' # calculate_gene_peakedness
+#' gene_peakedness <- calculate_gene_peakedness(
+#'   sce, pseudotime_slot="pseudotime")
+#'
+#' head(gene_peakedness)
+#'
+#' # plot_gene_peakedness
+#' plot_gene_peakedness(sce, gene_peakedness, "gene20",
+#'   pseudotime_slot = "pseudotime")
+#'
+#' # smooth_gene
+#' smoothed_gene20 <- smooth_gene(
+#'   sce, "gene20", pseudotime_slot = "pseudotime")
+#' head(smoothed_gene20)
 calculate_gene_peakedness <- function(sce, window_pct = 10,
     pseudotime_slot = "slingPseudotime_1", knots = 10,
     BPPARAM = BiocParallel::SerialParam()) {
@@ -130,25 +164,22 @@ calculate_gene_peakedness <- function(sce, window_pct = 10,
 #' smooth_gene
 #'
 #' @description
-#' ...
+#' Returns the smoothed expression of the given gene, based on a GAM fit to
+#' the normalised expression.
 #'
 #' @param sce SCE to do the calculations on.
 #' @param gene The name of the gene to smooth
 #' @param pseudotime_slot The slot in the SCE object containing pseudotime
 #' @param knots The number of knots to use when fitting the GAM
-#' @param lineage lineage to obtain TradeSeq smoothers from.
-#' @param window_pct the size of the window to consider, as a percentage
-#' of the maximum pseudotime value.
 #'
-#' @return ...
+#' @return Smoothed Gene Expression over pseudotime
 #' @export
 #'
 #' @concept gene-selection
 #' @import mgcv
 #'
-#' @examples
-smooth_gene <- function(sce, gene, lineage = 1,
-                        window_pct = 10,
+#' @inherit calculate_gene_peakedness examples
+smooth_gene <- function(sce, gene,
                         pseudotime_slot = "slingPseudotime_1",
                         knots = 10) {
     if (!(pseudotime_slot %in% colnames(SingleCellExperiment::colData(sce)))) {
@@ -181,8 +212,8 @@ smooth_gene <- function(sce, gene, lineage = 1,
 #' (red and blue dotted horizotal lines respectively), and the bounds of the
 #' window (in black dotted vertical lines).
 #' @export
-#'
-#' @examples
+#' @concept gene-selection
+#' @inherit calculate_gene_peakedness examples
 plot_gene_peakedness <- function(sce,
                                  gene_peakedness_df,
                                  gene,
@@ -201,7 +232,7 @@ plot_gene_peakedness <- function(sce,
     target <- gene_peakedness_df[gene_index, ]
     expression <- as.data.frame(SingleCellExperiment::normcounts(sce))
     expression <- as.data.frame(t(expression))
-    expression$pseudotime <- c(sce@colData$slingPseudotime_1)
+    expression$pseudotime <- pseudotime
     expression <- expression[order(expression$pseudotime), ]
     expression <- expression[,c("pseudotime", target$gene)]
 
@@ -233,6 +264,7 @@ plot_gene_peakedness <- function(sce,
     return(p)
 }
 
+#' @keywords internal
 PRIVATE_create_GAM <- function(to_smooth, knots) {
     return(
         mgcv::gam(
@@ -243,6 +275,7 @@ PRIVATE_create_GAM <- function(to_smooth, knots) {
     )
 }
 
+#' @keywords internal
 PRIVATE_smooth_GAM <- function(gam, pseudotime) {
     return(mgcv::predict.gam(
         gam,

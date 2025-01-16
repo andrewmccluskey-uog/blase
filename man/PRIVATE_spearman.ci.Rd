@@ -11,7 +11,7 @@ PRIVATE_spearman.ci(var1, var2, nrep = 1000, conf.level = 0.95)
 
 \item{var2}{nuermic verctor (second variable).}
 
-\item{nrep}{number of replicates for bootstraping.}
+\item{nrep}{number of replicates for bootstrapping.}
 
 \item{conf.level}{confidence level of the interval.}
 }
@@ -33,3 +33,4 @@ Computes the confidence interval of a Spearman's rank correlation
 coefficient by bootstraping. Originally implemented in RVAidemoire
 Version 0.9-83-7.
 }
+\keyword{internal}
