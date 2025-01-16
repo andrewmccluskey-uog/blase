@@ -75,7 +75,7 @@ the desired precision (i.e. more granularity).
 
 BLASE uses a discretised pseudotime value, which we refer to as
 “pseudotime bins.” BLASE will calculate these bins when creating a
-BlaseData object, or when using the `assign_pseudotim_bins()` function
+BlaseData object, or when using the `assign_pseudotime_bins()` function
 to add these to the metadata of SingleCellExperiment or Seurat object.
 Because the BLASE algorithm relies heavily on these bins, it is
 important to have a reliable and consistent method to split these.
