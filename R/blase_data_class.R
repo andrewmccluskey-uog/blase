@@ -51,8 +51,8 @@ setMethod(
     definition = function(object) {
         output <- c(
             "Blase Data with:",
-            paste("\tbins:", list(object@bins)),
-            paste("\tselected genes:", list(object@genes), "\n")
+            paste0("\tbins: ", list(object@bins)),
+            paste0("\tselected genes: ", list(object@genes), "\n")
         )
 
         cat(paste(output, collapse = "\n"))

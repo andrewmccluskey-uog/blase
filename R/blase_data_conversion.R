@@ -17,47 +17,6 @@ setGeneric(
 )
 
 #' @rdname as.BlaseData
-#'
-#' @import methods
-#' @import Matrix
-#'
-#' @export
-setMethod(
-    f = "as.BlaseData",
-    signature = c(x = "data.frame"),
-    definition = function(x) {
-        return(methods::new("BlaseData", pseudobulks = x, bins = colnames(x)))
-    }
-)
-
-#' @rdname as.BlaseData
-#'
-#' @import methods
-#' @import Matrix
-#'
-#' @import rlang
-#'
-#' @export
-setMethod(
-    f = "as.BlaseData",
-    signature = c(x = "Seurat"),
-    definition = function(x, pseudotime_slot = "slingPseudotime_1",
-                          n_bins = 20, split_by = "pseudotime_range") {
-        rlang::check_installed("Seurat", reason = "to handle Seurat objects.")
-        sce <- Seurat::as.SingleCellExperiment(x)
-        return(
-            as.BlaseData(
-                sce,
-                pseudotime_slot = pseudotime_slot,
-                n_bins = n_bins,
-                split_by = split_by
-            )
-        )
-    }
-)
-
-
-#' @rdname as.BlaseData
 #' @param pseudotime_slot The [SingleCellExperiment::SingleCellExperiment]
 #' slot containing pseudotime values for each cell to be passed to
 #' [assign_pseudotime_bins()].

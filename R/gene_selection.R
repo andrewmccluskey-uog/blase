@@ -225,8 +225,12 @@ plot_gene_peakedness <- function(sce,
     pseudotime <- SingleCellExperiment::colData(sce)[[pseudotime_slot]]
     gene_index <- which(gene_peakedness_df$gene == gene)
 
-    if (gene_index == 0) {
-        stop("Gene not in gene_peakedness_df")
+    if (length(gene_index) == 0) {
+        stop("Gene not in gene_peakedness_df, please make sure gene exists in dataset.")
+    }
+
+    if (length(gene_index) > 1) {
+      stop("Multiple copies of gene in gene_peakedness_df, please make sure only one exists.")
     }
 
     target <- gene_peakedness_df[gene_index, ]
