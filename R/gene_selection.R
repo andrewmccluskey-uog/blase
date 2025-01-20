@@ -274,7 +274,7 @@ PRIVATE_create_GAM <- function(to_smooth, knots) {
         mgcv::gam(
             nc ~ s(pdt, bs = "cr", k = knots),
             data = to_smooth,
-            family = gaussian(link = "log")
+            family = stats::gaussian(link = "log")
         )
     )
 }

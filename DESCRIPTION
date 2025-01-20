@@ -40,7 +40,8 @@ Imports:
   BiocParallel,
   boot,
   dplyr,
-  mgcv
+  mgcv,
+  stats
 Suggests: 
     knitr,
     rmarkdown,
