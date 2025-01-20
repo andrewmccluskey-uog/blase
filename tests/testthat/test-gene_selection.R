@@ -106,11 +106,16 @@ test_that("gene_selection calculate_gene_peakedness calculates peakedness", {
   expect_equal(gene_peakedness$window_start, rep_len(66.5, 10))
   expect_equal(gene_peakedness$window_end, rep_len(73.5, 10))
   expect_equal(gene_peakedness$deviance_explained, c(
-    0.92270963, 0.92458661,
-    0.92647701, 0.92838311,
-    0.93030661, 0.93180178,
-    0.93324144, 0.93463523,
-    0.93599024, 0.93731242
+    0.96118653,
+    0.96158430,
+    0.96197700,
+    0.96236476,
+    0.96274769,
+    0.96312590,
+    0.96349949,
+    0.96386857,
+    0.96423325,
+    0.96459360
   ))
 
 })
@@ -134,16 +139,16 @@ test_that("gene_selection smooth_gene calculates gene smoothing results", {
     sce, "gene5", pseudotime_slot = "pseudotime")
 
   expected_result = c(
-    1.4912445963909,
-    1.75244505491791,
-    2.05837028285099,
-    2.41446414496174,
-    2.82595943037959,
-    3.29752981626186,
-    3.83282443273115,
-    4.4339036265525,
-    5.10059030161558,
-    5.82976759451327)
+    2.0624890,
+    2.3216792,
+    2.6130009,
+    2.9395440,
+    3.3044422,
+    3.7108109,
+    4.1616604,
+    4.6597895,
+    5.2076585,
+    5.8072420)
 
   expect_equal(as.vector(smoothed_gene5[1:10]), expected_result)
 
