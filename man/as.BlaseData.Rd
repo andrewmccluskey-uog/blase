@@ -2,21 +2,10 @@
 % Please edit documentation in R/blase_data_conversion.R
 \name{as.BlaseData}
 \alias{as.BlaseData}
-\alias{as.BlaseData,data.frame-method}
-\alias{as.BlaseData,Seurat-method}
 \alias{as.BlaseData,SingleCellExperiment-method}
 \title{Conversion to BlaseData}
 \usage{
 as.BlaseData(x, ...)
-
-\S4method{as.BlaseData}{data.frame}(x)
-
-\S4method{as.BlaseData}{Seurat}(
-  x,
-  pseudotime_slot = "slingPseudotime_1",
-  n_bins = 20,
-  split_by = "pseudotime_range"
-)
 
 \S4method{as.BlaseData}{SingleCellExperiment}(
   x,
