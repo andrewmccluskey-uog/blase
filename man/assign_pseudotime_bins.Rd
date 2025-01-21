@@ -7,7 +7,13 @@
 \alias{assign_pseudotime_bins,Seurat-method}
 \title{Assign Pseudotime Bins to a source object's metadata}
 \usage{
-assign_pseudotime_bins(x, split_by = "pseudotime_range", n_bins = 20, ...)
+assign_pseudotime_bins(
+  x,
+  split_by = "pseudotime_range",
+  n_bins = 20,
+  pseudotime_slot = "slingPseudotime_1",
+  ...
+)
 
 \S4method{assign_pseudotime_bins}{SingleCellExperiment}(
   x,
@@ -16,7 +22,12 @@ assign_pseudotime_bins(x, split_by = "pseudotime_range", n_bins = 20, ...)
   pseudotime_slot = "slingPseudotime_1"
 )
 
-\S4method{assign_pseudotime_bins}{data.frame}(x, split_by, n_bins)
+\S4method{assign_pseudotime_bins}{data.frame}(
+  x,
+  split_by,
+  n_bins,
+  pseudotime_slot = "slingPseudotime_1"
+)
 
 \S4method{assign_pseudotime_bins}{Seurat}(
   x,
@@ -28,38 +39,51 @@ assign_pseudotime_bins(x, split_by = "pseudotime_range", n_bins = 20, ...)
 \arguments{
 \item{x}{An object to add metadata to.}
 
-\item{split_by}{The technique used to split the bins. The default \code{pseudotime_range} picks the
-bin for a cell based on a constant range of pseudotime. \code{cells} picks the bin for a cell based on
-an even number of cells per bin.}
+\item{split_by}{The technique used to split the bins. The default
+\code{pseudotime_range} picks the bin for a cell based on a constant range of
+pseudotime. \code{cells} picks the bin for a cell based on an even number of
+cells per bin.}
 
 \item{n_bins}{The number of bins to split the cells into.}
 
-\item{...}{additional arguments passed to object-specific methods.}
+\item{pseudotime_slot}{The \link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment::SingleCellExperiment}
+slot containing the pseudotime values for each cell.}
 
-\item{pseudotime_slot}{The \link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment::SingleCellExperiment} slot containing the pseudotime values for each cell.}
+\item{...}{For arguments passed to other functions. Unused.}
+}
+\value{
+A copy of x where cells are annotated with their
+pseudotime bin.
 }
 \description{
 Assign Pseudotime Bins to a source object's metadata
 }
 \examples{
-counts_matrix <- matrix(c(seq_len(120)/10, seq_len(120)/5), ncol=48, nrow=5)
-sce <- SingleCellExperiment::SingleCellExperiment(assays=list(
-  normcounts=counts_matrix, logcounts=log(counts_matrix)))
-colnames(sce) = seq_len(48)
-rownames(sce) = as.character(seq_len(5))
-sce$cell_type = c(rep("celltype_1", 24), rep("celltype_2", 24))
+counts_matrix <- matrix(
+    c(seq_len(120) / 10, seq_len(120) / 5),
+    ncol = 48, nrow = 5
+)
+sce <- SingleCellExperiment::SingleCellExperiment(assays = list(
+    normcounts = counts_matrix, logcounts = log(counts_matrix)
+))
+colnames(sce) <- seq_len(48)
+rownames(sce) <- as.character(seq_len(5))
+sce$cell_type <- c(rep("celltype_1", 24), rep("celltype_2", 24))
 
-sce$pseudotime = seq_len(48)
-blase_data = as.BlaseData(sce, pseudotime_slot="pseudotime", n_bins=4)
-blase_data@genes = as.character(seq_len(5))
+sce$pseudotime <- seq_len(48)
+blase_data <- as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 4)
+genes(blase_data) <- as.character(seq_len(5))
 
-bulk_counts = matrix(seq_len(15)*10, ncol=3, nrow=5)
-colnames(bulk_counts) = c("A", "B", "C")
-rownames(bulk_counts) = as.character(seq_len(5))
+bulk_counts <- matrix(seq_len(15) * 10, ncol = 3, nrow = 5)
+colnames(bulk_counts) <- c("A", "B", "C")
+rownames(bulk_counts) <- as.character(seq_len(5))
 
 # Map to bin
-result = map_best_bin(blase_data, "B", bulk_counts)
+result <- map_best_bin(blase_data, "B", bulk_counts)
 result
+
+# Map all bulks to bin
+results <- map_all_best_bins(blase_data, bulk_counts)
 
 # Plot Heatmap
 plot_mapping_result_heatmap(list(result))
@@ -68,7 +92,19 @@ plot_mapping_result_heatmap(list(result))
 plot_mapping_result_corr(result)
 
 # Plot populations
-sce = assign_pseudotime_bins(sce, pseudotime_slot="pseudotime", n_bins=4)
-plot_bin_population(sce, result@best_bin, group_by_slot="cell_type")
+sce <- assign_pseudotime_bins(
+    sce,
+    pseudotime_slot = "pseudotime", n_bins = 4
+)
+plot_bin_population(sce, best_bin(result), group_by_slot = "cell_type")
+
+# Getters
+bulk_name(result)
+best_bin(result)
+best_correlation(result)
+top_2_distance(result)
+confident_mapping(result)
+mapping_history(result)
+bootstrap_iterations(result)
 }
 \concept{blase-object}

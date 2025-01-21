@@ -11,11 +11,14 @@ get_bins_as_bulk(
 )
 }
 \arguments{
-\item{pseudotime_sce}{The Single Cell Experiment object to get the bins from}
+\item{pseudotime_sce}{The Single Cell Experiment object to
+get the bins from}
 
-\item{min_cells_for_bulk}{The minimum cells to look for per replicate and bin.}
+\item{min_cells_for_bulk}{The minimum cells to look for per
+replicate and bin.}
 
-\item{replicate_slot}{The slot in the Single Cell Experiment that contains replicate information}
+\item{replicate_slot}{The slot in the Single Cell Experiment
+that contains replicate information}
 }
 \value{
 A dataframe pseudobulk counts matrix.
@@ -26,19 +29,25 @@ When a replicate has too few cells, it is discounted. If only one exists,
 then we sample from it twice to create the pseudobulks.
 }
 \examples{
-library(SingleCellExperiment, quietly=TRUE)
+library(SingleCellExperiment, quietly = TRUE)
 library(blase)
-counts <- matrix(rpois(1000, lambda = 10), ncol=100, nrow=10)
+counts <- matrix(rpois(1000, lambda = 10), ncol = 100, nrow = 10)
 sce <- SingleCellExperiment::SingleCellExperiment(
-  assays = list(normcounts = counts, counts = counts/2)
+    assays = list(normcounts = counts, counts = counts / 2)
 )
-sce$pseudotime = seq_len(100)
-colnames(sce) = seq_len(100)
-rownames(sce) = as.character(seq_len(10))
-sce = assign_pseudotime_bins(sce, n_bins=5,
-  pseudotime_slot="pseudotime", split_by="cells")
-sce$replicate=rep(c(1,2), 50)
-result = get_bins_as_bulk(sce, min_cells_for_bulk=1, replicate_slot="replicate")
+sce$pseudotime <- seq_len(100)
+colnames(sce) <- seq_len(100)
+rownames(sce) <- as.character(seq_len(10))
+sce <- assign_pseudotime_bins(sce,
+    n_bins = 5,
+    pseudotime_slot = "pseudotime", split_by = "cells"
+)
+sce$replicate <- rep(c(1, 2), 50)
+result <- get_bins_as_bulk(
+    sce,
+    min_cells_for_bulk = 1,
+    replicate_slot = "replicate"
+)
 result
 }
 \concept{util}

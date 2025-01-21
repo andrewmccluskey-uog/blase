@@ -6,3 +6,6 @@
 ^docs$
 ^pkgdown$
 ^vignettes/articles$
+^reproducibility$
+^.idea$
+^LICENSE\.md$

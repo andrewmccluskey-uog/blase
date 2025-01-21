@@ -1,6 +1,6 @@
 Package: blase
 Title: Bulk Linking Analysis for Single-cell Experiments
-Version: 0.0.0.9000
+Version: 0.99.0
 Authors@R: c(
   person("Andrew", "McCluskey", , "2117532m@student.gla.ac.uk", role = c("aut", "cre"), 
     comment = c(ORCID = "0009-0004-4187-799X")),
@@ -9,51 +9,63 @@ Authors@R: c(
   person("Thomas", "Otto", , "thomasdan.otto@glasgow.ac.uk", role=c("aut","ths"), 
     comment=c(ORCID = "0000-0002-1246-7404"))
   )
-Description: Use bulk RNA-Seq data to enhance knowledge about scRNA-Seq.
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+Description: Find where bulk RNA-seq data lies on a single-cell pseudotime 
+  trajectory. Uses a fast, understandable correlation based approach. Can be 
+  used to improve bulk DE, or understand real timepoints in SC from 
+  timeseries bulk data.
+License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
-biocViews:
+RoxygenNote: 7.3.2
+biocViews: 
+  Transcriptomics,
+  SingleCell,
+  Sequencing,
+  GeneExpression,
+  Transcription,
+  RNASeq,
+  TimeCourse,
+  CellBiology,
+  Software,
+  CellBasedAssays
 Imports: 
   SingleCellExperiment,
   ggplot2,
-  gridExtra,
   viridis,
+  gridExtra,
   Matrix,
   scater,
   methods,
   rlang,
-  metR,
-  parallel
+  BiocParallel,
+  boot,
+  dplyr,
+  mgcv,
+  stats
 Suggests: 
     knitr,
     rmarkdown,
     testthat (>= 3.0.0),
+    covr,
     tradeSeq,
     scran,
     slingshot,
-    BiocParallel,
-    Seurat,
+    Seurat (>= 4.0.0),
     dyngen,
     bluster,
     UpSetR,
     readxl,
     tools,
     ami,
-    emdist,
     ggplotify,
     reshape2,
     scales,
-    dplyr,
     plyr,
-    Signac,
     fs
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 URL: https://andrewmccluskey-uog.github.io/BLASE/
+BugReports: https://andrewmccluskey-uog.github.io/BLASE/issues
 Depends: 
-    R (>= 2.10)
-LazyData: true
-LazyDataCompression: bzip2
+    R (>= 4.4.0)
+LazyData: false

@@ -17,29 +17,41 @@ plot_find_best_params_results(
 
 \item{gene_count_colors}{Optional, custom gene count color scheme.}
 }
+\value{
+A plot showing how convexity changes as n_bins and n_genes
+are changed. See \code{\link[=find_best_params]{find_best_params()}} for details on how to interpret.
+}
 \description{
 Plot the results of the search for good parameters
 }
 \examples{
-ncells = 70
-ngenes = 100
-counts_matrix <- matrix(c(seq_len(3500)/10, seq_len(3500)/5), ncol=ncells, nrow=ngenes)
-sce <- SingleCellExperiment::SingleCellExperiment(assays=list(
-  normcounts=counts_matrix, logcounts=log(counts_matrix)))
-colnames(sce) = seq_len(ncells)
-rownames(sce) = as.character(seq_len(ngenes))
-sce$cell_type = c(rep("celltype_1", ncells/2), rep("celltype_2", ncells/2))
+ncells <- 70
+ngenes <- 100
+counts_matrix <- matrix(
+  c(seq_len(3500) / 10, seq_len(3500) / 5),
+  ncol = ncells,
+  nrow = ngenes
+)
+sce <- SingleCellExperiment::SingleCellExperiment(assays = list(
+  normcounts = counts_matrix, logcounts = log(counts_matrix)
+))
+colnames(sce) <- paste0("cell", seq_len(ncells))
+rownames(sce) <- paste0("gene", seq_len(ngenes))
+sce$cell_type <- c(
+  rep("celltype_1", ncells / 2),
+  rep("celltype_2", ncells / 2)
+)
 
-sce$pseudotime = seq_len(ncells)
-genelist = as.character(seq_len(ngenes))
+sce$pseudotime <- seq_len(ncells)
+genelist <- rownames(sce)
 
 # Finding the best params for the BlaseData
-best_params = find_best_params(
+best_params <- find_best_params(
   sce, genelist,
-  bins_count_range=c(10,20),
-  gene_count_range=c(20,50),
-  pseudotime_slot="pseudotime",
-  split_by="pseudotime_range"
+  bins_count_range = c(2, 3),
+  gene_count_range = c(20, 50),
+  pseudotime_slot = "pseudotime",
+  split_by = "pseudotime_range"
 )
 best_params
 plot_find_best_params_results(best_params)

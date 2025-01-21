@@ -9,7 +9,8 @@ find_best_params(
   genelist,
   bins_count_range = c(5, 10, 20, 40),
   gene_count_range = c(10, 20, 40, 80),
-  verbose = FALSE,
+  bootstrap_iterations = 200,
+  BPPARAM = BiocParallel::SerialParam(),
   ...
 )
 }
@@ -22,7 +23,10 @@ find_best_params(
 
 \item{gene_count_range}{The n_genes list to try out}
 
-\item{verbose}{Whether to print the n_gene/n_bin combination in progress. Defaults to False.}
+\item{bootstrap_iterations}{Iterations for bootstrapping when calculating
+confident mappings.}
+
+\item{BPPARAM}{The BiocParallel configuration. Defaults to SerialParam.}
 
 \item{...}{params to be passed to child functions, see \code{\link[=as.BlaseData]{as.BlaseData()}}}
 }
@@ -31,38 +35,50 @@ A dataframe of the results.
 \itemize{
 \item bin_count: The bin count for this attempt
 \item gene_count: The top n genes to use for this attempt
-\item worst_specificity: The worst specificity for these parameters
-\item mean_specificity: The mean specificity for these parameters
+\item min_convexity: The worst convexity for these parameters
+\item mean_convexity: The mean convexity for these parameters
+\item confident_mapping_pct: The percent of bins which were confidently mapped
+to themselves for these parameters. If this value is low, then it is
+likely that in real use, few or no results will be confidently mapped.
 }
 }
 \description{
 Identify the Best Parameters For Your Dataset
 }
 \examples{
-ncells = 70
-ngenes = 100
-counts_matrix <- matrix(c(seq_len(3500)/10, seq_len(3500)/5), ncol=ncells, nrow=ngenes)
-sce <- SingleCellExperiment::SingleCellExperiment(assays=list(
-  normcounts=counts_matrix, logcounts=log(counts_matrix)))
-colnames(sce) = seq_len(ncells)
-rownames(sce) = as.character(seq_len(ngenes))
-sce$cell_type = c(rep("celltype_1", ncells/2), rep("celltype_2", ncells/2))
+ncells <- 70
+ngenes <- 100
+counts_matrix <- matrix(
+  c(seq_len(3500) / 10, seq_len(3500) / 5),
+  ncol = ncells,
+  nrow = ngenes
+)
+sce <- SingleCellExperiment::SingleCellExperiment(assays = list(
+  normcounts = counts_matrix, logcounts = log(counts_matrix)
+))
+colnames(sce) <- paste0("cell", seq_len(ncells))
+rownames(sce) <- paste0("gene", seq_len(ngenes))
+sce$cell_type <- c(
+  rep("celltype_1", ncells / 2),
+  rep("celltype_2", ncells / 2)
+)
 
-sce$pseudotime = seq_len(ncells)
-genelist = as.character(seq_len(ngenes))
+sce$pseudotime <- seq_len(ncells)
+genelist <- rownames(sce)
 
 # Finding the best params for the BlaseData
-best_params = find_best_params(
+best_params <- find_best_params(
   sce, genelist,
-  bins_count_range=c(10,20),
-  gene_count_range=c(20,50),
-  pseudotime_slot="pseudotime",
-  split_by="pseudotime_range"
+  bins_count_range = c(2, 3),
+  gene_count_range = c(20, 50),
+  pseudotime_slot = "pseudotime",
+  split_by = "pseudotime_range"
 )
 best_params
 plot_find_best_params_results(best_params)
 }
 \seealso{
-\code{\link[=plot_find_best_params_results]{plot_find_best_params_results()}} for plotting the results of this function.
+\code{\link[=plot_find_best_params_results]{plot_find_best_params_results()}} for plotting the
+results of this function.
 }
 \concept{tuning}

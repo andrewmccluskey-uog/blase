@@ -4,18 +4,18 @@ template:
 reference:
   - title: BLASE Object
   - contents: has_concept("blase-object")
+  - title: BLASE Mapping Result Object
+  - contents: has_concept("mapping-result-object")
   - title: Mapping Bulks
   - contents: has_concept("mapping")
   - subtitle: Plots
   - contents: has_concept("mapping_plots")
   - title: Parameter Tuning
   - contents: has_concept("tuning")
-  - title: Utilities
-  - contents: has_concept("util")
   - title: Gene Selection
   - contents: has_concept("gene-selection")
-  - title: Datasets
-  - contents: has_concept("blase-data")
+  - title: Utilities
+  - contents: has_concept("util")
 
 navbar:
  components:
@@ -25,31 +25,3 @@ navbar:
       - text: Vignettes
       - text: How BLASE Works
         href: articles/How-Blase-Works.html
-      - text: DE with Blase
-        href: articles/DE_with_blase.html
-      - text: -------
-      - text: Verifying BLASE Works
-      - text: Simulated Data Workthrough
-        href: articles/compare_simulated_data.html
-      - text: Assign SC Pseudobulks To SC Pseudotime
-        href: articles/assign-bulk-to-pseudotime.html
-      - text: Weng 2024 Haematopoiesis
-        href: articles/BLASE-for-Hematopoesis.html
-      - text: -------
-      - text: Selecting Genes for Plasmodium sp.
-      - text: Comparing Gene Selection Methods In Depth
-        href: articles/gene_selection_comparison.html
-      - text: P. Falciparum Lifecycle - Comparing Bozdech and TradeSeq
-        href: articles/falciparum_lifecycle.html
-      - text: -------
-      - text: Data Generation
-      - text: Malaria Cell Atlas PB
-        href: articles/data_generation/generate-MCA-pb-object.html
-      - text: Malaria Cell Atlas PF
-        href: articles/data_generation/generate-MCA-pf-object.html
-      - text: Weng 2024 Haematopoiesis Test Dataset
-        href: articles/data_generation/generate-weng-2024-haematopoiesis-object.html
-      - text: Simulation Data
-        href: articles/data_generation/generate-simulated-data-object.html
-      - text: Generating Zhang et al. 2021 bulk FPKM Dataframe
-        href: articles/data_generation/generate-zhang-et-al-2021-bulk-FPKM-object.html
