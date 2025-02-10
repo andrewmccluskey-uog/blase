@@ -226,6 +226,7 @@ PRIVATE_mapping_result_heatmap_plot <- function(
         label = {{ confident_mapping_sym }},
         color = {{ is_best_bin_sym }}
     )) +
+        ggplot2::labs(x="Pseudotime Bin", y="Bulk Sample", fill='Correlation')
         fill_scale +
         ggplot2::guides(color = "none")
 

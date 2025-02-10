@@ -123,8 +123,23 @@ calculate_gene_peakedness <- function(sce, window_pct = 10,
     pseudotime <- SingleCellExperiment::colData(sce)[[pseudotime_slot]]
     normalised_counts <- SingleCellExperiment::normcounts(sce)
 
+    genes_with_counts = rownames(
+      counts(sce)[rowMaxs(SingleCellExperiment::counts(sce)) > 0,]
+    )
+
+    genes_with_no_counts = rownames(
+      counts(sce)[rowMaxs(SingleCellExperiment::counts(sce)) == 0,]
+    )
+
+    if (length(genes_with_no_counts) > 0) {
+      warning(
+        length(genes_with_no_counts),
+        " genes without counts have been omitted"
+      )
+    }
+
     dataframes <- list()
-    for (gene_id in rownames(normalised_counts)) {
+    for (gene_id in genes_with_counts) {
         df <- as.data.frame(normalised_counts[gene_id, ])
         colnames(df) <- c(gene_id)
         rownames(df) <- colnames(normalised_counts)
@@ -136,6 +151,7 @@ calculate_gene_peakedness <- function(sce, window_pct = 10,
             gene <- colnames(df)[1]
             to_smooth <- data.frame(nc = df[, gene], pdt = pseudotime)
 
+            #print(gene)
             gam <- PRIVATE_create_GAM(to_smooth, knots)
             smoothed <- PRIVATE_smooth_GAM(gam, pseudotime)
             peak_index <- which.max(smoothed)

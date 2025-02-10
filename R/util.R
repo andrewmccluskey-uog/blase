@@ -96,7 +96,7 @@ PRIVATE_get_bins_as_bulk_bin_has_replicates <- function(
     pseudobulks <- data.frame()
     for (rep_id in replicates_with_more_than_minimum) {
         bin_specific_rep_specific_sce_pseudobulk <- as.data.frame(
-            rowSums(SingleCellExperiment::counts(subset(
+            Matrix::rowSums(SingleCellExperiment::counts(subset(
                 bin_specific_sce, ,
                 bin_specific_sce@colData[[replicate_slot]] == rep_id
             )))
