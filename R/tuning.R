@@ -278,35 +278,65 @@ plot_find_best_params_results <- function(
         ggplot2::ggplot(find_best_params_results, ggplot2::aes(
             x = {{ gene_count }},
             y = {{ min_convexity }},
-            color = {{ bin_count }})) + ggplot2::geom_point()
-        + bin_count_colors,
+            color = {{ bin_count }})) + ggplot2::geom_point() +
+            bin_count_colors +
+            ggplot2::labs(
+              color="Bin Count",
+              x="Gene Count",
+              y="Min. Convexity"
+            ),
         ggplot2::ggplot(find_best_params_results, ggplot2::aes(
             x = {{ bin_count }},
             y = {{ min_convexity }},
             color = {{ gene_count }})) + ggplot2::geom_point()
-        + gene_count_colors,
+        + gene_count_colors +
+          ggplot2::labs(
+            color="Gene Count",
+            x="Bin Count",
+            y="Min. Convexity"
+          ),
         # Mean convexity
         ggplot2::ggplot(find_best_params_results, ggplot2::aes(
             x = {{ gene_count }},
             y = {{ mean_convexity }},
             color = {{ bin_count }})) + ggplot2::geom_point() +
-            bin_count_colors,
+            bin_count_colors +
+            ggplot2::labs(
+              color="Bin Count",
+              x="Gene Count",
+              y="Mean Convexity"
+            ),
         ggplot2::ggplot(find_best_params_results, ggplot2::aes(
             x = {{ bin_count }},
             y = {{ mean_convexity }},
             color = {{ gene_count }})) + ggplot2::geom_point() +
-            gene_count_colors,
+            gene_count_colors +
+            ggplot2::labs(
+              color="Gene Count",
+              x="Bin Count",
+              y="Mean Convexity"
+            ),
         # Confident mappings pct
         ggplot2::ggplot(find_best_params_results, ggplot2::aes(
             x = {{ gene_count }},
             y = {{ confident_mapping_pct }},
             color = {{ bin_count }})) + ggplot2::geom_point() +
-            bin_count_colors,
+            bin_count_colors +
+            ggplot2::labs(
+              color="Bin Count",
+              x="Gene Count",
+              y="Confident Mapping %"
+            ),
         ggplot2::ggplot(find_best_params_results, ggplot2::aes(
             x = {{ bin_count }},
             y = {{ confident_mapping_pct }},
             color = {{ gene_count }})) + ggplot2::geom_point() +
-            gene_count_colors,
+            gene_count_colors +
+            ggplot2::labs(
+              color="Gene Count",
+              x="Bin Count",
+              y="Confident Mapping %"
+            ),
         ncol = 2
     ))
 }
