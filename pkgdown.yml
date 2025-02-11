@@ -4,7 +4,7 @@ pkgdown_sha: ~
 articles:
   assign-bulk-to-pseudotime: assign-bulk-to-pseudotime.html
   How-Blase-Works: How-Blase-Works.html
-last_built: 2025-02-10T17:49Z
+last_built: 2025-02-11T11:17Z
 urls:
   reference: https://andrewmccluskey-uog.github.io/BLASE/reference
   article: https://andrewmccluskey-uog.github.io/BLASE/articles
