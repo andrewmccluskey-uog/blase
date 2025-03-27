@@ -83,7 +83,9 @@ the normalised expression.</p>
 <span class="r-in"><span>  nrow <span class="op">=</span> <span class="va">ngenes</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu">SingleCellExperiment</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/SingleCellExperiment/man/SingleCellExperiment.html" class="external-link">SingleCellExperiment</a></span><span class="op">(</span>assays <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  normcounts <span class="op">=</span> <span class="va">counts_matrix</span>, logcounts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">counts_matrix</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  counts <span class="op">=</span> <span class="va">counts_matrix</span> <span class="op">*</span> <span class="fl">3</span>,</span></span>
+<span class="r-in"><span>  normcounts <span class="op">=</span> <span class="va">counts_matrix</span>,</span></span>
+<span class="r-in"><span>  logcounts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">counts_matrix</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"cell"</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">ncells</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"gene"</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">ngenes</span><span class="op">)</span><span class="op">)</span></span></span>
@@ -98,16 +100,27 @@ the normalised expression.</p>
 <span class="r-in"><span><span class="co"># calculate_gene_peakedness</span></span></span>
 <span class="r-in"><span><span class="va">gene_peakedness</span> <span class="op">&lt;-</span> <span class="fu"><a href="calculate_gene_peakedness.html">calculate_gene_peakedness</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="va">sce</span>, pseudotime_slot<span class="op">=</span><span class="st">"pseudotime"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in assay(object, i = exprs_values, ...):</span> 'assay(&lt;SingleCellExperiment&gt;, i="character", ...)' invalid subscript 'i'</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> 'counts' not in names(assays(&lt;SingleCellExperiment&gt;))</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">gene_peakedness</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'x' in selecting a method for function 'head': object 'gene_peakedness' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       gene peak_pseudotime mean_in_window mean_out_window    ratio window_start</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 100  gene1              70          650.2        231.2076 2.812192         66.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1001 gene2              70          650.4        231.3545 2.811270         66.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1002 gene3              70          650.6        231.5015 2.810349         66.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1003 gene4              70          650.8        231.6485 2.809429         66.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1004 gene5              70          651.0        231.7955 2.808511         66.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1005 gene6              70          651.2        231.9424 2.807593         66.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      window_end deviance_explained</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 100        73.5          0.9608241</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1001       73.5          0.9608646</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1002       73.5          0.9609050</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1003       73.5          0.9609454</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1004       73.5          0.9609857</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1005       73.5          0.9610260</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># plot_gene_peakedness</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="plot_gene_peakedness.html">plot_gene_peakedness</a></span><span class="op">(</span><span class="va">sce</span>, <span class="va">gene_peakedness</span>, <span class="st">"gene20"</span>,</span></span>
 <span class="r-in"><span>  pseudotime_slot <span class="op">=</span> <span class="st">"pseudotime"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'gene_peakedness' not found</span>
+<span class="r-plt img"><img src="smooth_gene-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># smooth_gene</span></span></span>
 <span class="r-in"><span><span class="va">smoothed_gene20</span> <span class="op">&lt;-</span> <span class="fu">smooth_gene</span><span class="op">(</span></span></span>
