@@ -41,7 +41,8 @@ Imports:
   boot,
   dplyr,
   mgcv,
-  stats
+  stats,
+  MatrixGenerics
 Suggests: 
     knitr,
     rmarkdown,

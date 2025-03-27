@@ -31,7 +31,9 @@ counts_matrix <- matrix(
   nrow = ngenes
 )
 sce <- SingleCellExperiment::SingleCellExperiment(assays = list(
-  normcounts = counts_matrix, logcounts = log(counts_matrix)
+  counts = counts_matrix * 3,
+  normcounts = counts_matrix,
+  logcounts = log(counts_matrix)
 ))
 colnames(sce) <- paste0("cell", seq_len(ncells))
 rownames(sce) <- paste0("gene", seq_len(ngenes))

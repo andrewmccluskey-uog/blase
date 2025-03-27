@@ -77,6 +77,7 @@ get_top_n_genes <- function(
 #' @concept gene-selection
 #' @import BiocParallel
 #' @import mgcv
+#' @import MatrixGenerics
 #'
 #' @examples
 #' ncells <- 70
@@ -87,7 +88,9 @@ get_top_n_genes <- function(
 #'   nrow = ngenes
 #' )
 #' sce <- SingleCellExperiment::SingleCellExperiment(assays = list(
-#'   normcounts = counts_matrix, logcounts = log(counts_matrix)
+#'   counts = counts_matrix * 3,
+#'   normcounts = counts_matrix,
+#'   logcounts = log(counts_matrix)
 #' ))
 #' colnames(sce) <- paste0("cell", seq_len(ncells))
 #' rownames(sce) <- paste0("gene", seq_len(ngenes))
@@ -123,13 +126,13 @@ calculate_gene_peakedness <- function(sce, window_pct = 10,
     pseudotime <- SingleCellExperiment::colData(sce)[[pseudotime_slot]]
     normalised_counts <- SingleCellExperiment::normcounts(sce)
 
-    genes_with_counts = rownames(
-      counts(sce)[rowMaxs(SingleCellExperiment::counts(sce)) > 0,]
-    )
+    genes_with_counts = rownames(SingleCellExperiment::counts(sce)[
+        MatrixGenerics::rowMaxs(SingleCellExperiment::counts(sce)) > 0,
+      ])
 
-    genes_with_no_counts = rownames(
-      counts(sce)[rowMaxs(SingleCellExperiment::counts(sce)) == 0,]
-    )
+    genes_with_no_counts = rownames(SingleCellExperiment::counts(sce)[
+        MatrixGenerics::rowMaxs(SingleCellExperiment::counts(sce)) == 0,
+      ])
 
     if (length(genes_with_no_counts) > 0) {
       warning(
