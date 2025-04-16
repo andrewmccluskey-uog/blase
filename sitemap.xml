@@ -1,6 +1,8 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://andrewmccluskey-uog.github.io/BLASE/404.html</loc></url>
 <url><loc>https://andrewmccluskey-uog.github.io/BLASE/LICENSE.html</loc></url>
+<url><loc>https://andrewmccluskey-uog.github.io/BLASE/articles/BLASE-for-annotating-scRNA-seq.html</loc></url>
+<url><loc>https://andrewmccluskey-uog.github.io/BLASE/articles/BLASE-for-excluding-developmental-genes-from-bulk-RNA-seq.html</loc></url>
 <url><loc>https://andrewmccluskey-uog.github.io/BLASE/articles/How-Blase-Works.html</loc></url>
 <url><loc>https://andrewmccluskey-uog.github.io/BLASE/articles/assign-bulk-to-pseudotime.html</loc></url>
 <url><loc>https://andrewmccluskey-uog.github.io/BLASE/articles/index.html</loc></url>
