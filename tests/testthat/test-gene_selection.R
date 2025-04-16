@@ -1,8 +1,15 @@
 generate_gene_selection_test_sce <- function() {
   ncells <- 70
-  ngenes <- 10
+  ngenes <- 20
+
+  # Each gene should have mean around its gene number
+  counts = c()
+  for (i in seq_len(ngenes)) {
+    counts = c(counts, dnorm(seq_len(ncells), mean=(ncells/i), sd=1))
+  }
+
   counts_matrix <- matrix(
-    c(seq_len(350) / 10, seq_len(350) / 5),
+    counts,
     ncol = ncells,
     nrow = ngenes
   )
@@ -88,37 +95,53 @@ test_that("gene_selection calculate_gene_peakedness calculates peakedness", {
 
   gene_peakedness <- calculate_gene_peakedness(sce, pseudotime_slot="pseudotime")
 
+  # we'll check the first ten
+  gene_peakedness = gene_peakedness[1:10,]
+
   expect_equal(gene_peakedness$gene, paste0("gene", 1:10))
-  expect_equal(gene_peakedness$peak_pseudotime, rep_len(70, 10))
-  expect_equal(gene_peakedness$mean_in_window, c(65.2, 65.4, 65.6, 65.8, 66, 66.2, 66.4, 66.6, 66.8, 67))
+  expect_equal(gene_peakedness$peak_pseudotime, c(18.9, 18.9, 9.1, 70, 70, 0.7, 9.8, 11.9, 0.7, 0.7))
+  expect_equal(gene_peakedness$mean_in_window, c(
+    0.045635429, 0.053911890,
+    0.061627168, 0,
+    0, 0.000033458,
+    0.050363657, 0.050296111,
+    0.060492681, 0.099735570
+  ), tolerance = 0.0001)
   expect_equal(gene_peakedness$mean_out_window, c(
-    23.25303030, 23.40000000,
-    23.54696970, 23.69393939,
-    23.84090909, 23.98787879,
-    24.13484848, 24.28181818,
-    24.42878788, 24.57575758
-  ))
+    0.001154014, 0.005113787,
+    0.012975915, 0.028203005,
+    0.028324385, 0.021635033,
+    0.013108241, 0.009857911,
+    0.008691179, 0.006832208
+  ), tolerance = 0.0001)
   expect_equal(gene_peakedness$ratio, c(
-    2.80393562, 2.79487179,
-    2.78592111, 2.77708147,
-    2.76835081, 2.75972713,
-    2.75120849, 2.74279296,
-    2.73447870, 2.72626387
+    39.544944523, 10.542458045,
+    4.749350382, 0.0,
+    0.0, 0.001546453,
+    3.842136779, 5.102106562,
+    6.960238789, 14.597852918
+  ), tolerance = 0.0001)
+  expect_equal(gene_peakedness$window_start, c(
+    15.4, 15.4,
+    5.6, 66.5,
+    66.5, -2.8,
+    6.3, 8.4,
+    -2.8, -2.8
   ))
-  expect_equal(gene_peakedness$window_start, rep_len(66.5, 10))
-  expect_equal(gene_peakedness$window_end, rep_len(73.5, 10))
+  expect_equal(gene_peakedness$window_end, c(
+    22.4, 22.4,
+    12.6, 73.5,
+    73.5, 4.2,
+    13.3, 15.4,
+    4.2, 4.2
+  ))
   expect_equal(gene_peakedness$deviance_explained, c(
-    0.96118653,
-    0.96158430,
-    0.96197700,
-    0.96236476,
-    0.96274769,
-    0.96312590,
-    0.96349949,
-    0.96386857,
-    0.96423325,
-    0.96459360
-  ))
+    0.982064659, 0.833595976,
+    0.718683962, 0.007329955,
+    0.001096911, 0.001128665,
+    0.016843770, 0.939128426,
+    0.045942118, 0.044634839
+  ), tolerance = 0.0001)
 
 })
 
@@ -140,19 +163,9 @@ test_that("gene_selection smooth_gene calculates gene smoothing results", {
   smoothed_gene5 <- smooth_gene(
     sce, "gene5", pseudotime_slot = "pseudotime")
 
-  expected_result = c(
-    2.0624890,
-    2.3216792,
-    2.6130009,
-    2.9395440,
-    3.3044422,
-    3.7108109,
-    4.1616604,
-    4.6597895,
-    5.2076585,
-    5.8072420)
-
-  expect_equal(as.vector(smoothed_gene5[1:10]), expected_result)
+  smoothed_gene5 = as.vector(smoothed_gene5)
+  expect_equal(smoothed_gene5[1], 0.022075948, ignore_attr=TRUE)
+  expect_equal(smoothed_gene5[81], 0.029716046, ignore_attr=TRUE)
 
 })
 
@@ -190,4 +203,28 @@ test_that("gene_selection plot_gene_peakedness runs without error", {
   tmp1 = function() plot_gene_peakedness(sce, gene_peakedness, "gene5", pseudotime_slot="pseudotime")
   expect_no_error(tmp1)
 
+})
+
+# gene_peakedness_spread_selection
+test_that("gene_selection gene_peakedness_spread_selection selects genes", {
+  sce = generate_gene_selection_test_sce()
+  gene_peakedness <- calculate_gene_peakedness(sce, pseudotime_slot="pseudotime")
+
+  genes_to_use <- gene_peakedness_spread_selection(
+    sce, gene_peakedness, genes_per_bin = 2, n_gene_bins = 1,
+    pseudotime_slot="pseudotime")
+
+  expect_equal(genes_to_use, c("31", "361"))
+
+})
+
+test_that("gene_selection gene_peakedness_spread_selection selects genes", {
+  sce = generate_gene_selection_test_sce()
+  gene_peakedness <- calculate_gene_peakedness(sce, pseudotime_slot="pseudotime")
+
+  genes_to_use <- gene_peakedness_spread_selection(
+    sce, gene_peakedness, genes_per_bin = 1, n_gene_bins = 2,
+    pseudotime_slot="pseudotime")
+
+  expect_equal(genes_to_use, c("31", "57"))
 })

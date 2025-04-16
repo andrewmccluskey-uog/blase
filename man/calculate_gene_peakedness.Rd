@@ -37,8 +37,14 @@ pseudotime against the mean of the reads outside of this.
 \examples{
 ncells <- 70
 ngenes <- 100
+# Each gene should have mean around its gene number
+counts = c()
+for (i in seq_len(ngenes)) {
+  counts = c(counts, dnorm(seq_len(ncells), mean=(ncells/i), sd=1))
+}
+
 counts_matrix <- matrix(
-  c(seq_len(3500) / 10, seq_len(3500) / 5),
+  counts,
   ncol = ncells,
   nrow = ngenes
 )
@@ -71,5 +77,14 @@ plot_gene_peakedness(sce, gene_peakedness, "gene20",
 smoothed_gene20 <- smooth_gene(
   sce, "gene20", pseudotime_slot = "pseudotime")
 head(smoothed_gene20)
+
+# Select best spread of genes
+genes_to_use <- gene_peakedness_spread_selection(sce, gene_peakedness,
+  genes_per_bin=2, n_gene_bins=1, pseudotime_slot="pseudotime")
+
+print(genes_to_use)
+plot(x=gene_peakedness[genes_to_use,"peak_pseudotime"],
+  y=gene_peakedness[genes_to_use,"ratio"])
+
 }
 \concept{gene-selection}
