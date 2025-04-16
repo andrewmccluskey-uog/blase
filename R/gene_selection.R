@@ -141,11 +141,11 @@ calculate_gene_peakedness <- function(sce, window_pct = 10,
     pseudotime <- SingleCellExperiment::colData(sce)[[pseudotime_slot]]
     normalised_counts <- SingleCellExperiment::normcounts(sce)
 
-    genes_with_counts = rownames(SingleCellExperiment::counts(sce)[
+    genes_with_counts <- rownames(SingleCellExperiment::counts(sce)[
         MatrixGenerics::rowMaxs(SingleCellExperiment::counts(sce)) > 0,
       ])
 
-    genes_with_no_counts = rownames(SingleCellExperiment::counts(sce)[
+    genes_with_no_counts <- rownames(SingleCellExperiment::counts(sce)[
         MatrixGenerics::rowMaxs(SingleCellExperiment::counts(sce)) == 0,
       ])
 
@@ -168,8 +168,6 @@ calculate_gene_peakedness <- function(sce, window_pct = 10,
         dataframes, function(df) {
             gene <- colnames(df)[1]
             to_smooth <- data.frame(nc = df[, gene], pdt = pseudotime)
-
-            # print(paste(gene, min(to_smooth$nc), max(to_smooth$nc), nrow(to_smooth)))
 
             gam <- PRIVATE_create_GAM(to_smooth, knots)
             smoothed <- PRIVATE_smooth_GAM(gam, pseudotime)
@@ -229,12 +227,12 @@ gene_peakedness_spread_selection <- function(
     n_gene_bins=10,
     pseudotime_slot="slingPseudotime_1") {
 
-  genes_by_peakedness = c()
+  genes_by_peakedness <- c()
 
   max_pseudotime <- max(
     SingleCellExperiment::colData(sce)[[pseudotime_slot]]
   )
-  gene_bin_width = max_pseudotime/n_gene_bins
+  gene_bin_width <- max_pseudotime/n_gene_bins
 
   for (i in seq_len(n_gene_bins)) {
     lower_cutoff <- (i-1) * gene_bin_width
@@ -318,11 +316,13 @@ plot_gene_peakedness <- function(sce,
     gene_index <- which(gene_peakedness_df$gene == gene)
 
     if (length(gene_index) == 0) {
-        stop("Gene not in gene_peakedness_df, please make sure gene exists in dataset.")
+        stop("Gene not in gene_peakedness_df, ",
+             "please make sure gene exists in dataset.")
     }
 
     if (length(gene_index) > 1) {
-      stop("Multiple copies of gene in gene_peakedness_df, please make sure only one exists.")
+      stop("Multiple copies of gene in gene_peakedness_df,",
+           "please make sure only one exists.")
     }
 
     target <- gene_peakedness_df[gene_index, ]
