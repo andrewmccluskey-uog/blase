@@ -25,3 +25,10 @@ navbar:
       - text: Vignettes
       - text: How BLASE Works
         href: articles/How-Blase-Works.html
+      - text: Assigning Bulk to Pseudotime
+        href: assign-bulk-to-pseudotime.html
+      - text: Articles
+      - text: BLASE for excluding developmental genes from bulk RNA-seq
+        href: articles/articles/BLASE-for-excluding-developmental-genes-from-bulk-RNA-seq.html
+      - text: BLASE for annotating scRNA-seq
+        href: articles/articles/BLASE-for-annotating-scRNA-seq.html

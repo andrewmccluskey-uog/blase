@@ -214,7 +214,7 @@ test_that("gene_selection gene_peakedness_spread_selection selects genes", {
     sce, gene_peakedness, genes_per_bin = 2, n_gene_bins = 1,
     pseudotime_slot="pseudotime")
 
-  expect_equal(genes_to_use, c("31", "361"))
+  expect_equal(genes_to_use, c("gene11", "gene19"))
 
 })
 
@@ -226,5 +226,5 @@ test_that("gene_selection gene_peakedness_spread_selection selects genes", {
     sce, gene_peakedness, genes_per_bin = 1, n_gene_bins = 2,
     pseudotime_slot="pseudotime")
 
-  expect_equal(genes_to_use, c("31", "57"))
+  expect_equal(genes_to_use, c("gene11", "gene16"))
 })

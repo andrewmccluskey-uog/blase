@@ -246,9 +246,8 @@ gene_peakedness_spread_selection <- function(
       genes_by_peakedness, available_genes$gene[seq_len(genes_per_bin)]
     )
   }
-  return(rownames(
-    gene_peakedness_df[gene_peakedness_df$gene %in% genes_by_peakedness,]
-  ))
+  return(gene_peakedness_df
+         [gene_peakedness_df$gene %in% genes_by_peakedness,]$gene)
 }
 
 #' smooth_gene
@@ -321,7 +320,7 @@ plot_gene_peakedness <- function(sce,
     }
 
     if (length(gene_index) > 1) {
-      stop("Multiple copies of gene in gene_peakedness_df,",
+      stop("Multiple copies of gene in gene_peakedness_df, ",
            "please make sure only one exists.")
     }
 

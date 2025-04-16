@@ -1,0 +1,14 @@
+---
+title: "BLASE for excluding developmental genes from bulk RNA-seq"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(blase)
+```
