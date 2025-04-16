@@ -77,8 +77,14 @@ the normalised expression.</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">ncells</span> <span class="op">&lt;-</span> <span class="fl">70</span></span></span>
 <span class="r-in"><span><span class="va">ngenes</span> <span class="op">&lt;-</span> <span class="fl">100</span></span></span>
+<span class="r-in"><span><span class="co"># Each gene should have mean around its gene number</span></span></span>
+<span class="r-in"><span><span class="va">counts</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">ngenes</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="va">counts</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">counts</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">dnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">ncells</span><span class="op">)</span>, mean<span class="op">=</span><span class="op">(</span><span class="va">ncells</span><span class="op">/</span><span class="va">i</span><span class="op">)</span>, sd<span class="op">=</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">counts_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fl">3500</span><span class="op">)</span> <span class="op">/</span> <span class="fl">10</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fl">3500</span><span class="op">)</span> <span class="op">/</span> <span class="fl">5</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="va">counts</span>,</span></span>
 <span class="r-in"><span>  ncol <span class="op">=</span> <span class="va">ncells</span>,</span></span>
 <span class="r-in"><span>  nrow <span class="op">=</span> <span class="va">ngenes</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
@@ -100,34 +106,60 @@ the normalised expression.</p>
 <span class="r-in"><span><span class="co"># calculate_gene_peakedness</span></span></span>
 <span class="r-in"><span><span class="va">gene_peakedness</span> <span class="op">&lt;-</span> <span class="fu"><a href="calculate_gene_peakedness.html">calculate_gene_peakedness</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="va">sce</span>, pseudotime_slot<span class="op">=</span><span class="st">"pseudotime"</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Iteration limit reached without full convergence - check carefully</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Iteration limit reached without full convergence - check carefully</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Iteration limit reached without full convergence - check carefully</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Fitting terminated with step failure - check results carefully</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Iteration limit reached without full convergence - check carefully</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Iteration limit reached without full convergence - check carefully</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Iteration limit reached without full convergence - check carefully</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Iteration limit reached without full convergence - check carefully</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Fitting terminated with step failure - check results carefully</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Fitting terminated with step failure - check results carefully</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Iteration limit reached without full convergence - check carefully</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Iteration limit reached without full convergence - check carefully</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Iteration limit reached without full convergence - check carefully</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">gene_peakedness</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       gene peak_pseudotime mean_in_window mean_out_window    ratio window_start</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 100  gene1              70          650.2        231.2076 2.812192         66.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1001 gene2              70          650.4        231.3545 2.811270         66.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1002 gene3              70          650.6        231.5015 2.810349         66.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1003 gene4              70          650.8        231.6485 2.809429         66.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1004 gene5              70          651.0        231.7955 2.808511         66.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1005 gene6              70          651.2        231.9424 2.807593         66.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      window_end deviance_explained</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 100        73.5          0.9608241</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1001       73.5          0.9608646</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1002       73.5          0.9609050</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1003       73.5          0.9609454</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1004       73.5          0.9609857</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1005       73.5          0.9610260</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      gene peak_pseudotime mean_in_window mean_out_window        ratio</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 100 gene1            70.0   1.060616e-24     0.037863935 2.801125e-23</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 52  gene2            36.4   4.680824e-02     0.029379725 1.593216e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 28  gene3            19.6   4.327921e-02     0.014445463 2.996042e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21  gene4            14.7   4.563543e-02     0.006531685 6.986777e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   gene5             0.7   9.973557e-02     0.004076218 2.446767e+01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7   gene6             4.9   8.791281e-02     0.000187520 4.688183e+02</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     window_start window_end deviance_explained</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 100         66.5       73.5         0.02680534</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 52          32.9       39.9         0.01912609</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 28          16.1       23.1         0.04505152</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21          11.2       18.2         0.58156238</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1           -2.8        4.2         0.21032129</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7            1.4        8.4         0.14902599</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># plot_gene_peakedness</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="plot_gene_peakedness.html">plot_gene_peakedness</a></span><span class="op">(</span><span class="va">sce</span>, <span class="va">gene_peakedness</span>, <span class="st">"gene20"</span>,</span></span>
 <span class="r-in"><span>  pseudotime_slot <span class="op">=</span> <span class="st">"pseudotime"</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Iteration limit reached without full convergence - check carefully</span>
 <span class="r-plt img"><img src="smooth_gene-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># smooth_gene</span></span></span>
 <span class="r-in"><span><span class="va">smoothed_gene20</span> <span class="op">&lt;-</span> <span class="fu">smooth_gene</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="va">sce</span>, <span class="st">"gene20"</span>, pseudotime_slot <span class="op">=</span> <span class="st">"pseudotime"</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Iteration limit reached without full convergence - check carefully</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">smoothed_gene20</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        1        2        3        4        5        6 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 18.65217 21.10711 23.88086 27.00601 30.51590 34.44399 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            1            2            3            4            5            6 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2.220446e-16 2.220446e-16 2.220446e-16 2.220446e-16 2.220446e-16 2.220446e-16 </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Select best spread of genes</span></span></span>
+<span class="r-in"><span><span class="va">genes_to_use</span> <span class="op">&lt;-</span> <span class="fu"><a href="gene_peakedness_spread_selection.html">gene_peakedness_spread_selection</a></span><span class="op">(</span><span class="va">sce</span>, <span class="va">gene_peakedness</span>,</span></span>
+<span class="r-in"><span>  genes_per_bin<span class="op">=</span><span class="fl">2</span>, n_gene_bins<span class="op">=</span><span class="fl">1</span>, pseudotime_slot<span class="op">=</span><span class="st">"pseudotime"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">genes_to_use</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "72"  "104"</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">gene_peakedness</span><span class="op">[</span><span class="va">genes_to_use</span>,<span class="st">"peak_pseudotime"</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  y<span class="op">=</span><span class="va">gene_peakedness</span><span class="op">[</span><span class="va">genes_to_use</span>,<span class="st">"ratio"</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="smooth_gene-2.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
