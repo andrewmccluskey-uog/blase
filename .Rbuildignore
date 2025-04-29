@@ -9,3 +9,5 @@
 ^reproducibility$
 ^.idea$
 ^LICENSE\.md$
+^doc$
+^Meta$

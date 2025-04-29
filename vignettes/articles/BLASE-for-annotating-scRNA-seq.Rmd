@@ -1,5 +1,10 @@
 ---
 title: "BLASE for annotating scRNA-seq"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{BLASE for annotating scRNA-seq}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
 ---
 
 ```{r, include = FALSE}
@@ -10,5 +15,146 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
+library(scater)
+library(ggplot2)
+library(BiocParallel)
 library(blase)
+```
+
+```{r, randomseed}
+RNGversion("3.5.0")
+SEED <- 7
+set.seed(SEED)
+```
+
+```{r, concurrency}
+N_CORES <- 4
+if (ami::using_ci()) {
+    N_CORES <- 2
+}
+bpparam = MulticoreParam(N_CORES)
+```
+
+This article will show how BLASE can be used for annotating scRNA-seq data using
+existing bulk or microarray data. We make use of scRNA-seq 
+(Dogga et al. 2024)[https://www.science.org/doi/10.1126/science.adj4088]
+and microarray data from 
+(Painter et al. 2018)[https://www.nature.com/articles/s41467-018-04966-3]. 
+Code for generating the objects used here is available in the BLASE 
+reproducibility repository.
+
+## Load Data
+
+First we'll load in the data we're using, pre-prepared from the BLASE
+reproducibility repository.
+
+```{r, load_data}
+painter_microarray = readRDS('Data/painter_2018_pf.rds')
+dogga_sc = readRDS('Data/processed_MCA_PF_SCE_allgenes.rds')
+```
+
+We can examine the true lifecycle stages, and also the calculated pseudotime
+trajectory (Slingshot).
+
+```{r, sc_umaps}
+#| fig.alt: >
+#|   UMAP of Dogga et al. single-cell RNA-seq reference coloured by lifecycle
+#|   stage, showing the cycle from Rings, Trophozoites, Schizonts, to Rings 
+#|   again.
+plotUMAP(dogga_sc, colour_by="STAGE_HR")
+
+#| fig.alt: >
+#|   UMAP of Dogga et al. single-cell RNA-seq reference coloured by pseudotime,
+#|   starting with Rings, and ending with Schizonts.
+plotUMAP(dogga_sc, colour_by="slingPseudotime_1")
+```
+
+## Prepare BLASE
+
+Now we'll prepare BLASE for use.
+
+### Create BLASE data object
+
+First, we create the object, giving it the 
+number of bins we want to use, and how to calculate them.
+
+```{r, create_BLASE_object}
+blase_data = as.BlaseData(
+  dogga_sc, 
+  pseudotime_slot="slingPseudotime_1", 
+  n_bins=8, 
+  split_by="pseudotime_range")
+```
+
+### Select Genes
+
+Now we will select the genes we want to use, using BLASE's gene peakedness 
+metric.
+
+```{r, calculate_gene_peakedness}
+gene_peakedness_info = blase::calculate_gene_peakedness(
+  dogga_sc, 
+  window_pct = 5, 
+  knots = 18, 
+  BPPARAM = bpparam)
+
+genes_to_use = blase::gene_peakedness_spread_selection(
+  dogga_sc, 
+  gene_peakedness_info, 
+  genes_per_bin = 30, 
+  n_gene_bins = 30)
+
+head(gene_peakedness_info)
+```
+
+By using the `gene_peakedness_spread_selection` function, we can ensure that 
+genes with high ratios are selected from throughout the trajectory.
+
+```{r, plot_gene_peakedness}
+#| fig.alt: >
+#|   Scatter plot showing gene peakedness ratios for all genes, ordered
+#|   by pseudotime.
+ggplot(gene_peakedness_info, aes(x=peak_pseudotime, y=ratio)) + 
+  geom_point() +
+  ggtitle("All genes")
+
+gene_peakedness_selected_genes = gene_peakedness_info[
+  gene_peakedness_info$gene %in% genes_to_use,]
+#| fig.alt: >
+#|   Scatter plot showing gene peakedness ratios for genes selected by BLASE 
+#|   spread selection, ordered by pseudotime.
+ggplot(gene_peakedness_selected_genes, aes(x=peak_pseudotime, y=ratio)) + 
+  geom_point() +
+  ggtitle("Selected genes")
+```
+Here, we add them to the BLASE object for mapping with.
+```{r, add_genes_to_blase_data}
+genes(blase_data) = genes_to_use
+```
+
+## Calculate Mappings
+
+Now we can perform the actual mapping step, and review the results.
+
+```{r, mapping}
+mapping_results = blase::map_all_best_bins(
+  blase_data, 
+  painter_microarray, 
+  BPPARAM=bpparam)
+
+#| fig.alt: >
+#|   Heatmap of mapping correlations of the Painter et al. data onto 
+#|   the Dogga et al. scRNA-seq.
+blase::plot_mapping_result_heatmap(mapping_results)
+```
+
+## Transfer Mappings
+TODO
+```{r, transfer_mappings_to_sc}
+
+```
+
+## Session Info
+```{r, sessioninfo}
+sessionInfo()
 ```
