@@ -176,14 +176,11 @@ mean_expression_in_window, mean_expression_out_window, ratio</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">genes_to_use</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "gene30" "gene40"</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">gene_peakedness</span><span class="op">[</span><span class="va">genes_to_use</span>,<span class="st">"peak_pseudotime"</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>  y<span class="op">=</span><span class="va">gene_peakedness</span><span class="op">[</span><span class="va">genes_to_use</span>,<span class="st">"ratio"</span><span class="op">]</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>no non-missing arguments to min; returning Inf</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>no non-missing arguments to max; returning -Inf</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>no non-missing arguments to min; returning Inf</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>no non-missing arguments to max; returning -Inf</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">gene_peakedness</span><span class="op">[</span></span></span>
+<span class="r-in"><span>  <span class="va">gene_peakedness</span><span class="op">$</span><span class="va">gene</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">genes_to_use</span>,<span class="st">"peak_pseudotime"</span></span></span>
+<span class="r-in"><span> <span class="op">]</span>,</span></span>
+<span class="r-in"><span> y<span class="op">=</span><span class="va">gene_peakedness</span><span class="op">[</span><span class="va">gene_peakedness</span><span class="op">$</span><span class="va">gene</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">genes_to_use</span>,<span class="st">"ratio"</span><span class="op">]</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="calculate_gene_peakedness-2.png" alt="" width="700" height="433"></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in plot.window(...):</span> need finite 'xlim' values</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
