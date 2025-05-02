@@ -128,8 +128,10 @@ get_top_n_genes <- function(
 #'   genes_per_bin=2, n_gene_bins=1, pseudotime_slot="pseudotime")
 #'
 #' print(genes_to_use)
-#' plot(x=gene_peakedness[genes_to_use,"peak_pseudotime"],
-#'   y=gene_peakedness[genes_to_use,"ratio"])
+#' plot(x=gene_peakedness[
+#'   gene_peakedness$gene %in% genes_to_use,"peak_pseudotime"
+#'  ],
+#'  y=gene_peakedness[gene_peakedness$gene %in% genes_to_use,"ratio"])
 #'
 calculate_gene_peakedness <- function(sce, window_pct = 10,
     pseudotime_slot = "slingPseudotime_1", knots = 10,

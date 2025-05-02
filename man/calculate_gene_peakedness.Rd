@@ -83,8 +83,10 @@ genes_to_use <- gene_peakedness_spread_selection(sce, gene_peakedness,
   genes_per_bin=2, n_gene_bins=1, pseudotime_slot="pseudotime")
 
 print(genes_to_use)
-plot(x=gene_peakedness[genes_to_use,"peak_pseudotime"],
-  y=gene_peakedness[genes_to_use,"ratio"])
+plot(x=gene_peakedness[
+  gene_peakedness$gene \%in\% genes_to_use,"peak_pseudotime"
+ ],
+ y=gene_peakedness[gene_peakedness$gene \%in\% genes_to_use,"ratio"])
 
 }
 \concept{gene-selection}
