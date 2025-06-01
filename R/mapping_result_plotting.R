@@ -155,6 +155,8 @@ setMethod(
 #' apply to the heatmap.
 #' @param annotate Whether to annotate the heatmap with significant results
 #' or not, defaults to TRUE.
+#' @param bin_order The order in which to plot the pseudotime bins along
+#' the x-axis.
 #'
 #' @returns A heatmap showing the correlations of each mapping result across
 #' every pseudotime bin.
@@ -166,7 +168,8 @@ plot_mapping_result_heatmap <- function(
     heatmap_fill_scale = ggplot2::scale_fill_gradientn(
         colors = c("blue", "white", "red"), limits = c(-1, 1)
     ),
-    annotate = TRUE) {
+    annotate = TRUE,
+    bin_order = NULL) {
     if (!all(lapply(mapping_result_list, class) == "MappingResult")) {
         stop("You must provide a list of MappingResult objects only.")
     }
@@ -203,7 +206,13 @@ plot_mapping_result_heatmap <- function(
         bulk_results$bulk_name,
         levels = as.character(unique(bulk_results$bulk_name))
     )
-    bulk_results$pseudotime_bin <- as.factor(bulk_results$pseudotime_bin)
+
+    if (is.null(bin_order)) {
+      bin_order = bulk_results$pseudotime_bin
+    }
+    bulk_results$pseudotime_bin <- factor(
+      bulk_results$pseudotime_bin, levels=as.character(unique(bin_order))
+    )
 
     return(PRIVATE_mapping_result_heatmap_plot(
         bulk_results, heatmap_fill_scale, annotate
