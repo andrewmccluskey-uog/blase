@@ -55,7 +55,7 @@ First, let's generate a Single Cell Experiment to use the tool with,
 based on the [tradeSeq
 vignette](https://bioconductor.org/packages/devel/bioc/vignettes/tradeSeq/inst/doc/tradeSeq.html).
 
-```{r}
+```{r setupSCE}
 data(countMatrix, package = "tradeSeq")
 counts <- as.matrix(countMatrix)
 rm(countMatrix)
@@ -91,7 +91,7 @@ gridExtra::grid.arrange(
 Now we'll find the genes we want to use. We select the top 200 so that
 we can do some parameter tuning below.
 
-```{r}
+```{r TradeSeqGeneSelection}
 # Use consecutive for genes that change over time
 assoRes <- associationTest(
     sce,
@@ -118,7 +118,7 @@ bins used.
 
 We can do this using the following commands, provided by BLASE:
 
-```{r}
+```{r findBestParams}
 res <- blase::find_best_params(
     sce,
     genelist,
@@ -142,7 +142,7 @@ Now we can check if this is a good fit by showing how other bins from
 the SC dataset map using these genes. Ideally, each bin is very
 specific, with a high "worst specificity".
 
-```{r}
+```{r checkBinsChoice}
 blase_data <- as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 10)
 genes(blase_data) <- genelist[1:80]
 evaluate_parameters(blase_data, make_plot = TRUE)
@@ -153,7 +153,7 @@ evaluate_parameters(blase_data, make_plot = TRUE)
 We can also see how the genes change over pseudotime, by plotting expression 
 of the top genes changing over each pseudotime bin.
 
-```{r}
+```{r evaluateTopGenes}
 evaluate_top_n_genes(blase_data)
 ```
 
@@ -164,7 +164,7 @@ cell. We'll do this by pseudobulking cell types in the
 SingleCellExperiment but in reality you should use a real bulk dataset.
 See some of our other articles for examples.
 
-```{r}
+```{r doBLASEMapping}
 bulks_df <- DataFrame(row.names = rownames(counts(sce)))
 for (type in unique(sce$celltype)) {
     bulks_df <- cbind(
@@ -187,7 +187,7 @@ neutrophils_result
 
 We can also generate this result with `map_all_best_bins`, which can also 
 allow for parallelisation of the process for large numbers of bulks:
-```{r}
+```{r fastMapping}
 map_all_best_bins(blase_data, bulks_df)
 ```
 
@@ -198,7 +198,7 @@ can plot a heatmap of all these results. The neutrophils and
 Erythrocytes are confidently mapped, but the GMP population doesn't map
 as well.
 
-```{r}
+```{r plotMappingResults}
 plot_mapping_result_heatmap(list(
     multipotent_progenitors_result,
     basophils_result,
@@ -213,7 +213,7 @@ Because the the lower boundary of the best selection (bin 3) is higher
 than the higher bounds of the next-best bin (bin 4), BLASE makes a
 confident call.
 
-```{r}
+```{r plotMappingResultCorr}
 plot_mapping_result_corr(basophils_result)
 ```
 
@@ -225,7 +225,7 @@ we need to add the pseudotime bins to the metadata of the SCE. We can
 see that the true proportions of cell types in the mapped bin do indeed
 map to the cell type we expect.
 
-```{r}
+```{r assignPseudotimeBinsAndPlot}
 binned_sce <- assign_pseudotime_bins(
     sce,
     split_by = "pseudotime_range",
@@ -241,7 +241,7 @@ plot_mapping_result(
 
 To view the bin population chart in full, use:
 
-```{r}
+```{r plotBinPopulation}
 plot_bin_population(binned_sce, 1, group_by_slot = "celltype")
 ```
 
