@@ -25,10 +25,12 @@ The goal of BLASE is to enable you to map bulk RNA-seq samples onto Single Cell 
 It provides:  
 
 
-* Configurable discretisation of pseudotime into "pseudotime bins"  
-* A fourier method for identifying DE genes, particularly effective for Plasmodium sp., as introduced by Bozdech et al.  
-* Mapping of bulk RNA-seq onto these bins.  
-* Plotting functions
+- Configurable discretisation of pseudotime into “pseudotime bins”
+- A custom "Gene Peakedness" method for identifying temporally
+  variable genes
+- Annotation of scRNA-seq based on bulk samples
+- Mapping of bulk RNA-seq onto these bins.
+- Plotting functions
 
 ## Installation
 
