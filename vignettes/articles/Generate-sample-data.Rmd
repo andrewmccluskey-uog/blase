@@ -1,0 +1,207 @@
+---
+title: "Generate sample data"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Generating Malaria Cell Atlas PF Test dataset}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE, eval=FALSE}
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>"
+)
+```
+
+# Generating Malaria Cell Atlas PF Test Dataset
+
+```{r, eval=FALSE, setup}
+library(readxl)
+library(scran)
+library(slingshot)
+library(BiocParallel)
+library(fs)
+library(gridExtra)
+library(scater)
+library(utils)
+library(ami)
+```
+
+First configure R:
+```{r, eval=FALSE, randomseed}
+RNGversion("3.5.0")
+SEED <- 7
+set.seed(SEED)
+```
+
+```{r, eval=FALSE, concurrency}
+N_CORES <- 4
+if (ami::using_ci()) {
+    N_CORES <- 2
+}
+```
+
+First download the data from the Malaria Cell Atlas
+```{r, eval=FALSE, getData}
+root_dir <- tools::R_user_dir("BLASE", "data")
+article_dir <- fs::path(root_dir, "Generate_MCA_PF_Object")
+
+if (!dir.exists(article_dir)) {
+    dir.create(article_dir, recursive = TRUE)
+}
+
+mca_path <- fs::path(article_dir, "MCA", ext = "zip")
+if (!file.exists(mca_path)) {
+    download.file("https://www.malariacellatlas.org/downloads/pf.zip", mca_path)
+    unzip(mca_path, exdir = paste0(article_dir, "/MCA"))
+} else {
+    print("Using cached")
+}
+```
+
+## Prepare SC
+Now we read the files and create an SCE.
+
+```{r, eval=FALSE, loadSC}
+mca_counts_path <- path(article_dir, "MCA", "pf-ch10x-raw", ext = "csv")
+sc_readcounts <- read.csv(mca_counts_path, row.names = 1)
+
+mca_annotation_path <- path(article_dir, "MCA", "pf-ch10x-data", ext = "csv")
+sc_annotations <- read.csv(mca_annotation_path, row.names = 1)
+
+rownames(sc_annotations) <- gsub(x = rownames(sc_annotations), pattern = "-", replacement = ".", fixed = TRUE)
+```
+
+Here, we collapse transcripts for the same gene, so that can match some of our bulk datasets better. This is not a reccomended approach in most analyses.
+```{r, eval=FALSE, removeSCDupTranscripts}
+genes_to_fix <- rownames(sc_readcounts)[!(rownames(sc_readcounts) %in% sub(x = rownames(sc_readcounts), pattern = "\\.[0-9]", replacement = ""))]
+genes_to_fix <- unique(sub(x = genes_to_fix, pattern = "\\.[0-9]", replacement = ""))
+
+new_rows <- data.frame()
+rownames_to_remove <- c()
+
+# Do some pre-work to get colSums quickly
+sc_readcounts_matrix <- data.matrix(sc_readcounts)
+sc_readcounts_n <- ncol(sc_readcounts_matrix)
+
+for (gene in genes_to_fix) {
+    targetRowNames <- rownames(sc_readcounts)[grep(x = rownames(sc_readcounts), pattern = gene)]
+    rownames_to_remove <- c(rownames_to_remove, targetRowNames)
+    # N = col index, M = row index
+    counts <- .colSums(sc_readcounts_matrix[targetRowNames, ], m = length(targetRowNames), n = sc_readcounts_n)
+    counts <- t(data.frame(counts = counts))
+    rownames(counts) <- c(gene)
+    colnames(counts) <- colnames(sc_readcounts)
+    new_rows <- rbind(new_rows, counts)
+}
+
+sc_readcounts <- sc_readcounts[!(rownames(sc_readcounts) %in% rownames_to_remove), ]
+sc_readcounts <- rbind(sc_readcounts, new_rows)
+
+genes_to_fix <- rownames(sc_readcounts)[!(rownames(sc_readcounts) %in% sub(x = rownames(sc_readcounts), pattern = "\\.[0-9]", replacement = ""))]
+genes_to_fix <- unique(sub(x = genes_to_fix, pattern = "\\.[0-9]", replacement = ""))
+print(paste("Remaining genes with dups:", genes_to_fix))
+
+rm(new_rows, rownames_to_remove, sc_readcounts_matrix, sc_readcounts_n, genes_to_fix, targetRowNames, gene)
+gc()
+```
+
+Now we can create a `SingleCellExperiment` object:
+```{r, eval=FALSE, sceCreation}
+sparse_matrix <- as(as.matrix(sc_readcounts), "sparseMatrix")
+sce <- SingleCellExperiment(assays = list(counts = sparse_matrix), colData = sc_annotations)
+rownames(sce) <- sub(x = rownames(sce), pattern = "\\.[0-9]", replacement = "")
+
+colData(sce)$STAGE_LR <- factor(colData(sce)$STAGE_LR)
+colData(sce)$STAGE_HR <- factor(colData(sce)$STAGE_HR)
+colData(sce)$DAY <- factor(colData(sce)$DAY)
+colData(sce)$STRAIN <- factor(colData(sce)$STRAIN)
+colData(sce)$STAGE_HR2 <- factor(colData(sce)$STAGE_HR2)
+colData(sce)$HOST <- factor(colData(sce)$HOST)
+colData(sce)$CLUSTER <- factor(colData(sce)$CLUSTER)
+```
+
+We also subset out gametocytes, since we focus on Plasmodium's asexual reproduction in these articles. Then we limit outselves to 6,000 cells, which is plenty for BLASE, and reduces the resource load of this file.
+```{r, eval=FALSE, scSubsetting}
+sce <- subset(sce, , STAGE_LR != "gametocyte")
+
+# Subsample to reduce memory consumption
+cells_to_keep <- sample(colnames(sce), size = 3500)
+sce <- sce[, colnames(sce) %in% cells_to_keep]
+
+rm(sc_annotations, sc_readcounts, cells_to_keep)
+gc()
+```
+
+Now we start annotating and preprocessing the data.
+```{r, eval=FALSE, scPreprocessing}
+sce <- computeSumFactors(sce)
+sce <- logNormCounts(sce)
+normcounts(sce) <- exp(logcounts(sce))
+
+dec <- modelGeneVar(sce)
+hvg <- getTopHVGs(dec, prop = 0.3)
+
+reducedDim(sce, "PCA") <- as.matrix(cbind(colData(sce)["PC_1"], colData(sce)["PC_2"], colData(sce)["PC_3"]))
+# better separation in the 2nd and 3rd dimension for just asexual stages
+reducedDim(sce, "UMAP") <- as.matrix(cbind(colData(sce)["UMAP_2"], colData(sce)["UMAP_3"]))
+
+gridExtra::grid.arrange(
+    plotPCA(sce, colour_by = "STAGE_HR2"),
+    plotUMAP(sce, colour_by = "STAGE_HR2"),
+    plotPCA(sce, colour_by = "DAY"),
+    plotUMAP(sce, colour_by = "DAY"),
+    ncol = 2
+)
+```
+
+## Running Trajectory Analysis
+
+Generate the pseudotime trajectory
+```{r, eval=FALSE, runSlingShot}
+sce <- slingshot(sce, reducedDim = "UMAP", clusterLabels = "STAGE_HR", start.clus = "early ring")
+plotUMAP(sce, colour_by = "slingPseudotime_1")
+```
+## Remove Extraneous Genes
+We remove some genes here to reduce file size.
+```{r, eval=FALSE}
+gene_peakedness_info <- blase::calculate_gene_peakedness(
+    sce,
+    window_pct = 5,
+    knots = 18,
+    BPPARAM = MulticoreParam(4, progressbar = TRUE)
+)
+
+genes_to_keep <- blase::gene_peakedness_spread_selection(
+    sce,
+    gene_peakedness_info,
+    genes_per_bin = 65,
+    n_gene_bins = 30
+)
+
+sce <- sce[genes_to_keep, ]
+```
+
+## Saving the SCE Object
+Now we save the RDS so we can distribute with BLASE.
+```{r, eval=FALSE, saveRDS}
+logcounts(sce) <- NULL
+sce$slingshot <- NULL
+
+if (!dir.exists("Data")) {
+    dir.create(.. / data)
+}
+saveRDS(sce, "Data/MCA_PF_SCE.rds", compress = "bzip2")
+```
+
+## Loading the SCE Object
+You can load this SCE with:
+```{r, eval=FALSE, loadRDS}
+MCA_PF_SCE <- readRDS("Data/MCA_PF_SCE.rds")
+```
+
+## Session Info
+``` {r, eval=FALSE}
+sessionInfo()
+```

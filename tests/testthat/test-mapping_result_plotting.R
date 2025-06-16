@@ -9,28 +9,14 @@ test_that("plot_mapping_result_heatmap throws error if list has no MappingResult
 })
 
 test_that("plot_mapping_result_heatmap throws error if list has a mix of MappingResults and other types", {
-    mapping_result <- methods::new("MappingResult",
-        bulk_name = "Test",
-        best_bin = 1,
-        best_correlation = 0.05,
-        top_2_distance = 0.001,
-        history = data.frame()
-    )
+    mapping_result <- generate_test_mapping_result()
 
     tmp1 <- function() plot_mapping_result_heatmap(list(mapping_result, 5))
     expect_error(tmp1(), "You must provide a list of MappingResult objects only.", fixed = TRUE)
 })
 
 test_that("plot_mapping_result_heatmap runs for list of MappingResults only", {
-    mapping_result <- methods::new("MappingResult",
-        bulk_name = "Test",
-        best_bin = 1,
-        best_correlation = 0.05,
-        top_2_distance = 0.001,
-        confident_mapping = TRUE,
-        history = data.frame(bin = c(1), correlation = c(0.5), lower_bound = c(0.3), upper_bound = c(0.6)),
-        bootstrap_iterations = 200
-    )
+    mapping_result <- generate_test_mapping_result()
 
     tmp1 <- function() plot_mapping_result_heatmap(list(mapping_result))
     expect_no_error(tmp1())

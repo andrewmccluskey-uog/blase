@@ -25,27 +25,28 @@ test_that("find_best_params() warns about too few genes", {
 })
 
 test_that("find_best_params() runs without error", {
-  sce <- generate_test_sce(200, 300)
-  sce$pseudotime <- (1:200) / 200
-  colnames(sce) <- paste0("C", seq_len(200))
-  rownames(sce) <- paste0("G", seq_len(300))
+    sce <- generate_test_sce(200, 300)
+    sce$pseudotime <- (1:200) / 200
+    colnames(sce) <- paste0("C", seq_len(200))
+    rownames(sce) <- paste0("G", seq_len(300))
 
-  results = find_best_params(
-    sce,
-    genelist = paste0("G",seq_len(40)),
-    bins_count_range = 2:3,
-    gene_count_range = c(5,10),
-    pseudotime_slot = "pseudotime")
+    results <- find_best_params(
+        sce,
+        genelist = paste0("G", seq_len(40)),
+        bins_count_range = 2:3,
+        gene_count_range = c(5, 10),
+        pseudotime_slot = "pseudotime"
+    )
 
-  expected = data.frame(data.frame(
-    column_label=c("1", "2", "1", "2"),
-    bin_count=c(2, 2, 3, 3),
-    gene_count=c(5, 10, 5, 10),
-    min_convexity=as.double(c(NA, NA, NA, NA)),
-    mean_convexity=as.double(c(NA, NA, NA, NA)),
-    confident_mapping_pct=as.double(c(NA, NA, NA,NA))
-  ))
-  rownames(expected) = seq_len(4)
+    expected <- data.frame(data.frame(
+        column_label = c("1", "2", "1", "2"),
+        bin_count = c(2, 2, 3, 3),
+        gene_count = c(5, 10, 5, 10),
+        min_convexity = as.double(c(NA, NA, NA, NA)),
+        mean_convexity = as.double(c(NA, NA, NA, NA)),
+        confident_mapping_pct = as.double(c(NA, NA, NA, NA))
+    ))
+    rownames(expected) <- seq_len(4)
 
-  expect_equal(results, expected)
+    expect_equal(results, expected)
 })

@@ -9,8 +9,8 @@ vignette: >
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
+    collapse = TRUE,
+    comment = "#>"
 )
 ```
 
@@ -34,7 +34,7 @@ N_CORES <- 4
 if (ami::using_ci()) {
     N_CORES <- 2
 }
-bpparam = MulticoreParam(N_CORES)
+bpparam <- MulticoreParam(N_CORES)
 ```
 
 This article will show how BLASE can be used for excluding the effect of 
@@ -52,8 +52,8 @@ First we'll load in the data we're using, pre-prepared from the BLASE
 reproducibility repository.
 
 ```{r, load_data}
-zhang_bulk = readRDS('Data/zhang_2021_heat_shock_bulk.rds')
-dogga_sc = readRDS('Data/processed_MCA_PF_SCE_allgenes.rds')
+zhang_bulk <- readRDS("Data/zhang_2021_heat_shock_bulk.rds")
+dogga_sc <- readRDS("Data/MCA_PF_SCE.rds")
 ```
 
 We can examine the true lifecycle stages, and also the calculated pseudotime
@@ -62,14 +62,14 @@ trajectory (Slingshot).
 ```{r, sc_umaps}
 #| fig.alt: >
 #|   UMAP of Dogga et al. single-cell RNA-seq reference coloured by lifecycle
-#|   stage, showing the cycle from Rings, Trophozoites, Schizonts, to Rings 
+#|   stage, showing the cycle from Rings, Trophozoites, Schizonts, to Rings
 #|   again.
-plotUMAP(dogga_sc, colour_by="STAGE_HR")
+plotUMAP(dogga_sc, colour_by = "STAGE_HR")
 
 #| fig.alt: >
 #|   UMAP of Dogga et al. single-cell RNA-seq reference coloured by pseudotime,
 #|   starting with Rings, and ending with Schizonts.
-plotUMAP(dogga_sc, colour_by="slingPseudotime_1")
+plotUMAP(dogga_sc, colour_by = "slingPseudotime_1")
 ```
 ## Prepare BLASE
 
@@ -81,17 +81,19 @@ First, we create the object, giving it the
 number of bins we want to use, and how to calculate them.
 
 ```{r, create_BLASE_object}
-blase_data = as.BlaseData(
-  dogga_sc, 
-  pseudotime_slot="slingPseudotime_1", 
-  n_bins=8, 
-  split_by="pseudotime_range")
+blase_data <- as.BlaseData(
+    dogga_sc,
+    pseudotime_slot = "slingPseudotime_1",
+    n_bins = 8,
+    split_by = "pseudotime_range"
+)
 
 # Add these bins to the sc metadata
-dogga_sc = blase::assign_pseudotime_bins(dogga_sc, 
-  pseudotime_slot="slingPseudotime_1", 
-  n_bins=8, 
-  split_by="pseudotime_range")
+dogga_sc <- blase::assign_pseudotime_bins(dogga_sc,
+    pseudotime_slot = "slingPseudotime_1",
+    n_bins = 8,
+    split_by = "pseudotime_range"
+)
 ```
 
 ### Select Genes
@@ -100,24 +102,26 @@ Now we will select the genes we want to use, using BLASE's gene peakedness
 metric.
 
 ```{r, calculate_gene_peakedness}
-gene_peakedness_info = blase::calculate_gene_peakedness(
-  dogga_sc, 
-  window_pct = 5, 
-  knots = 18, 
-  BPPARAM = bpparam)
+gene_peakedness_info <- blase::calculate_gene_peakedness(
+    dogga_sc,
+    window_pct = 5,
+    knots = 18,
+    BPPARAM = bpparam
+)
 
-genes_to_use = blase::gene_peakedness_spread_selection(
-  dogga_sc, 
-  gene_peakedness_info, 
-  genes_per_bin = 30, 
-  n_gene_bins = 30)
+genes_to_use <- blase::gene_peakedness_spread_selection(
+    dogga_sc,
+    gene_peakedness_info,
+    genes_per_bin = 30,
+    n_gene_bins = 30
+)
 
 head(gene_peakedness_info)
 ```
 
 Here, we add them to the BLASE object for mapping with.
 ```{r, add_genes_to_blase_data}
-genes(blase_data) = genes_to_use
+genes(blase_data) <- genes_to_use
 ```
 
 ## Calculate Mappings
@@ -125,13 +129,14 @@ genes(blase_data) = genes_to_use
 Now we can perform the actual mapping step, and review the results.
 
 ```{r, mapping}
-mapping_results = blase::map_all_best_bins(
-  blase_data, 
-  zhang_bulk, 
-  BPPARAM=bpparam)
+mapping_results <- blase::map_all_best_bins(
+    blase_data,
+    zhang_bulk,
+    BPPARAM = bpparam
+)
 
 #| fig.alt: >
-#|   Heatmap of mapping correlations of the Zhang et al. data onto 
+#|   Heatmap of mapping correlations of the Zhang et al. data onto
 #|   the Dogga et al. scRNA-seq.
 blase::plot_mapping_result_heatmap(mapping_results)
 ```
@@ -142,82 +147,82 @@ We calculate DE genes using Limma (ref) as we have access to only
 normalised counts.
 
 ```{r, setUpDE}
-metadata = data.frame(row.names = seq_len(12))
-metadata$strain = c(
-  rep("NF54", 4),
-  rep("PB4", 4),
-  rep("PB31", 4)
+metadata <- data.frame(row.names = seq_len(12))
+metadata$strain <- c(
+    rep("NF54", 4),
+    rep("PB4", 4),
+    rep("PB31", 4)
 )
-metadata$growth_conditions = rep(c("Normal", "Normal", "HS", "HS"), 3)
-metadata$group = paste0(metadata$strain, "_", metadata$growth_conditions)
-rownames(metadata) = c(
-  "NF54_37_1",
-  "NF54_37_2",
-  "NF54_41_1",
-  "NF54_41_2",
-  "PB4_37_1",
-  "PB4_37_2",
-  "PB4_41_1",
-  "PB4_41_2",
-  "PB31_37_1",
-  "PB31_37_2",
-  "PB31_41_1",
-  "PB31_41_2"
+metadata$growth_conditions <- rep(c("Normal", "Normal", "HS", "HS"), 3)
+metadata$group <- paste0(metadata$strain, "_", metadata$growth_conditions)
+rownames(metadata) <- c(
+    "NF54_37_1",
+    "NF54_37_2",
+    "NF54_41_1",
+    "NF54_41_2",
+    "PB4_37_1",
+    "PB4_37_2",
+    "PB4_41_1",
+    "PB4_41_2",
+    "PB31_37_1",
+    "PB31_37_2",
+    "PB31_41_1",
+    "PB31_41_2"
 )
 
-design <- model.matrix(~0+group, metadata)
+design <- model.matrix(~ 0 + group, metadata)
 colnames(design) <- gsub("group", "", colnames(design))
 design
 
 contr.matrix <- makeContrasts(
-   WT_normal_v_HS = NF54_Normal - NF54_HS, 
-   PB31_normal_v_HS = PB31_Normal - PB31_HS, 
-   normal_NF54_v_PB31 = NF54_Normal - PB31_Normal, 
-   levels = colnames(design))
+    WT_normal_v_HS = NF54_Normal - NF54_HS,
+    PB31_normal_v_HS = PB31_Normal - PB31_HS,
+    normal_NF54_v_PB31 = NF54_Normal - PB31_Normal,
+    levels = colnames(design)
+)
 contr.matrix
 ```
 
 ### Phenotype + Development (Bulk DE)
 ```{r, calculateBulkDE}
-
 vfit <- lmFit(zhang_bulk, design)
-vfit <- contrasts.fit(vfit, contrasts=contr.matrix)
+vfit <- contrasts.fit(vfit, contrasts = contr.matrix)
 efit <- eBayes(vfit)
 
 summary(decideTests(efit))
 
-PB31_normal_v_HS_BULK_DE = topTable(efit, n=Inf, coef=2)
-PB31_normal_v_HS_BULK_DE = PB31_normal_v_HS_BULK_DE[PB31_normal_v_HS_BULK_DE$adj.P.Val < 0.05 & PB31_normal_v_HS_BULK_DE$logFC > 0,]
-PB31_normal_v_HS_BULK_DE = PB31_normal_v_HS_BULK_DE[order(-PB31_normal_v_HS_BULK_DE$logFC), ]
+PB31_normal_v_HS_BULK_DE <- topTable(efit, n = Inf, coef = 2)
+PB31_normal_v_HS_BULK_DE <- PB31_normal_v_HS_BULK_DE[PB31_normal_v_HS_BULK_DE$adj.P.Val < 0.05 & PB31_normal_v_HS_BULK_DE$logFC > 0, ]
+PB31_normal_v_HS_BULK_DE <- PB31_normal_v_HS_BULK_DE[order(-PB31_normal_v_HS_BULK_DE$logFC), ]
 ```
 
 ### Development (SC DE)
 First, let's pseudobulk based on the pseudotime bins
 ```{r, pseudobulk}
-pseudobulked_dogga_sc = data.frame(row.names=rownames(dogga_sc))
+pseudobulked_dogga_sc <- data.frame(row.names = rownames(dogga_sc))
 for (r in mapping_results) {
-  pseudobulked_dogga_sc[bulk_name(r)] = rowSums(counts(dogga_sc[,dogga_sc$pseudotime_bin == best_bin(r)]))
+    pseudobulked_dogga_sc[bulk_name(r)] <- rowSums(counts(dogga_sc[, dogga_sc$pseudotime_bin == best_bin(r)]))
 }
-pseudobulked_dogga_sc = as.matrix(pseudobulked_dogga_sc)
+pseudobulked_dogga_sc <- as.matrix(pseudobulked_dogga_sc)
 ```
 
 And now calculate DE genes for these
 ```{r}
 ## Normalise, not needed for true bulks
-par(mfrow=c(1,2))
-v <- voom(pseudobulked_dogga_sc, design, plot=FALSE)
+par(mfrow = c(1, 2))
+v <- voom(pseudobulked_dogga_sc, design, plot = FALSE)
 
 vfit_sc <- lmFit(v, design)
-vfit_sc <- contrasts.fit(vfit_sc, contrasts=contr.matrix)
+vfit_sc <- contrasts.fit(vfit_sc, contrasts = contr.matrix)
 efit_sc <- eBayes(vfit_sc)
 
 summary(decideTests(efit_sc))
 ```
 
 ```{r}
-PB31_normal_v_HS_SC_DE = topTable(efit_sc, n=Inf, coef=2)
-PB31_normal_v_HS_SC_DE = PB31_normal_v_HS_SC_DE[PB31_normal_v_HS_SC_DE$adj.P.Val < 0.05 & PB31_normal_v_HS_SC_DE$logFC > 0,]
-PB31_normal_v_HS_SC_DE = PB31_normal_v_HS_SC_DE[order(-PB31_normal_v_HS_SC_DE$logFC), ]
+PB31_normal_v_HS_SC_DE <- topTable(efit_sc, n = Inf, coef = 2)
+PB31_normal_v_HS_SC_DE <- PB31_normal_v_HS_SC_DE[PB31_normal_v_HS_SC_DE$adj.P.Val < 0.05 & PB31_normal_v_HS_SC_DE$logFC > 0, ]
+PB31_normal_v_HS_SC_DE <- PB31_normal_v_HS_SC_DE[order(-PB31_normal_v_HS_SC_DE$logFC), ]
 ```
 
 ## Remove Developmental Genes
@@ -227,8 +232,8 @@ Venn Diagram:
 #| fig.alt: >
 #|   Venn Diagram showing the intersection of Bulk and SC DE genes.
 ggVennDiagram(list(
-  Phenotype = rownames(PB31_normal_v_HS_BULK_DE),
-  Development = rownames(PB31_normal_v_HS_SC_DE)
+    Phenotype = rownames(PB31_normal_v_HS_BULK_DE),
+    Development = rownames(PB31_normal_v_HS_SC_DE)
 )) + ggtitle("PB31 Normal vs Heat Shock")
 ```
 
@@ -238,7 +243,7 @@ original DE genes list.
 NB: This is a primitive approach, and there are likely many other and better
 ways to calculate which genes should be kept or removed.
 ```{r}
-PB31_normal_v_HS_corrected_DE = rownames(PB31_normal_v_HS_BULK_DE[!(rownames(PB31_normal_v_HS_BULK_DE) %in% rownames(PB31_normal_v_HS_SC_DE)),])
+PB31_normal_v_HS_corrected_DE <- rownames(PB31_normal_v_HS_BULK_DE[!(rownames(PB31_normal_v_HS_BULK_DE) %in% rownames(PB31_normal_v_HS_SC_DE)), ])
 ```
 
 Further downstream analysis can now be performed, as desired by the researcher, 

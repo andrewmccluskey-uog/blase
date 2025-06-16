@@ -40,26 +40,26 @@ of pseudotime. The number of regions and genes per region can be tuned.
 ncells <- 70
 ngenes <- 100
 # Each gene should have mean around its gene number
-counts = c()
+counts <- c()
 for (i in seq_len(ngenes)) {
-  counts = c(counts, dnorm(seq_len(ncells), mean=(ncells/i), sd=1))
+    counts <- c(counts, dnorm(seq_len(ncells), mean = (ncells / i), sd = 1))
 }
 
 counts_matrix <- matrix(
-  counts,
-  ncol = ncells,
-  nrow = ngenes
+    counts,
+    ncol = ncells,
+    nrow = ngenes
 )
 sce <- SingleCellExperiment::SingleCellExperiment(assays = list(
-  counts = counts_matrix * 3,
-  normcounts = counts_matrix,
-  logcounts = log(counts_matrix)
+    counts = counts_matrix * 3,
+    normcounts = counts_matrix,
+    logcounts = log(counts_matrix)
 ))
 colnames(sce) <- paste0("cell", seq_len(ncells))
 rownames(sce) <- paste0("gene", seq_len(ngenes))
 sce$cell_type <- c(
-  rep("celltype_1", ncells / 2),
-  rep("celltype_2", ncells / 2)
+    rep("celltype_1", ncells / 2),
+    rep("celltype_2", ncells / 2)
 )
 
 sce$pseudotime <- seq_len(ncells)
@@ -67,28 +67,36 @@ genelist <- rownames(sce)
 
 # calculate_gene_peakedness
 gene_peakedness <- calculate_gene_peakedness(
-  sce, pseudotime_slot="pseudotime")
+    sce,
+    pseudotime_slot = "pseudotime"
+)
 
 head(gene_peakedness)
 
 # plot_gene_peakedness
 plot_gene_peakedness(sce, gene_peakedness, "gene20",
-  pseudotime_slot = "pseudotime")
+    pseudotime_slot = "pseudotime"
+)
 
 # smooth_gene
 smoothed_gene20 <- smooth_gene(
-  sce, "gene20", pseudotime_slot = "pseudotime")
+    sce, "gene20",
+    pseudotime_slot = "pseudotime"
+)
 head(smoothed_gene20)
 
 # Select best spread of genes
 genes_to_use <- gene_peakedness_spread_selection(sce, gene_peakedness,
-  genes_per_bin=2, n_gene_bins=1, pseudotime_slot="pseudotime")
+    genes_per_bin = 2, n_gene_bins = 1, pseudotime_slot = "pseudotime"
+)
 
 print(genes_to_use)
-plot(x=gene_peakedness[
-  gene_peakedness$gene \%in\% genes_to_use,"peak_pseudotime"
- ],
- y=gene_peakedness[gene_peakedness$gene \%in\% genes_to_use,"ratio"])
+plot(
+    x = gene_peakedness[
+        gene_peakedness$gene \%in\% genes_to_use, "peak_pseudotime"
+    ],
+    y = gene_peakedness[gene_peakedness$gene \%in\% genes_to_use, "ratio"]
+)
 
 }
 \concept{gene-selection}

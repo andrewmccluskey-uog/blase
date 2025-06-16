@@ -28,7 +28,7 @@ best mapping buckets. Higher indicates a less doubtful mapping.}
 than the maximum upper bound of the other bins.}
 
 \item{\code{history}}{A dataframe of the correlation score and confidence bounds
-for each bin.}
+for each bin. Access with \code{mapping_history()}}
 
 \item{\code{bootstrap_iterations}}{The number of iterations used during
 the bootstrap.}
@@ -73,6 +73,10 @@ sce <- assign_pseudotime_bins(
     pseudotime_slot = "pseudotime", n_bins = 4
 )
 plot_bin_population(sce, best_bin(result), group_by_slot = "cell_type")
+
+# Annotate SC from existing bulk
+annotate_sce(sce, list(result))
+table(sce$BLASE_Annotation)
 
 # Getters
 bulk_name(result)
