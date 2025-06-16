@@ -78,7 +78,7 @@ than the maximum upper bound of the other bins.</p></dd>
 
 <dt><code>history</code></dt>
 <dd><p>A dataframe of the correlation score and confidence bounds
-for each bin.</p></dd>
+for each bin. Access with <code><a href="mapping-result-history-getter.html">mapping_history()</a></code></p></dd>
 
 
 <dt><code>bootstrap_iterations</code></dt>
@@ -140,6 +140,22 @@ the bootstrap.</p></dd>
 <span class="r-in"><span><span class="fu"><a href="plot_bin_population.html">plot_bin_population</a></span><span class="op">(</span><span class="va">sce</span>, <span class="fu"><a href="mapping-result-best-bin-getter.html">best_bin</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>, group_by_slot <span class="op">=</span> <span class="st">"cell_type"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="MappingResult-class-3.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Annotate SC from existing bulk</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="annotate_sce.html">annotate_sce</a></span><span class="op">(</span><span class="va">sce</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> class: SingleCellExperiment </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> dim: 5 48 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> metadata(0):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> assays(2): normcounts logcounts</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> rownames(5): 1 2 3 4 5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> rowData names(0):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> colnames(48): 1 2 ... 47 48</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> colData names(4): cell_type pseudotime pseudotime_bin BLASE_Annotation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> reducedDimNames(0):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mainExpName: NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> altExpNames(0):</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">sce</span><span class="op">$</span><span class="va">BLASE_Annotation</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt; table of extent 0 &gt;</span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Getters</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="mapping-result-bulk-name-getter.html">bulk_name</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "B"</span>
@@ -170,7 +186,7 @@ the bootstrap.</p></dd>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer></div>

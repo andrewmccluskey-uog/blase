@@ -3,6 +3,7 @@
 <url><loc>https://andrewmccluskey-uog.github.io/BLASE/LICENSE.html</loc></url>
 <url><loc>https://andrewmccluskey-uog.github.io/BLASE/articles/BLASE-for-annotating-scRNA-seq.html</loc></url>
 <url><loc>https://andrewmccluskey-uog.github.io/BLASE/articles/BLASE-for-excluding-developmental-genes-from-bulk-RNA-seq.html</loc></url>
+<url><loc>https://andrewmccluskey-uog.github.io/BLASE/articles/Generate-sample-data.html</loc></url>
 <url><loc>https://andrewmccluskey-uog.github.io/BLASE/articles/How-Blase-Works.html</loc></url>
 <url><loc>https://andrewmccluskey-uog.github.io/BLASE/articles/assign-bulk-to-pseudotime.html</loc></url>
 <url><loc>https://andrewmccluskey-uog.github.io/BLASE/articles/index.html</loc></url>
@@ -13,6 +14,7 @@
 <url><loc>https://andrewmccluskey-uog.github.io/BLASE/reference/MappingResult-class.html</loc></url>
 <url><loc>https://andrewmccluskey-uog.github.io/BLASE/reference/PRIVATE_.ci.html</loc></url>
 <url><loc>https://andrewmccluskey-uog.github.io/BLASE/reference/PRIVATE_spearman.ci.html</loc></url>
+<url><loc>https://andrewmccluskey-uog.github.io/BLASE/reference/annotate_sce.html</loc></url>
 <url><loc>https://andrewmccluskey-uog.github.io/BLASE/reference/as.BlaseData.html</loc></url>
 <url><loc>https://andrewmccluskey-uog.github.io/BLASE/reference/assign_pseudotime_bins.html</loc></url>
 <url><loc>https://andrewmccluskey-uog.github.io/BLASE/reference/calculate_gene_peakedness.html</loc></url>
