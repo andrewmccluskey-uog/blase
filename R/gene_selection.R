@@ -382,7 +382,8 @@ PRIVATE_get_smooth_expression_for_plot <- function(
             pseudotime_slot = pseudotime_slot, knots = 10
         )
     )
-    colnames(smooth_df) <- c("pseudotime", target$gene)
+    colnames(smooth_df) <- c("pseudotime", gene)
+    return(smooth_df)
 }
 
 #' @keywords internal
@@ -392,6 +393,7 @@ PRIVATE_get_expression_matrix_for_plot <- function(sce, pseudotime, gene) {
     expression$pseudotime <- pseudotime
     expression <- expression[order(expression$pseudotime), ]
     expression <- expression[, c("pseudotime", gene)]
+    return(expression)
 }
 
 #' @keywords internal

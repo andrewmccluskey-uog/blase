@@ -17,7 +17,6 @@ knitr::opts_chunk$set(
 # Generating Malaria Cell Atlas PF Test Dataset
 
 ```{r, eval=FALSE, setup}
-library(readxl)
 library(scran)
 library(slingshot)
 library(BiocParallel)

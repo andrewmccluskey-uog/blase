@@ -53,18 +53,13 @@ Suggests:
     scran,
     slingshot,
     Seurat (>= 4.0.0),
-    dyngen,
-    bluster,
-    UpSetR,
-    readxl,
     tools,
     ami,
-    ggplotify,
     reshape2,
-    scales,
     plyr,
     fs,
-    sparseMatrixStats
+    sparseMatrixStats,
+    ggVennDiagram
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 URL: https://andrewmccluskey-uog.github.io/BLASE/
