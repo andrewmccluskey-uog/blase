@@ -25,7 +25,7 @@ confident.}
 \value{
 A \link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment::SingleCellExperiment} with annotations
 added to metadata (in a column defined by \code{annotation_col}), and the
-correlations in \code{BLASE_Annotation_Best_Mapping_Correlation} if
+correlations in \code{BLASE_Annotation_Correlation} if
 \code{include_stats} is enabled.
 }
 \description{

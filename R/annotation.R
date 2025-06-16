@@ -19,7 +19,7 @@
 #'
 #' @return A [SingleCellExperiment::SingleCellExperiment] with annotations
 #' added to metadata (in a column defined by `annotation_col`), and the
-#' correlations in `BLASE_Annotation_Best_Mapping_Correlation` if
+#' correlations in `BLASE_Annotation_Correlation` if
 #' `include_stats` is enabled.
 #' @export
 #'
@@ -52,7 +52,7 @@ annotate_sce <- function(
     SummarizedExperiment::colData(sce)[, annotation_col] <- "Unknown"
     if (include_stats) {
         SummarizedExperiment::colData(sce)[
-            , "BLASE_Annotation_Best_Mapping_Correlation"
+            , "BLASE_Annotation_Correlation"
         ] <- NA
     }
 
@@ -66,7 +66,7 @@ annotate_sce <- function(
 
             if (include_stats) {
                 SummarizedExperiment::colData(sce)[
-                    mask, "BLASE_Annotation_Best_Mapping_Correlation"
+                    mask, "BLASE_Annotation_Correlation"
                 ] <- best_match$correlation
             }
         }

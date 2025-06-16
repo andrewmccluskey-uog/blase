@@ -10,7 +10,7 @@ editor_options:
     wrap: 72
 ---
 
-```{r, include = FALSE}
+```{r, results='hide', message=FALSE, warning=FALSE}
 knitr::opts_chunk$set(
     collapse = TRUE,
     comment = "#>"
@@ -20,6 +20,11 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(ggplot2)
 library(reshape2)
+library(fontawesome)
+library(magick)
+library(dplyr)
+library(hexSticker)
+library(devtools)
 ```
 
 ## Principle
@@ -33,7 +38,7 @@ to infer which stage of the trajectory a cell is currently in. This
 is of course a constructed example and unlikely to be exactly repeated in 
 real life, but hopefully demonstrates the principle BLASE works on.
 
-```{r}
+```{r expressionOverPseudotime}
 # Adapted from
 # https://codepal.ai/code-generator/query/n4dEA6I9/plot-sine-wave-ggplot2-r
 x <- seq(0, 2 * pi, length.out = 500)
@@ -46,7 +51,10 @@ genes <- data.frame(gene1 = gene1_expr, gene2 = gene2_expr, gene3 = gene3_expr)
 genes_melt <- melt(t(genes), varnames = c("gene", "x"))
 genes_melt$x <- as.numeric(genes_melt$x)
 
-# Create the plot using ggplot2
+#| fig.alt: >
+#|   Plot showing gene expression varying over time for three genes, with lines
+#|   marking different areas which can be uniquely identified by the rank-order
+#|   of the expression of the genes.
 ggplot(genes_melt, aes = aes()) +
     geom_line(aes(x = x, y = value, color = gene)) +
     geom_vline(xintercept = 0, linetype = "dashed") +
@@ -64,13 +72,8 @@ ggplot(genes_melt, aes = aes()) +
 ```
 
 ## Generating Icon
-```{r, eval=FALSE}
+```{r generateIcon, eval=FALSE}
 # Adapted from https://nelson-gon.github.io/12/06/2020/hex-sticker-creation-r/
-library(fontawesome)
-library(magick)
-library(dplyr)
-library(hexSticker)
-library(devtools)
 
 logo_color <- "orange"
 fill_color <- "red"
@@ -98,6 +101,6 @@ usethis::use_logo("blase_icon.png")
 ```
 
 ## Session Info
-```{r}
+```{r, sessionInfo}
 sessionInfo()
 ```

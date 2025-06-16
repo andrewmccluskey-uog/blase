@@ -54,7 +54,7 @@ test_that("adds stats to sce if flag enabled", {
 
     sce <- annotate_sce(sce, mappings, include_stats = TRUE)
 
-    expect_true(all(sce$BLASE_Annotation_Best_Mapping_Correlation == 0.5))
+    expect_true(all(sce$BLASE_Annotation_Correlation == 0.5))
 })
 
 test_that("does not add stats to sce if flag disabled", {
@@ -63,5 +63,5 @@ test_that("does not add stats to sce if flag disabled", {
     mappings <- list(generate_test_mapping_result())
 
     sce <- annotate_sce(sce, mappings, include_stats = FALSE)
-    expect_true(is.null(sce$BLASE_Annotation_Best_Mapping_Correlation))
+    expect_true(is.null(sce$BLASE_Annotation_Correlation))
 })

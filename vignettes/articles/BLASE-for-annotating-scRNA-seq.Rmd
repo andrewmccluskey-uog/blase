@@ -17,11 +17,12 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
+```{r setup, results='hide', message=FALSE, warning=FALSE}
 library(scater)
 library(ggplot2)
 library(BiocParallel)
 library(blase)
+library(patchwork)
 ```
 
 ```{r, randomseed}
@@ -181,13 +182,24 @@ We can use this to transfer back to the scRNA-seq as follows:
 
 ```{r, transfer_mappings_to_sc}
 annotated_sce <- blase::annotate_sce(dogga_sc, mapping_results, include_stats = TRUE)
+
+#| fig.alt: >
+#|   A UMAP of the reference scRNA-seq data coloured by pseudotime bin, as 
+#|   calculated by BLASE.
 plotUMAP(annotated_sce, colour_by = "pseudotime_bin")
-plotUMAP(annotated_sce, colour_by = "BLASE_Annotation")
-plotUMAP(annotated_sce, colour_by = "BLASE_Annotation_Best_Mapping_Correlation")
 
 annotated_sce$BLASE_Annotation <- gsub(" hpi", "", annotated_sce$BLASE_Annotation)
 annotated_sce$BLASE_Annotation <- as.numeric(annotated_sce$BLASE_Annotation)
-plotUMAP(annotated_sce, colour_by = "BLASE_Annotation")
+
+annotation_plot <- plotUMAP(annotated_sce, colour_by = "BLASE_Annotation")
+corr_plot <- plotUMAP(annotated_sce, colour_by = "BLASE_Annotation_Correlation") + 
+  labs(color='Correlation')
+
+#| fig.alt: >
+#|   UMAP of Dogga et al. single-cell RNA-seq reference coloured 
+#|   by best matching bulk RNA-seq sample (hpi). Beside it is a UMAP of 
+#|   the correlations of these mappings.
+annotation_plot + corr_plot
 
 annotated_sce$BLASE_Annotation_transfer <- ""
 for (best_bulk in unique(annotated_sce$BLASE_Annotation)) {
@@ -203,18 +215,15 @@ for (best_bulk in unique(annotated_sce$BLASE_Annotation)) {
         annotated_sce[, mask]$BLASE_Annotation_transfer <- "Schizont"
     }
 }
-plotUMAP(annotated_sce, colour_by = "BLASE_Annotation_transfer")
-plotUMAP(annotated_sce, colour_by = "STAGE_LR")
 
-# #| fig.alt: >
-# #|   UMAP of Dogga et al. single-cell RNA-seq reference coloured by lifecycle
-# #|   stage as annotated by BLASE.
-# plotUMAP(annotated_sce, colour_by="BLASE_annotation_transfer")
-#
-# #| fig.alt: >
-# #|   UMAP of Dogga et al. single-cell RNA-seq reference coloured by best
-# #|   matching bulk RNA-seq sample.
-# plotUMAP(annotated_sce, colour_by="BLASE_annotation_transfer_hd")
+#| fig.alt: >
+#|   UMAP of Dogga et al. single-cell RNA-seq reference coloured 
+#|   the original mappings from Dogga et al. and by best
+#|   matching bulk RNA-seq sample, and then named by the expected cell type (
+#|   from annotations in Painter et al.).
+#|   The mappings are broadly the same.
+plotUMAP(annotated_sce, colour_by = "BLASE_Annotation_transfer") + 
+  plotUMAP(annotated_sce, colour_by = "STAGE_LR")
 ```
 
 ## Session Info

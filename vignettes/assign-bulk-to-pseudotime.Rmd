@@ -79,6 +79,10 @@ sce <- logNormCounts(sce)
 normcounts(sce) <- exp(logcounts(sce))
 sce <- runUMAP(sce)
 
+#| fig.alt: >
+#|   Plots showing a UMAP of the single-cell data, 
+#|   coloured by celltype and pseudotime. The UMAP is shaped like a horizontal
+#|   line, showing the differentiation of a set of immune cell types.
 gridExtra::grid.arrange(
     plotUMAP(sce, text_by = "celltype", colour_by = "celltype"),
     plotUMAP(sce, colour_by = "pseudotime"),
@@ -125,6 +129,10 @@ res <- blase::find_best_params(
     split_by = "pseudotime_range",
     pseudotime_slot = "pseudotime"
 )
+
+#| fig.alt: >
+#|   Figures showing the minimum and mean convexity, as well as % confident
+#|   mappings different numbers of genes and bins calculated.
 blase::plot_find_best_params_results(res)
 ```
 
@@ -145,6 +153,11 @@ specific, with a high "worst specificity".
 ```{r checkBinsChoice}
 blase_data <- as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 10)
 genes(blase_data) <- genelist[1:80]
+
+#| fig.alt: >
+#|   These plots show the correlations of each bin to itself and all other
+#|   bins. This shows how distinct each bin is compared to others, based on
+#|   the number of bins and genes selected.
 evaluate_parameters(blase_data, make_plot = TRUE)
 ```
 
@@ -154,6 +167,9 @@ We can also see how the genes change over pseudotime, by plotting expression
 of the top genes changing over each pseudotime bin.
 
 ```{r evaluateTopGenes}
+#| fig.alt: >
+#|   Plot showing a the "best" genes selected for use with BLASE, according 
+#|   to how related their expression is to the pseudotime of the cell.
 evaluate_top_n_genes(blase_data)
 ```
 
@@ -199,6 +215,11 @@ Erythrocytes are confidently mapped, but the GMP population doesn't map
 as well.
 
 ```{r plotMappingResults}
+#| fig.alt: >
+#|   A heatmap showing the correlations BLASE found for a subset 
+#|   of cell types in this data. Confident mappings are indicated
+#|   with asterisks over the mapped tile. This information is also
+#|   available as text from the results of the previous code block.
 plot_mapping_result_heatmap(list(
     multipotent_progenitors_result,
     basophils_result,
@@ -214,6 +235,10 @@ than the higher bounds of the next-best bin (bin 4), BLASE makes a
 confident call.
 
 ```{r plotMappingResultCorr}
+#| fig.alt: >
+#|   A plot of the correlation of each bin with the basophils pseudobulk
+#|   sample, also showing upper and lower bounds as calculated by BLASE. The
+#|   best mapping is for bin 3, and bin 4 is the next most similar. 
 plot_mapping_result_corr(basophils_result)
 ```
 
@@ -232,6 +257,15 @@ binned_sce <- assign_pseudotime_bins(
     n_bins = 10,
     pseudotime_slot = "pseudotime"
 )
+
+#| fig.alt: >
+#|   An overview of mapping for Multipotent progenitors, including UMAPs
+#|   of all cells and just those in the mapped pseudotime bin
+#|   coloured by pseudotime bin, and cell-type. Also includes a line plot
+#|   of correlation of the mapping over every bin, and a bar plot of the 
+#|   different cell-type populations in that bin, showing that the bulk
+#|   was correctly mapped to a bin consisting mostly of Multipotent 
+#|   progenitor cells.
 plot_mapping_result(
     binned_sce,
     multipotent_progenitors_result,
@@ -242,6 +276,8 @@ plot_mapping_result(
 To view the bin population chart in full, use:
 
 ```{r plotBinPopulation}
+#| fig.alt: >
+#|   A full size bar plot of the cell-type populations of bin 1.
 plot_bin_population(binned_sce, 1, group_by_slot = "celltype")
 ```
 
