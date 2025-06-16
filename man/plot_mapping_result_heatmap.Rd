@@ -8,7 +8,8 @@ plot_mapping_result_heatmap(
   mapping_result_list,
   heatmap_fill_scale = ggplot2::scale_fill_gradientn(colors = c("blue", "white", "red"),
     limits = c(-1, 1)),
-  annotate = TRUE
+  annotate = TRUE,
+  bin_order = NULL
 )
 }
 \arguments{
@@ -20,6 +21,9 @@ apply to the heatmap.}
 
 \item{annotate}{Whether to annotate the heatmap with significant results
 or not, defaults to TRUE.}
+
+\item{bin_order}{The order in which to plot the pseudotime bins along
+the x-axis.}
 }
 \value{
 A heatmap showing the correlations of each mapping result across
