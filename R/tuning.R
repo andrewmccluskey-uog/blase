@@ -62,22 +62,11 @@ evaluate_parameters <- function(
     results.convexity <- c()
     results.confident_mapping <- c()
 
-    # This randomly selects 50% of cells for use on each side
-    pseudobulked_bins <- NULL
-    for (i in blase_data@bins) {
-        x <- blase_data@pseudobulk_bins[[i]]
-        split <- round(stats::runif(ncol(x), 0, 1))
-        test <- as.matrix(x[, split == 1])
-        train <- as.matrix(x[, split == 0])
-        test_pseudobulk <- Matrix::rowSums(test)
-        pseudobulked_bins <- cbind(pseudobulked_bins, test_pseudobulk)
-        blase_data@pseudobulk_bins[[i]] <- train
-    }
-    colnames(pseudobulked_bins) <- blase_data@bins
+    data <- PRIVATE_test_train_split(blase_data)
 
     results <- map_all_best_bins(
-        blase_data = blase_data,
-        bulk_data = pseudobulked_bins,
+        blase_data = data$train,
+        bulk_data = data$test,
         bootstrap_iterations = bootstrap_iterations, BPPARAM = BPPARAM
     )
 
@@ -101,8 +90,7 @@ evaluate_parameters <- function(
 
     if (make_plot == TRUE) {
         PRIVATE_evaluate_parameters_plots(
-            blase_data, blase_data@bins,
-            results.best_bin, results.best_corr,
+            blase_data, blase_data@bins, results.best_bin, results.best_corr,
             results.history, results.convexity, plot_columns, min_convexity
         )
     }
@@ -110,6 +98,25 @@ evaluate_parameters <- function(
     return(c(min_convexity, mean_convexity, confident_mapping_pct))
 }
 
+#' @keywords internal
+PRIVATE_test_train_split <- function(blase_data) {
+    # This randomly selects 50% of cells for use on each side
+    pseudobulked_bins <- NULL
+    for (i in blase_data@bins) {
+        x <- blase_data@pseudobulk_bins[[i]]
+        split <- round(stats::runif(ncol(x), 0, 1))
+        test <- as.matrix(x[, split == 1])
+        train <- as.matrix(x[, split == 0])
+        test_pseudobulk <- Matrix::rowSums(test)
+        pseudobulked_bins <- cbind(pseudobulked_bins, test_pseudobulk)
+        blase_data@pseudobulk_bins[[i]] <- train
+    }
+    colnames(pseudobulked_bins) <- blase_data@bins
+
+    return(list(test = pseudobulked_bins, train = blase_data))
+}
+
+#' @keywords internal
 PRIVATE_evaluate_parameters_plots <- function(
     blase_data,
     bin_ids,

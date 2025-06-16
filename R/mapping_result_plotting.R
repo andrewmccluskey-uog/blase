@@ -181,24 +181,9 @@ plot_mapping_result_heatmap <- function(
     )
 
     for (mappingResult in mapping_result_list) {
-        history <- mappingResult@history
-
-        this_bulk_results <- data.frame(
-            bulk_name = rep(mappingResult@bulk_name, nrow(history)),
-            pseudotime_bin = history[, "bin"],
-            correlation = history[, "correlation"],
-            is_best_bin = history[, "bin"] == mappingResult@best_bin,
-            confident_mapping = ifelse(
-                history[, "bin"] == mappingResult@best_bin &
-                    rep(
-                        mappingResult@confident_mapping,
-                        length(history[, "bin"])
-                    ),
-                "*",
-                ""
-            )
+        this_bulk_results <- PRIVATE_get_df_for_this_bulk_to_plot(
+            mappingResult
         )
-
         bulk_results <- rbind(bulk_results, this_bulk_results)
     }
 
@@ -208,10 +193,11 @@ plot_mapping_result_heatmap <- function(
     )
 
     if (is.null(bin_order)) {
-      bin_order = bulk_results$pseudotime_bin
+        bin_order <- bulk_results$pseudotime_bin
     }
     bulk_results$pseudotime_bin <- factor(
-      bulk_results$pseudotime_bin, levels=as.character(unique(bin_order))
+        bulk_results$pseudotime_bin,
+        levels = as.character(unique(bin_order))
     )
 
     return(PRIVATE_mapping_result_heatmap_plot(
@@ -219,6 +205,27 @@ plot_mapping_result_heatmap <- function(
     ))
 }
 
+#' @keywords internal
+PRIVATE_get_df_for_this_bulk_to_plot <- function(mappingResult) {
+    history <- mappingResult@history
+    return(data.frame(
+        bulk_name = rep(mappingResult@bulk_name, nrow(history)),
+        pseudotime_bin = history[, "bin"],
+        correlation = history[, "correlation"],
+        is_best_bin = history[, "bin"] == mappingResult@best_bin,
+        confident_mapping = ifelse(
+            history[, "bin"] == mappingResult@best_bin &
+                rep(
+                    mappingResult@confident_mapping,
+                    length(history[, "bin"])
+                ),
+            "*",
+            ""
+        )
+    ))
+}
+
+#' @keywords internal
 PRIVATE_mapping_result_heatmap_plot <- function(
     bulk_results, fill_scale, annotate) {
     bulk_name_sym <- ggplot2::sym("bulk_name")
