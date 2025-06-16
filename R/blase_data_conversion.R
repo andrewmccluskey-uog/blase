@@ -45,7 +45,7 @@ setMethod(
 
         for (i in bin_ids) {
             bin_subset_sce <- pseudotime_sce[
-                , SingleCellExperiment::colData(pseudotime_sce)[[
+                , SummarizedExperiment::colData(pseudotime_sce)[[
                     "pseudotime_bin"
                 ]] == i
             ]

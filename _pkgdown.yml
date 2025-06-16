@@ -14,6 +14,8 @@ reference:
   - contents: has_concept("tuning")
   - title: Gene Selection
   - contents: has_concept("gene-selection")
+  - title: Annotation of scRNA-seq
+  - contents: has_concept("annotation")
   - title: Utilities
   - contents: has_concept("util")
 

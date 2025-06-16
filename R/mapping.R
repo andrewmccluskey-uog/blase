@@ -229,10 +229,14 @@ PRIVATE_spearman.ci <-
     function(var1, var2, nrep = 1000, conf.level = 0.95) {
         if (length(var1) != length(var2)) {
             stop("'", deparse(substitute(var1)), "' and '",
-                deparse(substitute(var2)), "' lengths differ", sep = "")
+                deparse(substitute(var2)), "' lengths differ",
+                sep = ""
+            )
         }
         data.name <- paste(deparse(substitute(var1)), " and ",
-            deparse(substitute(var2)), "\n", nrep, " replicates", sep = "")
+            deparse(substitute(var2)), "\n", nrep, " replicates",
+            sep = ""
+        )
         nul <- as.numeric(
             row.names(table(c(which(is.na(var1)), which(is.na(var2)))))
         )
@@ -249,9 +253,9 @@ PRIVATE_spearman.ci <-
         cor.fun <- function(data, ind) {
             as.numeric(suppressWarnings(
                 stats::cor.test(
-                  data[ind, 1],
-                  data[ind, 2],
-                  method = "spearman"
+                    data[ind, 1],
+                    data[ind, 2],
+                    method = "spearman"
                 )$estimate
             ))
         }
@@ -265,7 +269,8 @@ PRIVATE_spearman.ci <-
         result <- list(
             method = "Spearman's rank correlation", conf.level = conf.level,
             rep = nrep, data.name = data.name, estimate = coeff,
-            conf.int = interval)
+            conf.int = interval
+        )
         class(result) <- "htest"
         return(result)
     }

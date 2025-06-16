@@ -29,6 +29,7 @@ biocViews:
   Software,
   CellBasedAssays
 Imports: 
+  SummarizedExperiment,
   SingleCellExperiment,
   ggplot2,
   viridis,

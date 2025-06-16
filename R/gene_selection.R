@@ -83,26 +83,26 @@ get_top_n_genes <- function(
 #' ncells <- 70
 #' ngenes <- 100
 #' # Each gene should have mean around its gene number
-#' counts = c()
+#' counts <- c()
 #' for (i in seq_len(ngenes)) {
-#'   counts = c(counts, dnorm(seq_len(ncells), mean=(ncells/i), sd=1))
+#'     counts <- c(counts, dnorm(seq_len(ncells), mean = (ncells / i), sd = 1))
 #' }
 #'
 #' counts_matrix <- matrix(
-#'   counts,
-#'   ncol = ncells,
-#'   nrow = ngenes
+#'     counts,
+#'     ncol = ncells,
+#'     nrow = ngenes
 #' )
 #' sce <- SingleCellExperiment::SingleCellExperiment(assays = list(
-#'   counts = counts_matrix * 3,
-#'   normcounts = counts_matrix,
-#'   logcounts = log(counts_matrix)
+#'     counts = counts_matrix * 3,
+#'     normcounts = counts_matrix,
+#'     logcounts = log(counts_matrix)
 #' ))
 #' colnames(sce) <- paste0("cell", seq_len(ncells))
 #' rownames(sce) <- paste0("gene", seq_len(ngenes))
 #' sce$cell_type <- c(
-#'   rep("celltype_1", ncells / 2),
-#'   rep("celltype_2", ncells / 2)
+#'     rep("celltype_1", ncells / 2),
+#'     rep("celltype_2", ncells / 2)
 #' )
 #'
 #' sce$pseudotime <- seq_len(ncells)
@@ -110,61 +110,47 @@ get_top_n_genes <- function(
 #'
 #' # calculate_gene_peakedness
 #' gene_peakedness <- calculate_gene_peakedness(
-#'   sce, pseudotime_slot="pseudotime")
+#'     sce,
+#'     pseudotime_slot = "pseudotime"
+#' )
 #'
 #' head(gene_peakedness)
 #'
 #' # plot_gene_peakedness
 #' plot_gene_peakedness(sce, gene_peakedness, "gene20",
-#'   pseudotime_slot = "pseudotime")
+#'     pseudotime_slot = "pseudotime"
+#' )
 #'
 #' # smooth_gene
 #' smoothed_gene20 <- smooth_gene(
-#'   sce, "gene20", pseudotime_slot = "pseudotime")
+#'     sce, "gene20",
+#'     pseudotime_slot = "pseudotime"
+#' )
 #' head(smoothed_gene20)
 #'
 #' # Select best spread of genes
 #' genes_to_use <- gene_peakedness_spread_selection(sce, gene_peakedness,
-#'   genes_per_bin=2, n_gene_bins=1, pseudotime_slot="pseudotime")
+#'     genes_per_bin = 2, n_gene_bins = 1, pseudotime_slot = "pseudotime"
+#' )
 #'
 #' print(genes_to_use)
-#' plot(x=gene_peakedness[
-#'   gene_peakedness$gene %in% genes_to_use,"peak_pseudotime"
-#'  ],
-#'  y=gene_peakedness[gene_peakedness$gene %in% genes_to_use,"ratio"])
+#' plot(
+#'     x = gene_peakedness[
+#'         gene_peakedness$gene %in% genes_to_use, "peak_pseudotime"
+#'     ],
+#'     y = gene_peakedness[gene_peakedness$gene %in% genes_to_use, "ratio"]
+#' )
 #'
-calculate_gene_peakedness <- function(sce, window_pct = 10,
+calculate_gene_peakedness <- function(
+    sce, window_pct = 10,
     pseudotime_slot = "slingPseudotime_1", knots = 10,
     BPPARAM = BiocParallel::SerialParam()) {
-    if (!(pseudotime_slot %in% colnames(SingleCellExperiment::colData(sce)))) {
+    if (!(pseudotime_slot %in% colnames(SummarizedExperiment::colData(sce)))) {
         stop("Pseudotime slot not in object")
     }
 
-    pseudotime <- SingleCellExperiment::colData(sce)[[pseudotime_slot]]
-    normalised_counts <- SingleCellExperiment::normcounts(sce)
-
-    genes_with_counts <- rownames(SingleCellExperiment::counts(sce)[
-        MatrixGenerics::rowMaxs(SingleCellExperiment::counts(sce)) > 0,
-      ])
-
-    genes_with_no_counts <- rownames(SingleCellExperiment::counts(sce)[
-        MatrixGenerics::rowMaxs(SingleCellExperiment::counts(sce)) == 0,
-      ])
-
-    if (length(genes_with_no_counts) > 0) {
-      warning(
-        length(genes_with_no_counts),
-        " genes without counts have been omitted"
-      )
-    }
-
-    dataframes <- list()
-    for (gene_id in genes_with_counts) {
-        df <- as.data.frame(normalised_counts[gene_id, ])
-        colnames(df) <- c(gene_id)
-        rownames(df) <- colnames(normalised_counts)
-        dataframes[[length(dataframes) + 1]] <- df
-    }
+    pseudotime <- SummarizedExperiment::colData(sce)[[pseudotime_slot]]
+    dataframes <- PRIVATE_get_norm_expr_dfs_for_genes_with_counts(sce)
 
     results <- BiocParallel::bplapply(
         dataframes, function(df) {
@@ -183,17 +169,50 @@ calculate_gene_peakedness <- function(sce, window_pct = 10,
                 to_smooth$pdt >= window_start & to_smooth$pdt <= window_end,
             ]$nc)
             mean_out <- mean(to_smooth[
-                to_smooth$pdt < window_start | to_smooth$pdt > window_end,]$nc)
+                to_smooth$pdt < window_start | to_smooth$pdt > window_end,
+            ]$nc)
 
-            result <- data.frame(gene = gene, peak_pseudotime = peak_pseudotime,
+            result <- data.frame(
+                gene = gene, peak_pseudotime = peak_pseudotime,
                 mean_in_window = mean_in, mean_out_window = mean_out,
                 ratio = mean_in / mean_out, window_start = window_start,
                 window_end = window_end,
                 deviance_explained = summary(gam)$dev.expl
             )
             return(result)
-        }, BPPARAM = BPPARAM)
+        },
+        BPPARAM = BPPARAM
+    )
     return(do.call("rbind", results))
+}
+
+#' @keywords internal
+PRIVATE_get_norm_expr_dfs_for_genes_with_counts <- function(sce) {
+    genes_with_counts <- rownames(SingleCellExperiment::counts(sce)[
+        MatrixGenerics::rowMaxs(SingleCellExperiment::counts(sce)) > 0,
+    ])
+
+    genes_with_no_counts <- rownames(SingleCellExperiment::counts(sce)[
+        MatrixGenerics::rowMaxs(SingleCellExperiment::counts(sce)) == 0,
+    ])
+
+    normalised_counts <- SingleCellExperiment::normcounts(sce)
+
+    if (length(genes_with_no_counts) > 0) {
+        warning(
+            length(genes_with_no_counts),
+            " genes without counts have been omitted"
+        )
+    }
+
+    dataframes <- list()
+    for (gene_id in genes_with_counts) {
+        df <- as.data.frame(normalised_counts[gene_id, ])
+        colnames(df) <- c(gene_id)
+        rownames(df) <- colnames(normalised_counts)
+        dataframes[[length(dataframes) + 1]] <- df
+    }
+    return(dataframes)
 }
 
 
@@ -225,31 +244,30 @@ calculate_gene_peakedness <- function(sce, window_pct = 10,
 gene_peakedness_spread_selection <- function(
     sce,
     gene_peakedness_df,
-    genes_per_bin=10,
-    n_gene_bins=10,
-    pseudotime_slot="slingPseudotime_1") {
+    genes_per_bin = 10,
+    n_gene_bins = 10,
+    pseudotime_slot = "slingPseudotime_1") {
+    genes_by_peakedness <- c()
 
-  genes_by_peakedness <- c()
-
-  max_pseudotime <- max(
-    SingleCellExperiment::colData(sce)[[pseudotime_slot]]
-  )
-  gene_bin_width <- max_pseudotime/n_gene_bins
-
-  for (i in seq_len(n_gene_bins)) {
-    lower_cutoff <- (i-1) * gene_bin_width
-    upper_cutoff <- i * gene_bin_width
-    available_genes <- gene_peakedness_df[
-      gene_peakedness_df$peak_pseudotime >= lower_cutoff &
-        gene_peakedness_df$peak_pseudotime < upper_cutoff,
-    ]
-    available_genes <- available_genes[order(-available_genes$ratio),]
-    genes_by_peakedness <- c(
-      genes_by_peakedness, available_genes$gene[seq_len(genes_per_bin)]
+    max_pseudotime <- max(
+        SummarizedExperiment::colData(sce)[[pseudotime_slot]]
     )
-  }
-  return(gene_peakedness_df
-         [gene_peakedness_df$gene %in% genes_by_peakedness,]$gene)
+    gene_bin_width <- max_pseudotime / n_gene_bins
+
+    for (i in seq_len(n_gene_bins)) {
+        lower_cutoff <- (i - 1) * gene_bin_width
+        upper_cutoff <- i * gene_bin_width
+        available_genes <- gene_peakedness_df[
+            gene_peakedness_df$peak_pseudotime >= lower_cutoff &
+                gene_peakedness_df$peak_pseudotime < upper_cutoff,
+        ]
+        available_genes <- available_genes[order(-available_genes$ratio), ]
+        genes_by_peakedness <- c(
+            genes_by_peakedness, available_genes$gene[seq_len(genes_per_bin)]
+        )
+    }
+    return(gene_peakedness_df
+    [gene_peakedness_df$gene %in% genes_by_peakedness, ]$gene)
 }
 
 #' smooth_gene
@@ -273,11 +291,11 @@ gene_peakedness_spread_selection <- function(
 smooth_gene <- function(sce, gene,
                         pseudotime_slot = "slingPseudotime_1",
                         knots = 10) {
-    if (!(pseudotime_slot %in% colnames(SingleCellExperiment::colData(sce)))) {
+    if (!(pseudotime_slot %in% colnames(SummarizedExperiment::colData(sce)))) {
         stop("Pseudotime slot not in object")
     }
 
-    pseudotime <- SingleCellExperiment::colData(sce)[[pseudotime_slot]]
+    pseudotime <- SummarizedExperiment::colData(sce)[[pseudotime_slot]]
     normalised_counts <- SingleCellExperiment::normcounts(sce)
     to_smooth <- data.frame(nc = normalised_counts[gene, ], pdt = pseudotime)
 
@@ -309,56 +327,90 @@ plot_gene_peakedness <- function(sce,
                                  gene_peakedness_df,
                                  gene,
                                  pseudotime_slot = "slingPseudotime_1") {
-    if (!(pseudotime_slot %in% colnames(SingleCellExperiment::colData(sce)))) {
+    if (!(pseudotime_slot %in% colnames(SummarizedExperiment::colData(sce)))) {
         stop("Pseudotime slot not in object")
     }
 
-    pseudotime <- SingleCellExperiment::colData(sce)[[pseudotime_slot]]
-    gene_index <- which(gene_peakedness_df$gene == gene)
+    pseudotime <- SummarizedExperiment::colData(sce)[[pseudotime_slot]]
+    target <- PRIVATE_get_target_gene_for_plot(gene_peakedness_df, gene)
 
-    if (length(gene_index) == 0) {
-        stop("Gene not in gene_peakedness_df, ",
-             "please make sure gene exists in dataset.")
-    }
-
-    if (length(gene_index) > 1) {
-      stop("Multiple copies of gene in gene_peakedness_df, ",
-           "please make sure only one exists.")
-    }
-
-    target <- gene_peakedness_df[gene_index, ]
-    expression <- as.data.frame(SingleCellExperiment::normcounts(sce))
-    expression <- as.data.frame(t(expression))
-    expression$pseudotime <- pseudotime
-    expression <- expression[order(expression$pseudotime), ]
-    expression <- expression[,c("pseudotime", target$gene)]
-
-    smooth_df <- data.frame(
-        pdt = (seq(100) / 100) * max(expression$pseudotime),
-        smooth_val = smooth_gene(sce = sce, gene = gene,
-            pseudotime_slot = pseudotime_slot, knots = 10))
-    colnames(smooth_df) <- c("pseudotime", target$gene)
+    expression <- PRIVATE_get_expression_matrix_for_plot(
+        sce, pseudotime, gene
+    )
+    smooth_df <- PRIVATE_get_smooth_expression_for_plot(
+        sce, expression, gene, pseudotime_slot
+    )
 
     # Rename to expression because gene name might be invalid for ggplot2
-    names(expression)[names(expression) == target$gene] <- 'expression'
-    names(smooth_df)[names(smooth_df) == target$gene] <- 'expression'
+    names(expression)[names(expression) == target$gene] <- "expression"
+    names(smooth_df)[names(smooth_df) == target$gene] <- "expression"
 
     p <- ggplot2::ggplot(NULL, ggplot2::aes(
-        x = pseudotime, y = expression)) +
+        x = pseudotime, y = expression
+    )) +
         ggplot2::geom_point(data = expression) +
         ggplot2::geom_vline(xintercept = target$peak_pseudotime) +
-        ggplot2::geom_vline(xintercept = target$window_start,
-            linetype = "dashed") +
-        ggplot2::geom_vline(xintercept = target$window_end,
-            linetype = "dashed") +
-        ggplot2::geom_hline(yintercept = target$mean_in_window,
-            linetype = "dashed", color = "red") +
-        ggplot2::geom_hline(yintercept = target$mean_out_window,
-            linetype = "dashed", color = "blue") +
+        ggplot2::geom_vline(
+            xintercept = target$window_start,
+            linetype = "dashed"
+        ) +
+        ggplot2::geom_vline(
+            xintercept = target$window_end,
+            linetype = "dashed"
+        ) +
+        ggplot2::geom_hline(
+            yintercept = target$mean_in_window,
+            linetype = "dashed", color = "red"
+        ) +
+        ggplot2::geom_hline(
+            yintercept = target$mean_out_window,
+            linetype = "dashed", color = "blue"
+        ) +
         ggplot2::ggtitle(paste0(target$gene, " (Ratio:", target$ratio, ")")) +
         ggplot2::geom_line(data = smooth_df, color = "green")
 
     return(p)
+}
+
+#' @keywords internal
+PRIVATE_get_smooth_expression_for_plot <- function(
+    sce, expression, gene, pseudotime_slot) {
+    smooth_df <- data.frame(
+        pdt = (seq(100) / 100) * max(expression$pseudotime),
+        smooth_val = smooth_gene(
+            sce = sce, gene = gene,
+            pseudotime_slot = pseudotime_slot, knots = 10
+        )
+    )
+    colnames(smooth_df) <- c("pseudotime", target$gene)
+}
+
+#' @keywords internal
+PRIVATE_get_expression_matrix_for_plot <- function(sce, pseudotime, gene) {
+    expression <- as.data.frame(SingleCellExperiment::normcounts(sce))
+    expression <- as.data.frame(t(expression))
+    expression$pseudotime <- pseudotime
+    expression <- expression[order(expression$pseudotime), ]
+    expression <- expression[, c("pseudotime", gene)]
+}
+
+#' @keywords internal
+PRIVATE_get_target_gene_for_plot <- function(gene_peakedness_df, gene) {
+    gene_index <- which(gene_peakedness_df$gene == gene)
+    if (length(gene_index) == 0) {
+        stop(
+            "Gene not in gene_peakedness_df, ",
+            "please make sure gene exists in dataset."
+        )
+    }
+
+    if (length(gene_index) > 1) {
+        stop(
+            "Multiple copies of gene in gene_peakedness_df, ",
+            "please make sure only one exists."
+        )
+    }
+    return(gene_peakedness_df[gene_index, ])
 }
 
 #' @keywords internal
