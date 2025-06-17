@@ -28,10 +28,10 @@ correlation with the current pseudotime bin of interest."><meta property="og:ima
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><h6 class="dropdown-header" data-toc-skip>Vignettes</h6></li>
     <li><a class="dropdown-item" href="../articles/How-Blase-Works.html">How BLASE Works</a></li>
-    <li><a class="dropdown-item" href="../assign-bulk-to-pseudotime.html">Assigning Bulk to Pseudotime</a></li>
+    <li><a class="dropdown-item" href="../articles/assign-bulk-to-pseudotime.html">Assigning Bulk to Pseudotime</a></li>
     <li><h6 class="dropdown-header" data-toc-skip>Articles</h6></li>
-    <li><a class="dropdown-item" href="../articles/BLASE-for-excluding-developmental-genes-from-bulk-RNA-seq.html">BLASE for excluding developmental genes from bulk RNA-seq</a></li>
     <li><a class="dropdown-item" href="../articles/BLASE-for-annotating-scRNA-seq.html">BLASE for annotating scRNA-seq</a></li>
+    <li><a class="dropdown-item" href="../articles/BLASE-for-excluding-developmental-genes-from-bulk-RNA-seq.html">BLASE for excluding developmental genes from bulk RNA-seq</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -117,68 +117,18 @@ correlations in <code>BLASE_Annotation_Correlation</code> if
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">bulk_counts</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span>, <span class="st">"B"</span>, <span class="st">"C"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">bulk_counts</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Map to bin</span></span></span>
-<span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="map_best_bin.html">map_best_bin</a></span><span class="op">(</span><span class="va">blase_data</span>, <span class="st">"B"</span>, <span class="va">bulk_counts</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">result</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MappingResult for 'B': best_bin=1 correlation=1 top_2_distance=0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	 Confident Result: FALSE (next max upper  1 )</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	 with history for scores against 4  bins</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 	 Bootstrapped with 200 iterations</span>
-<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Map all bulks to bin</span></span></span>
 <span class="r-in"><span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="map_all_best_bins.html">map_all_best_bins</a></span><span class="op">(</span><span class="va">blase_data</span>, <span class="va">bulk_counts</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Plot Heatmap</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="plot_mapping_result_heatmap.html">plot_mapping_result_heatmap</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="annotate_sce-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Plot Correlation</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="plot_mapping_result_corr.html">plot_mapping_result_corr</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="annotate_sce-2.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Plot populations</span></span></span>
 <span class="r-in"><span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu"><a href="assign_pseudotime_bins.html">assign_pseudotime_bins</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    <span class="va">sce</span>,</span></span>
-<span class="r-in"><span>    pseudotime_slot <span class="op">=</span> <span class="st">"pseudotime"</span>, n_bins <span class="op">=</span> <span class="fl">4</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="plot_bin_population.html">plot_bin_population</a></span><span class="op">(</span><span class="va">sce</span>, <span class="fu"><a href="mapping-result-best-bin-getter.html">best_bin</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>, group_by_slot <span class="op">=</span> <span class="st">"cell_type"</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="annotate_sce-3.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span>    <span class="va">sce</span>, pseudotime_slot <span class="op">=</span> <span class="st">"pseudotime"</span>, n_bins <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Annotate SC from existing bulk</span></span></span>
-<span class="r-in"><span><span class="fu">annotate_sce</span><span class="op">(</span><span class="va">sce</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> class: SingleCellExperiment </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> dim: 5 48 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> metadata(0):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> assays(2): normcounts logcounts</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> rownames(5): 1 2 3 4 5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> rowData names(0):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> colnames(48): 1 2 ... 47 48</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> colData names(4): cell_type pseudotime pseudotime_bin BLASE_Annotation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> reducedDimNames(0):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mainExpName: NULL</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> altExpNames(0):</span>
+<span class="r-in"><span><span class="va">sce</span> <span class="op">=</span> <span class="fu">annotate_sce</span><span class="op">(</span><span class="va">sce</span>, <span class="va">results</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">sce</span><span class="op">$</span><span class="va">BLASE_Annotation</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt; table of extent 0 &gt;</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Getters</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="mapping-result-bulk-name-getter.html">bulk_name</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "B"</span>
-<span class="r-in"><span><span class="fu"><a href="mapping-result-best-bin-getter.html">best_bin</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
-<span class="r-in"><span><span class="fu"><a href="mapping-result-best-correlation-getter.html">best_correlation</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
-<span class="r-in"><span><span class="fu"><a href="mapping-result-top-2-distance-getter.html">top_2_distance</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0</span>
-<span class="r-in"><span><span class="fu"><a href="mapping-result-confident-mapping-getter.html">confident_mapping</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
-<span class="r-in"><span><span class="fu"><a href="mapping-result-history-getter.html">mapping_history</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   bin correlation lower_bound upper_bound</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1   1           1           1           1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2   2           1           1           1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3   3           1           1           1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4   4           1           1           1</span>
-<span class="r-in"><span><span class="fu"><a href="mapping-result-bootstrap-iterations-getter.html">bootstrap_iterations</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 200</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  A </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 48 </span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

@@ -40,10 +40,10 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><h6 class="dropdown-header" data-toc-skip>Vignettes</h6></li>
     <li><a class="dropdown-item" href="../articles/How-Blase-Works.html">How BLASE Works</a></li>
-    <li><a class="dropdown-item" href="../assign-bulk-to-pseudotime.html">Assigning Bulk to Pseudotime</a></li>
+    <li><a class="dropdown-item" href="../articles/assign-bulk-to-pseudotime.html">Assigning Bulk to Pseudotime</a></li>
     <li><h6 class="dropdown-header" data-toc-skip>Articles</h6></li>
-    <li><a class="dropdown-item" href="../articles/BLASE-for-excluding-developmental-genes-from-bulk-RNA-seq.html">BLASE for excluding developmental genes from bulk RNA-seq</a></li>
     <li><a class="dropdown-item" href="../articles/BLASE-for-annotating-scRNA-seq.html">BLASE for annotating scRNA-seq</a></li>
+    <li><a class="dropdown-item" href="../articles/BLASE-for-excluding-developmental-genes-from-bulk-RNA-seq.html">BLASE for excluding developmental genes from bulk RNA-seq</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -92,11 +92,10 @@
 <span><span class="op">}</span></span>
 <span><span class="va">bpparam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocParallel/man/MulticoreParam-class.html" class="external-link">MulticoreParam</a></span><span class="op">(</span><span class="va">N_CORES</span><span class="op">)</span></span></code></pre></div>
 <p>This article will show how BLASE can be used for annotating scRNA-seq
-data using existing bulk or microarray data. We make use of scRNA-seq
-(Dogga et al. 2024)[<a href="https://www.science.org/doi/10.1126/science.adj4088" class="external-link uri">https://www.science.org/doi/10.1126/science.adj4088</a>] and
-microarray data from (Painter et al. 2018)[<a href="https://www.nature.com/articles/s41467-018-04966-3" class="external-link uri">https://www.nature.com/articles/s41467-018-04966-3</a>].
-Code for generating the objects used here is available in the BLASE
-reproducibility repository.</p>
+data using existing bulk or microarray data. We make use of scRNA-seq <a href="https://www.science.org/doi/10.1126/science.adj4088" class="external-link">Dogga et al.
+2024</a> and microarray data from <a href="https://www.nature.com/articles/s41467-018-04966-3" class="external-link">Painter et al.
+2018</a>. Code for generating the objects used here is available in the
+BLASE reproducibility repository.</p>
 <div class="section level2">
 <h2 id="load-data">Load Data<a class="anchor" aria-label="anchor" href="#load-data"></a>
 </h2>
@@ -111,8 +110,7 @@ pseudotime trajectory (Slingshot).</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plot_reddim.html" class="external-link">plotUMAP</a></span><span class="op">(</span><span class="va">dogga_sc</span>, colour_by <span class="op">=</span> <span class="st">"STAGE_HR"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="BLASE-for-annotating-scRNA-seq_files/figure-html/sc_umaps-1.png" alt="UMAP of Dogga et al. single-cell RNA-seq reference coloured by lifecycle stage, showing the cycle from Rings, Trophozoites, Schizonts, to Rings again." width="700"></p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="co">#| fig.alt: &gt;</span></span>
+<code class="sourceCode R"><span><span class="co">#| fig.alt: &gt;</span></span>
 <span><span class="co">#|   UMAP of Dogga et al. single-cell RNA-seq reference coloured by pseudotime,</span></span>
 <span><span class="co">#|   starting with Rings, and ending with Schizonts.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plot_reddim.html" class="external-link">plotUMAP</a></span><span class="op">(</span><span class="va">dogga_sc</span>, colour_by <span class="op">=</span> <span class="st">"slingPseudotime_1"</span><span class="op">)</span></span></code></pre></div>
@@ -189,16 +187,14 @@ the trajectory.</p>
 <code class="sourceCode R"><span></span>
 <span><span class="va">gene_peakedness_selected_genes</span> <span class="op">&lt;-</span> <span class="va">gene_peakedness_info</span><span class="op">[</span></span>
 <span>    <span class="va">gene_peakedness_info</span><span class="op">$</span><span class="va">gene</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">genes_to_use</span>,</span>
-<span><span class="op">]</span></span>
-<span><span class="co">#| fig.alt: &gt;</span></span>
-<span><span class="co">#|   Scatter plot showing gene peakedness ratios for genes selected by BLASE</span></span>
-<span><span class="co">#|   spread selection, ordered by pseudotime.</span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">gene_peakedness_selected_genes</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">peak_pseudotime</span>, y <span class="op">=</span> <span class="va">ratio</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="op">]</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">gene_peakedness_selected_genes</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">peak_pseudotime</span>, y <span class="op">=</span> <span class="va">ratio</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Selected genes"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="BLASE-for-annotating-scRNA-seq_files/figure-html/plot_gene_peakedness-2.png" alt="Scatter plot showing gene peakedness ratios for all genes, ordered by pseudotime." width="700"></p>
+<p><img src="BLASE-for-annotating-scRNA-seq_files/figure-html/plot_gene_peakedness_selection-1.png" alt="Scatter plot showing gene peakedness ratios for genes selected by BLASE spread selection, ordered by pseudotime." width="700"></p>
 <p>Here, we add them to the BLASE object for mapping with.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/genes-getter.html">genes</a></span><span class="op">(</span><span class="va">blase_data</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">genes_to_use</span></span></code></pre></div>
 </div>
 </div>
@@ -207,7 +203,7 @@ the trajectory.</p>
 </h2>
 <p>Now we can perform the actual mapping step, and review the
 results.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mapping_results</span> <span class="op">&lt;-</span> <span class="fu">blase</span><span class="fu">::</span><span class="fu"><a href="../reference/map_all_best_bins.html">map_all_best_bins</a></span><span class="op">(</span></span>
 <span>    <span class="va">blase_data</span>,</span>
 <span>    <span class="va">painter_microarray</span>,</span>
@@ -227,16 +223,11 @@ results.</p>
 follows: | Lifecycle Stage | Painter et al. HPI | |—————–|——————–| |
 Ring | 0-21 | | Trophozoite | 16-32 | | Schizont | 33-48 |</p>
 <p>We can use this to transfer back to the scRNA-seq as follows:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">annotated_sce</span> <span class="op">&lt;-</span> <span class="fu">blase</span><span class="fu">::</span><span class="fu"><a href="../reference/annotate_sce.html">annotate_sce</a></span><span class="op">(</span><span class="va">dogga_sc</span>, <span class="va">mapping_results</span>, include_stats <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co">#| fig.alt: &gt;</span></span>
-<span><span class="co">#|   A UMAP of the reference scRNA-seq data coloured by pseudotime bin, as </span></span>
-<span><span class="co">#|   calculated by BLASE.</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plot_reddim.html" class="external-link">plotUMAP</a></span><span class="op">(</span><span class="va">annotated_sce</span>, colour_by <span class="op">=</span> <span class="st">"pseudotime_bin"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="BLASE-for-annotating-scRNA-seq_files/figure-html/transfer_mappings_to_sc-1.png" width="700"></p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plot_reddim.html" class="external-link">plotUMAP</a></span><span class="op">(</span><span class="va">dogga_sc</span>, colour_by <span class="op">=</span> <span class="st">"pseudotime_bin"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="BLASE-for-annotating-scRNA-seq_files/figure-html/plot_pseudotime_bins-1.png" alt="A UMAP of the reference scRNA-seq data coloured by pseudotime bin, as  calculated by BLASE." width="700"></p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">annotated_sce</span> <span class="op">&lt;-</span> <span class="fu">blase</span><span class="fu">::</span><span class="fu"><a href="../reference/annotate_sce.html">annotate_sce</a></span><span class="op">(</span><span class="va">dogga_sc</span>, <span class="va">mapping_results</span>, include_stats <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">annotated_sce</span><span class="op">$</span><span class="va">BLASE_Annotation</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span><span class="st">" hpi"</span>, <span class="st">""</span>, <span class="va">annotated_sce</span><span class="op">$</span><span class="va">BLASE_Annotation</span><span class="op">)</span></span>
 <span><span class="va">annotated_sce</span><span class="op">$</span><span class="va">BLASE_Annotation</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">annotated_sce</span><span class="op">$</span><span class="va">BLASE_Annotation</span><span class="op">)</span></span>
 <span></span>
@@ -249,10 +240,9 @@ Ring | 0-21 | | Trophozoite | 16-32 | | Schizont | 33-48 |</p>
 <span><span class="co">#|   by best matching bulk RNA-seq sample (hpi). Beside it is a UMAP of </span></span>
 <span><span class="co">#|   the correlations of these mappings.</span></span>
 <span><span class="va">annotation_plot</span> <span class="op">+</span> <span class="va">corr_plot</span></span></code></pre></div>
-<p><img src="BLASE-for-annotating-scRNA-seq_files/figure-html/transfer_mappings_to_sc-2.png" width="700"></p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="va">annotated_sce</span><span class="op">$</span><span class="va">BLASE_Annotation_transfer</span> <span class="op">&lt;-</span> <span class="st">""</span></span>
+<p><img src="BLASE-for-annotating-scRNA-seq_files/figure-html/transfer_mappings_to_sc-1.png" width="700"></p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">annotated_sce</span><span class="op">$</span><span class="va">BLASE_Annotation_transfer</span> <span class="op">&lt;-</span> <span class="st">""</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">best_bulk</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">annotated_sce</span><span class="op">$</span><span class="va">BLASE_Annotation</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="va">mask</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">colData</a></span><span class="op">(</span><span class="va">annotated_sce</span><span class="op">)</span><span class="op">[</span>, <span class="st">"BLASE_Annotation"</span><span class="op">]</span> <span class="op">==</span> <span class="va">best_bulk</span></span>
 <span></span>
@@ -275,12 +265,12 @@ Ring | 0-21 | | Trophozoite | 16-32 | | Schizont | 33-48 |</p>
 <span><span class="co">#|   The mappings are broadly the same.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plot_reddim.html" class="external-link">plotUMAP</a></span><span class="op">(</span><span class="va">annotated_sce</span>, colour_by <span class="op">=</span> <span class="st">"BLASE_Annotation_transfer"</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/scater/man/plot_reddim.html" class="external-link">plotUMAP</a></span><span class="op">(</span><span class="va">annotated_sce</span>, colour_by <span class="op">=</span> <span class="st">"STAGE_LR"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="BLASE-for-annotating-scRNA-seq_files/figure-html/transfer_mappings_to_sc-3.png" width="700"></p>
+<p><img src="BLASE-for-annotating-scRNA-seq_files/figure-html/transfer_painter_stages_to_sc-1.png" width="700"></p>
 </div>
 <div class="section level2">
 <h2 id="session-info">Session Info<a class="anchor" aria-label="anchor" href="#session-info"></a>
 </h2>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R version 4.5.1 (2025-06-13)</span></span>
 <span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu</span></span>

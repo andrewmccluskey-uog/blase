@@ -40,10 +40,10 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><h6 class="dropdown-header" data-toc-skip>Vignettes</h6></li>
     <li><a class="dropdown-item" href="../articles/How-Blase-Works.html">How BLASE Works</a></li>
-    <li><a class="dropdown-item" href="../assign-bulk-to-pseudotime.html">Assigning Bulk to Pseudotime</a></li>
+    <li><a class="dropdown-item" href="../articles/assign-bulk-to-pseudotime.html">Assigning Bulk to Pseudotime</a></li>
     <li><h6 class="dropdown-header" data-toc-skip>Articles</h6></li>
-    <li><a class="dropdown-item" href="../articles/BLASE-for-excluding-developmental-genes-from-bulk-RNA-seq.html">BLASE for excluding developmental genes from bulk RNA-seq</a></li>
     <li><a class="dropdown-item" href="../articles/BLASE-for-annotating-scRNA-seq.html">BLASE for annotating scRNA-seq</a></li>
+    <li><a class="dropdown-item" href="../articles/BLASE-for-excluding-developmental-genes-from-bulk-RNA-seq.html">BLASE for excluding developmental genes from bulk RNA-seq</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -112,8 +112,7 @@ pseudotime trajectory (Slingshot).</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plot_reddim.html" class="external-link">plotUMAP</a></span><span class="op">(</span><span class="va">dogga_sc</span>, colour_by <span class="op">=</span> <span class="st">"STAGE_HR"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="BLASE-for-excluding-developmental-genes-from-bulk-RNA-seq_files/figure-html/sc_umaps-1.png" alt="UMAP of Dogga et al. single-cell RNA-seq reference coloured by lifecycle stage, showing the cycle from Rings, Trophozoites, Schizonts, to Rings again." width="700"></p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="co">#| fig.alt: &gt;</span></span>
+<code class="sourceCode R"><span><span class="co">#| fig.alt: &gt;</span></span>
 <span><span class="co">#|   UMAP of Dogga et al. single-cell RNA-seq reference coloured by pseudotime,</span></span>
 <span><span class="co">#|   starting with Rings, and ending with Schizonts.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plot_reddim.html" class="external-link">plotUMAP</a></span><span class="op">(</span><span class="va">dogga_sc</span>, colour_by <span class="op">=</span> <span class="st">"slingPseudotime_1"</span><span class="op">)</span></span></code></pre></div>
@@ -229,41 +228,13 @@ normalised counts.</p>
 <span></span>
 <span><span class="va">design</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html" class="external-link">model.matrix</a></span><span class="op">(</span><span class="op">~</span> <span class="fl">0</span> <span class="op">+</span> <span class="va">group</span>, <span class="va">metadata</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">design</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span><span class="st">"group"</span>, <span class="st">""</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">design</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">design</span></span>
-<span><span class="co">#&gt;           NF54_HS NF54_Normal PB31_HS PB31_Normal PB4_HS PB4_Normal</span></span>
-<span><span class="co">#&gt; NF54_37_1       0           1       0           0      0          0</span></span>
-<span><span class="co">#&gt; NF54_37_2       0           1       0           0      0          0</span></span>
-<span><span class="co">#&gt; NF54_41_1       1           0       0           0      0          0</span></span>
-<span><span class="co">#&gt; NF54_41_2       1           0       0           0      0          0</span></span>
-<span><span class="co">#&gt; PB4_37_1        0           0       0           0      0          1</span></span>
-<span><span class="co">#&gt; PB4_37_2        0           0       0           0      0          1</span></span>
-<span><span class="co">#&gt; PB4_41_1        0           0       0           0      1          0</span></span>
-<span><span class="co">#&gt; PB4_41_2        0           0       0           0      1          0</span></span>
-<span><span class="co">#&gt; PB31_37_1       0           0       0           1      0          0</span></span>
-<span><span class="co">#&gt; PB31_37_2       0           0       0           1      0          0</span></span>
-<span><span class="co">#&gt; PB31_41_1       0           0       1           0      0          0</span></span>
-<span><span class="co">#&gt; PB31_41_2       0           0       1           0      0          0</span></span>
-<span><span class="co">#&gt; attr(,"assign")</span></span>
-<span><span class="co">#&gt; [1] 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt; attr(,"contrasts")</span></span>
-<span><span class="co">#&gt; attr(,"contrasts")$group</span></span>
-<span><span class="co">#&gt; [1] "contr.treatment"</span></span>
 <span></span>
 <span><span class="va">contr.matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/limma/man/makeContrasts.html" class="external-link">makeContrasts</a></span><span class="op">(</span></span>
 <span>    WT_normal_v_HS <span class="op">=</span> <span class="va">NF54_Normal</span> <span class="op">-</span> <span class="va">NF54_HS</span>,</span>
 <span>    PB31_normal_v_HS <span class="op">=</span> <span class="va">PB31_Normal</span> <span class="op">-</span> <span class="va">PB31_HS</span>,</span>
 <span>    normal_NF54_v_PB31 <span class="op">=</span> <span class="va">NF54_Normal</span> <span class="op">-</span> <span class="va">PB31_Normal</span>,</span>
 <span>    levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">design</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span><span class="va">contr.matrix</span></span>
-<span><span class="co">#&gt;              Contrasts</span></span>
-<span><span class="co">#&gt; Levels        WT_normal_v_HS PB31_normal_v_HS normal_NF54_v_PB31</span></span>
-<span><span class="co">#&gt;   NF54_HS                 -1                0                  0</span></span>
-<span><span class="co">#&gt;   NF54_Normal              1                0                  1</span></span>
-<span><span class="co">#&gt;   PB31_HS                  0               -1                  0</span></span>
-<span><span class="co">#&gt;   PB31_Normal              0                1                 -1</span></span>
-<span><span class="co">#&gt;   PB4_HS                   0                0                  0</span></span>
-<span><span class="co">#&gt;   PB4_Normal               0                0                  0</span></span></code></pre></div>
+<span><span class="op">)</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="phenotype-development-bulk-de">Phenotype + Development (Bulk DE)<a class="anchor" aria-label="anchor" href="#phenotype-development-bulk-de"></a>
 </h3>
@@ -329,7 +300,10 @@ from the original DE genes list.</p>
 <p>NB: This is a primitive approach, and there are likely many other and
 better ways to calculate which genes should be kept or removed.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">PB31_normal_v_HS_corrected_DE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">PB31_normal_v_HS_BULK_DE</span><span class="op">[</span><span class="op">!</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">PB31_normal_v_HS_BULK_DE</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">PB31_normal_v_HS_SC_DE</span><span class="op">)</span><span class="op">)</span>, <span class="op">]</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">PB31_normal_v_HS_corrected_DE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">PB31_normal_v_HS_BULK_DE</span><span class="op">[</span><span class="op">!</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">PB31_normal_v_HS_BULK_DE</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">PB31_normal_v_HS_SC_DE</span><span class="op">)</span><span class="op">)</span>, <span class="op">]</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">PB31_normal_v_HS_corrected_DE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "PF3D7-0714000" "PF3D7-1010300" "PF3D7-0731500" "PF3D7-1017500"</span></span>
+<span><span class="co">#&gt; [5] "PF3D7-1335100" "PF3D7-1342600"</span></span></code></pre></div>
 <p>Further downstream analysis can now be performed, as desired by the
 researcher, for example Gene Ontology term enrichment.</p>
 </div>
