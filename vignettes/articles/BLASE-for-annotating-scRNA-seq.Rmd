@@ -41,10 +41,10 @@ bpparam <- MulticoreParam(N_CORES)
 
 This article will show how BLASE can be used for annotating scRNA-seq
 data using existing bulk or microarray data. We make use of scRNA-seq
-(Dogga et al.
-2024)[<https://www.science.org/doi/10.1126/science.adj4088>] and
-microarray data from (Painter et al.
-2018)[<https://www.nature.com/articles/s41467-018-04966-3>]. Code for
+[Dogga et al.
+2024](https://www.science.org/doi/10.1126/science.adj4088) and
+microarray data from [Painter et al.
+2018](https://www.nature.com/articles/s41467-018-04966-3). Code for
 generating the objects used here is available in the BLASE
 reproducibility repository.
 
@@ -67,18 +67,17 @@ pseudotime trajectory (Slingshot).
 #|   stage, showing the cycle from Rings, Trophozoites, Schizonts, to Rings
 #|   again.
 plotUMAP(dogga_sc, colour_by = "STAGE_HR")
-
 #| fig.alt: >
 #|   UMAP of Dogga et al. single-cell RNA-seq reference coloured by pseudotime,
 #|   starting with Rings, and ending with Schizonts.
 plotUMAP(dogga_sc, colour_by = "slingPseudotime_1")
 ```
 
-## Prepare BLASE
+## Prepare BLASE 
 
 Now we'll prepare BLASE for use.
 
-### Create BLASE data object
+### Create BLASE data object 
 
 First, we create the object, giving it the number of bins we want to
 use, and how to calculate them.
@@ -99,7 +98,7 @@ dogga_sc <- blase::assign_pseudotime_bins(dogga_sc,
 )
 ```
 
-### Select Genes
+### Select Genes 
 
 Now we will select the genes we want to use, using BLASE's gene
 peakedness metric.
@@ -136,6 +135,9 @@ ggplot(gene_peakedness_info, aes(x = peak_pseudotime, y = ratio)) +
 gene_peakedness_selected_genes <- gene_peakedness_info[
     gene_peakedness_info$gene %in% genes_to_use,
 ]
+```
+
+```{r plot_gene_peakedness_selection}
 #| fig.alt: >
 #|   Scatter plot showing gene peakedness ratios for genes selected by BLASE
 #|   spread selection, ordered by pseudotime.
@@ -180,14 +182,15 @@ follows:
 
 We can use this to transfer back to the scRNA-seq as follows:
 
-```{r, transfer_mappings_to_sc}
-annotated_sce <- blase::annotate_sce(dogga_sc, mapping_results, include_stats = TRUE)
-
+```{r, plot_pseudotime_bins}
 #| fig.alt: >
 #|   A UMAP of the reference scRNA-seq data coloured by pseudotime bin, as 
 #|   calculated by BLASE.
-plotUMAP(annotated_sce, colour_by = "pseudotime_bin")
+plotUMAP(dogga_sc, colour_by = "pseudotime_bin")
+```
 
+```{r, transfer_mappings_to_sc}
+annotated_sce <- blase::annotate_sce(dogga_sc, mapping_results, include_stats = TRUE)
 annotated_sce$BLASE_Annotation <- gsub(" hpi", "", annotated_sce$BLASE_Annotation)
 annotated_sce$BLASE_Annotation <- as.numeric(annotated_sce$BLASE_Annotation)
 
@@ -200,7 +203,9 @@ corr_plot <- plotUMAP(annotated_sce, colour_by = "BLASE_Annotation_Correlation")
 #|   by best matching bulk RNA-seq sample (hpi). Beside it is a UMAP of 
 #|   the correlations of these mappings.
 annotation_plot + corr_plot
+```
 
+```{r, transfer_painter_stages_to_sc}
 annotated_sce$BLASE_Annotation_transfer <- ""
 for (best_bulk in unique(annotated_sce$BLASE_Annotation)) {
     mask <- colData(annotated_sce)[, "BLASE_Annotation"] == best_bulk

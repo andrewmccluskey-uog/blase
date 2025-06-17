@@ -62,10 +62,6 @@
 #' )
 #' plot_bin_population(sce, best_bin(result), group_by_slot = "cell_type")
 #'
-#' # Annotate SC from existing bulk
-#' annotate_sce(sce, list(result))
-#' table(sce$BLASE_Annotation)
-#'
 #' # Getters
 #' bulk_name(result)
 #' best_bin(result)

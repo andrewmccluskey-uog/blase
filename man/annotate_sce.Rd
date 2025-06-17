@@ -55,37 +55,14 @@ bulk_counts <- matrix(seq_len(15) * 10, ncol = 3, nrow = 5)
 colnames(bulk_counts) <- c("A", "B", "C")
 rownames(bulk_counts) <- as.character(seq_len(5))
 
-# Map to bin
-result <- map_best_bin(blase_data, "B", bulk_counts)
-result
-
 # Map all bulks to bin
 results <- map_all_best_bins(blase_data, bulk_counts)
 
-# Plot Heatmap
-plot_mapping_result_heatmap(list(result))
-
-# Plot Correlation
-plot_mapping_result_corr(result)
-
-# Plot populations
 sce <- assign_pseudotime_bins(
-    sce,
-    pseudotime_slot = "pseudotime", n_bins = 4
-)
-plot_bin_population(sce, best_bin(result), group_by_slot = "cell_type")
+    sce, pseudotime_slot = "pseudotime", n_bins = 4)
 
 # Annotate SC from existing bulk
-annotate_sce(sce, list(result))
+sce = annotate_sce(sce, results)
 table(sce$BLASE_Annotation)
-
-# Getters
-bulk_name(result)
-best_bin(result)
-best_correlation(result)
-top_2_distance(result)
-confident_mapping(result)
-mapping_history(result)
-bootstrap_iterations(result)
 }
 \concept{annotation}

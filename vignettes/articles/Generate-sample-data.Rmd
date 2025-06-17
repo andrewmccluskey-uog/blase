@@ -1,8 +1,8 @@
 ---
-title: "Generate sample data"
+title: "Generate Sample Data"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Generating Malaria Cell Atlas PF Test dataset}
+  %\VignetteIndexEntry{Generate Sample Data}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

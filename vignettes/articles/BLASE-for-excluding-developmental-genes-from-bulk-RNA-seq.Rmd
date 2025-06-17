@@ -46,7 +46,7 @@ and bulk RNA-seq data from
 Code for generating the objects used here is available in the BLASE 
 reproducibility repository.
 
-## Load Data
+## Load Data 
 
 First we'll load in the data we're using, pre-prepared from the BLASE
 reproducibility repository.
@@ -65,17 +65,16 @@ trajectory (Slingshot).
 #|   stage, showing the cycle from Rings, Trophozoites, Schizonts, to Rings
 #|   again.
 plotUMAP(dogga_sc, colour_by = "STAGE_HR")
-
 #| fig.alt: >
 #|   UMAP of Dogga et al. single-cell RNA-seq reference coloured by pseudotime,
 #|   starting with Rings, and ending with Schizonts.
 plotUMAP(dogga_sc, colour_by = "slingPseudotime_1")
 ```
-## Prepare BLASE
+## Prepare BLASE 
 
 Now we'll prepare BLASE for use.
 
-### Create BLASE data object
+### Create BLASE data object 
 
 First, we create the object, giving it the 
 number of bins we want to use, and how to calculate them.
@@ -172,7 +171,6 @@ rownames(metadata) <- c(
 
 design <- model.matrix(~ 0 + group, metadata)
 colnames(design) <- gsub("group", "", colnames(design))
-design
 
 contr.matrix <- makeContrasts(
     WT_normal_v_HS = NF54_Normal - NF54_HS,
@@ -180,7 +178,6 @@ contr.matrix <- makeContrasts(
     normal_NF54_v_PB31 = NF54_Normal - PB31_Normal,
     levels = colnames(design)
 )
-contr.matrix
 ```
 
 ### Phenotype + Development (Bulk DE)
@@ -244,6 +241,7 @@ NB: This is a primitive approach, and there are likely many other and better
 ways to calculate which genes should be kept or removed.
 ```{r}
 PB31_normal_v_HS_corrected_DE <- rownames(PB31_normal_v_HS_BULK_DE[!(rownames(PB31_normal_v_HS_BULK_DE) %in% rownames(PB31_normal_v_HS_SC_DE)), ])
+head(PB31_normal_v_HS_corrected_DE)
 ```
 
 Further downstream analysis can now be performed, as desired by the researcher, 

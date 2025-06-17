@@ -10,14 +10,14 @@ editor_options:
     wrap: 72
 ---
 
-```{r, results='hide', message=FALSE, warning=FALSE}
+```{r, include = FALSE}
 knitr::opts_chunk$set(
     collapse = TRUE,
     comment = "#>"
 )
 ```
 
-```{r setup}
+```{r setup, results='hide', message=FALSE, warning=FALSE}
 library(ggplot2)
 library(reshape2)
 ```

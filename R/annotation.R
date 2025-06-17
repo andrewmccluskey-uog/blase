@@ -25,7 +25,35 @@
 #'
 #' @import SingleCellExperiment
 #'
-#' @inherit MappingResult-class examples
+#' @examples
+#' counts_matrix <- matrix(
+#'     c(seq_len(120) / 10, seq_len(120) / 5),
+#'     ncol = 48, nrow = 5
+#' )
+#' sce <- SingleCellExperiment::SingleCellExperiment(assays = list(
+#'     normcounts = counts_matrix, logcounts = log(counts_matrix)
+#' ))
+#' colnames(sce) <- seq_len(48)
+#' rownames(sce) <- as.character(seq_len(5))
+#' sce$cell_type <- c(rep("celltype_1", 24), rep("celltype_2", 24))
+#'
+#' sce$pseudotime <- seq_len(48)
+#' blase_data <- as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 4)
+#' genes(blase_data) <- as.character(seq_len(5))
+#'
+#' bulk_counts <- matrix(seq_len(15) * 10, ncol = 3, nrow = 5)
+#' colnames(bulk_counts) <- c("A", "B", "C")
+#' rownames(bulk_counts) <- as.character(seq_len(5))
+#'
+#' # Map all bulks to bin
+#' results <- map_all_best_bins(blase_data, bulk_counts)
+#'
+#' sce <- assign_pseudotime_bins(
+#'     sce, pseudotime_slot = "pseudotime", n_bins = 4)
+#'
+#' # Annotate SC from existing bulk
+#' sce = annotate_sce(sce, results)
+#' table(sce$BLASE_Annotation)
 annotate_sce <- function(
     sce,
     blase_results,
