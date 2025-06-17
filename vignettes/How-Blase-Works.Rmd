@@ -20,11 +20,6 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(ggplot2)
 library(reshape2)
-library(fontawesome)
-library(magick)
-library(dplyr)
-library(hexSticker)
-library(devtools)
 ```
 
 ## Principle
@@ -74,6 +69,11 @@ ggplot(genes_melt, aes = aes()) +
 ## Generating Icon
 ```{r generateIcon, eval=FALSE}
 # Adapted from https://nelson-gon.github.io/12/06/2020/hex-sticker-creation-r/
+library(fontawesome)
+library(magick)
+library(dplyr)
+library(hexSticker)
+library(devtools)
 
 logo_color <- "orange"
 fill_color <- "red"
