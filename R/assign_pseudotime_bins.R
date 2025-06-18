@@ -49,17 +49,13 @@ setMethod(
 
         if (split_by == "pseudotime_range") {
             min_pdt <- 0
-            max_pdt <- ceiling(max(pseudotime))
+            max_pdt <- max(pseudotime)
 
             bin_size <- max_pdt / n_bins
             bin_upper_limits <- seq(bin_size, max_pdt, by = bin_size)
 
             ## Put cells into the right bins
             pseudotime_sce$pseudotime_bin <- ceiling(pseudotime / bin_size)
-
-            pseudotime_sce$pseudotime_bin[
-                pseudotime_sce$pseudotime_bin == 0
-            ] <- 1
         } else {
             pseudotime_order <- order(pseudotime, decreasing = FALSE)
 

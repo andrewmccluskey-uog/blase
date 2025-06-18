@@ -18,7 +18,8 @@ test_that("generates pseudotime bins by pseudotime_range", {
 
     cells_per_bin <- c(lapply(blase_data@pseudobulk_bins, ncol), recursive = TRUE)
     expect_equal(sum(cells_per_bin), n_cells)
-    expected_output <- c(4, 14, 24, 33, 42, 33)
+
+    expected_output <- c(4, 12, 21, 29, 38, 46)
     expect_equal(cells_per_bin, expected_output)
 })
 
