@@ -127,7 +127,9 @@ res <- blase::find_best_params(
     sce,
     genelist,
     split_by = "pseudotime_range",
-    pseudotime_slot = "pseudotime"
+    pseudotime_slot = "pseudotime",
+    bins_count_range = c(5, 10),
+    gene_count_range = c(40, 80)
 )
 
 #| fig.alt: >
