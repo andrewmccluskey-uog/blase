@@ -275,9 +275,9 @@ normalised counts.</p>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/limma/man/decideTests.html" class="external-link">decideTests</a></span><span class="op">(</span><span class="va">efit_sc</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;        WT_normal_v_HS PB31_normal_v_HS normal_NF54_v_PB31</span></span>
-<span><span class="co">#&gt; Down              342              743                139</span></span>
-<span><span class="co">#&gt; NotSig           1413              883               1360</span></span>
-<span><span class="co">#&gt; Up                 13              142                269</span></span></code></pre></div>
+<span><span class="co">#&gt; Down                0                0                  0</span></span>
+<span><span class="co">#&gt; NotSig           1768             1768               1768</span></span>
+<span><span class="co">#&gt; Up                  0                0                  0</span></span></code></pre></div>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">PB31_normal_v_HS_SC_DE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/limma/man/toptable.html" class="external-link">topTable</a></span><span class="op">(</span><span class="va">efit_sc</span>, n <span class="op">=</span> <span class="cn">Inf</span>, coef <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="va">PB31_normal_v_HS_SC_DE</span> <span class="op">&lt;-</span> <span class="va">PB31_normal_v_HS_SC_DE</span><span class="op">[</span><span class="va">PB31_normal_v_HS_SC_DE</span><span class="op">$</span><span class="va">adj.P.Val</span> <span class="op">&lt;</span> <span class="fl">0.05</span> <span class="op">&amp;</span> <span class="va">PB31_normal_v_HS_SC_DE</span><span class="op">$</span><span class="va">logFC</span> <span class="op">&gt;</span> <span class="fl">0</span>, <span class="op">]</span></span>
@@ -302,8 +302,8 @@ better ways to calculate which genes should be kept or removed.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">PB31_normal_v_HS_corrected_DE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">PB31_normal_v_HS_BULK_DE</span><span class="op">[</span><span class="op">!</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">PB31_normal_v_HS_BULK_DE</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">PB31_normal_v_HS_SC_DE</span><span class="op">)</span><span class="op">)</span>, <span class="op">]</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">PB31_normal_v_HS_corrected_DE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "PF3D7-0714000" "PF3D7-1010300" "PF3D7-0731500" "PF3D7-1017500"</span></span>
-<span><span class="co">#&gt; [5] "PF3D7-1335100" "PF3D7-1342600"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "PF3D7-1003600" "PF3D7-1310700" "PF3D7-1035200" "PF3D7-0714000"</span></span>
+<span><span class="co">#&gt; [5] "PF3D7-0725400" "PF3D7-1035500"</span></span></code></pre></div>
 <p>Further downstream analysis can now be performed, as desired by the
 researcher, for example Gene Ontology term enrichment.</p>
 </div>

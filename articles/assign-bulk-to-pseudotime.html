@@ -179,7 +179,9 @@ values.</li>
 <span>    <span class="va">sce</span>,</span>
 <span>    <span class="va">genelist</span>,</span>
 <span>    split_by <span class="op">=</span> <span class="st">"pseudotime_range"</span>,</span>
-<span>    pseudotime_slot <span class="op">=</span> <span class="st">"pseudotime"</span></span>
+<span>    pseudotime_slot <span class="op">=</span> <span class="st">"pseudotime"</span>,</span>
+<span>    bins_count_range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">10</span><span class="op">)</span>,</span>
+<span>    gene_count_range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">40</span>, <span class="fl">80</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">#| fig.alt: &gt;</span></span>
@@ -210,7 +212,7 @@ specific, with a high “worst specificity”.</p>
 <span><span class="co">#|   the number of bins and genes selected.</span></span>
 <span><span class="fu"><a href="../reference/evaluate_parameters.html">evaluate_parameters</a></span><span class="op">(</span><span class="va">blase_data</span>, make_plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="assign-bulk-to-pseudotime_files/figure-html/checkBinsChoice-1.png" width="700"></p>
-<pre><code><span><span class="co">#&gt; [1]  0.02470000  0.08541667 66.66666667</span></span></code></pre>
+<pre><code><span><span class="co">#&gt; [1]  0.00390  0.04389 30.00000</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="inspect-genes-choice">Inspect Genes Choice<a class="anchor" aria-label="anchor" href="#inspect-genes-choice"></a>
@@ -248,21 +250,21 @@ See some of our other articles for examples.</p>
 <span>    <span class="va">blase_data</span>, <span class="st">"Multipotent progenitors"</span>, <span class="va">bulks_df</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">multipotent_progenitors_result</span></span>
-<span><span class="co">#&gt; MappingResult for 'Multipotent progenitors': best_bin=1 correlation=0.988162212845757 top_2_distance=0.2343</span></span>
-<span><span class="co">#&gt;   Confident Result: TRUE (next max upper  0.829316633243031 )</span></span>
-<span><span class="co">#&gt;   with history for scores against 6  bins</span></span>
+<span><span class="co">#&gt; MappingResult for 'Multipotent progenitors': best_bin=1 correlation=0.976863572433193 top_2_distance=0.1132</span></span>
+<span><span class="co">#&gt;   Confident Result: TRUE (next max upper  0.905784949515087 )</span></span>
+<span><span class="co">#&gt;   with history for scores against 10  bins</span></span>
 <span><span class="co">#&gt;   Bootstrapped with 200 iterations</span></span>
 <span><span class="va">basophils_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/map_best_bin.html">map_best_bin</a></span><span class="op">(</span><span class="va">blase_data</span>, <span class="st">"Basophils"</span>, <span class="va">bulks_df</span><span class="op">)</span></span>
 <span><span class="va">basophils_result</span></span>
-<span><span class="co">#&gt; MappingResult for 'Basophils': best_bin=3 correlation=0.95337552742616 top_2_distance=0.022</span></span>
-<span><span class="co">#&gt;   Confident Result: FALSE (next max upper  0.977367606360524 )</span></span>
-<span><span class="co">#&gt;   with history for scores against 6  bins</span></span>
+<span><span class="co">#&gt; MappingResult for 'Basophils': best_bin=5 correlation=0.948968588842007 top_2_distance=0.0054</span></span>
+<span><span class="co">#&gt;   Confident Result: FALSE (next max upper  0.981861911186719 )</span></span>
+<span><span class="co">#&gt;   with history for scores against 10  bins</span></span>
 <span><span class="co">#&gt;   Bootstrapped with 200 iterations</span></span>
 <span><span class="va">neutrophils_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/map_best_bin.html">map_best_bin</a></span><span class="op">(</span><span class="va">blase_data</span>, <span class="st">"Neutrophils"</span>, <span class="va">bulks_df</span><span class="op">)</span></span>
 <span><span class="va">neutrophils_result</span></span>
-<span><span class="co">#&gt; MappingResult for 'Neutrophils': best_bin=6 correlation=0.973206751054852 top_2_distance=0.1042</span></span>
-<span><span class="co">#&gt;   Confident Result: TRUE (next max upper  0.921075160371052 )</span></span>
-<span><span class="co">#&gt;   with history for scores against 6  bins</span></span>
+<span><span class="co">#&gt; MappingResult for 'Neutrophils': best_bin=10 correlation=0.974120956399437 top_2_distance=0.0637</span></span>
+<span><span class="co">#&gt;   Confident Result: FALSE (next max upper  0.949063705545067 )</span></span>
+<span><span class="co">#&gt;   with history for scores against 10  bins</span></span>
 <span><span class="co">#&gt;   Bootstrapped with 200 iterations</span></span></code></pre></div>
 <p>We can also generate this result with <code>map_all_best_bins</code>,
 which can also allow for parallelisation of the process for large
@@ -270,39 +272,39 @@ numbers of bulks:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/map_all_best_bins.html">map_all_best_bins</a></span><span class="op">(</span><span class="va">blase_data</span>, <span class="va">bulks_df</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [[1]]</span></span>
-<span><span class="co">#&gt; MappingResult for 'Multipotent progenitors': best_bin=1 correlation=0.988162212845757 top_2_distance=0.2343</span></span>
-<span><span class="co">#&gt;   Confident Result: TRUE (next max upper  0.832703900917173 )</span></span>
-<span><span class="co">#&gt;   with history for scores against 6  bins</span></span>
+<span><span class="co">#&gt; MappingResult for 'Multipotent progenitors': best_bin=1 correlation=0.976863572433193 top_2_distance=0.1132</span></span>
+<span><span class="co">#&gt;   Confident Result: TRUE (next max upper  0.905685603039828 )</span></span>
+<span><span class="co">#&gt;   with history for scores against 10  bins</span></span>
 <span><span class="co">#&gt;   Bootstrapped with 200 iterations</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; [[2]]</span></span>
-<span><span class="co">#&gt; MappingResult for 'Monocytes': best_bin=5 correlation=0.973417721518987 top_2_distance=0.0072</span></span>
-<span><span class="co">#&gt;   Confident Result: FALSE (next max upper  0.980463894556627 )</span></span>
-<span><span class="co">#&gt;   with history for scores against 6  bins</span></span>
+<span><span class="co">#&gt; MappingResult for 'Monocytes': best_bin=9 correlation=0.978809188935771 top_2_distance=0.0137</span></span>
+<span><span class="co">#&gt;   Confident Result: FALSE (next max upper  0.982243801749818 )</span></span>
+<span><span class="co">#&gt;   with history for scores against 10  bins</span></span>
 <span><span class="co">#&gt;   Bootstrapped with 200 iterations</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; [[3]]</span></span>
-<span><span class="co">#&gt; MappingResult for 'Neutrophils': best_bin=6 correlation=0.973206751054852 top_2_distance=0.1042</span></span>
-<span><span class="co">#&gt;   Confident Result: TRUE (next max upper  0.920806943467042 )</span></span>
-<span><span class="co">#&gt;   with history for scores against 6  bins</span></span>
+<span><span class="co">#&gt; MappingResult for 'Neutrophils': best_bin=10 correlation=0.974120956399437 top_2_distance=0.0637</span></span>
+<span><span class="co">#&gt;   Confident Result: FALSE (next max upper  0.94970677926343 )</span></span>
+<span><span class="co">#&gt;   with history for scores against 10  bins</span></span>
 <span><span class="co">#&gt;   Bootstrapped with 200 iterations</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; [[4]]</span></span>
-<span><span class="co">#&gt; MappingResult for 'Basophils': best_bin=3 correlation=0.95337552742616 top_2_distance=0.022</span></span>
-<span><span class="co">#&gt;   Confident Result: FALSE (next max upper  0.976051134697707 )</span></span>
-<span><span class="co">#&gt;   with history for scores against 6  bins</span></span>
+<span><span class="co">#&gt; MappingResult for 'Basophils': best_bin=5 correlation=0.948968588842007 top_2_distance=0.0054</span></span>
+<span><span class="co">#&gt;   Confident Result: FALSE (next max upper  0.984755918807678 )</span></span>
+<span><span class="co">#&gt;   with history for scores against 10  bins</span></span>
 <span><span class="co">#&gt;   Bootstrapped with 200 iterations</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; [[5]]</span></span>
-<span><span class="co">#&gt; MappingResult for 'Megakaryocytes': best_bin=2 correlation=0.796038443506798 top_2_distance=0.0292</span></span>
-<span><span class="co">#&gt;   Confident Result: FALSE (next max upper  0.844677956560492 )</span></span>
-<span><span class="co">#&gt;   with history for scores against 6  bins</span></span>
+<span><span class="co">#&gt; MappingResult for 'Megakaryocytes': best_bin=2 correlation=0.849132676980778 top_2_distance=0.0985</span></span>
+<span><span class="co">#&gt;   Confident Result: FALSE (next max upper  0.858607182229728 )</span></span>
+<span><span class="co">#&gt;   with history for scores against 10  bins</span></span>
 <span><span class="co">#&gt;   Bootstrapped with 200 iterations</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; [[6]]</span></span>
-<span><span class="co">#&gt; MappingResult for 'GMP': best_bin=2 correlation=0.921401781528364 top_2_distance=0.0278</span></span>
-<span><span class="co">#&gt;   Confident Result: FALSE (next max upper  0.959381815623461 )</span></span>
-<span><span class="co">#&gt;   with history for scores against 6  bins</span></span>
+<span><span class="co">#&gt; MappingResult for 'GMP': best_bin=4 correlation=0.976605719643694 top_2_distance=0.08</span></span>
+<span><span class="co">#&gt;   Confident Result: TRUE (next max upper  0.949557957929789 )</span></span>
+<span><span class="co">#&gt;   with history for scores against 10  bins</span></span>
 <span><span class="co">#&gt;   Bootstrapped with 200 iterations</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="plotting-heatmap-of-mappings">Plotting Heatmap of Mappings<a class="anchor" aria-label="anchor" href="#plotting-heatmap-of-mappings"></a>
