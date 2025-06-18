@@ -56,6 +56,13 @@ setMethod(
 
             ## Put cells into the right bins
             pseudotime_sce$pseudotime_bin <- ceiling(pseudotime / bin_size)
+
+            ## In slingshot there is one cell which starts exactly at 0 which
+            ## which we want to include in bin 1. We can't access a bin in R
+            ## which has the name 0 as R is 1 indexed.
+            pseudotime_sce$pseudotime_bin[
+              pseudotime_sce$pseudotime_bin == 0] <- 1
+
         } else {
             pseudotime_order <- order(pseudotime, decreasing = FALSE)
 
