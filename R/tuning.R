@@ -14,6 +14,8 @@
 #' for each pseudobulk bin when we try to map the given bin.
 #' @param plot_columns How many columns to use in the plot.
 #'
+#'.@import patchwork
+#'
 #' @return A vector of length 3:
 #' * "worst top 2 distance" containing the lowest difference between the
 #'  absolute values of the top 2 most correlated bins for each bin.
@@ -126,8 +128,8 @@ PRIVATE_evaluate_parameters_plots <- function(
     results.convexity,
     plot_columns,
     min_convexity) {
-    plots <- list()
 
+    plots <- list()
     for (i in seq_len(length(bin_ids))) {
         plots[[i]] <- PRIVATE_plot_history(
             i,
@@ -138,15 +140,15 @@ PRIVATE_evaluate_parameters_plots <- function(
         )
     }
 
-    gridExtra::grid.arrange(
-        top = grid::textGrob(paste(
-            length(blase_data@genes),
-            "genes and worst convexity:",
-            signif(min_convexity, 2)
-        ), gp = grid::gpar(fontsize = 20, font = 3)),
-        grobs = plots,
-        ncol = plot_columns
-    )
+    title <- paste(
+      length(blase_data@genes),
+      "genes and worst convexity:",
+      signif(min_convexity, 2))
+
+    output <- (patchwork::wrap_plots(plots, ncol = plot_columns) &
+      blase_plots_theme()) +
+      patchwork::plot_annotation(title = title, theme = blase_titles_theme())
+    print(output)
 }
 
 
@@ -274,6 +276,7 @@ find_best_params <- function(
 #' @seealso [find_best_params()]
 #'
 #' @import viridis
+#' @import patchwork
 #'
 #' @export
 #'
@@ -282,30 +285,32 @@ plot_find_best_params_results <- function(
     find_best_params_results,
     bin_count_colors = viridis::scale_color_viridis(option = "viridis"),
     gene_count_colors = viridis::scale_color_viridis(option = "magma")) {
-    return(gridExtra::grid.arrange(
+
         # Worst convexity
-        PRIVATE_plot_min_convexity_by_genes(
+        plot = PRIVATE_plot_min_convexity_by_genes(
             find_best_params_results, bin_count_colors
-        ),
+        ) +
         PRIVATE_plot_min_convexity_by_bins(
             find_best_params_results, gene_count_colors
-        ),
+        ) +
         # Mean convexity
         PRIVATE_plot_mean_convexity_by_genes(
             find_best_params_results, bin_count_colors
-        ),
+        ) +
         PRIVATE_plot_mean_convexity_by_bins(
             find_best_params_results, gene_count_colors
-        ),
+        ) +
         # Confident mappings pct
         PRIVATE_plot_confident_mapping_by_genes(
             find_best_params_results, bin_count_colors
-        ),
+        ) +
         PRIVATE_plot_confident_mapping_by_bins(
             find_best_params_results, gene_count_colors
-        ),
-        ncol = 2
-    ))
+        ) +
+        patchwork::plot_layout(ncol=2, axis_title="collect") &
+        blase_plots_theme()
+
+        return(plot)
 }
 
 #' @keywords internal
@@ -501,14 +506,11 @@ evaluate_top_n_genes <- function(
         )
     }
 
-    return(gridExtra::grid.arrange(
-        top = grid::textGrob(
-            paste(length(blase_data@genes), "genes"),
-            gp = grid::gpar(fontsize = 20, font = 3)
-        ),
-        grobs = plots,
-        ncol = plot_columns
-    ))
+    title <- paste(length(blase_data@genes), "genes")
+    output <- (patchwork::wrap_plots(plots, ncol = plot_columns) &
+                 blase_plots_theme()) +
+      patchwork::plot_annotation(title = title, theme = blase_titles_theme())
+    return(output)
 }
 
 PRIVATE_plot_history <- function(i, bin, corr, history, convexity) {

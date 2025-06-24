@@ -21,7 +21,7 @@ library(scran)
 library(slingshot)
 library(BiocParallel)
 library(fs)
-library(gridExtra)
+library(patchwork)
 library(scater)
 library(utils)
 library(ami)
@@ -63,10 +63,10 @@ if (!file.exists(mca_path)) {
 Now we read the files and create an SCE.
 
 ```{r, eval=FALSE, loadSC}
-mca_counts_path <- path(article_dir, "MCA", "pf-ch10x-raw", ext = "csv")
+mca_counts_path <- fs::path(article_dir, "MCA", "pf-ch10x-raw", ext = "csv")
 sc_readcounts <- read.csv(mca_counts_path, row.names = 1)
 
-mca_annotation_path <- path(article_dir, "MCA", "pf-ch10x-data", ext = "csv")
+mca_annotation_path <- fs::path(article_dir, "MCA", "pf-ch10x-data", ext = "csv")
 sc_annotations <- read.csv(mca_annotation_path, row.names = 1)
 
 rownames(sc_annotations) <- gsub(x = rownames(sc_annotations), pattern = "-", replacement = ".", fixed = TRUE)
@@ -146,13 +146,11 @@ reducedDim(sce, "PCA") <- as.matrix(cbind(colData(sce)["PC_1"], colData(sce)["PC
 # better separation in the 2nd and 3rd dimension for just asexual stages
 reducedDim(sce, "UMAP") <- as.matrix(cbind(colData(sce)["UMAP_2"], colData(sce)["UMAP_3"]))
 
-gridExtra::grid.arrange(
-    plotPCA(sce, colour_by = "STAGE_HR2"),
-    plotUMAP(sce, colour_by = "STAGE_HR2"),
-    plotPCA(sce, colour_by = "DAY"),
-    plotUMAP(sce, colour_by = "DAY"),
-    ncol = 2
-)
+plotPCA(sce, colour_by = "STAGE_HR2") +
+plotUMAP(sce, colour_by = "STAGE_HR2") +
+plotPCA(sce, colour_by = "DAY") +
+plotUMAP(sce, colour_by = "DAY") +
+patchwork::plot_layout(ncol=2, axis_title="collect")
 ```
 
 ## Running Trajectory Analysis

@@ -57,40 +57,41 @@ setGeneric(
 #' populations in the best mapped bin.
 #'
 #' @import scater
+#' @import patchwork
 #'
 #' @export
 setMethod(
     f = "plot_mapping_result",
     signature = c(x = "SingleCellExperiment", y = "MappingResult"),
     definition = function(x, y, group_by_slot) {
-        # TODO offer this with more than just umaps
-        return(gridExtra::grid.arrange(
-            scater::plotUMAP(x, colour_by = "pseudotime_bin"),
-            scater::plotUMAP(x, colour_by = group_by_slot),
-            scater::plotUMAP(
-                x[, x$pseudotime_bin == y@best_bin],
-                colour_by = "pseudotime_bin"
-            ),
-            scater::plotUMAP(
-                x[, x$pseudotime_bin == y@best_bin],
-                colour_by = group_by_slot
-            ),
-            plot_mapping_result_corr(y),
-            plot_bin_population(x, y@best_bin, group_by_slot = group_by_slot),
-            ncol = 2,
-            top = grid::textGrob(
-                paste0(
-                    y@bulk_name,
-                    ": Bin ",
-                    y@best_bin,
-                    ", Cor ",
-                    round(y@best_correlation, 4),
-                    ", distance ",
-                    y@top_2_distance
-                ),
-                gp = grid::gpar(fontsize = 20, font = 3)
-            )
-        ))
+
+      layout = "
+      AB
+      CD
+      EF
+      "
+
+      title <- paste0(y@bulk_name, ": Bin ",
+                      y@best_bin, ", Cor ", round(y@best_correlation, 4),
+                      ", distance ", y@top_2_distance)
+
+      output <- (scater::plotUMAP(x, colour_by = "pseudotime_bin") +
+        scater::plotUMAP(x, colour_by = group_by_slot) +
+        scater::plotUMAP(
+          x[, x$pseudotime_bin == y@best_bin],
+          colour_by = "pseudotime_bin"
+        ) +
+        scater::plotUMAP(
+          x[, x$pseudotime_bin == y@best_bin],
+          colour_by = group_by_slot
+        ) +
+        plot_mapping_result_corr(y) +
+        plot_bin_population(x, y@best_bin, group_by_slot = group_by_slot) &
+        blase_plots_theme()) +
+        patchwork::plot_annotation(title = title, theme = blase_titles_theme()) +
+        patchwork::plot_layout(design=layout)
+
+      return(output)
     }
 )
 

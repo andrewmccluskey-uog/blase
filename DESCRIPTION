@@ -33,7 +33,7 @@ Imports:
   SingleCellExperiment,
   ggplot2,
   viridis,
-  gridExtra,
+  patchwork,
   Matrix,
   scater,
   methods,

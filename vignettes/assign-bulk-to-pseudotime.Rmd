@@ -26,6 +26,7 @@ library(scran)
 library(scater)
 library(BiocParallel)
 library(ami)
+library(patchwork)
 ```
 
 ```{r randomseed}
@@ -73,7 +74,6 @@ sce$celltype <- celltype
 
 sce <- subset(sce, , celltype != "Erythrocyte")
 
-# sce <- computeSumFactors(sce, clusters=quickCluster(sce))
 sce <- computeSumFactors(sce)
 sce <- logNormCounts(sce)
 normcounts(sce) <- exp(logcounts(sce))
@@ -83,11 +83,9 @@ sce <- runUMAP(sce)
 #|   Plots showing a UMAP of the single-cell data, 
 #|   coloured by celltype and pseudotime. The UMAP is shaped like a horizontal
 #|   line, showing the differentiation of a set of immune cell types.
-gridExtra::grid.arrange(
-    plotUMAP(sce, text_by = "celltype", colour_by = "celltype"),
-    plotUMAP(sce, colour_by = "pseudotime"),
-    ncol = 1
-)
+plotUMAP(sce, text_by = "celltype", colour_by = "celltype") +
+plotUMAP(sce, colour_by = "pseudotime") +
+patchwork::plot_layout(ncol=1, axis_title="collect")
 ```
 
 ## Finding the most descriptive genes with tradeSeq
