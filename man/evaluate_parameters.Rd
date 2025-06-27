@@ -23,7 +23,9 @@ confident mappings.}
 \item{make_plot}{Whether or not to render the plot showing the correlations
 for each pseudobulk bin when we try to map the given bin.}
 
-\item{plot_columns}{How many columns to use in the plot.}
+\item{plot_columns}{How many columns to use in the plot.
+
+.@import patchwork}
 }
 \value{
 A vector of length 3:
