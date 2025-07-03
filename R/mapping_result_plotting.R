@@ -274,7 +274,7 @@ PRIVATE_mapping_result_heatmap_plot <- function(
             width = 0.98,
             height = 0.99
         ), linewidth = 0.8) +
-            ggplot2::geom_text(fontface = "bold", colour="#000000") +
+            ggplot2::geom_text(colour="#000000") +
             ggplot2::scale_color_manual(
                 breaks = c(FALSE, TRUE),
                 values = c("transparent", "#000000")
