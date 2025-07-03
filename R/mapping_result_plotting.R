@@ -271,7 +271,7 @@ PRIVATE_mapping_result_heatmap_plot <- function(
 
     if (annotate == TRUE) {
         p <- p + ggplot2::geom_tile(ggplot2::aes(
-            width = 0.98,
+            width = 0.99,
             height = 0.99
         ), linewidth = 0.8) +
             ggplot2::geom_text(colour="#000000") +
