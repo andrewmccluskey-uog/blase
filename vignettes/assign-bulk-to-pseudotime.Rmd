@@ -215,6 +215,7 @@ Erythrocytes are confidently mapped, but the GMP population doesn't map
 as well.
 
 ```{r plotMappingResults}
+devtools::load_all()
 #| fig.alt: >
 #|   A heatmap showing the correlations BLASE found for a subset 
 #|   of cell types in this data. Confident mappings are indicated
@@ -224,7 +225,7 @@ plot_mapping_result_heatmap(list(
     multipotent_progenitors_result,
     basophils_result,
     neutrophils_result
-))
+), annotate_correlation = TRUE)
 ```
 
 ### Plotting Detailed Correlation Maps

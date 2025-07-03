@@ -154,7 +154,10 @@ setMethod(
 #' in the heatmap.
 #' @param heatmap_fill_scale The ggplot2 compatible fill gradient scale to
 #' apply to the heatmap.
-#' @param annotate Whether to annotate the heatmap with significant results
+#' @param annotate_confidence Whether to annotate the heatmap with significant results
+#' or not, defaults to TRUE.
+#' @param annotate_correlation Whether to annotate the heatmap with the
+#' correlation of bin to each bulk sample. Defaults to FALSE.
 #' or not, defaults to TRUE.
 #' @param bin_order The order in which to plot the pseudotime bins along
 #' the x-axis.
@@ -169,7 +172,8 @@ plot_mapping_result_heatmap <- function(
     heatmap_fill_scale = ggplot2::scale_fill_gradientn(
         colors = c("blue", "white", "red"), limits = c(-1, 1)
     ),
-    annotate = TRUE,
+    annotate_confidence = TRUE,
+    annotate_correlation = FALSE,
     bin_order = NULL) {
     if (!all(lapply(mapping_result_list, class) == "MappingResult")) {
         stop("You must provide a list of MappingResult objects only.")
@@ -183,7 +187,7 @@ plot_mapping_result_heatmap <- function(
 
     for (mappingResult in mapping_result_list) {
         this_bulk_results <- PRIVATE_get_df_for_this_bulk_to_plot(
-            mappingResult
+            mappingResult, annotate_confidence, annotate_correlation
         )
         bulk_results <- rbind(bulk_results, this_bulk_results)
     }
@@ -202,27 +206,43 @@ plot_mapping_result_heatmap <- function(
     )
 
     return(PRIVATE_mapping_result_heatmap_plot(
-        bulk_results, heatmap_fill_scale, annotate
+        bulk_results, heatmap_fill_scale,
+        annotate_confidence || annotate_correlation
     ))
 }
 
 #' @keywords internal
-PRIVATE_get_df_for_this_bulk_to_plot <- function(mappingResult) {
+PRIVATE_get_df_for_this_bulk_to_plot <- function(
+    mappingResult, annotate_confident, annotate_corr) {
     history <- mappingResult@history
+
+
+    mapp_corrs = history[, "correlation"]
+
+    confident_mapping = ifelse(
+      history[, "bin"] == mappingResult@best_bin &
+        rep(
+          mappingResult@confident_mapping,
+          length(history[, "bin"])
+        ),
+      "*",
+      ""
+    )
+
+    labels = rep("", length(history[, "bin"]))
+    if (annotate_corr) {
+      labels = paste0(labels, round(mapp_corrs,2))
+    }
+    if (annotate_confident) {
+      labels = paste0(labels, confident_mapping)
+    }
+
     return(data.frame(
         bulk_name = rep(mappingResult@bulk_name, nrow(history)),
         pseudotime_bin = history[, "bin"],
         correlation = history[, "correlation"],
         is_best_bin = history[, "bin"] == mappingResult@best_bin,
-        confident_mapping = ifelse(
-            history[, "bin"] == mappingResult@best_bin &
-                rep(
-                    mappingResult@confident_mapping,
-                    length(history[, "bin"])
-                ),
-            "*",
-            ""
-        )
+        label = labels
     ))
 }
 
@@ -232,7 +252,7 @@ PRIVATE_mapping_result_heatmap_plot <- function(
     bulk_name_sym <- ggplot2::sym("bulk_name")
     pseudotime_bin_sym <- ggplot2::sym("pseudotime_bin")
     correlation_sym <- ggplot2::sym("correlation")
-    confident_mapping_sym <- ggplot2::sym("confident_mapping")
+    labels_sym <- ggplot2::sym("label")
     is_best_bin_sym <- ggplot2::sym("is_best_bin")
 
     # Change elow here
@@ -240,7 +260,7 @@ PRIVATE_mapping_result_heatmap_plot <- function(
         x = {{ pseudotime_bin_sym }},
         y = {{ bulk_name_sym }},
         fill = {{ correlation_sym }},
-        label = {{ confident_mapping_sym }},
+        label = {{ labels_sym }},
         color = {{ is_best_bin_sym }}
     )) +
         ggplot2::labs(
@@ -251,13 +271,13 @@ PRIVATE_mapping_result_heatmap_plot <- function(
 
     if (annotate == TRUE) {
         p <- p + ggplot2::geom_tile(ggplot2::aes(
-            width = 0.975,
-            height = 0.975
-        ), linewidth = 0.45) +
-            ggplot2::geom_text(fontface = "bold") +
+            width = 0.98,
+            height = 0.99
+        ), linewidth = 0.8) +
+            ggplot2::geom_text(fontface = "bold", colour="#000000") +
             ggplot2::scale_color_manual(
                 breaks = c(FALSE, TRUE),
-                values = c("#ffffff", "#000000")
+                values = c("transparent", "#000000")
             )
     } else {
         p <- p + ggplot2::geom_tile() +

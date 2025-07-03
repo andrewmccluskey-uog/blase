@@ -8,7 +8,8 @@ plot_mapping_result_heatmap(
   mapping_result_list,
   heatmap_fill_scale = ggplot2::scale_fill_gradientn(colors = c("blue", "white", "red"),
     limits = c(-1, 1)),
-  annotate = TRUE,
+  annotate_confidence = TRUE,
+  annotate_correlation = FALSE,
   bin_order = NULL
 )
 }
@@ -19,7 +20,11 @@ in the heatmap.}
 \item{heatmap_fill_scale}{The ggplot2 compatible fill gradient scale to
 apply to the heatmap.}
 
-\item{annotate}{Whether to annotate the heatmap with significant results
+\item{annotate_confidence}{Whether to annotate the heatmap with significant results
+or not, defaults to TRUE.}
+
+\item{annotate_correlation}{Whether to annotate the heatmap with the
+correlation of bin to each bulk sample. Defaults to FALSE.
 or not, defaults to TRUE.}
 
 \item{bin_order}{The order in which to plot the pseudotime bins along
