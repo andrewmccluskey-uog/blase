@@ -80,12 +80,12 @@ normcounts(sce) <- exp(logcounts(sce))
 sce <- runUMAP(sce)
 
 #| fig.alt: >
-#|   Plots showing a UMAP of the single-cell data, 
+#|   Plots showing a UMAP of the single-cell data,
 #|   coloured by celltype and pseudotime. The UMAP is shaped like a horizontal
 #|   line, showing the differentiation of a set of immune cell types.
 plotUMAP(sce, text_by = "celltype", colour_by = "celltype") +
-plotUMAP(sce, colour_by = "pseudotime") +
-patchwork::plot_layout(ncol=1, axis_title="collect")
+    plotUMAP(sce, colour_by = "pseudotime") +
+    patchwork::plot_layout(ncol = 1, axis_title = "collect")
 ```
 
 ## Finding the most descriptive genes with tradeSeq
@@ -168,7 +168,7 @@ of the top genes changing over each pseudotime bin.
 
 ```{r evaluateTopGenes}
 #| fig.alt: >
-#|   Plot showing a the "best" genes selected for use with BLASE, according 
+#|   Plot showing a the "best" genes selected for use with BLASE, according
 #|   to how related their expression is to the pseudotime of the cell.
 evaluate_top_n_genes(blase_data)
 ```
@@ -216,7 +216,7 @@ as well.
 
 ```{r plotMappingResults}
 #| fig.alt: >
-#|   A heatmap showing the correlations BLASE found for a subset 
+#|   A heatmap showing the correlations BLASE found for a subset
 #|   of cell types in this data. Confident mappings are indicated
 #|   with asterisks over the mapped tile. This information is also
 #|   available as text from the results of the previous code block.
@@ -238,7 +238,7 @@ confident call.
 #| fig.alt: >
 #|   A plot of the correlation of each bin with the basophils pseudobulk
 #|   sample, also showing upper and lower bounds as calculated by BLASE. The
-#|   best mapping is for bin 3, and bin 4 is the next most similar. 
+#|   best mapping is for bin 3, and bin 4 is the next most similar.
 plot_mapping_result_corr(basophils_result)
 ```
 
@@ -262,9 +262,9 @@ binned_sce <- assign_pseudotime_bins(
 #|   An overview of mapping for Multipotent progenitors, including UMAPs
 #|   of all cells and just those in the mapped pseudotime bin
 #|   coloured by pseudotime bin, and cell-type. Also includes a line plot
-#|   of correlation of the mapping over every bin, and a bar plot of the 
+#|   of correlation of the mapping over every bin, and a bar plot of the
 #|   different cell-type populations in that bin, showing that the bulk
-#|   was correctly mapped to a bin consisting mostly of Multipotent 
+#|   was correctly mapped to a bin consisting mostly of Multipotent
 #|   progenitor cells.
 plot_mapping_result(
     binned_sce,

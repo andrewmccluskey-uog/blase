@@ -155,29 +155,46 @@ calculate_gene_peakedness <- function(
     results <- BiocParallel::bplapply(
         dataframes, function(df) {
             gene <- colnames(df)[1]
-            to_smooth <- data.frame(nc = df[, gene], pdt = pseudotime)
 
-            gam <- PRIVATE_create_GAM(to_smooth, knots)
-            smoothed <- PRIVATE_smooth_GAM(gam, pseudotime)
-            peak_index <- which.max(smoothed)
-            peak_pseudotime <- max(pseudotime) * (peak_index / 100)
-            window_start <- peak_index - (window_pct / 2)
-            window_end <- peak_index + (window_pct / 2)
-            window_start <- (window_start / 100) * max(pseudotime)
-            window_end <- (window_end / 100) * max(pseudotime)
-            mean_in <- mean(to_smooth[
-                to_smooth$pdt >= window_start & to_smooth$pdt <= window_end,
-            ]$nc)
-            mean_out <- mean(to_smooth[
-                to_smooth$pdt < window_start | to_smooth$pdt > window_end,
-            ]$nc)
+            result <- tryCatch(
+                {
+                    to_smooth <- data.frame(nc = df[, gene], pdt = pseudotime)
 
-            result <- data.frame(
-                gene = gene, peak_pseudotime = peak_pseudotime,
-                mean_in_window = mean_in, mean_out_window = mean_out,
-                ratio = mean_in / mean_out, window_start = window_start,
-                window_end = window_end,
-                deviance_explained = summary(gam)$dev.expl
+                    gam <- PRIVATE_create_GAM(to_smooth, knots)
+
+                    smoothed <- PRIVATE_smooth_GAM(gam, pseudotime)
+                    peak_index <- which.max(smoothed)
+                    peak_pseudotime <- max(pseudotime) * (peak_index / 100)
+                    window_start <- peak_index - (window_pct / 2)
+                    window_end <- peak_index + (window_pct / 2)
+                    window_start <- (window_start / 100) * max(pseudotime)
+                    window_end <- (window_end / 100) * max(pseudotime)
+                    mean_in <- mean(to_smooth[
+                        to_smooth$pdt >= window_start & to_smooth$pdt <= window_end,
+                    ]$nc)
+                    mean_out <- mean(to_smooth[
+                        to_smooth$pdt < window_start | to_smooth$pdt > window_end,
+                    ]$nc)
+
+                    result <- data.frame(
+                        gene = gene, peak_pseudotime = peak_pseudotime,
+                        mean_in_window = mean_in, mean_out_window = mean_out,
+                        ratio = mean_in / mean_out, window_start = window_start,
+                        window_end = window_end,
+                        deviance_explained = summary(gam)$dev.expl
+                    )
+                    return(result)
+                },
+                error = function(e) {
+                    print(paste("Err: Skipping", gene, ": ", conditionMessage(e)))
+                    return(data.frame(
+                        gene = gene, peak_pseudotime = NA,
+                        mean_in_window = NA, mean_out_window = NA,
+                        ratio = NA, window_start = NA,
+                        window_end = NA,
+                        deviance_explained = NA
+                    ))
+                }
             )
             return(result)
         },
@@ -417,13 +434,12 @@ PRIVATE_get_target_gene_for_plot <- function(gene_peakedness_df, gene) {
 
 #' @keywords internal
 PRIVATE_create_GAM <- function(to_smooth, knots) {
-    return(
-        mgcv::gam(
-            nc ~ s(pdt, bs = "cr", k = knots),
-            data = to_smooth,
-            family = stats::gaussian(link = "log")
-        )
+    result <- mgcv::gam(
+        nc ~ s(pdt, bs = "cr", k = knots),
+        data = to_smooth,
+        family = stats::gaussian(link = "log")
     )
+    return(result)
 }
 
 #' @keywords internal

@@ -49,10 +49,12 @@
 #' results <- map_all_best_bins(blase_data, bulk_counts)
 #'
 #' sce <- assign_pseudotime_bins(
-#'     sce, pseudotime_slot = "pseudotime", n_bins = 4)
+#'     sce,
+#'     pseudotime_slot = "pseudotime", n_bins = 4
+#' )
 #'
 #' # Annotate SC from existing bulk
-#' sce = annotate_sce(sce, results)
+#' sce <- annotate_sce(sce, results)
 #' table(sce$BLASE_Annotation)
 annotate_sce <- function(
     sce,

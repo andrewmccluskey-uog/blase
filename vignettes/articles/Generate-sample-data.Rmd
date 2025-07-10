@@ -147,10 +147,10 @@ reducedDim(sce, "PCA") <- as.matrix(cbind(colData(sce)["PC_1"], colData(sce)["PC
 reducedDim(sce, "UMAP") <- as.matrix(cbind(colData(sce)["UMAP_2"], colData(sce)["UMAP_3"]))
 
 plotPCA(sce, colour_by = "STAGE_HR2") +
-plotUMAP(sce, colour_by = "STAGE_HR2") +
-plotPCA(sce, colour_by = "DAY") +
-plotUMAP(sce, colour_by = "DAY") +
-patchwork::plot_layout(ncol=2, axis_title="collect")
+    plotUMAP(sce, colour_by = "STAGE_HR2") +
+    plotPCA(sce, colour_by = "DAY") +
+    plotUMAP(sce, colour_by = "DAY") +
+    patchwork::plot_layout(ncol = 2, axis_title = "collect")
 ```
 
 ## Running Trajectory Analysis

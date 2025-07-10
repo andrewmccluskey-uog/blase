@@ -184,7 +184,7 @@ We can use this to transfer back to the scRNA-seq as follows:
 
 ```{r, plot_pseudotime_bins}
 #| fig.alt: >
-#|   A UMAP of the reference scRNA-seq data coloured by pseudotime bin, as 
+#|   A UMAP of the reference scRNA-seq data coloured by pseudotime bin, as
 #|   calculated by BLASE.
 plotUMAP(dogga_sc, colour_by = "pseudotime_bin")
 ```
@@ -195,12 +195,12 @@ annotated_sce$BLASE_Annotation <- gsub(" hpi", "", annotated_sce$BLASE_Annotatio
 annotated_sce$BLASE_Annotation <- as.numeric(annotated_sce$BLASE_Annotation)
 
 annotation_plot <- plotUMAP(annotated_sce, colour_by = "BLASE_Annotation")
-corr_plot <- plotUMAP(annotated_sce, colour_by = "BLASE_Annotation_Correlation") + 
-  labs(color='Correlation')
+corr_plot <- plotUMAP(annotated_sce, colour_by = "BLASE_Annotation_Correlation") +
+    labs(color = "Correlation")
 
 #| fig.alt: >
-#|   UMAP of Dogga et al. single-cell RNA-seq reference coloured 
-#|   by best matching bulk RNA-seq sample (hpi). Beside it is a UMAP of 
+#|   UMAP of Dogga et al. single-cell RNA-seq reference coloured
+#|   by best matching bulk RNA-seq sample (hpi). Beside it is a UMAP of
 #|   the correlations of these mappings.
 annotation_plot + corr_plot
 ```
@@ -222,13 +222,13 @@ for (best_bulk in unique(annotated_sce$BLASE_Annotation)) {
 }
 
 #| fig.alt: >
-#|   UMAP of Dogga et al. single-cell RNA-seq reference coloured 
+#|   UMAP of Dogga et al. single-cell RNA-seq reference coloured
 #|   the original mappings from Dogga et al. and by best
 #|   matching bulk RNA-seq sample, and then named by the expected cell type (
 #|   from annotations in Painter et al.).
 #|   The mappings are broadly the same.
-plotUMAP(annotated_sce, colour_by = "BLASE_Annotation_transfer") + 
-  plotUMAP(annotated_sce, colour_by = "STAGE_LR")
+plotUMAP(annotated_sce, colour_by = "BLASE_Annotation_transfer") +
+    plotUMAP(annotated_sce, colour_by = "STAGE_LR")
 ```
 
 ## Session Info

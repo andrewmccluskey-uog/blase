@@ -64,34 +64,35 @@ setMethod(
     f = "plot_mapping_result",
     signature = c(x = "SingleCellExperiment", y = "MappingResult"),
     definition = function(x, y, group_by_slot) {
-
-      layout = "
+        layout <- "
       AB
       CD
       EF
       "
 
-      title <- paste0(y@bulk_name, ": Bin ",
-                      y@best_bin, ", Cor ", round(y@best_correlation, 4),
-                      ", distance ", y@top_2_distance)
+        title <- paste0(
+            y@bulk_name, ": Bin ",
+            y@best_bin, ", Cor ", round(y@best_correlation, 4),
+            ", distance ", y@top_2_distance
+        )
 
-      output <- (scater::plotUMAP(x, colour_by = "pseudotime_bin") +
-        scater::plotUMAP(x, colour_by = group_by_slot) +
-        scater::plotUMAP(
-          x[, x$pseudotime_bin == y@best_bin],
-          colour_by = "pseudotime_bin"
-        ) +
-        scater::plotUMAP(
-          x[, x$pseudotime_bin == y@best_bin],
-          colour_by = group_by_slot
-        ) +
-        plot_mapping_result_corr(y) +
-        plot_bin_population(x, y@best_bin, group_by_slot = group_by_slot) &
-        blase_plots_theme()) +
-        patchwork::plot_annotation(title = title, theme = blase_titles_theme()) +
-        patchwork::plot_layout(design=layout)
+        output <- (scater::plotUMAP(x, colour_by = "pseudotime_bin") +
+            scater::plotUMAP(x, colour_by = group_by_slot) +
+            scater::plotUMAP(
+                x[, x$pseudotime_bin == y@best_bin],
+                colour_by = "pseudotime_bin"
+            ) +
+            scater::plotUMAP(
+                x[, x$pseudotime_bin == y@best_bin],
+                colour_by = group_by_slot
+            ) +
+            plot_mapping_result_corr(y) +
+            plot_bin_population(x, y@best_bin, group_by_slot = group_by_slot) &
+            blase_plots_theme()) +
+            patchwork::plot_annotation(title = title, theme = blase_titles_theme()) +
+            patchwork::plot_layout(design = layout)
 
-      return(output)
+        return(output)
     }
 )
 
@@ -217,24 +218,24 @@ PRIVATE_get_df_for_this_bulk_to_plot <- function(
     history <- mappingResult@history
 
 
-    mapp_corrs = history[, "correlation"]
+    mapp_corrs <- history[, "correlation"]
 
-    confident_mapping = ifelse(
-      history[, "bin"] == mappingResult@best_bin &
-        rep(
-          mappingResult@confident_mapping,
-          length(history[, "bin"])
-        ),
-      "*",
-      ""
+    confident_mapping <- ifelse(
+        history[, "bin"] == mappingResult@best_bin &
+            rep(
+                mappingResult@confident_mapping,
+                length(history[, "bin"])
+            ),
+        "*",
+        ""
     )
 
-    labels = rep("", length(history[, "bin"]))
+    labels <- rep("", length(history[, "bin"]))
     if (annotate_corr) {
-      labels = paste0(labels, round(mapp_corrs,2))
+        labels <- paste0(labels, round(mapp_corrs, 2))
     }
     if (annotate_confident) {
-      labels = paste0(labels, confident_mapping)
+        labels <- paste0(labels, confident_mapping)
     }
 
     return(data.frame(
@@ -274,7 +275,7 @@ PRIVATE_mapping_result_heatmap_plot <- function(
             width = 0.99,
             height = 0.99
         ), linewidth = 0.8) +
-            ggplot2::geom_text(colour="#000000") +
+            ggplot2::geom_text(colour = "#000000") +
             ggplot2::scale_color_manual(
                 breaks = c(FALSE, TRUE),
                 values = c("transparent", "#000000")

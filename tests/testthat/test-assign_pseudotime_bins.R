@@ -18,27 +18,27 @@ test_that("(pdt_range) adds pseudotime bins to a seurat object", {
 
 # assign_pseudotime_bins (sce)
 test_that("(pdt_range) adds pseudotime bins to a sce object", {
-  sce <- generate_test_sce()
-  sce <- assign_pseudotime_bins(sce, "pseudotime_range", 2, pseudotime_slot = "pseudotime")
-  expect_equal(unname(sce$pseudotime_bin), c(rep(1, 50), rep(2, 50)))
+    sce <- generate_test_sce()
+    sce <- assign_pseudotime_bins(sce, "pseudotime_range", 2, pseudotime_slot = "pseudotime")
+    expect_equal(unname(sce$pseudotime_bin), c(rep(1, 50), rep(2, 50)))
 })
 
 test_that("(pdt_range) correctly places pseudotime 0 cell in bin 1", {
-  sce <- generate_test_sce()
-  sce$pseudotime[1] <- 0
-  sce <- assign_pseudotime_bins(sce, "pseudotime_range", 2, pseudotime_slot = "pseudotime")
-  expect_equal(unname(sce$pseudotime_bin), c(rep(1, 50), rep(2, 50)))
+    sce <- generate_test_sce()
+    sce$pseudotime[1] <- 0
+    sce <- assign_pseudotime_bins(sce, "pseudotime_range", 2, pseudotime_slot = "pseudotime")
+    expect_equal(unname(sce$pseudotime_bin), c(rep(1, 50), rep(2, 50)))
 })
 
 test_that("(pdt_range) adds correct number of bins when max pseudotime < 1", {
-  sce <- generate_test_sce()
-  sce$pseudotime = seq_len(ncol(sce)) / (ncol(sce)*2)
-  sce <- assign_pseudotime_bins(sce, "pseudotime_range", 10, pseudotime_slot = "pseudotime")
-  expect_equal(length(unique(sce$pseudotime_bin)), 10)
+    sce <- generate_test_sce()
+    sce$pseudotime <- seq_len(ncol(sce)) / (ncol(sce) * 2)
+    sce <- assign_pseudotime_bins(sce, "pseudotime_range", 10, pseudotime_slot = "pseudotime")
+    expect_equal(length(unique(sce$pseudotime_bin)), 10)
 })
 
 test_that("(cell) adds pseudotime bins to a sce object", {
-  sce <- generate_test_sce()
-  sce <- assign_pseudotime_bins(sce, "cells", 2, pseudotime_slot = "pseudotime")
-  expect_equal(unname(sce$pseudotime_bin), c(rep(1, 50), rep(2, 50)))
+    sce <- generate_test_sce()
+    sce <- assign_pseudotime_bins(sce, "cells", 2, pseudotime_slot = "pseudotime")
+    expect_equal(unname(sce$pseudotime_bin), c(rep(1, 50), rep(2, 50)))
 })
