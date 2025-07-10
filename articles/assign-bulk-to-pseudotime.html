@@ -134,12 +134,12 @@ vignette</a>.</p>
 <span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scater/man/runUMAP.html" class="external-link">runUMAP</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">#| fig.alt: &gt;</span></span>
-<span><span class="co">#|   Plots showing a UMAP of the single-cell data, </span></span>
+<span><span class="co">#|   Plots showing a UMAP of the single-cell data,</span></span>
 <span><span class="co">#|   coloured by celltype and pseudotime. The UMAP is shaped like a horizontal</span></span>
 <span><span class="co">#|   line, showing the differentiation of a set of immune cell types.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plot_reddim.html" class="external-link">plotUMAP</a></span><span class="op">(</span><span class="va">sce</span>, text_by <span class="op">=</span> <span class="st">"celltype"</span>, colour_by <span class="op">=</span> <span class="st">"celltype"</span><span class="op">)</span> <span class="op">+</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/scater/man/plot_reddim.html" class="external-link">plotUMAP</a></span><span class="op">(</span><span class="va">sce</span>, colour_by <span class="op">=</span> <span class="st">"pseudotime"</span><span class="op">)</span> <span class="op">+</span></span>
-<span><span class="fu">patchwork</span><span class="fu">::</span><span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_layout.html" class="external-link">plot_layout</a></span><span class="op">(</span>ncol<span class="op">=</span><span class="fl">1</span>, axis_title<span class="op">=</span><span class="st">"collect"</span><span class="op">)</span></span></code></pre></div>
+<span>    <span class="fu"><a href="https://rdrr.io/pkg/scater/man/plot_reddim.html" class="external-link">plotUMAP</a></span><span class="op">(</span><span class="va">sce</span>, colour_by <span class="op">=</span> <span class="st">"pseudotime"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu">patchwork</span><span class="fu">::</span><span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_layout.html" class="external-link">plot_layout</a></span><span class="op">(</span>ncol <span class="op">=</span> <span class="fl">1</span>, axis_title <span class="op">=</span> <span class="st">"collect"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="assign-bulk-to-pseudotime_files/figure-html/setupSCE-1.png" width="700"></p>
 </div>
 <div class="section level2">
@@ -271,37 +271,37 @@ numbers of bulks:</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/map_all_best_bins.html">map_all_best_bins</a></span><span class="op">(</span><span class="va">blase_data</span>, <span class="va">bulks_df</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [[1]]</span></span>
 <span><span class="co">#&gt; MappingResult for 'Multipotent progenitors': best_bin=1 correlation=0.976863572433193 top_2_distance=0.1132</span></span>
-<span><span class="co">#&gt;   Confident Result: TRUE (next max upper  0.905685603039828 )</span></span>
+<span><span class="co">#&gt;   Confident Result: TRUE (next max upper  0.905150576977202 )</span></span>
 <span><span class="co">#&gt;   with history for scores against 10  bins</span></span>
 <span><span class="co">#&gt;   Bootstrapped with 200 iterations</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; [[2]]</span></span>
 <span><span class="co">#&gt; MappingResult for 'Monocytes': best_bin=9 correlation=0.978809188935771 top_2_distance=0.0137</span></span>
-<span><span class="co">#&gt;   Confident Result: FALSE (next max upper  0.982243801749818 )</span></span>
+<span><span class="co">#&gt;   Confident Result: FALSE (next max upper  0.980763591578206 )</span></span>
 <span><span class="co">#&gt;   with history for scores against 10  bins</span></span>
 <span><span class="co">#&gt;   Bootstrapped with 200 iterations</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; [[3]]</span></span>
 <span><span class="co">#&gt; MappingResult for 'Neutrophils': best_bin=10 correlation=0.974120956399437 top_2_distance=0.0637</span></span>
-<span><span class="co">#&gt;   Confident Result: FALSE (next max upper  0.94970677926343 )</span></span>
+<span><span class="co">#&gt;   Confident Result: FALSE (next max upper  0.946382709244643 )</span></span>
 <span><span class="co">#&gt;   with history for scores against 10  bins</span></span>
 <span><span class="co">#&gt;   Bootstrapped with 200 iterations</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; [[4]]</span></span>
 <span><span class="co">#&gt; MappingResult for 'Basophils': best_bin=5 correlation=0.948968588842007 top_2_distance=0.0054</span></span>
-<span><span class="co">#&gt;   Confident Result: FALSE (next max upper  0.984755918807678 )</span></span>
+<span><span class="co">#&gt;   Confident Result: FALSE (next max upper  0.98374727362274 )</span></span>
 <span><span class="co">#&gt;   with history for scores against 10  bins</span></span>
 <span><span class="co">#&gt;   Bootstrapped with 200 iterations</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; [[5]]</span></span>
 <span><span class="co">#&gt; MappingResult for 'Megakaryocytes': best_bin=2 correlation=0.849132676980778 top_2_distance=0.0985</span></span>
-<span><span class="co">#&gt;   Confident Result: FALSE (next max upper  0.858607182229728 )</span></span>
+<span><span class="co">#&gt;   Confident Result: FALSE (next max upper  0.860205469812826 )</span></span>
 <span><span class="co">#&gt;   with history for scores against 10  bins</span></span>
 <span><span class="co">#&gt;   Bootstrapped with 200 iterations</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; [[6]]</span></span>
 <span><span class="co">#&gt; MappingResult for 'GMP': best_bin=4 correlation=0.976605719643694 top_2_distance=0.08</span></span>
-<span><span class="co">#&gt;   Confident Result: TRUE (next max upper  0.949557957929789 )</span></span>
+<span><span class="co">#&gt;   Confident Result: TRUE (next max upper  0.939234034569291 )</span></span>
 <span><span class="co">#&gt;   with history for scores against 10  bins</span></span>
 <span><span class="co">#&gt;   Bootstrapped with 200 iterations</span></span></code></pre></div>
 <div class="section level3">
@@ -317,7 +317,7 @@ as well.</p>
 <span>    <span class="va">basophils_result</span>,</span>
 <span>    <span class="va">neutrophils_result</span></span>
 <span><span class="op">)</span>, annotate_correlation <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="assign-bulk-to-pseudotime_files/figure-html/plotMappingResults-1.png" alt="A heatmap showing the correlations BLASE found for a subset  of cell types in this data. Confident mappings are indicated with asterisks over the mapped tile. This information is also available as text from the results of the previous code block." width="700"></p>
+<p><img src="assign-bulk-to-pseudotime_files/figure-html/plotMappingResults-1.png" alt="A heatmap showing the correlations BLASE found for a subset of cell types in this data. Confident mappings are indicated with asterisks over the mapped tile. This information is also available as text from the results of the previous code block." width="700"></p>
 </div>
 <div class="section level3">
 <h3 id="plotting-detailed-correlation-maps">Plotting Detailed Correlation Maps<a class="anchor" aria-label="anchor" href="#plotting-detailed-correlation-maps"></a>
@@ -328,7 +328,7 @@ is higher than the higher bounds of the next-best bin (bin 4), BLASE
 makes a confident call.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_mapping_result_corr.html">plot_mapping_result_corr</a></span><span class="op">(</span><span class="va">basophils_result</span><span class="op">)</span></span></code></pre></div>
-<p><img src="assign-bulk-to-pseudotime_files/figure-html/plotMappingResultCorr-1.png" alt="A plot of the correlation of each bin with the basophils pseudobulk sample, also showing upper and lower bounds as calculated by BLASE. The best mapping is for bin 3, and bin 4 is the next most similar. " width="700"></p>
+<p><img src="assign-bulk-to-pseudotime_files/figure-html/plotMappingResultCorr-1.png" alt="A plot of the correlation of each bin with the basophils pseudobulk sample, also showing upper and lower bounds as calculated by BLASE. The best mapping is for bin 3, and bin 4 is the next most similar." width="700"></p>
 </div>
 <div class="section level3">
 <h3 id="plotting-summary-plots-of-mappings">Plotting Summary Plots of Mappings<a class="anchor" aria-label="anchor" href="#plotting-summary-plots-of-mappings"></a>
@@ -350,9 +350,9 @@ map to the cell type we expect.</p>
 <span><span class="co">#|   An overview of mapping for Multipotent progenitors, including UMAPs</span></span>
 <span><span class="co">#|   of all cells and just those in the mapped pseudotime bin</span></span>
 <span><span class="co">#|   coloured by pseudotime bin, and cell-type. Also includes a line plot</span></span>
-<span><span class="co">#|   of correlation of the mapping over every bin, and a bar plot of the </span></span>
+<span><span class="co">#|   of correlation of the mapping over every bin, and a bar plot of the</span></span>
 <span><span class="co">#|   different cell-type populations in that bin, showing that the bulk</span></span>
-<span><span class="co">#|   was correctly mapped to a bin consisting mostly of Multipotent </span></span>
+<span><span class="co">#|   was correctly mapped to a bin consisting mostly of Multipotent</span></span>
 <span><span class="co">#|   progenitor cells.</span></span>
 <span><span class="fu"><a href="../reference/plot_mapping_result.html">plot_mapping_result</a></span><span class="op">(</span></span>
 <span>    <span class="va">binned_sce</span>,</span>
@@ -422,16 +422,16 @@ map to the cell type we expect.</p>
 <span><span class="co">#&gt; [22] jsonlite_2.0.0          DelayedArray_0.34.1     irlba_2.3.5.1          </span></span>
 <span><span class="co">#&gt; [25] parallel_4.5.1          cluster_2.1.8.1         R6_2.6.1               </span></span>
 <span><span class="co">#&gt; [28] bslib_0.9.0             RColorBrewer_1.1-3      limma_3.64.1           </span></span>
-<span><span class="co">#&gt; [31] boot_1.3-31             jquerylib_0.1.4         Rcpp_1.0.14            </span></span>
+<span><span class="co">#&gt; [31] boot_1.3-31             jquerylib_0.1.4         Rcpp_1.1.0             </span></span>
 <span><span class="co">#&gt; [34] knitr_1.50              FNN_1.1.4.1             Matrix_1.7-3           </span></span>
 <span><span class="co">#&gt; [37] splines_4.5.1           igraph_2.1.4            tidyselect_1.2.1       </span></span>
 <span><span class="co">#&gt; [40] abind_1.4-8             yaml_2.3.10             viridis_0.6.5          </span></span>
 <span><span class="co">#&gt; [43] codetools_0.2-20        lattice_0.22-7          tibble_3.3.0           </span></span>
 <span><span class="co">#&gt; [46] withr_3.0.2             evaluate_1.0.4          desc_1.4.3             </span></span>
-<span><span class="co">#&gt; [49] pillar_1.10.2           scales_1.4.0            glue_1.8.0             </span></span>
+<span><span class="co">#&gt; [49] pillar_1.11.0           scales_1.4.0            glue_1.8.0             </span></span>
 <span><span class="co">#&gt; [52] metapod_1.16.0          tools_4.5.1             BiocNeighbors_2.2.0    </span></span>
 <span><span class="co">#&gt; [55] ScaledMatrix_1.16.0     locfit_1.5-9.12         fs_1.6.6               </span></span>
-<span><span class="co">#&gt; [58] cowplot_1.1.3           grid_4.5.1              edgeR_4.6.2            </span></span>
+<span><span class="co">#&gt; [58] cowplot_1.2.0           grid_4.5.1              edgeR_4.6.3            </span></span>
 <span><span class="co">#&gt; [61] nlme_3.1-168            GenomeInfoDbData_1.2.14 beeswarm_0.4.0         </span></span>
 <span><span class="co">#&gt; [64] BiocSingular_1.24.0     vipor_0.4.7             cli_3.6.5              </span></span>
 <span><span class="co">#&gt; [67] rsvd_1.0.5              textshaping_1.0.1       S4Arrays_1.8.1         </span></span>

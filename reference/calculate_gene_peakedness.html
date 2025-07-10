@@ -120,7 +120,7 @@ mean_expression_in_window, mean_expression_out_window, ratio</p>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"celltype_2"</span>, <span class="va">ncells</span> <span class="op">/</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">sce</span><span class="op">$</span><span class="va">pseudotime</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">ncells</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">sce</span><span class="op">$</span><span class="va">pseudotime</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">ncells</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span></span></span>
 <span class="r-in"><span><span class="va">genelist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># calculate_gene_peakedness</span></span></span>
@@ -144,19 +144,19 @@ mean_expression_in_window, mean_expression_out_window, ratio</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">gene_peakedness</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      gene peak_pseudotime mean_in_window mean_out_window        ratio</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 100 gene1            70.0   1.060616e-24     0.037863935 2.801125e-23</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 52  gene2            36.4   4.680824e-02     0.029379725 1.593216e+00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 28  gene3            19.6   4.327921e-02     0.014445463 2.996042e+00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 21  gene4            14.7   4.563543e-02     0.006531685 6.986777e+00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1   gene5             0.7   9.973557e-02     0.004076218 2.446767e+01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7   gene6             4.9   8.791281e-02     0.000187520 4.688183e+02</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 100 gene1           69.00   1.060616e-24     0.037863935 2.801125e-23</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 51  gene2           35.19   4.680824e-02     0.029379725 1.593216e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 27  gene3           18.63   4.327921e-02     0.014445463 2.996042e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20  gene4           13.80   4.563543e-02     0.006531685 6.986777e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   gene5            0.69   7.978846e-02     0.004138929 1.927756e+01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5   gene6            3.45   3.456725e-02     0.006114805 5.653041e+00</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     window_start window_end deviance_explained</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 100         66.5       73.5         0.02680534</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 52          32.9       39.9         0.01912609</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 28          16.1       23.1         0.04505152</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 21          11.2       18.2         0.58156238</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1           -2.8        4.2         0.21032129</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7            1.4        8.4         0.14902599</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 100        65.55      72.45         0.02680534</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 51         31.74      38.64         0.01912609</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 27         15.18      22.08         0.04505152</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20         10.35      17.25         0.58156238</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1          -2.76       4.14         0.21032129</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5           0.00       6.90         0.14902599</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># plot_gene_peakedness</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="plot_gene_peakedness.html">plot_gene_peakedness</a></span><span class="op">(</span><span class="va">sce</span>, <span class="va">gene_peakedness</span>, <span class="st">"gene20"</span>,</span></span>
