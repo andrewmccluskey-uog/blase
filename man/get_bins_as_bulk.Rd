@@ -35,7 +35,7 @@ counts <- matrix(rpois(1000, lambda = 10), ncol = 100, nrow = 10)
 sce <- SingleCellExperiment::SingleCellExperiment(
     assays = list(normcounts = counts, counts = counts / 2)
 )
-sce$pseudotime <- seq_len(100)
+sce$pseudotime <- seq_len(100) - 1
 colnames(sce) <- seq_len(100)
 rownames(sce) <- as.character(seq_len(10))
 sce <- assign_pseudotime_bins(sce,

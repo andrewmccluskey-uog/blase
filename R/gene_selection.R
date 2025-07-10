@@ -105,7 +105,7 @@ get_top_n_genes <- function(
 #'     rep("celltype_2", ncells / 2)
 #' )
 #'
-#' sce$pseudotime <- seq_len(ncells)
+#' sce$pseudotime <- seq_len(ncells) - 1
 #' genelist <- rownames(sce)
 #'
 #' # calculate_gene_peakedness

@@ -42,7 +42,7 @@ sce$cell_type <- c(
     rep("celltype_2", ncells / 2)
 )
 
-sce$pseudotime <- seq_len(ncells)
+sce$pseudotime <- seq_len(ncells) - 1
 genelist <- rownames(sce)
 
 # Finding the best params for the BlaseData

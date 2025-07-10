@@ -2,6 +2,7 @@
 test_that("generates correct number of bins", {
     sce <- generate_test_sce(cells = 150, genes = 100)
     sce$pseudotime <- sqrt(seq_len(150))
+    sce$pseudotime[1] <- 0
 
     blase_data <- as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 5, split_by = "pseudotime_range")
     expect_equal(length(blase_data@bins), 5)
@@ -13,6 +14,7 @@ test_that("generates pseudotime bins by pseudotime_range", {
     n_cells <- 150
     sce <- generate_test_sce(cells = n_cells, genes = 100)
     sce$pseudotime <- sqrt(seq_len(n_cells))
+    sce$pseudotime[1] <- 0
 
     blase_data <- as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 6, split_by = "pseudotime_range")
 
@@ -27,6 +29,7 @@ test_that("generates pseudotime bins by cells", {
     n_cells <- 150
     sce <- generate_test_sce(cells = n_cells, genes = 100)
     sce$pseudotime <- sqrt(seq_len(n_cells))
+    sce$pseudotime[1] <- 0
 
     blase_data <- as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 6, split_by = "cells")
 
@@ -39,6 +42,7 @@ test_that("generates pseudotime bins by cells", {
 test_that("throws error for invalid split_by parameter", {
     sce <- generate_test_sce(cells = 150, genes = 100)
     sce$pseudotime <- sqrt(seq_len(150))
+    sce$pseudotime[1] <- 0
 
     tmp1 <- function() {
         blase_data <- as.BlaseData(sce,

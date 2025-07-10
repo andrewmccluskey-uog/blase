@@ -43,6 +43,7 @@ test_that("get_top_n_genes with associationTest should provide less genes than
 test_that("get_bins_as_bulk will handle happy case", {
     sce <- generate_test_sce(cells = 500, genes = 50)
     sce$pseudotime <- seq_len(500)
+    sce$pseudotime[1] <- 0
     sce <- assign_pseudotime_bins(sce, 5, pseudotime_slot = "pseudotime", split_by = "cells")
     sce$replicate <- rep(c(1, 2), 250)
 
@@ -71,6 +72,7 @@ test_that("get_bins_as_bulk will handle happy case", {
 test_that("get_bins_as_bulk will sample from replicates with small numbers of a given bin", {
     sce <- generate_test_sce(cells = 500, genes = 50)
     sce$pseudotime <- seq_len(500)
+    sce$pseudotime[1] <- 0
     sce <- assign_pseudotime_bins(sce, 5, pseudotime_slot = "pseudotime", split_by = "cells")
     # The end of the trajectory is replicate 1 inflated
     sce$replicate <- c(rep(c(1, 2), 200), rep(1, 100))
@@ -101,6 +103,7 @@ test_that("get_bins_as_bulk will skip a bin if there aren't enough cells accordi
     result <- ""
     sce <- generate_test_sce(cells = 500, genes = 50)
     sce$pseudotime <- seq_len(500)
+    sce$pseudotime[1] <- 0
     sce <- assign_pseudotime_bins(sce, 5, pseudotime_slot = "pseudotime", split_by = "cells")
     # The end of the trajectory is replicate 1 inflated
     sce$replicate <- c(rep(c(1, 2), 200), rep(c(1, 2, 3, 4, 5), 20))

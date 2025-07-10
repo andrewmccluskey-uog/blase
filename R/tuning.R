@@ -45,7 +45,7 @@
 #'     rep("celltype_2", ncells / 2)
 #' )
 #'
-#' sce$pseudotime <- seq_len(ncells)
+#' sce$pseudotime <- seq_len(ncells) - 1
 #' genelist <- as.character(seq_len(ngenes))
 #'
 #' # Evaluating created BlaseData
@@ -198,7 +198,7 @@ PRIVATE_evaluate_parameters_plots <- function(
 #'     rep("celltype_2", ncells / 2)
 #' )
 #'
-#' sce$pseudotime <- seq_len(ncells)
+#' sce$pseudotime <- seq_len(ncells) - 1
 #' genelist <- rownames(sce)
 #'
 #' # Finding the best params for the BlaseData
@@ -472,7 +472,7 @@ PRIVATE_plot_confident_mapping_by_bins <- function(results, gene_colors) {
 #'     rep("celltype_2", ncells / 2)
 #' )
 #'
-#' sce$pseudotime <- seq_len(ncells)
+#' sce$pseudotime <- seq_len(ncells) - 1
 #' genelist <- rownames(sce)
 #'
 #' # Evaluating created BlaseData

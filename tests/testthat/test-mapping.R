@@ -9,6 +9,7 @@ test_that("mapping all bulks runs without errors", {
     sce$cell_type <- c(rep("celltype_1", 24), rep("celltype_2", 24))
 
     sce$pseudotime <- seq_len(48)
+    sce$pseudotime[1] <- 0
     blase_data <- as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 4)
     blase_data@genes <- as.character(seq_len(5))
 
@@ -60,6 +61,7 @@ test_that("mapping runs without errors", {
     sce$cell_type <- c(rep("celltype_1", 24), rep("celltype_2", 24))
 
     sce$pseudotime <- seq_len(48)
+    sce$pseudotime[1] <- 0
     blase_data <- as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 4)
     blase_data@genes <- as.character(seq_len(5))
 

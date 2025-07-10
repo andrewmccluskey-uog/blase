@@ -33,6 +33,7 @@ test_that("(pdt_range) correctly places pseudotime 0 cell in bin 1", {
 test_that("(pdt_range) adds correct number of bins when max pseudotime < 1", {
     sce <- generate_test_sce()
     sce$pseudotime <- seq_len(ncol(sce)) / (ncol(sce) * 2)
+    sce$pseudotime[1] <- 0
     sce <- assign_pseudotime_bins(sce, "pseudotime_range", 10, pseudotime_slot = "pseudotime")
     expect_equal(length(unique(sce$pseudotime_bin)), 10)
 })

@@ -2,6 +2,7 @@ generate_test_sce <- function(cells = 100, genes = 50) {
     counts_matrix <- matrix(rep(1, cells * genes), ncol = cells, nrow = genes)
     sce <- SingleCellExperiment::SingleCellExperiment(assays = list(counts = counts_matrix * 3, normcounts = counts_matrix, logcounts = counts_matrix))
     sce$pseudotime <- (1:cells) / cells
+    sce$pseudotime[1] <- 0
     colnames(sce) <- paste0("C", seq_len(cells))
     rownames(sce) <- paste0("G", seq_len(genes))
     return(sce)

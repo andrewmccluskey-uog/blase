@@ -47,7 +47,7 @@ colnames(sce) <- seq_len(48)
 rownames(sce) <- as.character(seq_len(5))
 sce$cell_type <- c(rep("celltype_1", 24), rep("celltype_2", 24))
 
-sce$pseudotime <- seq_len(48)
+sce$pseudotime <- seq_len(48) - 1
 blase_data <- as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 4)
 genes(blase_data) <- as.character(seq_len(5))
 
@@ -59,10 +59,12 @@ rownames(bulk_counts) <- as.character(seq_len(5))
 results <- map_all_best_bins(blase_data, bulk_counts)
 
 sce <- assign_pseudotime_bins(
-    sce, pseudotime_slot = "pseudotime", n_bins = 4)
+    sce,
+    pseudotime_slot = "pseudotime", n_bins = 4
+)
 
 # Annotate SC from existing bulk
-sce = annotate_sce(sce, results)
+sce <- annotate_sce(sce, results)
 table(sce$BLASE_Annotation)
 }
 \concept{annotation}

@@ -5,6 +5,7 @@ test_that("evaluate_parameters() generates tuple of minimum and mean specifcity,
     counts_matrix <- matrix(seq_len(cells * genes), ncol = cells, nrow = genes)
     sce <- SingleCellExperiment::SingleCellExperiment(assays = list(counts = counts_matrix * 3, normcounts = counts_matrix, logcounts = counts_matrix / 2))
     sce$pseudotime <- (1:cells) / cells
+    sce$pseudotime[1] <- 0
     colnames(sce) <- paste0("C", seq_len(cells))
     rownames(sce) <- paste0("G", seq_len(genes))
 
@@ -27,6 +28,7 @@ test_that("find_best_params() warns about too few genes", {
 test_that("find_best_params() runs without error", {
     sce <- generate_test_sce(200, 300)
     sce$pseudotime <- (1:200) / 200
+    sce$pseudotime[1] <- 0
     colnames(sce) <- paste0("C", seq_len(200))
     rownames(sce) <- paste0("G", seq_len(300))
 

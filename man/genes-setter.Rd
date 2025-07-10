@@ -25,7 +25,7 @@ counts <- matrix(rpois(100, lambda = 10), ncol = 10, nrow = 10)
 sce <- SingleCellExperiment::SingleCellExperiment(
     assays = list(normcounts = counts)
 )
-sce$pseudotime <- seq_len(10)
+sce$pseudotime <- seq_len(10) - 1
 data <- as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 3)
 genes(data) <- as.character(seq_len(10))
 

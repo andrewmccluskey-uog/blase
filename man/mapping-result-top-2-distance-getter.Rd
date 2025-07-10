@@ -33,7 +33,7 @@ colnames(sce) <- seq_len(48)
 rownames(sce) <- as.character(seq_len(5))
 sce$cell_type <- c(rep("celltype_1", 24), rep("celltype_2", 24))
 
-sce$pseudotime <- seq_len(48)
+sce$pseudotime <- seq_len(48) - 1
 blase_data <- as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 4)
 genes(blase_data) <- as.character(seq_len(5))
 
