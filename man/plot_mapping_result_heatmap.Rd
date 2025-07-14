@@ -20,8 +20,8 @@ in the heatmap.}
 \item{heatmap_fill_scale}{The ggplot2 compatible fill gradient scale to
 apply to the heatmap.}
 
-\item{annotate_confidence}{Whether to annotate the heatmap with significant results
-or not, defaults to TRUE.}
+\item{annotate_confidence}{Whether to annotate the heatmap with
+significant results or not, defaults to TRUE.}
 
 \item{annotate_correlation}{Whether to annotate the heatmap with the
 correlation of bin to each bulk sample. Defaults to FALSE.

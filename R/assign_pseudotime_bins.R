@@ -36,9 +36,7 @@ setMethod(
     definition = function(x, split_by, n_bins,
                           pseudotime_slot = "slingPseudotime_1") {
         PRIVATE_assign_pseudotime_bins_validate_inputs(
-            x, split_by,
-            pseudotime_slot
-        )
+            x, split_by, pseudotime_slot)
 
         pseudotime_sce <- subset(x, , !is.na(
             SummarizedExperiment::colData(x)[pseudotime_slot]
@@ -46,7 +44,6 @@ setMethod(
         pseudotime <- (
             SummarizedExperiment::colData(pseudotime_sce)[[pseudotime_slot]]
         )
-
         if (min(pseudotime) != 0) {
             stop("pseudotime must start at 0")
         }
@@ -68,12 +65,10 @@ setMethod(
                 pseudotime_sce$pseudotime_bin == 0
             ] <- 1
         } else {
-            pseudotime_order <- order(pseudotime, decreasing = FALSE)
-
             ncells <- ncol(SingleCellExperiment::normcounts(pseudotime_sce))
             cells_per_bin <- floor(ncells / n_bins)
             pseudotime_ordered_cells <- rownames(pseudotime_sce@colData)[
-                pseudotime_order
+              order(pseudotime, decreasing = FALSE)
             ]
 
             pseudotime_sce$pseudotime_bin <- n_bins

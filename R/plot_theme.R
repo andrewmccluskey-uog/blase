@@ -6,6 +6,6 @@ blase_plots_theme <- function() {
 }
 
 #' @keywords internal
-blase_titles_theme <- function() {
+blase_titles <- function() {
     return(ggplot2::theme(plot.title = ggplot2::element_text(size = 18)))
 }

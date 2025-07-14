@@ -89,7 +89,7 @@ setMethod(
             plot_mapping_result_corr(y) +
             plot_bin_population(x, y@best_bin, group_by_slot = group_by_slot) &
             blase_plots_theme()) +
-            patchwork::plot_annotation(title = title, theme = blase_titles_theme()) +
+            patchwork::plot_annotation(title=title, theme = blase_titles()) +
             patchwork::plot_layout(design = layout)
 
         return(output)
@@ -155,8 +155,8 @@ setMethod(
 #' in the heatmap.
 #' @param heatmap_fill_scale The ggplot2 compatible fill gradient scale to
 #' apply to the heatmap.
-#' @param annotate_confidence Whether to annotate the heatmap with significant results
-#' or not, defaults to TRUE.
+#' @param annotate_confidence Whether to annotate the heatmap with
+#' significant results or not, defaults to TRUE.
 #' @param annotate_correlation Whether to annotate the heatmap with the
 #' correlation of bin to each bulk sample. Defaults to FALSE.
 #' or not, defaults to TRUE.

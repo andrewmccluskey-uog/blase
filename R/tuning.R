@@ -147,8 +147,7 @@ PRIVATE_evaluate_parameters_plots <- function(
 
     output <- (patchwork::wrap_plots(plots, ncol = plot_columns) &
         blase_plots_theme()) +
-        patchwork::plot_annotation(title = title, theme = blase_titles_theme())
-    print(output)
+        patchwork::plot_annotation(title = title, theme = blase_titles())
 }
 
 
@@ -508,7 +507,7 @@ evaluate_top_n_genes <- function(
     title <- paste(length(blase_data@genes), "genes")
     output <- (patchwork::wrap_plots(plots, ncol = plot_columns) &
         blase_plots_theme()) +
-        patchwork::plot_annotation(title = title, theme = blase_titles_theme())
+        patchwork::plot_annotation(title = title, theme = blase_titles())
     return(output)
 }
 

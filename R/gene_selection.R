@@ -54,6 +54,19 @@ get_top_n_genes <- function(
     return(topPdtGenesNames)
 }
 
+#' @keywords internal
+catch_error_calculate_gene_peakedness <- function(gene) {
+  return(function(e) {
+    warning("Err: Skipping ", gene, ": ", conditionMessage(e))
+    return(data.frame(
+        gene = gene, peak_pseudotime = NA,
+        mean_in_window = NA, mean_out_window = NA,
+        ratio = NA, window_start = NA,
+        window_end = NA,
+        deviance_explained = NA
+    ))
+  })
+}
 
 #' calculate_gene_peakedness
 #'
@@ -61,6 +74,8 @@ get_top_n_genes <- function(
 #' Calculate the peakedness of a gene. The power is the ratio of the mean of
 #' reads 5% either side of the smoothed peak of the gene's expression over
 #' pseudotime against the mean of the reads outside of this.
+#'
+#' This function can take some time to complete, please be patient.
 #'
 #' @param sce SCE to do the calculations on.
 #' @param window_pct the size of the window to consider, as a percentage
@@ -156,10 +171,8 @@ calculate_gene_peakedness <- function(
         dataframes, function(df) {
             gene <- colnames(df)[1]
 
-            result <- tryCatch(
-                {
+            result <- tryCatch({
                     to_smooth <- data.frame(nc = df[, gene], pdt = pseudotime)
-
                     gam <- PRIVATE_create_GAM(to_smooth, knots)
 
                     smoothed <- PRIVATE_smooth_GAM(gam, pseudotime)
@@ -170,31 +183,21 @@ calculate_gene_peakedness <- function(
                     window_start <- (window_start / 100) * max(pseudotime)
                     window_end <- (window_end / 100) * max(pseudotime)
                     mean_in <- mean(to_smooth[
-                        to_smooth$pdt >= window_start & to_smooth$pdt <= window_end,
-                    ]$nc)
+                        to_smooth$pdt >= window_start &
+                            to_smooth$pdt <= window_end,]$nc)
                     mean_out <- mean(to_smooth[
-                        to_smooth$pdt < window_start | to_smooth$pdt > window_end,
-                    ]$nc)
+                        to_smooth$pdt < window_start |
+                            to_smooth$pdt > window_end,]$nc)
 
                     result <- data.frame(
                         gene = gene, peak_pseudotime = peak_pseudotime,
                         mean_in_window = mean_in, mean_out_window = mean_out,
                         ratio = mean_in / mean_out, window_start = window_start,
                         window_end = window_end,
-                        deviance_explained = summary(gam)$dev.expl
-                    )
+                        deviance_explained = summary(gam)$dev.expl)
                     return(result)
                 },
-                error = function(e) {
-                    print(paste("Err: Skipping", gene, ": ", conditionMessage(e)))
-                    return(data.frame(
-                        gene = gene, peak_pseudotime = NA,
-                        mean_in_window = NA, mean_out_window = NA,
-                        ratio = NA, window_start = NA,
-                        window_end = NA,
-                        deviance_explained = NA
-                    ))
-                }
+                error = catch_error_calculate_gene_peakedness(gene)
             )
             return(result)
         },

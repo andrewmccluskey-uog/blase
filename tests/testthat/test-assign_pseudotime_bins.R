@@ -38,6 +38,14 @@ test_that("(pdt_range) adds correct number of bins when max pseudotime < 1", {
     expect_equal(length(unique(sce$pseudotime_bin)), 10)
 })
 
+test_that("(pdt_range) throws error if pseudotime starts above 0", {
+  sce <- generate_test_sce()
+  sce$pseudotime <- seq_len(ncol(sce)) / (ncol(sce) * 2)
+
+  tmp1 <- function() assign_pseudotime_bins(sce, "pseudotime_range", 10, pseudotime_slot = "pseudotime")
+  expect_error(tmp1(), "pseudotime must start at 0", fixed = TRUE)
+})
+
 test_that("(cell) adds pseudotime bins to a sce object", {
     sce <- generate_test_sce()
     sce <- assign_pseudotime_bins(sce, "cells", 2, pseudotime_slot = "pseudotime")
