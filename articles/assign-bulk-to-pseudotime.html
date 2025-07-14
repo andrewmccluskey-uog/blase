@@ -208,16 +208,15 @@ specific, with a high “worst specificity”.</p>
 <span><span class="co">#|   These plots show the correlations of each bin to itself and all other</span></span>
 <span><span class="co">#|   bins. This shows how distinct each bin is compared to others, based on</span></span>
 <span><span class="co">#|   the number of bins and genes selected.</span></span>
-<span><span class="fu"><a href="../reference/evaluate_parameters.html">evaluate_parameters</a></span><span class="op">(</span><span class="va">blase_data</span>, make_plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="assign-bulk-to-pseudotime_files/figure-html/checkBinsChoice-1.png" width="700"></p>
-<pre><code><span><span class="co">#&gt; [1]  0.00390  0.04389 30.00000</span></span></code></pre>
+<span><span class="fu"><a href="../reference/evaluate_parameters.html">evaluate_parameters</a></span><span class="op">(</span><span class="va">blase_data</span>, make_plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1]  0.00390  0.04389 30.00000</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="inspect-genes-choice">Inspect Genes Choice<a class="anchor" aria-label="anchor" href="#inspect-genes-choice"></a>
 </h3>
 <p>We can also see how the genes change over pseudotime, by plotting
 expression of the top genes changing over each pseudotime bin.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/evaluate_top_n_genes.html">evaluate_top_n_genes</a></span><span class="op">(</span><span class="va">blase_data</span><span class="op">)</span></span></code></pre></div>
 <p>&lt;img
 src=“/home/runner/work/BLASE/BLASE/docs/articles/assign-bulk-to-pseudotime_files/figure-html/evaluateTopGenes-1.png”
@@ -233,7 +232,7 @@ cell.” width=“700” /&gt;</p>
 cell. We’ll do this by pseudobulking cell types in the
 SingleCellExperiment but in reality you should use a real bulk dataset.
 See some of our other articles for examples.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bulks_df</span> <span class="op">&lt;-</span> <span class="fu">DataFrame</span><span class="op">(</span>row.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/dge.html" class="external-link">counts</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">type</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">sce</span><span class="op">$</span><span class="va">celltype</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="va">bulks_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span></span>
@@ -267,7 +266,7 @@ See some of our other articles for examples.</p>
 <p>We can also generate this result with <code>map_all_best_bins</code>,
 which can also allow for parallelisation of the process for large
 numbers of bulks:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/map_all_best_bins.html">map_all_best_bins</a></span><span class="op">(</span><span class="va">blase_data</span>, <span class="va">bulks_df</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [[1]]</span></span>
 <span><span class="co">#&gt; MappingResult for 'Multipotent progenitors': best_bin=1 correlation=0.976863572433193 top_2_distance=0.1132</span></span>
@@ -311,7 +310,7 @@ numbers of bulks:</p>
 we can plot a heatmap of all these results. The neutrophils and
 Erythrocytes are confidently mapped, but the GMP population doesn’t map
 as well.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_mapping_result_heatmap.html">plot_mapping_result_heatmap</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    <span class="va">multipotent_progenitors_result</span>,</span>
 <span>    <span class="va">basophils_result</span>,</span>
@@ -326,7 +325,7 @@ as well.</p>
 each bin. Because the the lower boundary of the best selection (bin 3)
 is higher than the higher bounds of the next-best bin (bin 4), BLASE
 makes a confident call.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_mapping_result_corr.html">plot_mapping_result_corr</a></span><span class="op">(</span><span class="va">basophils_result</span><span class="op">)</span></span></code></pre></div>
 <p><img src="assign-bulk-to-pseudotime_files/figure-html/plotMappingResultCorr-1.png" alt="A plot of the correlation of each bin with the basophils pseudobulk sample, also showing upper and lower bounds as calculated by BLASE. The best mapping is for bin 3, and bin 4 is the next most similar." width="700"></p>
 </div>
@@ -338,7 +337,7 @@ onto the Single Cell data, and the cell type proportions we expect , but
 we need to add the pseudotime bins to the metadata of the SCE. We can
 see that the true proportions of cell types in the mapped bin do indeed
 map to the cell type we expect.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">binned_sce</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/assign_pseudotime_bins.html">assign_pseudotime_bins</a></span><span class="op">(</span></span>
 <span>    <span class="va">sce</span>,</span>
 <span>    split_by <span class="op">=</span> <span class="st">"pseudotime_range"</span>,</span>
@@ -361,7 +360,7 @@ map to the cell type we expect.</p>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="assign-bulk-to-pseudotime_files/figure-html/assignPseudotimeBinsAndPlot-1.png" width="700"></p>
 <p>To view the bin population chart in full, use:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_bin_population.html">plot_bin_population</a></span><span class="op">(</span><span class="va">binned_sce</span>, <span class="fl">1</span>, group_by_slot <span class="op">=</span> <span class="st">"celltype"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="assign-bulk-to-pseudotime_files/figure-html/plotBinPopulation-1.png" alt="A full size bar plot of the cell-type populations of bin 1." width="700"></p>
 </div>
@@ -369,7 +368,7 @@ map to the cell type we expect.</p>
 <div class="section level2">
 <h2 id="session-info">Session Info<a class="anchor" aria-label="anchor" href="#session-info"></a>
 </h2>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R version 4.5.1 (2025-06-13)</span></span>
 <span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu</span></span>
@@ -449,7 +448,7 @@ map to the cell type we expect.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Andrew McCluskey, Toby Kettlewell, Thomas Otto.</p>
+  <p>Developed by Andrew McCluskey, Toby Kettlewell, Thomas D Otto.</p>
 </div>
 
 <div class="pkgdown-footer-right">
