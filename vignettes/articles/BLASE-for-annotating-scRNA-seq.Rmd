@@ -162,7 +162,9 @@ mapping_results <- blase::map_all_best_bins(
     painter_microarray,
     BPPARAM = bpparam
 )
+```
 
+```{r mappingPlot}
 #| fig.alt: >
 #|   Heatmap of mapping correlations of the Painter et al. data onto
 #|   the Dogga et al. scRNA-seq.
@@ -197,7 +199,9 @@ annotated_sce$BLASE_Annotation <- as.numeric(annotated_sce$BLASE_Annotation)
 annotation_plot <- plotUMAP(annotated_sce, colour_by = "BLASE_Annotation")
 corr_plot <- plotUMAP(annotated_sce, colour_by = "BLASE_Annotation_Correlation") +
     labs(color = "Correlation")
+```
 
+```{r, transfer_mappings_to_scPlot}
 #| fig.alt: >
 #|   UMAP of Dogga et al. single-cell RNA-seq reference coloured
 #|   by best matching bulk RNA-seq sample (hpi). Beside it is a UMAP of
@@ -220,7 +224,9 @@ for (best_bulk in unique(annotated_sce$BLASE_Annotation)) {
         annotated_sce[, mask]$BLASE_Annotation_transfer <- "Schizont"
     }
 }
+```
 
+```{r transfer_painter_stages_to_scPlot}
 #| fig.alt: >
 #|   UMAP of Dogga et al. single-cell RNA-seq reference coloured
 #|   the original mappings from Dogga et al. and by best

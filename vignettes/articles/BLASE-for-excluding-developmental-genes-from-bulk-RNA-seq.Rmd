@@ -133,7 +133,9 @@ mapping_results <- blase::map_all_best_bins(
     zhang_bulk,
     BPPARAM = bpparam
 )
+```
 
+```{r, mappingPlot}
 #| fig.alt: >
 #|   Heatmap of mapping correlations of the Zhang et al. data onto
 #|   the Dogga et al. scRNA-seq.

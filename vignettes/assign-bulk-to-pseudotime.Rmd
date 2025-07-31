@@ -78,7 +78,9 @@ sce <- computeSumFactors(sce)
 sce <- logNormCounts(sce)
 normcounts(sce) <- exp(logcounts(sce))
 sce <- runUMAP(sce)
+```
 
+```{r setupSCEPlot}
 #| fig.alt: >
 #|   Plots showing a UMAP of the single-cell data,
 #|   coloured by celltype and pseudotime. The UMAP is shaped like a horizontal
@@ -129,7 +131,9 @@ res <- blase::find_best_params(
     bins_count_range = c(5, 10),
     gene_count_range = c(40, 80)
 )
+```
 
+```{r findBestParamsPlot}
 #| fig.alt: >
 #|   Figures showing the minimum and mean convexity, as well as % confident
 #|   mappings different numbers of genes and bins calculated.
@@ -250,14 +254,16 @@ we need to add the pseudotime bins to the metadata of the SCE. We can
 see that the true proportions of cell types in the mapped bin do indeed
 map to the cell type we expect.
 
-```{r assignPseudotimeBinsAndPlot}
+```{r assignPseudotimeBins}
 binned_sce <- assign_pseudotime_bins(
     sce,
     split_by = "pseudotime_range",
     n_bins = 10,
     pseudotime_slot = "pseudotime"
 )
+```
 
+```{r assignPseudotimeBinsPlot}
 #| fig.alt: >
 #|   An overview of mapping for Multipotent progenitors, including UMAPs
 #|   of all cells and just those in the mapped pseudotime bin

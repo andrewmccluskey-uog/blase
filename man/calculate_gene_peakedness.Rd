@@ -33,6 +33,8 @@ mean_expression_in_window, mean_expression_out_window, ratio
 Calculate the peakedness of a gene. The power is the ratio of the mean of
 reads 5\% either side of the smoothed peak of the gene's expression over
 pseudotime against the mean of the reads outside of this.
+
+This function can take some time to complete, please be patient.
 }
 \examples{
 ncells <- 70

@@ -5,8 +5,11 @@ Authors@R: c(
   person("Andrew", "McCluskey", , "2117532m@student.gla.ac.uk", role = c("aut", "cre"), 
     comment = c(ORCID = "0009-0004-4187-799X")),
   person("Toby", "Kettlewell", , "t.kettlewell.1@research.gla.ac.uk", role = c("aut"), 
-    comment = c()),
-  person("Thomas D", "Otto", , "thomasdan.otto@glasgow.ac.uk", role=c("aut","ths"), 
+    comment = c(ORCID = "0009-0001-1225-3318")),
+  person("Adrian M.", "Smith", , , role = c("aut"), comment = c()),
+  person("Rhia", "Khundu", , , role = c("aut"), comment = c()),
+  person("David A.", "Gunn", , , role = c("aut"), comment = c()),
+  person("Thomas D.", "Otto", , "thomasdan.otto@glasgow.ac.uk", role=c("aut","ths"), 
     comment=c(ORCID = "0000-0002-1246-7404"))
   )
 Description: Find where bulk RNA-seq data lies on a single-cell pseudotime 
