@@ -159,7 +159,7 @@ setMethod(
 #' significant results or not, defaults to TRUE.
 #' @param annotate_correlation Whether to annotate the heatmap with the
 #' correlation of bin to each bulk sample. Defaults to FALSE.
-#' or not, defaults to TRUE.
+#'
 #' @param bin_order The order in which to plot the pseudotime bins along
 #' the x-axis.
 #'
