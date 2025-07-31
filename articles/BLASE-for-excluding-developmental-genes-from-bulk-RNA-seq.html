@@ -189,20 +189,17 @@ results.</p>
 <span>    <span class="va">blase_data</span>,</span>
 <span>    <span class="va">zhang_bulk</span>,</span>
 <span>    BPPARAM <span class="op">=</span> <span class="va">bpparam</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="co">#| fig.alt: &gt;</span></span>
-<span><span class="co">#|   Heatmap of mapping correlations of the Zhang et al. data onto</span></span>
-<span><span class="co">#|   the Dogga et al. scRNA-seq.</span></span>
-<span><span class="fu">blase</span><span class="fu">::</span><span class="fu"><a href="../reference/plot_mapping_result_heatmap.html">plot_mapping_result_heatmap</a></span><span class="op">(</span><span class="va">mapping_results</span><span class="op">)</span></span></code></pre></div>
-<p><img src="BLASE-for-excluding-developmental-genes-from-bulk-RNA-seq_files/figure-html/mapping-1.png" width="700"></p>
+<span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">blase</span><span class="fu">::</span><span class="fu"><a href="../reference/plot_mapping_result_heatmap.html">plot_mapping_result_heatmap</a></span><span class="op">(</span><span class="va">mapping_results</span><span class="op">)</span></span></code></pre></div>
+<p><img src="BLASE-for-excluding-developmental-genes-from-bulk-RNA-seq_files/figure-html/mappingPlot-1.png" alt="Heatmap of mapping correlations of the Zhang et al. data onto the Dogga et al. scRNA-seq." width="700"></p>
 </div>
 <div class="section level2">
 <h2 id="calculate-de-genes">Calculate DE genes<a class="anchor" aria-label="anchor" href="#calculate-de-genes"></a>
 </h2>
 <p>We calculate DE genes using Limma (ref) as we have access to only
 normalised counts.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">metadata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>row.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fl">12</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">metadata</span><span class="op">$</span><span class="va">strain</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"NF54"</span>, <span class="fl">4</span><span class="op">)</span>,</span>
@@ -238,7 +235,7 @@ normalised counts.</p>
 <div class="section level3">
 <h3 id="phenotype-development-bulk-de">Phenotype + Development (Bulk DE)<a class="anchor" aria-label="anchor" href="#phenotype-development-bulk-de"></a>
 </h3>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">vfit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/limma/man/lmFit.html" class="external-link">lmFit</a></span><span class="op">(</span><span class="va">zhang_bulk</span>, <span class="va">design</span><span class="op">)</span></span>
 <span><span class="va">vfit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/limma/man/contrasts.fit.html" class="external-link">contrasts.fit</a></span><span class="op">(</span><span class="va">vfit</span>, contrasts <span class="op">=</span> <span class="va">contr.matrix</span><span class="op">)</span></span>
 <span><span class="va">efit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/limma/man/ebayes.html" class="external-link">eBayes</a></span><span class="op">(</span><span class="va">vfit</span><span class="op">)</span></span>
@@ -257,14 +254,14 @@ normalised counts.</p>
 <h3 id="development-sc-de">Development (SC DE)<a class="anchor" aria-label="anchor" href="#development-sc-de"></a>
 </h3>
 <p>First, let’s pseudobulk based on the pseudotime bins</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pseudobulked_dogga_sc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>row.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">dogga_sc</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">r</span> <span class="kw">in</span> <span class="va">mapping_results</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="va">pseudobulked_dogga_sc</span><span class="op">[</span><span class="fu"><a href="../reference/mapping-result-bulk-name-getter.html">bulk_name</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/dge.html" class="external-link">counts</a></span><span class="op">(</span><span class="va">dogga_sc</span><span class="op">[</span>, <span class="va">dogga_sc</span><span class="op">$</span><span class="va">pseudotime_bin</span> <span class="op">==</span> <span class="fu"><a href="../reference/mapping-result-best-bin-getter.html">best_bin</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="va">pseudobulked_dogga_sc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">pseudobulked_dogga_sc</span><span class="op">)</span></span></code></pre></div>
 <p>And now calculate DE genes for these</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Normalise, not needed for true bulks</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">v</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/limma/man/voom.html" class="external-link">voom</a></span><span class="op">(</span><span class="va">pseudobulked_dogga_sc</span>, <span class="va">design</span>, plot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
@@ -278,7 +275,7 @@ normalised counts.</p>
 <span><span class="co">#&gt; Down                0                0                  0</span></span>
 <span><span class="co">#&gt; NotSig           1768             1768               1768</span></span>
 <span><span class="co">#&gt; Up                  0                0                  0</span></span></code></pre></div>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">PB31_normal_v_HS_SC_DE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/limma/man/toptable.html" class="external-link">topTable</a></span><span class="op">(</span><span class="va">efit_sc</span>, n <span class="op">=</span> <span class="cn">Inf</span>, coef <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="va">PB31_normal_v_HS_SC_DE</span> <span class="op">&lt;-</span> <span class="va">PB31_normal_v_HS_SC_DE</span><span class="op">[</span><span class="va">PB31_normal_v_HS_SC_DE</span><span class="op">$</span><span class="va">adj.P.Val</span> <span class="op">&lt;</span> <span class="fl">0.05</span> <span class="op">&amp;</span> <span class="va">PB31_normal_v_HS_SC_DE</span><span class="op">$</span><span class="va">logFC</span> <span class="op">&gt;</span> <span class="fl">0</span>, <span class="op">]</span></span>
 <span><span class="va">PB31_normal_v_HS_SC_DE</span> <span class="op">&lt;-</span> <span class="va">PB31_normal_v_HS_SC_DE</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="op">-</span><span class="va">PB31_normal_v_HS_SC_DE</span><span class="op">$</span><span class="va">logFC</span><span class="op">)</span>, <span class="op">]</span></span></code></pre></div>
@@ -289,7 +286,7 @@ normalised counts.</p>
 </h2>
 <p>How many of these genes overlap? We can look at the intersection
 using a Venn Diagram:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://gaospecial.github.io/ggVennDiagram/reference/ggVennDiagram.html" class="external-link">ggVennDiagram</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    Phenotype <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">PB31_normal_v_HS_BULK_DE</span><span class="op">)</span>,</span>
 <span>    Development <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">PB31_normal_v_HS_SC_DE</span><span class="op">)</span></span>
@@ -299,7 +296,7 @@ using a Venn Diagram:</p>
 from the original DE genes list.</p>
 <p>NB: This is a primitive approach, and there are likely many other and
 better ways to calculate which genes should be kept or removed.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">PB31_normal_v_HS_corrected_DE</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">PB31_normal_v_HS_BULK_DE</span><span class="op">[</span><span class="op">!</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">PB31_normal_v_HS_BULK_DE</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">PB31_normal_v_HS_SC_DE</span><span class="op">)</span><span class="op">)</span>, <span class="op">]</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">PB31_normal_v_HS_corrected_DE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "PF3D7-1003600" "PF3D7-1310700" "PF3D7-1035200" "PF3D7-0714000"</span></span>
@@ -310,7 +307,7 @@ researcher, for example Gene Ontology term enrichment.</p>
 <div class="section level2">
 <h2 id="session-info">Session Info<a class="anchor" aria-label="anchor" href="#session-info"></a>
 </h2>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R version 4.5.1 (2025-06-13)</span></span>
 <span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu</span></span>
@@ -344,7 +341,7 @@ researcher, for example Gene Ontology term enrichment.</p>
 <span><span class="co">#&gt;  [5] scater_1.36.0               ggplot2_3.5.2              </span></span>
 <span><span class="co">#&gt;  [7] scuttle_1.18.0              SingleCellExperiment_1.30.1</span></span>
 <span><span class="co">#&gt;  [9] SummarizedExperiment_1.38.1 Biobase_2.68.0             </span></span>
-<span><span class="co">#&gt; [11] GenomicRanges_1.60.0        GenomeInfoDb_1.44.0        </span></span>
+<span><span class="co">#&gt; [11] GenomicRanges_1.60.0        GenomeInfoDb_1.44.1        </span></span>
 <span><span class="co">#&gt; [13] IRanges_2.42.0              S4Vectors_0.46.0           </span></span>
 <span><span class="co">#&gt; [15] BiocGenerics_0.54.0         generics_0.1.4             </span></span>
 <span><span class="co">#&gt; [17] MatrixGenerics_1.20.0       matrixStats_1.5.0          </span></span>
@@ -373,7 +370,7 @@ researcher, for example Gene Ontology term enrichment.</p>
 <span><span class="co">#&gt; [61] pillar_1.11.0            htmltools_0.5.8.1        GenomeInfoDbData_1.2.14 </span></span>
 <span><span class="co">#&gt; [64] R6_2.6.1                 sparseMatrixStats_1.20.0 textshaping_1.0.1       </span></span>
 <span><span class="co">#&gt; [67] evaluate_1.0.4           lattice_0.22-7           bslib_0.9.0             </span></span>
-<span><span class="co">#&gt; [70] Rcpp_1.1.0               gridExtra_2.3            SparseArray_1.8.0       </span></span>
+<span><span class="co">#&gt; [70] Rcpp_1.1.0               gridExtra_2.3            SparseArray_1.8.1       </span></span>
 <span><span class="co">#&gt; [73] nlme_3.1-168             mgcv_1.9-3               xfun_0.52               </span></span>
 <span><span class="co">#&gt; [76] fs_1.6.6                 pkgconfig_2.0.3</span></span></code></pre></div>
 </div>
@@ -384,7 +381,7 @@ researcher, for example Gene Ontology term enrichment.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Andrew McCluskey, Toby Kettlewell, Thomas D Otto.</p>
+  <p>Developed by Andrew McCluskey, Toby Kettlewell, Adrian M. Smith, Rhia Khundu, David A. Gunn, Thomas D. Otto.</p>
 </div>
 
 <div class="pkgdown-footer-right">
