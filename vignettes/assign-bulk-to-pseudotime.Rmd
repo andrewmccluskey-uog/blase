@@ -228,7 +228,7 @@ plot_mapping_result_heatmap(list(
     multipotent_progenitors_result,
     basophils_result,
     neutrophils_result
-), annotate_correlation = TRUE)
+), annotate_correlation = TRUE, text_background = TRUE)
 ```
 
 ### Plotting Detailed Correlation Maps

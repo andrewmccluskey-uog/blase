@@ -159,9 +159,10 @@ setMethod(
 #' significant results or not, defaults to TRUE.
 #' @param annotate_correlation Whether to annotate the heatmap with the
 #' correlation of bin to each bulk sample. Defaults to FALSE.
-#'
 #' @param bin_order The order in which to plot the pseudotime bins along
 #' the x-axis.
+#' @param text_background Whether to show background on labels or not. Has no
+#' effect if no annotations are enabled.
 #'
 #' @returns A heatmap showing the correlations of each mapping result across
 #' every pseudotime bin.
@@ -175,7 +176,8 @@ plot_mapping_result_heatmap <- function(
     ),
     annotate_confidence = TRUE,
     annotate_correlation = FALSE,
-    bin_order = NULL) {
+    bin_order = NULL,
+    text_background=FALSE) {
     if (!all(lapply(mapping_result_list, class) == "MappingResult")) {
         stop("You must provide a list of MappingResult objects only.")
     }
@@ -208,7 +210,8 @@ plot_mapping_result_heatmap <- function(
 
     return(PRIVATE_mapping_result_heatmap_plot(
         bulk_results, heatmap_fill_scale,
-        annotate_confidence || annotate_correlation
+        annotate_confidence || annotate_correlation,
+        text_background
     ))
 }
 
@@ -249,14 +252,13 @@ PRIVATE_get_df_for_this_bulk_to_plot <- function(
 
 #' @keywords internal
 PRIVATE_mapping_result_heatmap_plot <- function(
-    bulk_results, fill_scale, annotate) {
+    bulk_results, fill_scale, annotate, text_background) {
     bulk_name_sym <- ggplot2::sym("bulk_name")
     pseudotime_bin_sym <- ggplot2::sym("pseudotime_bin")
     correlation_sym <- ggplot2::sym("correlation")
     labels_sym <- ggplot2::sym("label")
     is_best_bin_sym <- ggplot2::sym("is_best_bin")
 
-    # Change elow here
     p <- ggplot2::ggplot(bulk_results, ggplot2::aes(
         x = {{ pseudotime_bin_sym }},
         y = {{ bulk_name_sym }},
@@ -271,14 +273,18 @@ PRIVATE_mapping_result_heatmap_plot <- function(
         ggplot2::guides(color = "none")
 
     if (annotate == TRUE) {
+        text_geom <- ggplot2::geom_text(colour="black")
+        if (text_background) {
+          text_geom <- ggplot2::geom_label(colour = "black", fill="white")
+        }
         p <- p + ggplot2::geom_tile(ggplot2::aes(
             width = 0.99,
             height = 0.99
         ), linewidth = 0.8) +
-            ggplot2::geom_text(colour = "#000000") +
+            text_geom +
             ggplot2::scale_color_manual(
                 breaks = c(FALSE, TRUE),
-                values = c("transparent", "#000000")
+                values = c("transparent", "black")
             )
     } else {
         p <- p + ggplot2::geom_tile() +

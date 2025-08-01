@@ -10,7 +10,8 @@ plot_mapping_result_heatmap(
     limits = c(-1, 1)),
   annotate_confidence = TRUE,
   annotate_correlation = FALSE,
-  bin_order = NULL
+  bin_order = NULL,
+  text_background = FALSE
 )
 }
 \arguments{
@@ -28,6 +29,9 @@ correlation of bin to each bulk sample. Defaults to FALSE.}
 
 \item{bin_order}{The order in which to plot the pseudotime bins along
 the x-axis.}
+
+\item{text_background}{Whether to show background on labels or not. Has no
+effect if no annotations are enabled.}
 }
 \value{
 A heatmap showing the correlations of each mapping result across
