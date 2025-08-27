@@ -127,5 +127,4 @@ PRIVATE_assign_pseudotime_bins_validate_inputs <- function(
         stop("Pseudotime slot '", pseudotime_slot, "' does not exist")
     }
 
-    # TODO check for rownames and colnames existing
 }
