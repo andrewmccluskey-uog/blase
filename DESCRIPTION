@@ -61,8 +61,8 @@ Suggests:
     ggVennDiagram
 Config/testthat/edition: 3
 VignetteBuilder: knitr
-URL: https://andrewmccluskey-uog.github.io/BLASE/
-BugReports: https://andrewmccluskey-uog.github.io/BLASE/issues
+URL: https://andrewmccluskey-uog.github.io/blase/
+BugReports: https://andrewmccluskey-uog.github.io/blase/issues
 Depends: 
     R (>= 4.4.0)
 LazyData: false
