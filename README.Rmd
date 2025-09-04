@@ -34,6 +34,18 @@ It provides:
 
 ## Installation
 
+### Bioconductor
+Package has been submitted to Bioconductor.
+
+```
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("blase")
+```
+
+### Github
+
 You can install the development version of BLASE from [GitHub](https://github.com/) with:
 
 ``` r
