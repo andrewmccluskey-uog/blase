@@ -1,0 +1,12 @@
+@article {McCluskey2025.09.03.673925,
+	author = {McCluskey, Andrew and Kettlewell, Toby and Smith, Adrian M. and Kundu, Rhiannon and Gunn, David A. and Otto, Thomas D.},
+	title = {BLASE: Bulk Linkage Analysis for Single Cell Experiments - Teasing Out the Secrets of Bulk Transcriptomics with Trajectory Analysis},
+	elocation-id = {2025.09.03.673925},
+	year = {2025},
+	doi = {10.1101/2025.09.03.673925},
+	publisher = {Cold Spring Harbor Laboratory},
+	abstract = {Motivation scRNA-seq experiments can capture cell process trajectories. Bulk RNA-seq is more practical, however does not have the granularity to elucidate cell-type specific trajectories. Deconvolution methods can estimate cell-types in RNA-seq data, but there is a need for methods characterising their pseudotime.Results We show that our method, BLASE, can identify the progress of an RNA-seq sample through a trajectory in a scRNA-seq reference.Conclusion BLASE can be used to a) annotate scRNA-seq data from existing RNA-seq, b) identify progress of RNA-seq data through a process based on scRNA-seq data, and c) be used to correct developmental differences in RNA-seq differential expression analysis.Competing Interest StatementA.M. is partially funded by Unilever. A.M.S., R.K., and D.A.G. are employed by Unilever.Engineering and Physical Sciences Research Council, EP/T517896/1Wellcome Trust, https://ror.org/029chgv08, 104111/Z/14/Z\&amp;AExposUM Institute of the University of Montpellier, ANR-21-EXES-0005Unilever (United Kingdom), https://ror.org/05n8ah907Biotechnology and Biological Sciences Research Council, https://ror.org/00cwqg982, BB/X511389/1},
+	URL = {https://www.biorxiv.org/content/early/2025/09/07/2025.09.03.673925},
+	eprint = {https://www.biorxiv.org/content/early/2025/09/07/2025.09.03.673925.full.pdf},
+	journal = {bioRxiv}
+}
