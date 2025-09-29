@@ -11,17 +11,17 @@ get_bins_as_bulk(
 )
 }
 \arguments{
-\item{pseudotime_sce}{The Single Cell Experiment object to
-get the bins from}
+\item{pseudotime_sce}{The \link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment::SingleCellExperiment}
+object to get the bins from}
 
-\item{min_cells_for_bulk}{The minimum cells to look for per
+\item{min_cells_for_bulk}{Integer. The minimum cells to look for per
 replicate and bin.}
 
-\item{replicate_slot}{The slot in the Single Cell Experiment
-that contains replicate information}
+\item{replicate_slot}{String. The name of the matadata column in the
+Single Cell Experiment that contains replicate information}
 }
 \value{
-A dataframe pseudobulk counts matrix.
+A dataframe containing the pseudobulked counts matrix.
 }
 \description{
 This function will try to create a pseudobulked count matrix for the bins.

@@ -13,21 +13,24 @@ calculate_gene_peakedness(
 )
 }
 \arguments{
-\item{sce}{SCE to do the calculations on.}
+\item{sce}{\link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment::SingleCellExperiment} to
+do the calculations on.}
 
-\item{window_pct}{the size of the window to consider, as a percentage
-of the maximum pseudotime value.}
+\item{window_pct}{Decimal between 0-100. The size of
+the window to consider, as a percentage of the maximum pseudotime value.}
 
-\item{pseudotime_slot}{The slot in the SCE object containing pseudotime}
+\item{pseudotime_slot}{String. The name of the metadata column in the SCE
+object containing pseudotime}
 
-\item{knots}{The number of knots to use when fitting the GAM}
+\item{knots}{Integer. The number of knots to use when fitting the GAM}
 
-\item{BPPARAM}{The BiocParallel parameter for parallelisation
-Defaults to \link[BiocParallel:SerialParam-class]{BiocParallel::SerialParam}.}
+\item{BPPARAM}{The \link[BiocParallel:BiocParallelParam-class]{BiocParallel::BiocParallelParam} for
+parallelisation. Defaults to \link[BiocParallel:SerialParam-class]{BiocParallel::SerialParam}.}
 }
 \value{
 Dataframe, where each row is a gene, and the following columns:
-mean_expression_in_window, mean_expression_out_window, ratio
+mean_expression_in_window (decimal), mean_expression_out_window (decimal),
+ratio (decimal)
 }
 \description{
 Calculate the peakedness of a gene. The power is the ratio of the mean of

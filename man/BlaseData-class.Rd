@@ -6,7 +6,7 @@
 \alias{BlaseData}
 \title{Blase Data Object}
 \value{
-An \link{BlaseData} object
+A \link{BlaseData} object
 }
 \description{
 For creation details, see \code{\link[=as.BlaseData]{as.BlaseData()}}

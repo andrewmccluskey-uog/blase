@@ -15,15 +15,16 @@ map_best_bin(
 \arguments{
 \item{blase_data}{The \link{BlaseData} holding the bins.}
 
-\item{bulk_id}{The sample id of the bulk to analyse.}
+\item{bulk_id}{String. The sample id of the bulk to analyse.}
 
-\item{bulk_data}{The whole bulk read matrix as a dataframe. Each row should
-represent a gene, and each column a sample.}
+\item{bulk_data}{Dataframe. The whole bulk read matrix as a dataframe.
+Each row should represent a gene, and each column a sample.}
 
-\item{bootstrap_iterations}{The number of bootstrapping iterations to run.}
+\item{bootstrap_iterations}{Integer. The number of bootstrapping iterations
+to run.}
 
-\item{confidence_level}{The confidence interval to calculate for mappings.
-Defaults to 90\%.}
+\item{confidence_level}{Decimal between 0-1. The confidence interval to
+calculate for mappings. Defaults to 90\%.}
 }
 \value{
 A \link{MappingResult} object.

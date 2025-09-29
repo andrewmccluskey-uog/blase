@@ -7,13 +7,16 @@
 smooth_gene(sce, gene, pseudotime_slot = "slingPseudotime_1", knots = 10)
 }
 \arguments{
-\item{sce}{SCE to do the calculations on.}
+\item{sce}{\link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment::SingleCellExperiment} to do
+the calculations on.}
 
-\item{gene}{The name of the gene to smooth}
+\item{gene}{String. The name of the gene to smooth}
 
-\item{pseudotime_slot}{The slot in the SCE object containing pseudotime}
+\item{pseudotime_slot}{String. The slot in the
+\link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment::SingleCellExperiment} object metadata
+containing pseudotime}
 
-\item{knots}{The number of knots to use when fitting the GAM}
+\item{knots}{Integer. The number of knots to use when fitting the GAM}
 }
 \value{
 Smoothed Gene Expression over pseudotime

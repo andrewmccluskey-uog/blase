@@ -14,8 +14,8 @@ top_2_distance(x)
 \item{x}{a \link{MappingResult} object}
 }
 \value{
-the difference in correlation between the top 2 most correlated
-bins for this mapping.
+Decimal. The difference in correlation between
+the top 2 most correlated bins for this mapping.
 }
 \description{
 Get the difference in correlation between the top 2 most correlated

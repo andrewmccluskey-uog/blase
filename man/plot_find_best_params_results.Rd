@@ -11,11 +11,12 @@ plot_find_best_params_results(
 )
 }
 \arguments{
-\item{find_best_params_results}{Results dataframe from \code{\link[=find_best_params]{find_best_params()}}}
+\item{find_best_params_results}{Dataframe. Results dataframe from
+\code{\link[=find_best_params]{find_best_params()}}}
 
-\item{bin_count_colors}{Optional, custom bin count color scheme.}
+\item{bin_count_colors}{Optional, custom bin count scale color scheme.}
 
-\item{gene_count_colors}{Optional, custom gene count color scheme.}
+\item{gene_count_colors}{Optional, custom gene count scale color scheme.}
 }
 \value{
 A plot showing how convexity changes as n_bins and n_genes

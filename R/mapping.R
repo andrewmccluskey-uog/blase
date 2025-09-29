@@ -2,14 +2,15 @@
 #'
 #' @concept mapping
 #'
-#' @param blase_data The [BlaseData] holding the bins.
-#' @param bulk_data The whole bulk read matrix as a dataframe. Each row should
-#' represent a gene, and each column a sample.
-#' @param bootstrap_iterations The number of bootstrapping iterations to run.
-#' @param confidence_level The confidence interval to calculate for mappings.
-#' Defaults to 90%.
-#' @param BPPARAM The BiocParallel param for multithreading if desired.
-#' Defaults to [BiocParallel::SerialParam()]
+#' @param blase_data The [BlaseData] holding the bins and pseudobulks.
+#' @param bulk_data Dataframe. The whole bulk read matrix as a dataframe.
+#' Each row should represent a gene, and each column a sample.
+#' @param bootstrap_iterations Integer. The number of bootstrapping
+#' iterations to run.
+#' @param confidence_level Decimal between 0-1. The confidence interval
+#' to calculate for mappings. Defaults to 0.9, or 90%.
+#' @param BPPARAM The [BiocParallel::BiocParallelParam] for
+#' multithreading if desired. Defaults to [BiocParallel::SerialParam()]
 #'
 #' @importFrom methods new
 #' @importFrom BiocParallel SerialParam
@@ -66,12 +67,13 @@ map_all_best_bins <- function(blase_data, bulk_data,
 #' @concept mapping
 #'
 #' @param blase_data The [BlaseData] holding the bins.
-#' @param bulk_id The sample id of the bulk to analyse.
-#' @param bulk_data The whole bulk read matrix as a dataframe. Each row should
-#' represent a gene, and each column a sample.
-#' @param bootstrap_iterations The number of bootstrapping iterations to run.
-#' @param confidence_level The confidence interval to calculate for mappings.
-#' Defaults to 90%.
+#' @param bulk_id String. The sample id of the bulk to analyse.
+#' @param bulk_data Dataframe. The whole bulk read matrix as a dataframe.
+#' Each row should represent a gene, and each column a sample.
+#' @param bootstrap_iterations Integer. The number of bootstrapping iterations
+#' to run.
+#' @param confidence_level Decimal between 0-1. The confidence interval to
+#' calculate for mappings. Defaults to 90%.
 #'
 #' @importFrom methods new
 #'

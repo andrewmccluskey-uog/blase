@@ -7,23 +7,25 @@
 #' @concept tuning
 #'
 #' @param blase_data The [BlaseData] object to use.
-#' @param bootstrap_iterations Iterations for bootstrapping when calculating
-#' confident mappings.
-#' @param BPPARAM The BiocParallel configuration. Defaults to SerialParam.
-#' @param make_plot Whether or not to render the plot showing the correlations
-#' for each pseudobulk bin when we try to map the given bin.
-#' @param plot_columns How many columns to use in the plot.
+#' @param bootstrap_iterations Integer. Iterations for
+#' bootstrapping when calculating confident mappings.
+#' @param BPPARAM The [BiocParallel::BiocParallelParam] configuration.
+#' Defaults to [BiocParallel::SerialParam]
+#' @param make_plot Boolean. Whether or not to render the plot
+#' showing the correlations for each pseudobulk bin when we try
+#' to map the given bin.
+#' @param plot_columns Integer. How many columns to use in the plot.
 #'
 #'
 #' @return A vector of length 3:
-#' * "worst top 2 distance" containing the lowest difference between the
+#' * "worst top 2 distance" decimal containing the lowest difference between the
 #'  absolute values of the top 2 most correlated bins for each bin.
 #'  Higher is better for differentiating.
-#' * "mean top 2 distance" containing the mean top 2 distance across the
+#' * "mean top 2 distance" decimal containing the mean top 2 distance across the
 #'  entire set of genes and bins. Higher is better for differentiation,
 #'  but it should matter less than the worst value.
-#' * "confident_mapping_pct" - The percent of mappings for this setup which
-#'  were annotated as confident by BLASE
+#' * "confident_mapping_pct" decimal from 0-1. The percent of
+#'  mappings for this setup which were annotated as confident by BLASE.
 #'
 #' @importFrom BiocParallel SerialParam
 #'
@@ -162,22 +164,25 @@ PRIVATE_evaluate_parameters_plots <- function(
 #' @concept tuning
 #'
 #' @param x The object to create `BlaseData`` from
-#' @param genelist The list of genes to use (ordered by descending goodness)
-#' @param bins_count_range The n_bins list to try out
-#' @param gene_count_range The n_genes list to try out
-#' @param bootstrap_iterations Iterations for bootstrapping when calculating
-#' confident mappings.
-#' @param BPPARAM The BiocParallel configuration. Defaults to SerialParam.
+#' @param genelist Vector of strings. The list of genes to use
+#' (ordered by descending goodness)
+#' @param bins_count_range Integer vector. The n_bins list to try out
+#' @param gene_count_range Integer vector. The n_genes list to try out
+#' @param bootstrap_iterations Integer. Iterations for bootstrapping
+#' when calculating confident mappings.
+#' @param BPPARAM The [BiocParallel::BiocParallelParam]. Defaults to
+#' [BiocParallel::SerialParam]
 #' @param ... params to be passed to child functions, see [as.BlaseData()]
 #'
 #' @return A dataframe of the results.
-#' * bin_count: The bin count for this attempt
-#' * gene_count: The top n genes to use for this attempt
-#' * min_convexity: The worst convexity for these parameters
-#' * mean_convexity: The mean convexity for these parameters
-#' * confident_mapping_pct: The percent of bins which were confidently mapped
-#'   to themselves for these parameters. If this value is low, then it is
-#'   likely that in real use, few or no results will be confidently mapped.
+#' * bin_count: Integer. The bin count for this attempt
+#' * gene_count: Integer. The top n genes to use for this attempt
+#' * min_convexity: Decimal. The worst convexity for these parameters
+#' * mean_convexity: Decimal. The mean convexity for these parameters
+#' * confident_mapping_pct: Decimal. The percent of bins which were
+#'   confidently mapped to themselves for these parameters.
+#'   If this value is low, then it is likely that in real use,
+#'   few or no results will be confidently mapped.
 #'
 #' @seealso [plot_find_best_params_results()] for plotting the
 #' results of this function.
@@ -273,9 +278,10 @@ find_best_params <- function(
 #'
 #' @concept tuning
 #'
-#' @param find_best_params_results Results dataframe from [find_best_params()]
-#' @param bin_count_colors Optional, custom bin count color scheme.
-#' @param gene_count_colors Optional, custom gene count color scheme.
+#' @param find_best_params_results Dataframe. Results dataframe from
+#' [find_best_params()]
+#' @param bin_count_colors Optional, custom bin count scale color scheme.
+#' @param gene_count_colors Optional, custom gene count scale color scheme.
 #'
 #' @returns A plot showing how convexity changes as n_bins and n_genes
 #' are changed. See [find_best_params()] for details on how to interpret.
@@ -458,11 +464,11 @@ PRIVATE_plot_confident_mapping_by_bins <- function(results, gene_colors) {
 #' @concept tuning
 #'
 #' @param blase_data The [BlaseData] to get bins and expression from.
-#' @param n_genes_to_plot The number of genes to plot.
-#' @param plot_columns The number of columns to plot the grid with. Best as a
-#' divisor of `n_genes_to_plot`.
+#' @param n_genes_to_plot Integer. The number of genes to plot.
+#' @param plot_columns Integer. The number of columns to plot the grid with.
+#' Best as a divisor of `n_genes_to_plot`.
 #'
-#' @returns A plot showing the normalised expression of the top genes
+#' @returns A [ggplot2] plot showing the normalised expression of the top genes
 #' over pseudotime bins.
 #'
 #' @export

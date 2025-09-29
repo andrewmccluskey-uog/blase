@@ -13,7 +13,7 @@ confident_mapping(x)
 \item{x}{a \link{MappingResult} object}
 }
 \value{
-TRUE if the result is confident, otherwise FALSE
+Boolean. TRUE if the result is confident, otherwise FALSE
 }
 \description{
 Get if the result is confident for a BLASE Mapping Results object.

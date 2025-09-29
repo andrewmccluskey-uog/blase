@@ -13,7 +13,7 @@ bulk_name(x)
 \item{x}{a \link{MappingResult} object}
 }
 \value{
-The name of the bulk used to map against.
+String. The name of the bulk used to map against.
 }
 \description{
 Get name of bulk of a BLASE Mapping Results object.

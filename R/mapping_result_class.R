@@ -4,17 +4,18 @@
 #'
 #' @concept mapping-result-object
 #'
-#' @slot bulk_name The name of the bulk sample being mapped.
-#' @slot best_bin The bin that best matched the bulk sample.
-#' @slot best_correlation The spearman's rho that the test geneset had
+#' @slot bulk_name String. The name of the bulk sample being mapped.
+#' @slot best_bin Integer. The bin that best matched the bulk sample.
+#' @slot best_correlation Decimal. The spearman's rho that the test geneset had
 #' between the winning bin and the bulk.
-#' @slot top_2_distance The absolute difference between the best and second
-#' best mapping buckets. Higher indicates a less doubtful mapping.
-#' @slot confident_mapping TRUE when the mapped bin's lower bound is higher
-#' than the maximum upper bound of the other bins.
-#' @slot history A dataframe of the correlation score and confidence bounds
-#' for each bin. Access with `mapping_history()`
-#' @slot bootstrap_iterations The number of iterations used during
+#' @slot top_2_distance Decimal. The absolute difference between the best and
+#' second best mapping buckets. Higher indicates a less doubtful mapping.
+#' @slot confident_mapping Boolean. TRUE when the mapped bin's lower
+#' bound is higher than the maximum upper bound of the other bins.
+#' @slot history A dataframe of the correlation score (decimal) and
+#' confidence bounds (decimal pairs) for each bin.
+#' Access with `mapping_history()`
+#' @slot bootstrap_iterations Integer. The number of iterations used during
 #' the bootstrap.
 #'
 #' @return A [MappingResult] object
@@ -139,7 +140,7 @@ setMethod(
 #'
 #' @rdname mapping-result-bulk-name-getter
 #' @param x a [MappingResult] object
-#' @returns The name of the bulk used to map against.
+#' @returns String. The name of the bulk used to map against.
 #' @export
 #' @inherit MappingResult-class examples
 setGeneric("bulk_name", function(x) standardGeneric("bulk_name"))
@@ -158,7 +159,7 @@ setMethod(
 #'
 #' @rdname mapping-result-best-bin-getter
 #' @param x a [MappingResult] object
-#' @returns The best bin ID of this mapping
+#' @returns Integer. The best bin ID of this mapping
 #' @export
 #' @inherit MappingResult-class examples
 setGeneric("best_bin", function(x) standardGeneric("best_bin"))
@@ -176,7 +177,7 @@ setMethod(
 #'
 #' @rdname mapping-result-best-correlation-getter
 #' @param x a [MappingResult] object
-#' @returns The highest correlation value of this mapping
+#' @returns Decimal. The highest correlation value of this mapping
 #' @export
 #' @inherit MappingResult-class examples
 setGeneric("best_correlation", function(x) standardGeneric("best_correlation"))
@@ -195,8 +196,8 @@ setMethod(
 #'
 #' @rdname mapping-result-top-2-distance-getter
 #' @param x a [MappingResult] object
-#' @returns the difference in correlation between the top 2 most correlated
-#' bins for this mapping.
+#' @returns Decimal. The difference in correlation between
+#' the top 2 most correlated bins for this mapping.
 #' @export
 #' @inherit MappingResult-class examples
 setGeneric(
@@ -217,7 +218,7 @@ setMethod(
 #'
 #' @rdname mapping-result-confident-mapping-getter
 #' @param x a [MappingResult] object
-#' @returns TRUE if the result is confident, otherwise FALSE
+#' @returns Boolean. TRUE if the result is confident, otherwise FALSE
 #' @export
 #' @inherit MappingResult-class examples
 setGeneric(
@@ -257,7 +258,7 @@ setMethod(
 #'
 #' @rdname mapping-result-bootstrap-iterations-getter
 #' @param x a [MappingResult] object
-#' @returns The number of iterations performed for this mapping.
+#' @returns Integer. The number of iterations performed for this mapping.
 #' @export
 #' @inherit MappingResult-class examples
 setGeneric(

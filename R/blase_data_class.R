@@ -11,7 +11,7 @@
 #' @slot genes list. A list of the genes selected for
 #' discriminating timepoints.
 #'
-#' @return An [BlaseData] object
+#' @return A [BlaseData] object
 #' @export
 #'
 #' @examples
@@ -39,7 +39,7 @@ BlaseData <- setClass(
 #' @concept blase-object
 #' @rdname show_blase_object
 #'
-#' @param object an [BlaseData] object
+#' @param object a [BlaseData] object
 #'
 #' @returns A character vector describing the BLASE object
 #'
@@ -87,7 +87,7 @@ setMethod(
 #'
 #' @rdname genes-setter
 #' @param x a [BlaseData] object
-#' @param value new value for genes slot, should be a vector of strings
+#' @param value Vector of strings. The new value for genes slot
 #'
 #' @returns Nothing
 #'
@@ -108,16 +108,16 @@ setMethod(
 )
 
 #' @title Get bins of a BLASE Data object.
+#' @keywords internal
 #'
 #' @concept blase-object
 #'
 #' @rdname bins-getter
 #' @param x a [BlaseData] object
 #'
-#' @returns vector of integers. The vector of bin names in the
+#' @returns vector of integers. The bin names in the
 #' BLASE Data object.
 #'
-#' @export
 #' @inherit BlaseData-class examples
 setGeneric("bins", function(x) standardGeneric("bins"))
 
@@ -127,3 +127,78 @@ setMethod(
   signature = "BlaseData",
   definition = function(x) x@bins
 )
+
+#' @title Set genes of a BLASE Data object.
+#' @keywords internal
+#'
+#' @concept blase-object
+#'
+#' @rdname bins-setter
+#' @param x a [BlaseData] object
+#' @param value Vector of integers The new value for bins slot
+#'
+#' @returns Nothing
+#'
+#' @importFrom methods validObject
+setGeneric("bins<-", function(x, value) standardGeneric("bins<-"))
+
+#' @rdname bins-setter
+setMethod(
+  f = "bins<-",
+  signature = "BlaseData",
+  definition = function(x, value) {
+    x@bins <- value
+    validObject(x)
+    x
+  }
+)
+
+#' @title Get pseudobulk bins of a BLASE Data object.
+#' @keywords internal
+#'
+#' @concept blase-object
+#'
+#' @rdname pseudobulk-bins-getter
+#' @param x a [BlaseData] object
+#'
+#' @returns List of dataframes. Each dataframe is the normalised counts of
+#' cells by genes in each pseudotime bin. List index is the pseudotime bin.
+#'
+#' @inherit BlaseData-class examples
+setGeneric("pseudobulk_bins", function(x) standardGeneric("pseudobulk_bins"))
+
+#' @rdname pseudobulk-bins-getter
+setMethod(
+  f = "pseudobulk_bins",
+  signature = "BlaseData",
+  definition = function(x) x@pseudobulk_bins
+)
+
+#' @title Set genes of a BLASE Data object.
+#' @keywords internal
+#'
+#' @concept blase-object
+#'
+#' @rdname pseudobulk-bins-setter
+#' @param x a [BlaseData] object
+#' @param value List of dataframes. Each dataframe is the normalised counts of
+#' cells by genes in each pseudotime bin. List index is the pseudotime bin.
+#'
+#' @returns Nothing
+#'
+#' @importFrom methods validObject
+setGeneric("pseudobulk_bins<-", function(x, value) {
+  standardGeneric("pseudobulk_bins<-")
+})
+
+#' @rdname pseudobulk-bins-setter
+setMethod(
+  f = "pseudobulk_bins<-",
+  signature = "BlaseData",
+  definition = function(x, value) {
+    x@pseudobulk_bins <- value
+    validObject(x)
+    x
+  }
+)
+

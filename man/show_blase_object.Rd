@@ -7,7 +7,7 @@
 \S4method{show}{BlaseData}(object)
 }
 \arguments{
-\item{object}{an \link{BlaseData} object}
+\item{object}{a \link{BlaseData} object}
 }
 \value{
 A character vector describing the BLASE object

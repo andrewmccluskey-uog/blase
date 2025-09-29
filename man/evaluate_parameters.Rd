@@ -15,27 +15,29 @@ evaluate_parameters(
 \arguments{
 \item{blase_data}{The \link{BlaseData} object to use.}
 
-\item{bootstrap_iterations}{Iterations for bootstrapping when calculating
-confident mappings.}
+\item{bootstrap_iterations}{Integer. Iterations for
+bootstrapping when calculating confident mappings.}
 
-\item{BPPARAM}{The BiocParallel configuration. Defaults to SerialParam.}
+\item{BPPARAM}{The \link[BiocParallel:BiocParallelParam-class]{BiocParallel::BiocParallelParam} configuration.
+Defaults to \link[BiocParallel:SerialParam-class]{BiocParallel::SerialParam}}
 
-\item{make_plot}{Whether or not to render the plot showing the correlations
-for each pseudobulk bin when we try to map the given bin.}
+\item{make_plot}{Boolean. Whether or not to render the plot
+showing the correlations for each pseudobulk bin when we try
+to map the given bin.}
 
-\item{plot_columns}{How many columns to use in the plot.}
+\item{plot_columns}{Integer. How many columns to use in the plot.}
 }
 \value{
 A vector of length 3:
 \itemize{
-\item "worst top 2 distance" containing the lowest difference between the
+\item "worst top 2 distance" decimal containing the lowest difference between the
 absolute values of the top 2 most correlated bins for each bin.
 Higher is better for differentiating.
-\item "mean top 2 distance" containing the mean top 2 distance across the
+\item "mean top 2 distance" decimal containing the mean top 2 distance across the
 entire set of genes and bins. Higher is better for differentiation,
 but it should matter less than the worst value.
-\item "confident_mapping_pct" - The percent of mappings for this setup which
-were annotated as confident by BLASE
+\item "confident_mapping_pct" decimal from 0-1. The percent of
+mappings for this setup which were annotated as confident by BLASE.
 }
 }
 \description{

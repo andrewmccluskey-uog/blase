@@ -9,13 +9,13 @@ evaluate_top_n_genes(blase_data, n_genes_to_plot = 16, plot_columns = 4)
 \arguments{
 \item{blase_data}{The \link{BlaseData} to get bins and expression from.}
 
-\item{n_genes_to_plot}{The number of genes to plot.}
+\item{n_genes_to_plot}{Integer. The number of genes to plot.}
 
-\item{plot_columns}{The number of columns to plot the grid with. Best as a
-divisor of \code{n_genes_to_plot}.}
+\item{plot_columns}{Integer. The number of columns to plot the grid with.
+Best as a divisor of \code{n_genes_to_plot}.}
 }
 \value{
-A plot showing the normalised expression of the top genes
+A \link[ggplot2:ggplot2-package]{ggplot2::ggplot2} plot showing the normalised expression of the top genes
 over pseudotime bins.
 }
 \description{

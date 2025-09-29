@@ -21,20 +21,20 @@ in the heatmap.}
 \item{heatmap_fill_scale}{The ggplot2 compatible fill gradient scale to
 apply to the heatmap.}
 
-\item{annotate_confidence}{Whether to annotate the heatmap with
+\item{annotate_confidence}{Boolan. Whether to annotate the heatmap with
 significant results or not, defaults to TRUE.}
 
-\item{annotate_correlation}{Whether to annotate the heatmap with the
-correlation of bin to each bulk sample. Defaults to FALSE.}
+\item{annotate_correlation}{Boolean. Whether to annotate the heatmap with
+the correlation of bin to each bulk sample. Defaults to FALSE.}
 
-\item{bin_order}{The order in which to plot the pseudotime bins along
-the x-axis.}
+\item{bin_order}{Vector of integers. A vector of the bin ids in which to
+plot the pseudotime bins along the x-axis.}
 
-\item{text_background}{Whether to show background on labels or not. Has no
+\item{text_background}{Boolean. Whether to show background on labels or not. Has no
 effect if no annotations are enabled.}
 }
 \value{
-A heatmap showing the correlations of each mapping result across
+A \link[ggplot2:ggplot2-package]{ggplot2::ggplot2} heatmap showing the correlations of each mapping result across
 every pseudotime bin.
 }
 \description{

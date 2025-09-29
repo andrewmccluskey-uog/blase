@@ -50,7 +50,7 @@ setGeneric(
 
 #' @rdname plot_mapping_result
 #'
-#' @param group_by_slot The slot in the
+#' @param group_by_slot String. The metadata column in the
 #' [SingleCellExperiment::SingleCellExperiment] to be used as the coloring
 #' for the output plot. Passed to [scater::plotUMAP()] as
 #' `colour_by`, and will be used to produce a bar chart of
@@ -105,7 +105,7 @@ setMethod(
 #'
 #' @rdname plot_bin_population
 #' @param x An object to plot on.
-#' @param bin The bin ID to plot
+#' @param bin Integer. The pseudotime bin to plot
 #' @param ... additional arguments passed to object-specific methods.
 #'
 #' @returns A ggplot2 object of a plot of population in the given
@@ -121,7 +121,7 @@ setGeneric(
 
 #' @rdname plot_bin_population
 #'
-#' @param group_by_slot The slot in the
+#' @param group_by_slot String. The metadata column in the
 #' [SingleCellExperiment::SingleCellExperiment] to be used as the cell
 #' type labels.
 #'
@@ -158,16 +158,16 @@ setMethod(
 #' in the heatmap.
 #' @param heatmap_fill_scale The ggplot2 compatible fill gradient scale to
 #' apply to the heatmap.
-#' @param annotate_confidence Whether to annotate the heatmap with
+#' @param annotate_confidence Boolan. Whether to annotate the heatmap with
 #' significant results or not, defaults to TRUE.
-#' @param annotate_correlation Whether to annotate the heatmap with the
-#' correlation of bin to each bulk sample. Defaults to FALSE.
-#' @param bin_order The order in which to plot the pseudotime bins along
-#' the x-axis.
-#' @param text_background Whether to show background on labels or not. Has no
+#' @param annotate_correlation Boolean. Whether to annotate the heatmap with
+#' the correlation of bin to each bulk sample. Defaults to FALSE.
+#' @param bin_order Vector of integers. A vector of the bin ids in which to
+#' plot the pseudotime bins along the x-axis.
+#' @param text_background Boolean. Whether to show background on labels or not. Has no
 #' effect if no annotations are enabled.
 #'
-#' @returns A heatmap showing the correlations of each mapping result across
+#' @returns A [ggplot2] heatmap showing the correlations of each mapping result across
 #' every pseudotime bin.
 #'
 #' @export
@@ -308,7 +308,7 @@ PRIVATE_mapping_result_heatmap_plot <- function(
 #'
 #' @param mapping_result A [MappingResult] object to plot the correlations for.
 #'
-#' @returns A [ggplot2] object of the plot
+#' @returns A [ggplot2] object of the the line plot
 #'
 #' @export
 #' @inherit MappingResult-class examples

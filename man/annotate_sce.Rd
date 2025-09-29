@@ -14,13 +14,15 @@ annotate_sce(
 \arguments{
 \item{sce}{The \link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment::SingleCellExperiment} to annotate.}
 
-\item{blase_results}{A list of BLASE results to use for the annotation.}
+\item{blase_results}{A list of \link{MappingResult} to use for the
+annotation.}
 
-\item{annotation_col}{The metadata column to store the new annotations.}
+\item{annotation_col}{String. The name of the metadata column in which
+to store the new annotations.}
 
-\item{include_stats}{Whether or not to include metadata columns containing
-The correlation of the best matching bin, and whether that mapping was
-confident.}
+\item{include_stats}{Boolean. Whether or not to include metadata columns
+containing the correlation of the best matching bin, and whether
+that mapping was confident.}
 }
 \value{
 A \link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment::SingleCellExperiment} with annotations

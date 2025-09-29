@@ -12,18 +12,20 @@ get_top_n_genes(
 )
 }
 \arguments{
-\item{association_test_results}{The association test results data frame
-to take the genes from.}
+\item{association_test_results}{Dataframe. The association
+test results data frame to take the genes from. Generated
+by \link[tradeSeq:associationTest]{tradeSeq::associationTest}.}
 
-\item{n_genes}{The number of genes to return. Defaults to 40.}
+\item{n_genes}{Integer. The number of genes to return. Defaults to 40.}
 
 \item{lineage}{The Lineage to use. The Defaults to NA, which assumes
-the test was run with Lineages=False.}
+the test was run with \code{Lineages=False}.}
 
-\item{p_cutoff}{The P value cutoff to use. Defaults to less than 0.05.}
+\item{p_cutoff}{Decimal. The maximum P value cutoff to use.
+Defaults to 0.05.}
 }
 \value{
-A vector of the names of the genes that best describe
+A vector of strings. The names of the genes that best describe
 a lineage's trajectory.
 }
 \description{

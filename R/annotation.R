@@ -10,12 +10,13 @@
 #' @concept annotation
 #'
 #' @param sce The [SingleCellExperiment::SingleCellExperiment] to annotate.
-#' @param blase_results A list of BLASE results to use for the annotation.
-#' @param annotation_col The metadata column to store the new annotations.
-#' @param include_stats Whether or not to include metadata columns containing
-#' The correlation of the best matching bin, and whether that mapping was
-#' confident.
-#'
+#' @param blase_results A list of [MappingResult] to use for the
+#' annotation.
+#' @param annotation_col String. The name of the metadata column in which
+#' to store the new annotations.
+#' @param include_stats Boolean. Whether or not to include metadata columns
+#' containing the correlation of the best matching bin, and whether
+#' that mapping was confident.
 #'
 #' @return A [SingleCellExperiment::SingleCellExperiment] with annotations
 #' added to metadata (in a column defined by `annotation_col`), and the

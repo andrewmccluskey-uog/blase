@@ -12,15 +12,16 @@ plot_gene_peakedness(
 )
 }
 \arguments{
-\item{sce}{Single Cell Experiment to plot gene from. Must contain pseudotime,
-and normcounts}
+\item{sce}{\link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment::SingleCellExperiment} to
+plot gene from. Must contain pseudotime, and normcounts}
 
 \item{gene_peakedness_df}{The DataFrame Result of \code{calculate_gene_peakedness}}
 
-\item{gene}{The gene to plot. Must be present in the SCE and
-gene_peakedness_df}
+\item{gene}{String. The name of the gene to plot. Must
+be present in the SCE and gene_peakedness_df}
 
-\item{pseudotime_slot}{The pseudotime slot in the SCE object.}
+\item{pseudotime_slot}{String. The pseudotime column in the
+\link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment::SingleCellExperiment} object metadata.}
 }
 \value{
 A \link[ggplot2:ggplot2-package]{ggplot2::ggplot2} plot showing: in black points, expression of the gene

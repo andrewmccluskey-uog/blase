@@ -13,7 +13,7 @@ bins(x)
 \item{x}{a \link{BlaseData} object}
 }
 \value{
-vector of integers. The vector of bin names in the
+vector of integers. The bin names in the
 BLASE Data object.
 }
 \description{
@@ -31,3 +31,4 @@ genes(data) <- as.character(seq_len(10))
 genes(data)
 }
 \concept{blase-object}
+\keyword{internal}

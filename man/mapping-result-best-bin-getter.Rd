@@ -13,7 +13,7 @@ best_bin(x)
 \item{x}{a \link{MappingResult} object}
 }
 \value{
-The best bin ID of this mapping
+Integer. The best bin ID of this mapping
 }
 \description{
 Get best bin of a BLASE Mapping Results object.

@@ -13,7 +13,7 @@ best_correlation(x)
 \item{x}{a \link{MappingResult} object}
 }
 \value{
-The highest correlation value of this mapping
+Decimal. The highest correlation value of this mapping
 }
 \description{
 Get best correlation of a BLASE Mapping Results object.

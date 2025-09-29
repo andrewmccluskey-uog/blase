@@ -4,13 +4,14 @@
 #'
 #' @rdname assign_pseudotime_bins
 #' @param x An object to add metadata to.
-#' @param split_by The technique used to split the bins. The default
+#' @param split_by String. The technique used to split the bins. The default
 #' `pseudotime_range` picks the bin for a cell based on a constant range of
 #' pseudotime. `cells` picks the bin for a cell based on an even number of
 #' cells per bin.
-#' @param n_bins The number of bins to split the cells into.
-#' @param pseudotime_slot The [SingleCellExperiment::SingleCellExperiment]
-#' slot containing the pseudotime values for each cell.
+#' @param n_bins Integer. The number of bins to split the cells into.
+#' @param pseudotime_slot String. The name of the
+#' [SingleCellExperiment::SingleCellExperiment] slot containing the
+#' pseudotime values for each cell.
 #' @param ... For arguments passed to other functions. Unused.
 #'
 #' @returns A copy of x where cells are annotated with their
@@ -116,6 +117,7 @@ setMethod(
     }
 )
 
+#' @keywords internal
 PRIVATE_assign_pseudotime_bins_validate_inputs <- function(
     x,
     split_by,

@@ -13,18 +13,19 @@ map_all_best_bins(
 )
 }
 \arguments{
-\item{blase_data}{The \link{BlaseData} holding the bins.}
+\item{blase_data}{The \link{BlaseData} holding the bins and pseudobulks.}
 
-\item{bulk_data}{The whole bulk read matrix as a dataframe. Each row should
-represent a gene, and each column a sample.}
+\item{bulk_data}{Dataframe. The whole bulk read matrix as a dataframe.
+Each row should represent a gene, and each column a sample.}
 
-\item{bootstrap_iterations}{The number of bootstrapping iterations to run.}
+\item{bootstrap_iterations}{Integer. The number of bootstrapping
+iterations to run.}
 
-\item{confidence_level}{The confidence interval to calculate for mappings.
-Defaults to 90\%.}
+\item{confidence_level}{Decimal between 0-1. The confidence interval
+to calculate for mappings. Defaults to 0.9, or 90\%.}
 
-\item{BPPARAM}{The BiocParallel param for multithreading if desired.
-Defaults to \code{\link[BiocParallel:SerialParam-class]{BiocParallel::SerialParam()}}}
+\item{BPPARAM}{The \link[BiocParallel:BiocParallelParam-class]{BiocParallel::BiocParallelParam} for
+multithreading if desired. Defaults to \code{\link[BiocParallel:SerialParam-class]{BiocParallel::SerialParam()}}}
 }
 \value{
 A vector of \link{MappingResult} objects.

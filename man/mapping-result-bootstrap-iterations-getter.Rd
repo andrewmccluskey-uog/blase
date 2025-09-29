@@ -14,7 +14,7 @@ bootstrap_iterations(x)
 \item{x}{a \link{MappingResult} object}
 }
 \value{
-The number of iterations performed for this mapping.
+Integer. The number of iterations performed for this mapping.
 }
 \description{
 Get the number of bootstrap iterations

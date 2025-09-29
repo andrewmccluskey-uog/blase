@@ -6,14 +6,14 @@
 #'
 #' @concept util
 #'
-#' @param pseudotime_sce The Single Cell Experiment object to
-#' get the bins from
-#' @param min_cells_for_bulk The minimum cells to look for per
+#' @param pseudotime_sce The [SingleCellExperiment::SingleCellExperiment]
+#' object to get the bins from
+#' @param min_cells_for_bulk Integer. The minimum cells to look for per
 #' replicate and bin.
-#' @param replicate_slot The slot in the Single Cell Experiment
-#' that contains replicate information
+#' @param replicate_slot String. The name of the matadata column in the
+#' Single Cell Experiment that contains replicate information
 #'
-#' @return A dataframe pseudobulk counts matrix.
+#' @return A dataframe containing the pseudobulked counts matrix.
 #' @export
 #'
 #' @examples

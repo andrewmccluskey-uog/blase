@@ -12,11 +12,11 @@ plot_bin_population(x, bin, ...)
 \arguments{
 \item{x}{An object to plot on.}
 
-\item{bin}{The bin ID to plot}
+\item{bin}{Integer. The pseudotime bin to plot}
 
 \item{...}{additional arguments passed to object-specific methods.}
 
-\item{group_by_slot}{The slot in the
+\item{group_by_slot}{String. The metadata column in the
 \link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment::SingleCellExperiment} to be used as the cell
 type labels.}
 }

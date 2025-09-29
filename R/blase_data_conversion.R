@@ -20,10 +20,10 @@ setGeneric(
 #' @param pseudotime_slot The [SingleCellExperiment::SingleCellExperiment]
 #' slot containing pseudotime values for each cell to be passed to
 #' [assign_pseudotime_bins()].
-#' @param n_bins The number of bins to create, passed to
+#' @param n_bins Integer. The number of bins to create, passed to
 #' [assign_pseudotime_bins()].
-#' @param split_by The split_by method to be passed on to
-#' [assign_pseudotime_bins()].
+#' @param split_by String. The split_by method to be passed on to
+#' [assign_pseudotime_bins()]. Must be one of `pseudotime_range` or `cells`.
 #'
 #' @importFrom methods new
 #'

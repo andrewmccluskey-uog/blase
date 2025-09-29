@@ -39,15 +39,16 @@ assign_pseudotime_bins(
 \arguments{
 \item{x}{An object to add metadata to.}
 
-\item{split_by}{The technique used to split the bins. The default
+\item{split_by}{String. The technique used to split the bins. The default
 \code{pseudotime_range} picks the bin for a cell based on a constant range of
 pseudotime. \code{cells} picks the bin for a cell based on an even number of
 cells per bin.}
 
-\item{n_bins}{The number of bins to split the cells into.}
+\item{n_bins}{Integer. The number of bins to split the cells into.}
 
-\item{pseudotime_slot}{The \link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment::SingleCellExperiment}
-slot containing the pseudotime values for each cell.}
+\item{pseudotime_slot}{String. The name of the
+\link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment::SingleCellExperiment} slot containing the
+pseudotime values for each cell.}
 
 \item{...}{For arguments passed to other functions. Unused.}
 }

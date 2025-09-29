@@ -14,23 +14,24 @@ Created by \code{\link[=map_best_bin]{map_best_bin()}}
 \section{Slots}{
 
 \describe{
-\item{\code{bulk_name}}{The name of the bulk sample being mapped.}
+\item{\code{bulk_name}}{String. The name of the bulk sample being mapped.}
 
-\item{\code{best_bin}}{The bin that best matched the bulk sample.}
+\item{\code{best_bin}}{Integer. The bin that best matched the bulk sample.}
 
-\item{\code{best_correlation}}{The spearman's rho that the test geneset had
+\item{\code{best_correlation}}{Decimal. The spearman's rho that the test geneset had
 between the winning bin and the bulk.}
 
-\item{\code{top_2_distance}}{The absolute difference between the best and second
-best mapping buckets. Higher indicates a less doubtful mapping.}
+\item{\code{top_2_distance}}{Decimal. The absolute difference between the best and
+second best mapping buckets. Higher indicates a less doubtful mapping.}
 
-\item{\code{confident_mapping}}{TRUE when the mapped bin's lower bound is higher
-than the maximum upper bound of the other bins.}
+\item{\code{confident_mapping}}{Boolean. TRUE when the mapped bin's lower
+bound is higher than the maximum upper bound of the other bins.}
 
-\item{\code{history}}{A dataframe of the correlation score and confidence bounds
-for each bin. Access with \code{mapping_history()}}
+\item{\code{history}}{A dataframe of the correlation score (decimal) and
+confidence bounds (decimal pairs) for each bin.
+Access with \code{mapping_history()}}
 
-\item{\code{bootstrap_iterations}}{The number of iterations used during
+\item{\code{bootstrap_iterations}}{Integer. The number of iterations used during
 the bootstrap.}
 }}
 

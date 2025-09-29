@@ -23,11 +23,11 @@ as.BlaseData(x, ...)
 slot containing pseudotime values for each cell to be passed to
 \code{\link[=assign_pseudotime_bins]{assign_pseudotime_bins()}}.}
 
-\item{n_bins}{The number of bins to create, passed to
+\item{n_bins}{Integer. The number of bins to create, passed to
 \code{\link[=assign_pseudotime_bins]{assign_pseudotime_bins()}}.}
 
-\item{split_by}{The split_by method to be passed on to
-\code{\link[=assign_pseudotime_bins]{assign_pseudotime_bins()}}.}
+\item{split_by}{String. The split_by method to be passed on to
+\code{\link[=assign_pseudotime_bins]{assign_pseudotime_bins()}}. Must be one of \code{pseudotime_range} or \code{cells}.}
 }
 \value{
 An \link{BlaseData} object

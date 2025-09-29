@@ -17,29 +17,32 @@ find_best_params(
 \arguments{
 \item{x}{The object to create `BlaseData`` from}
 
-\item{genelist}{The list of genes to use (ordered by descending goodness)}
+\item{genelist}{Vector of strings. The list of genes to use
+(ordered by descending goodness)}
 
-\item{bins_count_range}{The n_bins list to try out}
+\item{bins_count_range}{Integer vector. The n_bins list to try out}
 
-\item{gene_count_range}{The n_genes list to try out}
+\item{gene_count_range}{Integer vector. The n_genes list to try out}
 
-\item{bootstrap_iterations}{Iterations for bootstrapping when calculating
-confident mappings.}
+\item{bootstrap_iterations}{Integer. Iterations for bootstrapping
+when calculating confident mappings.}
 
-\item{BPPARAM}{The BiocParallel configuration. Defaults to SerialParam.}
+\item{BPPARAM}{The \link[BiocParallel:BiocParallelParam-class]{BiocParallel::BiocParallelParam}. Defaults to
+\link[BiocParallel:SerialParam-class]{BiocParallel::SerialParam}}
 
 \item{...}{params to be passed to child functions, see \code{\link[=as.BlaseData]{as.BlaseData()}}}
 }
 \value{
 A dataframe of the results.
 \itemize{
-\item bin_count: The bin count for this attempt
-\item gene_count: The top n genes to use for this attempt
-\item min_convexity: The worst convexity for these parameters
-\item mean_convexity: The mean convexity for these parameters
-\item confident_mapping_pct: The percent of bins which were confidently mapped
-to themselves for these parameters. If this value is low, then it is
-likely that in real use, few or no results will be confidently mapped.
+\item bin_count: Integer. The bin count for this attempt
+\item gene_count: Integer. The top n genes to use for this attempt
+\item min_convexity: Decimal. The worst convexity for these parameters
+\item mean_convexity: Decimal. The mean convexity for these parameters
+\item confident_mapping_pct: Decimal. The percent of bins which were
+confidently mapped to themselves for these parameters.
+If this value is low, then it is likely that in real use,
+few or no results will be confidently mapped.
 }
 }
 \description{
