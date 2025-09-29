@@ -1,6 +1,6 @@
 ## Tests show
 test_that("mapping_result_class show() prints what we expect", {
-    mapping_result <- methods::new("MappingResult",
+    mapping_result <- MappingResult(
         bulk_name = "Test",
         best_bin = 1,
         best_correlation = 0.05,
@@ -19,7 +19,7 @@ test_that("mapping_result_class show() prints what we expect", {
 
 ## Test getters
 test_that("mapping_result_class show() getter(bulk_name) works", {
-    mapping_result <- methods::new("MappingResult",
+    mapping_result <- MappingResult(
         bulk_name = "Test",
         best_bin = 1,
         best_correlation = 0.05,
@@ -33,7 +33,7 @@ test_that("mapping_result_class show() getter(bulk_name) works", {
 })
 
 test_that("mapping_result_class show() getter(best_bin) works", {
-    mapping_result <- methods::new("MappingResult",
+    mapping_result <- MappingResult(
         bulk_name = "Test",
         best_bin = 1,
         best_correlation = 0.05,
@@ -47,7 +47,7 @@ test_that("mapping_result_class show() getter(best_bin) works", {
 })
 
 test_that("mapping_result_class show() getter(best_correlation) works", {
-    mapping_result <- methods::new("MappingResult",
+    mapping_result <- MappingResult(
         bulk_name = "Test",
         best_bin = 1,
         best_correlation = 0.05,
@@ -61,7 +61,7 @@ test_that("mapping_result_class show() getter(best_correlation) works", {
 })
 
 test_that("mapping_result_class show() getter(top_2_distance) works", {
-    mapping_result <- methods::new("MappingResult",
+    mapping_result <- MappingResult(
         bulk_name = "Test",
         best_bin = 1,
         best_correlation = 0.05,
@@ -76,7 +76,7 @@ test_that("mapping_result_class show() getter(top_2_distance) works", {
 
 
 test_that("mapping_result_class show() getter(confident_mapping) works", {
-    mapping_result <- methods::new("MappingResult",
+    mapping_result <- MappingResult(
         bulk_name = "Test",
         best_bin = 1,
         best_correlation = 0.05,
@@ -91,7 +91,7 @@ test_that("mapping_result_class show() getter(confident_mapping) works", {
 
 test_that("mapping_result_class show() getter(mapping_history) works", {
     history <- data.frame(bin = c(1), correlation = c(0.5), lower_bound = c(0.3), upper_bound = c(0.6))
-    mapping_result <- methods::new("MappingResult",
+    mapping_result <- MappingResult(
         bulk_name = "Test",
         best_bin = 1,
         best_correlation = 0.05,
@@ -105,7 +105,7 @@ test_that("mapping_result_class show() getter(mapping_history) works", {
 })
 
 test_that("mapping_result_class show() getter(bootstrap_iterations) works", {
-    mapping_result <- methods::new("MappingResult",
+    mapping_result <- MappingResult(
         bulk_name = "Test",
         best_bin = 1,
         best_correlation = 0.05,

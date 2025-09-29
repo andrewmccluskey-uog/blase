@@ -52,8 +52,7 @@ setMethod(
             counts <- SingleCellExperiment::normcounts(bin_subset_sce)
             pseudobulks[[i]] <- counts
         }
-        return(methods::new(
-            "BlaseData",
+        return(methods::new("BlaseData",
             pseudobulk_bins = pseudobulks,
             bins = bin_ids
         ))

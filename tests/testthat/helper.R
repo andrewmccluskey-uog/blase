@@ -37,7 +37,7 @@ generate_test_mapping_result <- function(
             upper_bound = c(0.6, 0.3)
         )
     }
-    return(methods::new("MappingResult",
+    return(MappingResult(
         bulk_name = name_,
         best_bin = best_bin_,
         best_correlation = best_correlation_,

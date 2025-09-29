@@ -20,7 +20,7 @@
 #' @seealso [map_best_bin()]
 #' @export
 #'
-#' @inherit MappingResult-class examples
+#' @inherit MappingResult examples
 map_all_best_bins <- function(blase_data, bulk_data,
                               bootstrap_iterations = 200,
                               confidence_level = 0.90,
@@ -75,12 +75,10 @@ map_all_best_bins <- function(blase_data, bulk_data,
 #' @param confidence_level Decimal between 0-1. The confidence interval to
 #' calculate for mappings. Defaults to 90%.
 #'
-#' @importFrom methods new
-#'
 #' @return A [MappingResult] object.
 #' @export
 #'
-#' @inherit MappingResult-class examples
+#' @inherit MappingResult examples
 map_best_bin <- function(
     blase_data,
     bulk_id,
@@ -115,7 +113,7 @@ map_best_bin <- function(
     best_low_bound <- results[results$bin == best_i, ]$lower_bound
     confident <- second_best_high_bound < best_low_bound && best_low_bound > 0
 
-    return(methods::new("MappingResult",
+    return(MappingResult(
         bulk_name = bulk_id,
         best_bin = best_i,
         best_correlation = best_cor,

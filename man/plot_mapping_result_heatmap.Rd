@@ -30,11 +30,12 @@ the correlation of bin to each bulk sample. Defaults to FALSE.}
 \item{bin_order}{Vector of integers. A vector of the bin ids in which to
 plot the pseudotime bins along the x-axis.}
 
-\item{text_background}{Boolean. Whether to show background on labels or not. Has no
-effect if no annotations are enabled.}
+\item{text_background}{Boolean. Whether to show background on labels or
+not. Has no effect if no annotations are enabled.}
 }
 \value{
-A \link[ggplot2:ggplot2-package]{ggplot2::ggplot2} heatmap showing the correlations of each mapping result across
+A \link[ggplot2:ggplot2-package]{ggplot2::ggplot2} heatmap showing the
+correlations of each mapping result across
 every pseudotime bin.
 }
 \description{

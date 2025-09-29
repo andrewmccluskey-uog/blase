@@ -112,7 +112,7 @@ setMethod(
 #' object for this bin.
 #'
 #' @export
-#' @inherit MappingResult-class examples
+#' @inherit MappingResult examples
 setGeneric(
     name = "plot_bin_population",
     signature = c(x = "x"),
@@ -172,7 +172,7 @@ setMethod(
 #' every pseudotime bin.
 #'
 #' @export
-#' @inherit MappingResult-class examples
+#' @inherit MappingResult examples
 plot_mapping_result_heatmap <- function(
     mapping_result_list,
     heatmap_fill_scale = ggplot2::scale_fill_gradientn(
@@ -311,7 +311,7 @@ PRIVATE_mapping_result_heatmap_plot <- function(
 #' @returns A [ggplot2] object of the the line plot
 #'
 #' @export
-#' @inherit MappingResult-class examples
+#' @inherit MappingResult examples
 plot_mapping_result_corr <- function(mapping_result) {
     bin_sym <- ggplot2::sym("bin")
     correlation_sym <- ggplot2::sym("correlation")

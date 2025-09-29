@@ -33,7 +33,6 @@ BlaseData <- setClass(
     )
 )
 
-
 #' @title Show an BlaseData object
 #'
 #' @concept blase-object

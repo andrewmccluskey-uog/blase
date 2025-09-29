@@ -18,7 +18,7 @@
 #' pseudotime bin.
 #'
 #' @export
-#' @inherit MappingResult-class examples
+#' @inherit MappingResult examples
 setGeneric(
     name = "assign_pseudotime_bins",
     signature = c(x = "x"),
