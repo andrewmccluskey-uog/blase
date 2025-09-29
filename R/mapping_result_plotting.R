@@ -74,23 +74,23 @@ setMethod(
       "
 
         title <- paste0(
-            y@bulk_name, ": Bin ",
-            y@best_bin, ", Cor ", round(y@best_correlation, 4),
-            ", distance ", y@top_2_distance
+            bulk_name(y), ": Bin ",
+            best_bin(y), ", Cor ", round(best_correlation(y), 4),
+            ", distance ", top_2_distance(y)
         )
 
         output <- (scater::plotUMAP(x, colour_by = "pseudotime_bin") +
             scater::plotUMAP(x, colour_by = group_by_slot) +
             scater::plotUMAP(
-                x[, x$pseudotime_bin == y@best_bin],
+                x[, x$pseudotime_bin == best_bin(y)],
                 colour_by = "pseudotime_bin"
             ) +
             scater::plotUMAP(
-                x[, x$pseudotime_bin == y@best_bin],
+                x[, x$pseudotime_bin == best_bin(y)],
                 colour_by = group_by_slot
             ) +
             plot_mapping_result_corr(y) +
-            plot_bin_population(x, y@best_bin, group_by_slot = group_by_slot) &
+            plot_bin_population(x, best_bin(y), group_by_slot = group_by_slot) &
             blase_plots_theme()) +
             patchwork::plot_annotation(title=title, theme = blase_titles()) +
             patchwork::plot_layout(design = layout)
@@ -164,10 +164,11 @@ setMethod(
 #' the correlation of bin to each bulk sample. Defaults to FALSE.
 #' @param bin_order Vector of integers. A vector of the bin ids in which to
 #' plot the pseudotime bins along the x-axis.
-#' @param text_background Boolean. Whether to show background on labels or not. Has no
-#' effect if no annotations are enabled.
+#' @param text_background Boolean. Whether to show background on labels or
+#' not. Has no effect if no annotations are enabled.
 #'
-#' @returns A [ggplot2] heatmap showing the correlations of each mapping result across
+#' @returns A [ggplot2] heatmap showing the
+#' correlations of each mapping result across
 #' every pseudotime bin.
 #'
 #' @export
@@ -221,15 +222,14 @@ plot_mapping_result_heatmap <- function(
 #' @keywords internal
 PRIVATE_get_df_for_this_bulk_to_plot <- function(
     mappingResult, annotate_confident, annotate_corr) {
-    history <- mappingResult@history
-
+    history <- mapping_history(mappingResult)
 
     mapp_corrs <- history[, "correlation"]
 
     confident_mapping <- ifelse(
-        history[, "bin"] == mappingResult@best_bin &
+        history[, "bin"] == best_bin(mappingResult) &
             rep(
-                mappingResult@confident_mapping,
+                confident_mapping(mappingResult),
                 length(history[, "bin"])
             ),
         "*",
@@ -245,10 +245,10 @@ PRIVATE_get_df_for_this_bulk_to_plot <- function(
     }
 
     return(data.frame(
-        bulk_name = rep(mappingResult@bulk_name, nrow(history)),
+        bulk_name = rep(bulk_name(mappingResult), nrow(history)),
         pseudotime_bin = history[, "bin"],
         correlation = history[, "correlation"],
-        is_best_bin = history[, "bin"] == mappingResult@best_bin,
+        is_best_bin = history[, "bin"] == best_bin(mappingResult),
         label = labels
     ))
 }
@@ -317,16 +317,16 @@ plot_mapping_result_corr <- function(mapping_result) {
     correlation_sym <- ggplot2::sym("correlation")
     upper_bound_sym <- ggplot2::sym("upper_bound")
     lower_bound_sym <- ggplot2::sym("lower_bound")
-    return(ggplot2::ggplot(mapping_result@history, ggplot2::aes(
+    return(ggplot2::ggplot(mapping_history(mapping_result), ggplot2::aes(
         x = {{ bin_sym }}, y = {{ correlation_sym }}
     )) +
         ggplot2::geom_line() +
         ggplot2::geom_hline(
-            yintercept = mapping_result@best_correlation,
+            yintercept = best_correlation(mapping_result),
             linetype = "dashed"
         ) +
         ggplot2::geom_vline(
-            xintercept = mapping_result@best_bin,
+            xintercept = best_bin(mapping_result),
             linetype = "dashed"
         ) +
         ggplot2::geom_line(

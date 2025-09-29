@@ -30,6 +30,8 @@ setGeneric(
 
 #' @rdname assign_pseudotime_bins
 #'
+#' @importFrom SummarizedExperiment colData
+#'
 #' @export
 setMethod(
     f = "assign_pseudotime_bins",
@@ -68,7 +70,8 @@ setMethod(
         } else {
             ncells <- ncol(SingleCellExperiment::normcounts(pseudotime_sce))
             cells_per_bin <- floor(ncells / n_bins)
-            pseudotime_ordered_cells <- rownames(pseudotime_sce@colData)[
+            pseudotime_ordered_cells <- rownames(
+              SummarizedExperiment::colData(pseudotime_sce))[
               order(pseudotime, decreasing = FALSE)
             ]
 
@@ -118,6 +121,7 @@ setMethod(
 )
 
 #' @keywords internal
+#' @importFrom SummarizedExperiment colData
 PRIVATE_assign_pseudotime_bins_validate_inputs <- function(
     x,
     split_by,
@@ -126,7 +130,7 @@ PRIVATE_assign_pseudotime_bins_validate_inputs <- function(
         stop("split_by must be 'pseudotime_range' or 'cells'")
     }
 
-    if (!any(colnames(x@colData) == pseudotime_slot)) {
+    if (!any(colnames(SummarizedExperiment::colData(x)) == pseudotime_slot)) {
         stop("Pseudotime slot '", pseudotime_slot, "' does not exist")
     }
 

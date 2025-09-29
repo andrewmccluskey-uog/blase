@@ -14,6 +14,8 @@
 #' Single Cell Experiment that contains replicate information
 #'
 #' @return A dataframe containing the pseudobulked counts matrix.
+#'
+#' @importFrom SummarizedExperiment colData
 #' @export
 #'
 #' @examples
@@ -42,12 +44,13 @@ get_bins_as_bulk <- function(
     replicate_slot = "replicate") {
     output <- data.frame()
     for (bin_id in seq_len(max(pseudotime_sce$pseudotime_bin))) {
+        metadata <- SummarizedExperiment::colData(pseudotime_sce)
         bin_specific_sce <- subset(
             pseudotime_sce, ,
-            pseudotime_sce@colData[["pseudotime_bin"]] == bin_id
-        )
+            metadata[["pseudotime_bin"]] == bin_id)
 
-        counts <- table(bin_specific_sce@colData[[replicate_slot]])
+        metadata <- SummarizedExperiment::colData(bin_specific_sce)
+        counts <- table(metadata[[replicate_slot]])
 
         replicates_with_more_than_minimum <- rownames(
             as.data.frame(counts[counts > min_cells_for_bulk])
@@ -58,21 +61,18 @@ get_bins_as_bulk <- function(
                 replicates_with_more_than_minimum,
                 bin_specific_sce,
                 replicate_slot,
-                bin_id
-            )
+                bin_id)
         } else if (length(replicates_with_more_than_minimum) == 1) {
             pseudobulks <- PRIVATE_get_bins_as_bulk_bin_without_replicates(
                 replicates_with_more_than_minimum,
                 bin_specific_sce,
                 replicate_slot,
-                bin_id
-            )
+                bin_id)
         } else {
             message(
                 "Couldn't create pseudobulks due to",
                 " too few cells in every replicate for bin ",
-                bin_id
-            )
+                bin_id)
             next()
         }
 
@@ -91,6 +91,7 @@ get_bins_as_bulk <- function(
 #' @keywords internal
 #' @importFrom Matrix rowSums
 #' @importFrom SingleCellExperiment counts
+#' @importFrom SummarizedExperiment colData
 PRIVATE_get_bins_as_bulk_bin_has_replicates <- function(
     replicates_with_more_than_minimum,
     bin_specific_sce,
@@ -98,10 +99,11 @@ PRIVATE_get_bins_as_bulk_bin_has_replicates <- function(
     bin_id) {
     pseudobulks <- data.frame()
     for (rep_id in replicates_with_more_than_minimum) {
+        metadata <- SummarizedExperiment::colData(bin_specific_sce)
         bin_specific_rep_specific_sce_pseudobulk <- as.data.frame(
             Matrix::rowSums(SingleCellExperiment::counts(subset(
                 bin_specific_sce, ,
-                bin_specific_sce@colData[[replicate_slot]] == rep_id
+                metadata[[replicate_slot]] == rep_id
             )))
         )
 
@@ -128,15 +130,16 @@ PRIVATE_get_bins_as_bulk_bin_has_replicates <- function(
 }
 
 #' @keywords internal
+#' @importFrom SummarizedExperiment colData
 PRIVATE_get_bins_as_bulk_bin_without_replicates <- function(
     replicates_with_more_than_minimum,
     bin_specific_sce,
     replicate_slot,
     bin_id) {
+    metadata <- SummarizedExperiment::colData(bin_specific_sce)
     bin_specific_pseudobulk <- subset(
         bin_specific_sce, ,
-        bin_specific_sce@colData[[replicate_slot]] ==
-            replicates_with_more_than_minimum[1]
+        metadata[[replicate_slot]] == replicates_with_more_than_minimum[1]
     )
 
     cell_count_to_sample <- ceiling((ncol(

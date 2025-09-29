@@ -26,7 +26,7 @@ map_all_best_bins <- function(blase_data, bulk_data,
                               confidence_level = 0.90,
                               BPPARAM = BiocParallel::SerialParam()) {
     bulk_data_blase_genes_only <- bulk_data[
-        rownames(bulk_data) %in% blase_data@genes,
+        rownames(bulk_data) %in% genes(blase_data),
     ]
     dataframes <- list()
     for (col_id in colnames(bulk_data)) {
@@ -36,15 +36,15 @@ map_all_best_bins <- function(blase_data, bulk_data,
         dataframes[[length(dataframes) + 1]] <- df
     }
 
-    blase_data@pseudobulk_bins <- lapply(
-        blase_data@pseudobulk_bins,
+    pseudobulk_bins(blase_data) <- lapply(
+      pseudobulk_bins(blase_data),
         function(x) {
-            return(x[blase_data@genes, ])
+            return(x[genes(blase_data), ])
         }
     )
 
     # force execution of lapply
-    force(blase_data@pseudobulk_bins)
+    force(pseudobulk_bins(blase_data))
 
     results <- BiocParallel::bplapply(
         dataframes,
@@ -90,7 +90,7 @@ map_best_bin <- function(
     PRIVATE_quality_check_blase_object(blase_data, bulk_data)
 
     results <- data.frame()
-    for (i in blase_data@bins) {
+    for (i in bins(blase_data)) {
         results <- rbind(results, PRIVATE_map_bin(
             blase_data,
             i,
@@ -145,12 +145,12 @@ PRIVATE_quality_check_blase_object <- function(blase_data, bulk) {
 
 #' @keywords internal
 PRIVATE_quality_check_bin <- function(blase_data, i, genes_present) {
-    if (ncol(blase_data@pseudobulk_bins[[i]]) <= 1) {
+    if (ncol(pseudobulk_bins(blase_data)[[i]]) <= 1) {
         stop(
             "Not enough cells in bin ",
             as.character(i),
             " to map against, please reduce number of bins (currently ",
-            length(blase_data@pseudobulk_bins),
+            length(pseudobulk_bins(blase_data)),
             ") or split by cells"
         )
     }
@@ -164,15 +164,15 @@ PRIVATE_map_bin <- function(
     bulk_id,
     bootstrap_iterations,
     confidence_level) {
-    genes_present_in_ref <- blase_data@genes[
-        blase_data@genes %in% rownames(blase_data@pseudobulk_bins[[i]])
+    genes_present_in_ref <- genes(blase_data)[
+        genes(blase_data) %in% rownames(pseudobulk_bins(blase_data)[[i]])
     ]
 
     genes_present_in_both <- genes_present_in_ref[
         genes_present_in_ref %in% rownames(bulk_data)
     ]
 
-    if (length(blase_data@genes) != length(genes_present_in_both)) {
+    if (length(genes(blase_data)) != length(genes_present_in_both)) {
         warning(
             "Genes for mapping not all in bulk, using ",
             length(genes_present_in_both),
@@ -180,7 +180,7 @@ PRIVATE_map_bin <- function(
         )
     }
 
-    if (any(blase_data@genes == bulk_id)) {
+    if (any(genes(blase_data) == bulk_id)) {
         warning(
             "Bulk ID matches a gene, if this fails then check you are",
             "using bulk name and not geneIds:", bulk_id
@@ -193,7 +193,7 @@ PRIVATE_map_bin <- function(
 
     PRIVATE_quality_check_bin(blase_data, i, genes_present_in_both)
 
-    bin_ratios <- blase_data@pseudobulk_bins[[i]][genes_present_in_both, ]
+    bin_ratios <- pseudobulk_bins(blase_data)[[i]][genes_present_in_both, ]
 
     corr <- PRIVATE_spearman.ci(
         unname(Matrix::rowSums(bin_ratios)),

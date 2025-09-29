@@ -77,13 +77,13 @@ evaluate_parameters <- function(
     )
 
     for (res in results) {
-        results.best_bin <- append(results.best_bin, c(res@best_bin))
-        results.best_corr <- append(results.best_corr, c(res@best_correlation))
-        results.convexity <- append(results.convexity, c(res@top_2_distance))
-        results.history <- append(results.history, c(res@history))
+        results.best_bin <- append(results.best_bin, c(best_bin(res)))
+        results.best_corr <- append(results.best_corr, c(best_correlation(res)))
+        results.convexity <- append(results.convexity, c(top_2_distance(res)))
+        results.history <- append(results.history, c(mapping_history(res)))
         results.confident_mapping <- append(
             results.confident_mapping,
-            c(res@confident_mapping)
+            c(confident_mapping(res))
         )
     }
 
@@ -92,11 +92,11 @@ evaluate_parameters <- function(
 
     # TRUE evaluated as 1
     confident_mapping_pct <- (
-        sum(results.confident_mapping) / length(blase_data@bins)) * 100
+        sum(results.confident_mapping) / length(bins(blase_data))) * 100
 
     if (make_plot == TRUE) {
         PRIVATE_evaluate_parameters_plots(
-            blase_data, blase_data@bins, results.best_bin, results.best_corr,
+            blase_data, bins(blase_data), results.best_bin, results.best_corr,
             results.history, results.convexity, plot_columns, min_convexity
         )
     }
@@ -110,16 +110,16 @@ evaluate_parameters <- function(
 PRIVATE_test_train_split <- function(blase_data) {
     # This randomly selects 50% of cells for use on each side
     pseudobulked_bins <- NULL
-    for (i in blase_data@bins) {
-        x <- blase_data@pseudobulk_bins[[i]]
+    for (i in bins(blase_data)) {
+        x <- pseudobulk_bins(blase_data)[[i]]
         split <- round(stats::runif(ncol(x), 0, 1))
         test <- as.matrix(x[, split == 1])
         train <- as.matrix(x[, split == 0])
         test_pseudobulk <- Matrix::rowSums(test)
         pseudobulked_bins <- cbind(pseudobulked_bins, test_pseudobulk)
-        blase_data@pseudobulk_bins[[i]] <- train
+        pseudobulk_bins(blase_data)[[i]] <- train
     }
-    colnames(pseudobulked_bins) <- blase_data@bins
+    colnames(pseudobulked_bins) <- bins(blase_data)
 
     return(list(test = pseudobulked_bins, train = blase_data))
 }
@@ -148,7 +148,7 @@ PRIVATE_evaluate_parameters_plots <- function(
     }
 
     title <- paste(
-        length(blase_data@genes),
+        length(genes(blase_data)),
         "genes and worst convexity:",
         signif(min_convexity, 2)
     )
@@ -249,7 +249,7 @@ find_best_params <- function(
             X = gene_count_range,
             BPPARAM = BPPARAM,
             FUN = function(genes_count) {
-                blase_data@genes <- genelist[seq_len(genes_count)]
+                genes(blase_data) <- genelist[seq_len(genes_count)]
                 res <- evaluate_parameters(
                     blase_data,
                     bootstrap_iterations,
@@ -504,27 +504,27 @@ evaluate_top_n_genes <- function(
     blase_data,
     n_genes_to_plot = 16,
     plot_columns = 4) {
-    if (n_genes_to_plot > length(blase_data@genes)) {
-        n_genes_to_plot <- length(blase_data@genes)
+    if (n_genes_to_plot > length(genes(blase_data))) {
+        n_genes_to_plot <- length(genes(blase_data))
     }
 
     pseudobulked_bins <- data.frame(
-        lapply(seq_len(length(blase_data@pseudobulk_bins)), function(i) {
-            x <- blase_data@pseudobulk_bins[[i]]
+        lapply(seq_len(length(pseudobulk_bins(blase_data))), function(i) {
+            x <- pseudobulk_bins(blase_data)[[i]]
             return(Matrix::rowMeans(x))
         })
     )
-    colnames(pseudobulked_bins) <- blase_data@bins
+    colnames(pseudobulked_bins) <- bins(blase_data)
 
     plots <- list()
     for (i in seq_len(n_genes_to_plot)) {
         plots[[i]] <- PRIVATE_plot_gene_over_bins(
             pseudobulked_bins,
-            blase_data@genes[i]
+            genes(blase_data)[i]
         )
     }
 
-    title <- paste(length(blase_data@genes), "genes")
+    title <- paste(length(genes(blase_data)), "genes")
     output <- (patchwork::wrap_plots(plots, ncol = plot_columns) &
         blase_plots_theme()) +
         patchwork::plot_annotation(title = title, theme = blase_titles())

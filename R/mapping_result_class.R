@@ -100,32 +100,32 @@ setMethod(
     signature = "MappingResult",
     definition = function(object) {
         non_top_mapping_best_upper_bound <- max(
-            object@history[object@history$bin != object@best_bin, ]$upper_bound
-        )
+            mapping_history(object)[
+              mapping_history(object)$bin != best_bin(object), ]$upper_bound)
 
         output <- c(
             paste0(
                 "MappingResult for '",
-                object@bulk_name,
-                "': best_bin=", object@best_bin,
-                " correlation=", object@best_correlation,
-                " top_2_distance=", object@top_2_distance
+                bulk_name(object),
+                "': best_bin=", best_bin(object),
+                " correlation=", best_correlation(object),
+                " top_2_distance=", top_2_distance(object)
             ),
             paste(
                 "\t Confident Result:",
-                object@confident_mapping,
+                confident_mapping(object),
                 "(next max upper ",
                 non_top_mapping_best_upper_bound,
                 ")"
             ),
             paste(
                 "\t with history for scores against",
-                nrow(object@history),
+                nrow(mapping_history(object)),
                 " bins"
             ),
             paste(
                 "\t Bootstrapped with",
-                object@bootstrap_iterations,
+                bootstrap_iterations(object),
                 "iterations\n"
             )
         )
