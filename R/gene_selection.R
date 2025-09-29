@@ -90,9 +90,8 @@ catch_error_calculate_gene_peakedness <- function(gene) {
 #' @export
 #'
 #' @concept gene-selection
-#' @import BiocParallel
-#' @import mgcv
-#' @import MatrixGenerics
+#' @importFrom BiocParallel bplapply
+#' @importFrom MatrixGenerics rowMaxs
 #'
 #' @examples
 #' ncells <- 70
@@ -305,7 +304,9 @@ gene_peakedness_spread_selection <- function(
 #' @export
 #'
 #' @concept gene-selection
-#' @import mgcv
+#' @importFrom mgcv gam
+#' @importFrom mgcv predict.gam
+#' @importFrom SummarizedExperiment colData
 #'
 #' @inherit calculate_gene_peakedness examples
 smooth_gene <- function(sce, gene,

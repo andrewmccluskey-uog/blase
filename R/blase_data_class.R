@@ -33,15 +33,17 @@ BlaseData <- setClass(
     )
 )
 
-# TODO validation of pseudobulk bins being a list of matrices
 
 #' @title Show an BlaseData object
 #'
 #' @concept blase-object
+#' @rdname show_blase_object
 #'
 #' @param object an [BlaseData] object
 #'
 #' @returns A character vector describing the BLASE object
+#'
+#' @importFrom methods show
 #'
 #' @export
 #' @inherit BlaseData-class examples
@@ -51,8 +53,8 @@ setMethod(
     definition = function(object) {
         output <- c(
             "Blase Data with:",
-            paste0("\tbins: ", list(object@bins)),
-            paste0("\tselected genes: ", list(object@genes), "\n")
+            paste0("\tbins: ", list(bins(object))),
+            paste0("\tselected genes: ", list(genes(object)), "\n")
         )
 
         cat(paste(output, collapse = "\n"))
@@ -89,6 +91,7 @@ setMethod(
 #'
 #' @returns Nothing
 #'
+#' @importFrom methods validObject
 #' @export
 #' @inherit BlaseData-class examples
 setGeneric("genes<-", function(x, value) standardGeneric("genes<-"))
@@ -102,4 +105,25 @@ setMethod(
         validObject(x)
         x
     }
+)
+
+#' @title Get bins of a BLASE Data object.
+#'
+#' @concept blase-object
+#'
+#' @rdname bins-getter
+#' @param x a [BlaseData] object
+#'
+#' @returns vector of integers. The vector of bin names in the
+#' BLASE Data object.
+#'
+#' @export
+#' @inherit BlaseData-class examples
+setGeneric("bins", function(x) standardGeneric("bins"))
+
+#' @rdname bins-getter
+setMethod(
+  f = "bins",
+  signature = "BlaseData",
+  definition = function(x) x@bins
 )

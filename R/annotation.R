@@ -23,7 +23,7 @@
 #' `include_stats` is enabled.
 #' @export
 #'
-#' @import SingleCellExperiment
+#' @importFrom SummarizedExperiment colData
 #'
 #' @examples
 #' counts_matrix <- matrix(

@@ -10,7 +10,7 @@ plot_mapping_result_corr(mapping_result)
 \item{mapping_result}{A \link{MappingResult} object to plot the correlations for.}
 }
 \value{
-A \link{ggplot2} object of the plot
+A \link[ggplot2:ggplot2-package]{ggplot2::ggplot2} object of the plot
 }
 \description{
 Plots the mapping results correlations with each pseudotime bin

@@ -91,6 +91,7 @@ MappingResult <- setClass(
 #'
 #' @returns A character vector describing the Mapping Result object
 #'
+#' @importFrom methods show
 #' @export
 #' @inherit MappingResult-class examples
 setMethod(

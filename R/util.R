@@ -88,6 +88,9 @@ get_bins_as_bulk <- function(
     return(output)
 }
 
+#' @keywords internal
+#' @importFrom Matrix rowSums
+#' @importFrom SingleCellExperiment counts
 PRIVATE_get_bins_as_bulk_bin_has_replicates <- function(
     replicates_with_more_than_minimum,
     bin_specific_sce,
@@ -124,6 +127,7 @@ PRIVATE_get_bins_as_bulk_bin_has_replicates <- function(
     return(pseudobulks)
 }
 
+#' @keywords internal
 PRIVATE_get_bins_as_bulk_bin_without_replicates <- function(
     replicates_with_more_than_minimum,
     bin_specific_sce,

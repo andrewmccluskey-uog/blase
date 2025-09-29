@@ -51,3 +51,15 @@ test_that("genes can be gotten using accessor", {
 
     expect_equal(genes(blase_data), as.character(seq_len(genes)))
 })
+
+## Test bins accessors
+test_that("bin names can be gotten using accessor", {
+  cells <- 15
+  genes <- 20
+
+  sce <- generate_test_sce(cells, genes)
+  blase_data <- as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 5)
+  blase_data@genes <- as.character(seq_len(genes))
+
+  expect_equal(bins(blase_data), seq_len(5))
+})

@@ -11,8 +11,9 @@
 #' @param BPPARAM The BiocParallel param for multithreading if desired.
 #' Defaults to [BiocParallel::SerialParam()]
 #'
-#' @import methods
-#' @import BiocParallel
+#' @importFrom methods new
+#' @importFrom BiocParallel SerialParam
+#' @importFrom BiocParallel bplapply
 #'
 #' @return A vector of [MappingResult] objects.
 #' @seealso [map_best_bin()]
@@ -72,7 +73,7 @@ map_all_best_bins <- function(blase_data, bulk_data,
 #' @param confidence_level The confidence interval to calculate for mappings.
 #' Defaults to 90%.
 #'
-#' @import methods
+#' @importFrom methods new
 #'
 #' @return A [MappingResult] object.
 #' @export
@@ -222,7 +223,7 @@ PRIVATE_map_bin <- function(
 #' @returns estimate Spearman's rank correlation coefficient.
 #' @returns conf.int confidence interval.
 #'
-#' @import boot
+#' @importFrom boot boot
 #' @keywords internal
 #'
 PRIVATE_spearman.ci <-

@@ -99,7 +99,8 @@ setMethod(
 
 #' @rdname assign_pseudotime_bins
 #'
-#' @import rlang
+#' @importFrom rlang check_installed
+#' @importFrom Seurat as.SingleCellExperiment
 #'
 #' @export
 setMethod(

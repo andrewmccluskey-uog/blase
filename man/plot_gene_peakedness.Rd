@@ -23,7 +23,7 @@ gene_peakedness_df}
 \item{pseudotime_slot}{The pseudotime slot in the SCE object.}
 }
 \value{
-A \link{ggplot2} plot showing: in black points, expression of the gene
+A \link[ggplot2:ggplot2-package]{ggplot2::ggplot2} plot showing: in black points, expression of the gene
 over pseudotime, in a green line, the fitted expression of the gene over
 pseudotime, the inside and outside of window means of smoothed expression
 (red and blue dotted horizotal lines respectively), and the bounds of the

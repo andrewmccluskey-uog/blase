@@ -25,7 +25,7 @@ setGeneric(
 #' @param split_by The split_by method to be passed on to
 #' [assign_pseudotime_bins()].
 #'
-#' @import methods
+#' @importFrom methods new
 #'
 #' @export
 setMethod(

@@ -14,7 +14,6 @@
 #' for each pseudobulk bin when we try to map the given bin.
 #' @param plot_columns How many columns to use in the plot.
 #'
-#' .@import patchwork
 #'
 #' @return A vector of length 3:
 #' * "worst top 2 distance" containing the lowest difference between the
@@ -25,6 +24,9 @@
 #'  but it should matter less than the worst value.
 #' * "confident_mapping_pct" - The percent of mappings for this setup which
 #'  were annotated as confident by BLASE
+#'
+#' @importFrom BiocParallel SerialParam
+#'
 #' @export
 #'
 #' @examples
@@ -101,6 +103,8 @@ evaluate_parameters <- function(
 }
 
 #' @keywords internal
+#' @importFrom stats runif
+#' @importFrom Matrix rowSums
 PRIVATE_test_train_split <- function(blase_data) {
     # This randomly selects 50% of cells for use on each side
     pseudobulked_bins <- NULL
@@ -119,6 +123,8 @@ PRIVATE_test_train_split <- function(blase_data) {
 }
 
 #' @keywords internal
+#' @importFrom patchwork plot_annotation
+#' @importFrom patchwork wrap_plots
 PRIVATE_evaluate_parameters_plots <- function(
     blase_data,
     bin_ids,
@@ -176,7 +182,9 @@ PRIVATE_evaluate_parameters_plots <- function(
 #' @seealso [plot_find_best_params_results()] for plotting the
 #' results of this function.
 #'
-#' @import dplyr
+#' @importFrom BiocParallel bplapply
+#' @importFrom BiocParallel SerialParam
+#' @importFrom dplyr bind_rows
 #' @export
 #'
 #' @examples
@@ -274,8 +282,9 @@ find_best_params <- function(
 #'
 #' @seealso [find_best_params()]
 #'
-#' @import viridis
-#' @import patchwork
+#' @importFrom viridis scale_color_viridis
+#' @importFrom patchwork plot_layout
+#' @importFrom ggplot2 ggplot_add
 #'
 #' @export
 #'
@@ -312,6 +321,11 @@ plot_find_best_params_results <- function(
 }
 
 #' @keywords internal
+#' @importFrom ggplot2 sym
+#' @importFrom ggplot2 ggplot
+#' @importFrom ggplot2 aes
+#' @importFrom ggplot2 geom_point
+#' @importFrom ggplot2 labs
 PRIVATE_plot_min_convexity_by_genes <- function(results, bin_colors) {
     gene_count <- ggplot2::sym("gene_count")
     bin_count <- ggplot2::sym("bin_count")

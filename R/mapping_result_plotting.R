@@ -56,8 +56,11 @@ setGeneric(
 #' `colour_by`, and will be used to produce a bar chart of
 #' populations in the best mapped bin.
 #'
-#' @import scater
-#' @import patchwork
+#' @importFrom scater plotUMAP
+#' @importFrom patchwork plot_annotation
+#' @importFrom patchwork plot_layout
+#'
+#' @importFrom ggplot2 ggplot_add
 #'
 #' @export
 setMethod(
