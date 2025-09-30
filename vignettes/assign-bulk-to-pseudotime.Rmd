@@ -123,32 +123,13 @@ BiocManager::install("blase")
 
 ## Setting up the Single Cell Experiment
 
-First, let's generate a Single Cell Experiment to use the tool with,
+First, let's load a Single Cell Experiment to use the tool with,
 based on the [tradeSeq
-vignette](https://bioconductor.org/packages/devel/bioc/vignettes/tradeSeq/inst/doc/tradeSeq.html).
+vignette](https://bioconductor.org/packages/devel/bioc/vignettes/tradeSeq/inst/doc/tradeSeq.html). We have added pseudotime to the object, and used tradeSeq as shown in their vignette.
 
-```{r setupSCE}
-data(countMatrix, package = "tradeSeq")
-counts <- as.matrix(countMatrix)
-rm(countMatrix)
-data(crv, package = "tradeSeq")
-data(celltype, package = "tradeSeq")
-
-pseudotime <- slingPseudotime(crv, na = FALSE)
-cellWeights <- slingCurveWeights(crv)
-sce <- fitGAM(
-    counts = counts, pseudotime = pseudotime, cellWeights = cellWeights,
-    nknots = 6, verbose = FALSE, BPPARAM = MulticoreParam(N_CORES)
-)
-sce$pseudotime <- pseudotime[, "curve1"]
-sce$celltype <- celltype
-
-sce <- subset(sce, , celltype != "Erythrocyte")
-
-sce <- computeSumFactors(sce)
-sce <- logNormCounts(sce)
-normcounts(sce) <- exp(logcounts(sce))
-sce <- runUMAP(sce)
+```{r loadSCE}
+data(tradeSeq_BLASE_example_sce, package = "blase")
+sce <- tradeSeq_BLASE_example_sce
 ```
 
 ```{r setupSCEPlot}
