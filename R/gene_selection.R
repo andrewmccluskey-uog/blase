@@ -59,7 +59,7 @@ get_top_n_genes <- function(
 #' @keywords internal
 catch_error_calculate_gene_peakedness <- function(gene) {
   return(function(e) {
-    warning("Err: Skipping ", gene, ": ", conditionMessage(e))
+    warning("Skipping ", gene, ": ", conditionMessage(e))
     return(data.frame(
         gene = gene, peak_pseudotime = NA,
         mean_in_window = NA, mean_out_window = NA,

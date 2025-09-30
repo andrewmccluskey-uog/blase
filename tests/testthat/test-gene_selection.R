@@ -233,3 +233,15 @@ test_that("gene_selection gene_peakedness_spread_selection selects genes", {
 
     expect_equal(genes_to_use, c("gene11", "gene16"))
 })
+
+# Tests catch_error_calculate_gene_peakedness
+test_that("catches error and turns into a warning for that gene", {
+
+  tmp1 = function() tryCatch({stop("An error has occurred")}, error = catch_error_calculate_gene_peakedness("gene1"))
+  expect_warning(res<-tmp1(), "Skipping gene1: An error has occurred")
+  expect_equal(res, data.frame(gene = "gene1", peak_pseudotime = NA,
+               mean_in_window = NA, mean_out_window = NA,
+               ratio = NA, window_start = NA,
+               window_end = NA,
+               deviance_explained = NA))
+})

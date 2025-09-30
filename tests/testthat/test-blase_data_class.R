@@ -53,6 +53,17 @@ test_that("genes can be gotten using accessor", {
 })
 
 ## Test bins accessors
+test_that("bins can be set using accessor", {
+  cells <- 15
+  genes <- 20
+
+  sce <- generate_test_sce(cells, genes)
+  blase_data <- as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 5)
+  bins(blase_data) <- seq(from=2, to=10, by=2)
+
+  expect_equal(blase_data@bins, c(2,4,6,8, 10))
+})
+
 test_that("bin names can be gotten using accessor", {
   cells <- 15
   genes <- 20

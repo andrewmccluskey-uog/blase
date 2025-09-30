@@ -32,8 +32,7 @@ test_that("mapping all bulks runs without errors", {
 
 
 
-## WIP test map_best_bin
-
+## test map_best_bin
 test_that("throws error if gene list is null", {
     sce <- generate_test_sce()
     blase_data <- as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 5)
@@ -49,6 +48,53 @@ test_that("throws error if gene list has nothing matching the bulks", {
 
     tmp1 <- function() map_best_bin(blase_data, "1", data.frame(), bootstrap_iterations = 1)
     expect_error(tmp1(), "No genes in genes(blase_data) exist in the rows of the bulk dataframe, exiting.", fixed = TRUE)
+})
+
+test_that("throws error if too few cells for requested bins", {
+  sce <- generate_test_sce()
+  blase_data <- as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 100)
+  genes(blase_data) = rownames(sce)
+
+  bulk_counts <- matrix(seq_len(15) * 10, ncol = 3, nrow = nrow(sce))
+  colnames(bulk_counts) <- c("A", "B", "C")
+  rownames(bulk_counts) <- rownames(sce)
+
+  tmp1 <- function() map_best_bin(blase_data, "A", bulk_counts, bootstrap_iterations = 1)
+  expect_error(tmp1(), "Not enough cells in bin 1 to map against, please reduce number of bins (currently 100) or split by cells", fixed = TRUE)
+})
+
+test_that("raises a warning if a bulk id matches a gene id", {
+
+  sce <- generate_test_sce()
+  blase_data <- as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 5)
+
+  bulk_counts <- matrix(seq_len(15) * 10, ncol = 3, nrow = nrow(sce))
+  colnames(bulk_counts) <- c("A", "B", "C")
+  rownames(bulk_counts) <- rownames(sce)
+
+  genes(blase_data) = c(colnames(bulk_counts), rownames(sce)[1])
+
+  tmp1 <- function() map_best_bin(blase_data, "A", bulk_counts, bootstrap_iterations = 1)
+  expect_warning(expect_error(
+    expect_warning(tmp1(), "Bulk ID matches a gene, if this fails then check you areusing bulk name and not geneIds:A", fixed = TRUE)
+  ))
+})
+
+test_that("raises a warning if a not all genes are in bulk", {
+
+  sce <- generate_test_sce()
+  blase_data <- as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 5)
+
+  bulk_counts <- matrix(seq_len(15) * 10, ncol = 3, nrow = nrow(sce))
+  colnames(bulk_counts) <- c("A", "B", "C")
+  rownames(bulk_counts) <- rownames(sce)
+
+  genes(blase_data) = c("not_a_gene", rownames(sce)[1])
+
+  tmp1 <- function() map_best_bin(blase_data, "A", bulk_counts, bootstrap_iterations = 1)
+  expect_error(
+    expect_warning(tmp1(), "Genes for mapping not all in bulk, using 1 genes available in both reference and bulk.", fixed = TRUE)
+  )
 })
 
 test_that("mapping runs without errors", {

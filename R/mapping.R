@@ -85,7 +85,8 @@ map_best_bin <- function(
     bulk_data,
     bootstrap_iterations = 200,
     confidence_level = 0.90) {
-    PRIVATE_quality_check_blase_object(blase_data, bulk_data)
+
+    PRIVATE_quality_check_blase_object(blase_data, bulk_data, bulk_id)
 
     results <- data.frame()
     for (i in bins(blase_data)) {
@@ -125,7 +126,15 @@ map_best_bin <- function(
 }
 
 #' @keywords internal
-PRIVATE_quality_check_blase_object <- function(blase_data, bulk) {
+PRIVATE_quality_check_blase_object <- function(blase_data, bulk, bulk_id) {
+
+    if (any(genes(blase_data) == bulk_id)) {
+      warning(
+        "Bulk ID matches a gene, if this fails then check you are",
+        "using bulk name and not geneIds:", bulk_id
+      )
+    }
+
     if (any(is.na(genes(blase_data))) || length(genes(blase_data)) == 0) {
         stop(
             "No genes to map with. ",
@@ -178,18 +187,11 @@ PRIVATE_map_bin <- function(
         )
     }
 
-    if (any(genes(blase_data) == bulk_id)) {
-        warning(
-            "Bulk ID matches a gene, if this fails then check you are",
-            "using bulk name and not geneIds:", bulk_id
-        )
-    }
+    PRIVATE_quality_check_bin(blase_data, i, genes_present_in_both)
 
     counts_for_top_genes <- bulk_data[
         genes_present_in_both, as.character(bulk_id)
     ]
-
-    PRIVATE_quality_check_bin(blase_data, i, genes_present_in_both)
 
     bin_ratios <- pseudobulk_bins(blase_data)[[i]][genes_present_in_both, ]
 
