@@ -95,10 +95,10 @@ evaluate_parameters <- function(
         sum(results.confident_mapping) / length(bins(blase_data))) * 100
 
     if (make_plot == TRUE) {
-        PRIVATE_evaluate_parameters_plots(
+        print(PRIVATE_evaluate_parameters_plots(
             blase_data, bins(blase_data), results.best_bin, results.best_corr,
             results.history, results.convexity, plot_columns, min_convexity
-        )
+        ))
     }
 
     return(c(min_convexity, mean_convexity, confident_mapping_pct))

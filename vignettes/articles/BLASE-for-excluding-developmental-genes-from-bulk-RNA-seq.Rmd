@@ -88,7 +88,7 @@ blase_data <- as.BlaseData(
 )
 
 # Add these bins to the sc metadata
-dogga_sc <- blase::assign_pseudotime_bins(dogga_sc,
+dogga_sc <- assign_pseudotime_bins(dogga_sc,
     pseudotime_slot = "slingPseudotime_1",
     n_bins = 8,
     split_by = "pseudotime_range"
@@ -101,14 +101,14 @@ Now we will select the genes we want to use, using BLASE's gene peakedness
 metric.
 
 ```{r, calculate_gene_peakedness}
-gene_peakedness_info <- blase::calculate_gene_peakedness(
+gene_peakedness_info <- calculate_gene_peakedness(
     dogga_sc,
     window_pct = 5,
     knots = 18,
     BPPARAM = bpparam
 )
 
-genes_to_use <- blase::gene_peakedness_spread_selection(
+genes_to_use <- gene_peakedness_spread_selection(
     dogga_sc,
     gene_peakedness_info,
     genes_per_bin = 30,
@@ -128,7 +128,7 @@ genes(blase_data) <- genes_to_use
 Now we can perform the actual mapping step, and review the results.
 
 ```{r, mapping}
-mapping_results <- blase::map_all_best_bins(
+mapping_results <- map_all_best_bins(
     blase_data,
     zhang_bulk,
     BPPARAM = bpparam
@@ -139,7 +139,7 @@ mapping_results <- blase::map_all_best_bins(
 #| fig.alt: >
 #|   Heatmap of mapping correlations of the Zhang et al. data onto
 #|   the Dogga et al. scRNA-seq.
-blase::plot_mapping_result_heatmap(mapping_results)
+plot_mapping_result_heatmap(mapping_results)
 ```
 
 ## Calculate DE genes
