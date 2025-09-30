@@ -60,7 +60,8 @@ Suggests:
     plyr,
     fs,
     sparseMatrixStats,
-    ggVennDiagram
+    ggVennDiagram,
+    uwot
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 URL: https://andrewmccluskey-uog.github.io/blase/
