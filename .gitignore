@@ -10,3 +10,7 @@ inst/doc
 /doc/
 /Meta/
 .idea
+lib
+**/*report.html
+*.Rproj
+**/*.build.timestamp

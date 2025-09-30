@@ -95,6 +95,14 @@ test_that("gene_selection calculate_gene_peakedness throws error if pseudotime s
     expect_error(tmp1(), "Pseudotime slot not in object", fixed = TRUE)
 })
 
+test_that("gene_selection calculate_gene_peakedness raises a warning if a gene has no counts", {
+  sce <- generate_gene_selection_test_sce()
+  SingleCellExperiment::counts(sce)[1,] = 0
+
+  tmp1 <- function() calculate_gene_peakedness(sce, pseudotime_slot = "pseudotime")
+  expect_warning(tmp1(), "1 genes without counts have been omitted", fixed = TRUE)
+})
+
 test_that("gene_selection calculate_gene_peakedness calculates peakedness", {
     sce <- generate_gene_selection_test_sce()
 
@@ -203,8 +211,55 @@ test_that("gene_selection plot_gene_peakedness runs without error", {
     sce <- generate_gene_selection_test_sce()
     gene_peakedness <- calculate_gene_peakedness(sce, pseudotime_slot = "pseudotime")
 
-    tmp1 <- function() plot_gene_peakedness(sce, gene_peakedness, "gene5", pseudotime_slot = "pseudotime")
+    tmp1 <- function() print(plot_gene_peakedness(sce, gene_peakedness, "gene5", pseudotime_slot = "pseudotime"))
     expect_no_error(tmp1)
+})
+
+test_that("gene_selection plot_gene_peakedness plot includes correct axis labels", {
+  sce <- generate_gene_selection_test_sce()
+  gene_peakedness <- calculate_gene_peakedness(sce, pseudotime_slot = "pseudotime")
+
+  p <- plot_gene_peakedness(sce, gene_peakedness, "gene5", pseudotime_slot = "pseudotime")
+  expect_s3_class(p, "ggplot")
+  expect_equal(rlang::as_name(p$mapping$x), "pseudotime")
+  expect_equal(rlang::as_name(p$mapping$y), "expression")
+})
+
+test_that("gene_selection plot_gene_peakedness plot includes solid line at peak pseudotime", {
+  sce <- generate_gene_selection_test_sce()
+  gene_peakedness <- calculate_gene_peakedness(sce, pseudotime_slot = "pseudotime")
+
+  p <- plot_gene_peakedness(sce, gene_peakedness, "gene5", pseudotime_slot = "pseudotime")
+  expect_s3_class(p, "ggplot")
+  expect_equal(p$layers$geom_vline$data[["xintercept"]], 70)
+})
+
+test_that("gene_selection plot_gene_peakedness plot includes dashed line at window start and end", {
+  sce <- generate_gene_selection_test_sce()
+  gene_peakedness <- calculate_gene_peakedness(sce, pseudotime_slot = "pseudotime")
+
+  p <- plot_gene_peakedness(sce, gene_peakedness, "gene5", pseudotime_slot = "pseudotime")
+  expect_s3_class(p, "ggplot")
+  expect_equal(p$layers$geom_vline...3$data[["xintercept"]], 66.5)
+  expect_equal(p$layers$geom_vline...3$aes_params[["linetype"]], "dashed")
+  expect_equal(p$layers$geom_vline...4$data[["xintercept"]], 73.5)
+  expect_equal(p$layers$geom_vline...4$aes_params[["linetype"]], "dashed")
+})
+
+test_that("gene_selection plot_gene_peakedness plot includes horizontal line at mean in-window and out-window expression", {
+  sce <- generate_gene_selection_test_sce()
+  gene_peakedness <- calculate_gene_peakedness(sce, pseudotime_slot = "pseudotime")
+
+  p <- plot_gene_peakedness(sce, gene_peakedness, "gene5", pseudotime_slot = "pseudotime")
+  expect_s3_class(p, "ggplot")
+
+  expect_equal(p$layers$geom_hline$data[["yintercept"]], 0)
+  expect_equal(p$layers$geom_hline$aes_params[["linetype"]], "dashed")
+  expect_equal(p$layers$geom_hline$aes_params[["colour"]], "red")
+
+  expect_equal(p$layers$geom_hline...6$data[["yintercept"]], 0.02832, tolerance = 0.01)
+  expect_equal(p$layers$geom_hline...6$aes_params[["linetype"]], "dashed")
+  expect_equal(p$layers$geom_hline...6$aes_params[["colour"]], "blue")
 })
 
 # gene_peakedness_spread_selection
@@ -244,4 +299,36 @@ test_that("catches error and turns into a warning for that gene", {
                ratio = NA, window_start = NA,
                window_end = NA,
                deviance_explained = NA))
+})
+
+# Tests PRIVATE_get_expression_matrix_for_plot
+test_that("returns normcounts ordered by pseudotime", {
+
+  sce <- generate_gene_selection_test_sce()
+  pseudotime = rev(seq_len(ncol(sce)))
+  gene = "gene1"
+
+  res = PRIVATE_get_expression_matrix_for_plot(sce, pseudotime, gene)
+
+  expect_equal(rownames(res), paste0("cell", seq(from=70, to=1, by=-1)))
+  expect_equal(res$pseudotime, seq_len(70))
+
+})
+
+# Tests PRIVATE_get_smooth_expression_for_plot
+test_that("returns smooth expression with pseudotime column", {
+
+  sce <- generate_gene_selection_test_sce()
+  pseudotime = seq_len(ncol(sce))
+  gene = "gene1"
+
+  expression = PRIVATE_get_expression_matrix_for_plot(sce, pseudotime, gene)
+
+  res = PRIVATE_get_smooth_expression_for_plot(
+    sce, expression, gene, "pseudotime"
+  )
+
+  expect_equal(rownames(res), as.character(seq_len(100)))
+  expect_equal(res$pseudotime, max(sce$pseudotime)*(seq_len(100)/100))
+
 })

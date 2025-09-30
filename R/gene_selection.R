@@ -212,13 +212,13 @@ calculate_gene_peakedness <- function(
 
 #' @keywords internal
 PRIVATE_get_norm_expr_dfs_for_genes_with_counts <- function(sce) {
-    genes_with_counts <- rownames(SingleCellExperiment::counts(sce)[
-        MatrixGenerics::rowMaxs(SingleCellExperiment::counts(sce)) > 0,
-    ])
+    genes_with_counts <- rownames(sce)[
+      MatrixGenerics::rowMaxs(SingleCellExperiment::counts(sce)) > 0
+    ]
 
-    genes_with_no_counts <- rownames(SingleCellExperiment::counts(sce)[
-        MatrixGenerics::rowMaxs(SingleCellExperiment::counts(sce)) == 0,
-    ])
+    genes_with_no_counts <- rownames(sce)[
+      MatrixGenerics::rowMaxs(SingleCellExperiment::counts(sce)) == 0
+    ]
 
     normalised_counts <- SingleCellExperiment::normcounts(sce)
 
