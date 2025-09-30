@@ -1,6 +1,6 @@
 ---
 title: "BLASE for excluding developmental genes from bulk RNA-seq"
-output: rmarkdown::html_vignette
+output: BiocStyle::html_document
 vignette: >
   %\VignetteIndexEntry{BLASE for excluding developmental genes from bulk RNA-seq}
   %\VignetteEncoding{UTF-8}

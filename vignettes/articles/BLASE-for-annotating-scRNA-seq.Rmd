@@ -1,6 +1,6 @@
 ---
 title: "BLASE for annotating scRNA-seq"
-output: rmarkdown::html_vignette
+output: BiocStyle::html_document
 vignette: >
   %\VignetteIndexEntry{BLASE for annotating scRNA-seq}
   %\VignetteEncoding{UTF-8}
@@ -41,9 +41,8 @@ bpparam <- MulticoreParam(N_CORES)
 
 This article will show how BLASE can be used for annotating scRNA-seq
 data using existing bulk or microarray data. We make use of scRNA-seq
-[Dogga et al.
-2024](https://www.science.org/doi/10.1126/science.adj4088) and
-microarray data from [Painter et al.
+[Dogga et al. 2024](https://www.science.org/doi/10.1126/science.adj4088)
+and microarray data from [Painter et al.
 2018](https://www.nature.com/articles/s41467-018-04966-3). Code for
 generating the objects used here is available in the BLASE
 reproducibility repository.
@@ -73,11 +72,11 @@ plotUMAP(dogga_sc, colour_by = "STAGE_HR")
 plotUMAP(dogga_sc, colour_by = "slingPseudotime_1")
 ```
 
-## Prepare BLASE 
+## Prepare BLASE
 
 Now we'll prepare BLASE for use.
 
-### Create BLASE data object 
+### Create BLASE data object
 
 First, we create the object, giving it the number of bins we want to
 use, and how to calculate them.
@@ -98,7 +97,7 @@ dogga_sc <- blase::assign_pseudotime_bins(dogga_sc,
 )
 ```
 
-### Select Genes 
+### Select Genes
 
 Now we will select the genes we want to use, using BLASE's gene
 peakedness metric.
@@ -171,11 +170,11 @@ mapping_results <- blase::map_all_best_bins(
 blase::plot_mapping_result_heatmap(mapping_results)
 ```
 
-
 ## Transfer Mappings
 
 In the Painter et al. paper, the expected lifecycle stages are as
 follows:
+
 | Lifecycle Stage | Painter et al. HPI |
 |-----------------|--------------------|
 | Ring            | 0-21               |

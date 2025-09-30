@@ -1,6 +1,6 @@
 ---
 title: "How Blase Works"
-output: rmarkdown::html_vignette
+output: BiocStyle::html_document
 vignette: >
   %\VignetteIndexEntry{How Blase Works}
   %\VignetteEncoding{UTF-8}

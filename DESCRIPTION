@@ -61,7 +61,8 @@ Suggests:
     fs,
     sparseMatrixStats,
     ggVennDiagram,
-    uwot
+    uwot,
+    BiocStyle
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 URL: https://andrewmccluskey-uog.github.io/blase/

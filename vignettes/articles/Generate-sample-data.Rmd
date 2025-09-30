@@ -1,6 +1,6 @@
 ---
 title: "Generate Sample Data"
-output: rmarkdown::html_vignette
+output: BiocStyle::html_document
 vignette: >
   %\VignetteIndexEntry{Generate Sample Data}
   %\VignetteEngine{knitr::rmarkdown}

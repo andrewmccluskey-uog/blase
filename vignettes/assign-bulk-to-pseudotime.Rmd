@@ -1,6 +1,6 @@
 ---
 title: "Assigning bulk RNA-seq to pseudotime"
-output: rmarkdown::html_vignette
+output: BiocStyle::html_document
 vignette: >
   %\VignetteIndexEntry{Assigning bulk RNA-seq to pseudotime}
   %\VignetteEncoding{UTF-8}
