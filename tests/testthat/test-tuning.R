@@ -17,6 +17,24 @@ test_that("evaluate_parameters() generates tuple of minimum and mean specifcity,
     expect_equal(result, c(0, 0, 0))
 })
 
+test_that("evaluate_parameters() runs when make_plot enabled", {
+  cells <- 100
+  genes <- 20
+  counts_matrix <- matrix(seq_len(cells * genes), ncol = cells, nrow = genes)
+  sce <- SingleCellExperiment::SingleCellExperiment(assays = list(counts = counts_matrix * 3, normcounts = counts_matrix, logcounts = counts_matrix / 2))
+  sce$pseudotime <- (1:cells) / cells
+  sce$pseudotime[1] <- 0
+  colnames(sce) <- paste0("C", seq_len(cells))
+  rownames(sce) <- paste0("G", seq_len(genes))
+
+  blase_data <- as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 5)
+  blase_data@genes <- paste0("G", seq_len(genes))
+
+  result <- evaluate_parameters(blase_data, make_plot = TRUE)
+
+  expect_equal(result, c(0, 0, 0))
+})
+
 ## find_best_params
 test_that("find_best_params() warns about too few genes", {
     sce <- generate_test_sce(200, 300)
@@ -32,13 +50,15 @@ test_that("find_best_params() runs without error", {
     colnames(sce) <- paste0("C", seq_len(200))
     rownames(sce) <- paste0("G", seq_len(300))
 
+    suppressWarnings(
     results <- find_best_params(
         sce,
         genelist = paste0("G", seq_len(40)),
         bins_count_range = 2:3,
         gene_count_range = c(5, 10),
         pseudotime_slot = "pseudotime"
-    )
+    ))
+
 
     expected <- data.frame(data.frame(
         column_label = c("1", "2", "1", "2"),
@@ -51,4 +71,20 @@ test_that("find_best_params() runs without error", {
     rownames(expected) <- seq_len(4)
 
     expect_equal(results, expected)
+})
+
+# tests for plot_find_best_params
+test_that("plot_find_best_params() runs without error", {
+  find_best_params_result <- data.frame(data.frame(
+    column_label = c("1", "2", "1", "2"),
+    bin_count = c(2, 2, 3, 3),
+    gene_count = c(5, 10, 5, 10),
+    min_convexity = as.double(c(0.1, 0.4, 0.2, 0.6)),
+    mean_convexity = as.double(c(0.15, 0.45, 0.25, 0.65)),
+    confident_mapping_pct = as.double(c(0.7, 0.3, 0.4, 0.1))
+  ))
+
+  tmp1 <- function() print(plot_find_best_params_results(find_best_params_result))
+  expect_no_error(tmp1())
+
 })
