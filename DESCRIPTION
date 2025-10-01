@@ -62,7 +62,9 @@ Suggests:
     sparseMatrixStats,
     ggVennDiagram,
     uwot,
-    BiocStyle
+    BiocStyle,
+    DelayedMatrixStats,
+    limma
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 URL: https://andrewmccluskey-uog.github.io/blase/

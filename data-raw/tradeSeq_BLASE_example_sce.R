@@ -21,4 +21,4 @@ tradeSeq_BLASE_example_sce <- logNormCounts(tradeSeq_BLASE_example_sce)
 normcounts(tradeSeq_BLASE_example_sce) <- exp(logcounts(tradeSeq_BLASE_example_sce))
 tradeSeq_BLASE_example_sce <- runUMAP(tradeSeq_BLASE_example_sce)
 
-usethis::use_data(tradeSeq_BLASE_example_sce, overwrite = TRUE)
+usethis::use_data(tradeSeq_BLASE_example_sce, overwrite = TRUE, compress = "xz")

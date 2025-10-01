@@ -30,10 +30,7 @@ set.seed(SEED)
 ```
 
 ```{r, concurrency}
-N_CORES <- 4
-if (ami::using_ci()) {
-    N_CORES <- 2
-}
+N_CORES <- 2
 bpparam <- MulticoreParam(N_CORES)
 ```
 
@@ -52,8 +49,8 @@ First we'll load in the data we're using, pre-prepared from the BLASE
 reproducibility repository.
 
 ```{r, load_data}
-zhang_bulk <- readRDS("Data/zhang_2021_heat_shock_bulk.rds")
-dogga_sc <- readRDS("Data/MCA_PF_SCE.rds")
+data(zhang_2021_heat_shock_bulk, package = "blase")
+data(MCA_PF_SCE, package = "blase")
 ```
 
 We can examine the true lifecycle stages, and also the calculated pseudotime
@@ -64,11 +61,11 @@ trajectory (Slingshot).
 #|   UMAP of Dogga et al. single-cell RNA-seq reference coloured by lifecycle
 #|   stage, showing the cycle from Rings, Trophozoites, Schizonts, to Rings
 #|   again.
-plotUMAP(dogga_sc, colour_by = "STAGE_HR")
+plotUMAP(MCA_PF_SCE, colour_by = "STAGE_HR")
 #| fig.alt: >
 #|   UMAP of Dogga et al. single-cell RNA-seq reference coloured by pseudotime,
 #|   starting with Rings, and ending with Schizonts.
-plotUMAP(dogga_sc, colour_by = "slingPseudotime_1")
+plotUMAP(MCA_PF_SCE, colour_by = "slingPseudotime_1")
 ```
 ## Prepare BLASE 
 
@@ -81,14 +78,14 @@ number of bins we want to use, and how to calculate them.
 
 ```{r, create_BLASE_object}
 blase_data <- as.BlaseData(
-    dogga_sc,
+    MCA_PF_SCE,
     pseudotime_slot = "slingPseudotime_1",
     n_bins = 8,
     split_by = "pseudotime_range"
 )
 
 # Add these bins to the sc metadata
-dogga_sc <- assign_pseudotime_bins(dogga_sc,
+MCA_PF_SCE <- assign_pseudotime_bins(MCA_PF_SCE,
     pseudotime_slot = "slingPseudotime_1",
     n_bins = 8,
     split_by = "pseudotime_range"
@@ -102,14 +99,14 @@ metric.
 
 ```{r, calculate_gene_peakedness}
 gene_peakedness_info <- calculate_gene_peakedness(
-    dogga_sc,
+    MCA_PF_SCE,
     window_pct = 5,
     knots = 18,
     BPPARAM = bpparam
 )
 
 genes_to_use <- gene_peakedness_spread_selection(
-    dogga_sc,
+    MCA_PF_SCE,
     gene_peakedness_info,
     genes_per_bin = 30,
     n_gene_bins = 30
@@ -130,7 +127,7 @@ Now we can perform the actual mapping step, and review the results.
 ```{r, mapping}
 mapping_results <- map_all_best_bins(
     blase_data,
-    zhang_bulk,
+    zhang_2021_heat_shock_bulk,
     BPPARAM = bpparam
 )
 ```
@@ -184,7 +181,7 @@ contr.matrix <- makeContrasts(
 
 ### Phenotype + Development (Bulk DE)
 ```{r, calculateBulkDE}
-vfit <- lmFit(zhang_bulk, design)
+vfit <- lmFit(zhang_2021_heat_shock_bulk, design)
 vfit <- contrasts.fit(vfit, contrasts = contr.matrix)
 efit <- eBayes(vfit)
 
@@ -198,18 +195,18 @@ PB31_normal_v_HS_BULK_DE <- PB31_normal_v_HS_BULK_DE[order(-PB31_normal_v_HS_BUL
 ### Development (SC DE)
 First, let's pseudobulk based on the pseudotime bins
 ```{r, pseudobulk}
-pseudobulked_dogga_sc <- data.frame(row.names = rownames(dogga_sc))
+pseudobulked_MCA_PF_SCE <- data.frame(row.names = rownames(MCA_PF_SCE))
 for (r in mapping_results) {
-    pseudobulked_dogga_sc[bulk_name(r)] <- rowSums(counts(dogga_sc[, dogga_sc$pseudotime_bin == best_bin(r)]))
+    pseudobulked_MCA_PF_SCE[bulk_name(r)] <- rowSums(counts(MCA_PF_SCE[, MCA_PF_SCE$pseudotime_bin == best_bin(r)]))
 }
-pseudobulked_dogga_sc <- as.matrix(pseudobulked_dogga_sc)
+pseudobulked_MCA_PF_SCE <- as.matrix(pseudobulked_MCA_PF_SCE)
 ```
 
 And now calculate DE genes for these
 ```{r}
 ## Normalise, not needed for true bulks
 par(mfrow = c(1, 2))
-v <- voom(pseudobulked_dogga_sc, design, plot = FALSE)
+v <- voom(pseudobulked_MCA_PF_SCE, design, plot = FALSE)
 
 vfit_sc <- lmFit(v, design)
 vfit_sc <- contrasts.fit(vfit_sc, contrasts = contr.matrix)
