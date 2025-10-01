@@ -1,4 +1,4 @@
-url: https://andrewmccluskey-uog.github.io/BLASE/
+url: https://andrewmccluskey-uog.github.io/blase/
 template:
   bootstrap: 5
   bslib:
@@ -20,18 +20,16 @@ reference:
   - contents: has_concept("annotation")
   - title: Utilities
   - contents: has_concept("util")
+  - title: Data
+  - contents: has_concept("data")
 
 navbar:
  components:
     articles:
-      text: Articles
+      text: Vignettes
       menu:
-      - text: Vignettes
-      - text: How BLASE Works
-        href: articles/How-Blase-Works.html
       - text: Assigning Bulk to Pseudotime
         href: articles/assign-bulk-to-pseudotime.html
-      - text: Articles
       - text: BLASE for annotating scRNA-seq
         href: articles/BLASE-for-annotating-scRNA-seq.html
       - text: BLASE for excluding developmental genes from bulk RNA-seq

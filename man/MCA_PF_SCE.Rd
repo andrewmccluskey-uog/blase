@@ -25,4 +25,5 @@ Data from the Malaria Cell Atlas, with the following additional processing:
 high ratios by BLASE's "Gene Peakedness" measure.
 }
 }
+\concept{data}
 \keyword{datasets}

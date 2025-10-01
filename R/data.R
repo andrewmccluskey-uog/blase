@@ -9,6 +9,7 @@
 #' 4. Erythrocyte cell type removed
 #' 5. UMAP calculated
 #'
+#' @concept data
 #' @source <https://bioconductor.org/packages/devel/bioc/vignettes/tradeSeq/inst/doc/tradeSeq.html>
 "tradeSeq_BLASE_example_sce"
 
@@ -23,6 +24,7 @@
 #' 6. Genes subset to include a spread of those found to have
 #'    high ratios by BLASE's "Gene Peakedness" measure.
 #'
+#' @concept data
 #' @source <https://www.malariacellatlas.org/atlas/plasmodium-falciparum-atlas/>
 "MCA_PF_SCE"
 
@@ -33,6 +35,7 @@
 #' <https://zenodo.org/records/16615703>, however genes have been subset to
 #' reduce file size.
 #'
+#' @concept data
 #' @source <https://zenodo.org/records/16615703>
 "painter_microarray"
 
@@ -43,5 +46,6 @@
 #' <https://zenodo.org/records/16615703>, however genes have been subset to
 #' reduce file size.
 #'
+#' @concept data
 #' @source <https://zenodo.org/records/16615703>
 "zhang_2021_heat_shock_bulk"
