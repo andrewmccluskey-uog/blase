@@ -64,8 +64,7 @@ Suggests:
     uwot,
     BiocStyle,
     DelayedMatrixStats,
-    limma,
-    GenomeInfoDb
+    limma
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 URL: https://andrewmccluskey-uog.github.io/blase/
