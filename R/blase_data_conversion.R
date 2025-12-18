@@ -39,6 +39,7 @@ setMethod(
             n_bins = n_bins,
             pseudotime_slot = pseudotime_slot
         )
+        pseudotime_sce = pseudotime_sce[, !is.na(pseudotime_sce$pseudotime_bin)]
 
         bin_ids <- sort(unique(pseudotime_sce@colData[["pseudotime_bin"]]))
         pseudobulks <- list()

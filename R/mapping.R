@@ -88,6 +88,7 @@ map_best_bin <- function(
 
     PRIVATE_quality_check_blase_object(blase_data, bulk_data, bulk_id)
 
+    # DISTANCE_CALCULATIONS
     results <- data.frame()
     for (i in bins(blase_data)) {
         results <- rbind(results, PRIVATE_map_bin(
@@ -99,6 +100,7 @@ map_best_bin <- function(
             confidence_level
         ))
     }
+    # DISTANCE_CALCULATIONS
 
     colnames(results) <- c("bin", "correlation", "lower_bound", "upper_bound")
 
