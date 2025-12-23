@@ -86,6 +86,7 @@ setMethod(
 
         x$pseudotime_bin = NA
         for (lin in lineages_long_to_short) {
+          print(lin)
           bins_for_lineage = lineage_n_bins[[lin]]
 
           y = x[, x$original_lineage==lin & !is.na(x$original_lineage)]
@@ -96,7 +97,9 @@ setMethod(
 
           # include 0 as an option as for first sample, all are NA, so max()
           # returns -Inf
-          x[, x$original_lineage==lin & !is.na(x$original_lineage)]$pseudotime_bin <- y$pseudotime_bin + max(x$pseudotime_bin, 0, na.rm = TRUE)
+          # x[, x$original_lineage==lin & !is.na(x$original_lineage)]$pseudotime_bin <- y$pseudotime_bin + max(x$pseudotime_bin, 0, na.rm = TRUE)
+          x$pseudotime_bin = replace(x$pseudotime_bin, x$original_lineage==lin & !is.na(x$original_lineage), y$pseudotime_bin + max(x$pseudotime_bin, 0, na.rm = TRUE))
+
           print(table(x$original_lineage, x$pseudotime_bin))
         }
 
@@ -262,7 +265,10 @@ PRIVATE_assign_pseudotime_bins_for_one_lineage <- function(
       cells_for_bin <- pseudotime_ordered_cells[
         (i * cells_per_bin - cells_per_bin + 1):(i * cells_per_bin)
       ]
-      pseudotime_sce[, cells_for_bin]$pseudotime_bin <- i
+      # pseudotime_sce[, cells_for_bin]$pseudotime_bin <- i
+
+      print(i)
+      pseudotime_sce$pseudotime_bin = replace(pseudotime_sce$pseudotime_bin, colnames(pseudotime_sce) %in% cells_for_bin, i)
     }
   }
 
