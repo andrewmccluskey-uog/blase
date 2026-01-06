@@ -175,15 +175,33 @@ setMethod(
 #' @inherit MappingResult examples
 plot_mapping_result_heatmap <- function(
     mapping_result_list,
-    heatmap_fill_scale = ggplot2::scale_fill_gradientn(
-        colors = c("blue", "white", "red"), limits = c(-1, 1)
-    ),
+    heatmap_fill_scale = NULL,
     annotate_confidence = TRUE,
     annotate_correlation = FALSE,
     bin_order = NULL,
     text_background=FALSE) {
     if (!all(lapply(mapping_result_list, class) == "MappingResult")) {
         stop("You must provide a list of MappingResult objects only.")
+    }
+
+    if (is.null(heatmap_fill_scale)) {
+      lims = c(-1,1)
+
+      if (metric(mapping_result_list[[1]]) == "cosine_similarity") {
+        message("Inferred a scale fill limit of 0-1 for cosine similarity.")
+        lims = c(0,1)
+      } else if (metric(mapping_result_list[[1]]) %in% c("euclidean", "manhattan")) {
+        message("Inferred an unbound scale fill limit of distance metrics.")
+        lims = NULL
+      } else if (metric(mapping_result_list[[1]]) %in% c("spearman", "pearson", "kendall")) {
+        message("Inferred a scale fill limit of -1-1 for correlation.")
+        lims = c(-1,1)
+      }
+
+
+      heatmap_fill_scale = ggplot2::scale_fill_gradientn(
+        colors <- c("blue", "white", "red"), limits = lims
+      )
     }
 
     bulk_results <- data.frame(
