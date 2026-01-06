@@ -24,7 +24,8 @@
 map_all_best_bins <- function(blase_data, bulk_data,
                               bootstrap_iterations = 200,
                               confidence_level = 0.90,
-                              BPPARAM = BiocParallel::SerialParam()) {
+                              BPPARAM = BiocParallel::SerialParam(),
+                              metric = "spearman") {
     bulk_data_blase_genes_only <- bulk_data[
         rownames(bulk_data) %in% genes(blase_data),
     ]
@@ -52,7 +53,8 @@ map_all_best_bins <- function(blase_data, bulk_data,
             id <- colnames(df)[1]
             return(map_best_bin(blase_data, id, df,
                 bootstrap_iterations = bootstrap_iterations,
-                confidence_level = confidence_level
+                confidence_level = confidence_level,
+                metric = metric
             ))
         },
         BPPARAM = BPPARAM
@@ -84,7 +86,8 @@ map_best_bin <- function(
     bulk_id,
     bulk_data,
     bootstrap_iterations = 200,
-    confidence_level = 0.90) {
+    confidence_level = 0.90,
+    metric = "spearman") {
 
     PRIVATE_quality_check_blase_object(blase_data, bulk_data, bulk_id)
 
@@ -97,11 +100,11 @@ map_best_bin <- function(
             bulk_data,
             bulk_id,
             bootstrap_iterations,
-            confidence_level
+            confidence_level,
+            metric
         ))
     }
     # DISTANCE_CALCULATIONS
-
     colnames(results) <- c("bin", "correlation", "lower_bound", "upper_bound")
 
     best_cor <- max(results$correlation)
@@ -123,7 +126,8 @@ map_best_bin <- function(
         top_2_distance = distance_between_top_2_corrs,
         confident_mapping = confident,
         history = results,
-        bootstrap_iterations = bootstrap_iterations
+        bootstrap_iterations = bootstrap_iterations,
+        metric = metric
     ))
 }
 
@@ -172,7 +176,8 @@ PRIVATE_map_bin <- function(
     bulk_data,
     bulk_id,
     bootstrap_iterations,
-    confidence_level) {
+    confidence_level,
+    metric) {
     genes_present_in_ref <- genes(blase_data)[
         genes(blase_data) %in% rownames(pseudobulk_bins(blase_data)[[i]])
     ]
@@ -197,41 +202,64 @@ PRIVATE_map_bin <- function(
 
     bin_ratios <- pseudobulk_bins(blase_data)[[i]][genes_present_in_both, ]
 
-    corr <- PRIVATE_spearman.ci(
+    if (metric %in% c("spearman", "pearson", "kendall")) {
+      corr <- PRIVATE_correlation.ci(
+          unname(Matrix::rowSums(bin_ratios)),
+          counts_for_top_genes,
+          nrep = bootstrap_iterations,
+          conf.level = confidence_level,
+          metric=metric
+      )
+    } else if (metric == "cosine_similarity") {
+      corr <- PRIVATE_cosine_similarity.ci(
         unname(Matrix::rowSums(bin_ratios)),
         counts_for_top_genes,
         nrep = bootstrap_iterations,
         conf.level = confidence_level
-    )
+      )
+    } else if (metric %in% c("euclidean", "manhattan")) {
+      corr <- PRIVATE_distance.ci(
+        unname(Matrix::rowSums(bin_ratios)),
+        counts_for_top_genes,
+        nrep = bootstrap_iterations,
+        conf.level = confidence_level,
+        metric=metric
+      )
+    } else {
+      stop("Metric not recognised. Please see documentation for valid options.")
+    }
 
     return(c(
         i, corr$estimate, unname(corr$conf.int[1]), unname(corr$conf.int[2])
     ))
 }
 
-#' Confidence interval of a Spearman's rank correlation coefficient
+#' Confidence interval of a correlation coefficient
 #'
-#' Computes the confidence interval of a Spearman's rank correlation
-#' coefficient by bootstraping. Originally implemented in RVAidemoire
+#' Computes the confidence interval of a correlation
+#' coefficient by bootstraping. Adapted from the implementation of
+#' spearman.ci in RVAidemoire
 #' Version 0.9-83-7.
 #'
 #' @param var1 numeric vector (first variable).
 #' @param var2 nuermic verctor (second variable).
 #' @param nrep number of replicates for bootstrapping.
 #' @param conf.level confidence level of the interval.
+#' @param metric character from "pearson", "spearman", "kendall", the
+#' correlation method to use.
 #'
 #' @returns description method name of the test.
 #' @returns data.name a character string giving the name(s) of the data.
 #' @returns conf.level confidence level.
 #' @returns rep number of replicates.
-#' @returns estimate Spearman's rank correlation coefficient.
+#' @returns estimate of correlation coefficient.
 #' @returns conf.int confidence interval.
 #'
 #' @importFrom boot boot
 #' @keywords internal
 #'
-PRIVATE_spearman.ci <-
-    function(var1, var2, nrep = 1000, conf.level = 0.95) {
+PRIVATE_correlation.ci <-
+    function(var1, var2, nrep = 1000, conf.level = 0.95, metric="spearman") {
         if (length(var1) != length(var2)) {
             stop("'", deparse(substitute(var1)), "' and '",
                 deparse(substitute(var2)), "' lengths differ",
@@ -260,7 +288,7 @@ PRIVATE_spearman.ci <-
                 stats::cor.test(
                     data[ind, 1],
                     data[ind, 2],
-                    method = "spearman"
+                    method = metric
                 )$estimate
             ))
         }
@@ -268,17 +296,175 @@ PRIVATE_spearman.ci <-
         interval <- PRIVATE_.ci(simul$t, conf.level = conf.level)
         attr(interval, "conf.level") <- conf.level
         coeff <- as.numeric(suppressWarnings(
-            stats::cor.test(var1, var2, method = "spearman")$estimate
+            stats::cor.test(var1, var2, method = metric)$estimate
         ))
-        names(coeff) <- "rho"
+
+        if (metric == "spearman") {
+          names(coeff) <- "rho"
+        } else if (metric == "pearson") {
+          names(coeff) <- "rho"
+        } else if (metric == "kendall") {
+          names(coeff) <- "tau"
+        }
+
         result <- list(
-            method = "Spearman's rank correlation", conf.level = conf.level,
+            method = metric, conf.level = conf.level,
             rep = nrep, data.name = data.name, estimate = coeff,
             conf.int = interval
         )
         class(result) <- "htest"
         return(result)
     }
+
+#' Confidence interval of a distance metric
+#'
+#' Computes the confidence interval of a Spearman's rank correlation
+#' coefficient by bootstraping. Adapted from the implementation
+#' of spearman.ci in RVAidemoire
+#' Version 0.9-83-7.
+#'
+#' @param var1 numeric vector (first variable).
+#' @param var2 nuermic verctor (second variable).
+#' @param nrep number of replicates for bootstrapping.
+#' @param conf.level confidence level of the interval.
+#' @param metric character from "euclidean", "manhattan", the
+#' distance method to use.
+#'
+#' @returns description method name of the test.
+#' @returns data.name a character string giving the name(s) of the data.
+#' @returns conf.level confidence level.
+#' @returns rep number of replicates.
+#' @returns estimate calculated distance (as a negative, so that there is
+#' consistency with other methods where a higher value indicates more
+#' similarity).
+#' @returns conf.int confidence interval.
+#'
+#' @importFrom boot boot
+#' @keywords internal
+#'
+PRIVATE_distance.ci <-
+  function(var1, var2, nrep = 1000, conf.level = 0.95, metric="euclidean") {
+    if (length(var1) != length(var2)) {
+      stop("'", deparse(substitute(var1)), "' and '",
+           deparse(substitute(var2)), "' lengths differ",
+           sep = ""
+      )
+    }
+    data.name <- paste(deparse(substitute(var1)), " and ",
+                       deparse(substitute(var2)), "\n", nrep, " replicates",
+                       sep = ""
+    )
+    nul <- as.numeric(
+      row.names(table(c(which(is.na(var1)), which(is.na(var2)))))
+    )
+    var1.2 <- if (length(nul) > 0) {
+      var1[-nul]
+    } else {
+      var1
+    }
+    var2.2 <- if (length(nul) > 0) {
+      var2[-nul]
+    } else {
+      var2
+    }
+    dist.fun <- function(data, ind) {
+      as.numeric(suppressWarnings(
+        dist(matrix(c(data[ind, 1], data[ind, 2]), nrow=2), method = metric)[1]
+      ))
+    }
+    simul <- boot::boot(data.frame(var1.2, var2.2), dist.fun, R = nrep)
+    interval <- PRIVATE_.ci(simul$t, conf.level = conf.level)
+    attr(interval, "conf.level") <- conf.level
+    coeff <- as.numeric(suppressWarnings(
+      dist(matrix(c(var1, var2), nrow=2), method = metric)[1]
+    ))
+
+    names(coeff) <- "negative distance"
+
+    coeff = coeff*-1
+    interval[1] = interval[1]*-1
+    interval[2] = interval[2]*-1
+
+    result <- list(
+      method = metric, conf.level = conf.level,
+      rep = nrep, data.name = data.name, estimate = coeff*-1,
+      conf.int = interval
+    )
+    class(result) <- "htest"
+    return(result)
+  }
+
+#' Confidence interval of cosine similarity
+#'
+#' Computes the confidence interval of a cosine similarity
+#' coefficient by bootstraping. Adapted from the implementation
+#' of spearman.ci in RVAidemoire
+#' Version 0.9-83-7.
+#'
+#' @param var1 numeric vector (first variable).
+#' @param var2 nuermic verctor (second variable).
+#' @param nrep number of replicates for bootstrapping.
+#' @param conf.level confidence level of the interval.
+#'
+#' @returns description method name of the test.
+#' @returns data.name a character string giving the name(s) of the data.
+#' @returns conf.level confidence level.
+#' @returns rep number of replicates.
+#' @returns estimate Spearman's rank correlation coefficient.
+#' @returns conf.int confidence interval.
+#'
+#' @importFrom boot boot
+#' @importFrom lsa cosine
+#' @keywords internal
+#'
+PRIVATE_cosine_similarity.ci <-
+  function(var1, var2, nrep = 1000, conf.level = 0.95) {
+    if (length(var1) != length(var2)) {
+      stop("'", deparse(substitute(var1)), "' and '",
+           deparse(substitute(var2)), "' lengths differ",
+           sep = ""
+      )
+    }
+    data.name <- paste(deparse(substitute(var1)), " and ",
+                       deparse(substitute(var2)), "\n", nrep, " replicates",
+                       sep = ""
+    )
+    nul <- as.numeric(
+      row.names(table(c(which(is.na(var1)), which(is.na(var2)))))
+    )
+    var1.2 <- if (length(nul) > 0) {
+      var1[-nul]
+    } else {
+      var1
+    }
+    var2.2 <- if (length(nul) > 0) {
+      var2[-nul]
+    } else {
+      var2
+    }
+    dist.fun <- function(data, ind) {
+      as.numeric(suppressWarnings(
+        lsa::cosine(data[ind, 1], data[ind, 2])
+      ))
+    }
+    simul <- boot::boot(data.frame(var1.2, var2.2), dist.fun, R = nrep)
+    interval <- PRIVATE_.ci(simul$t, conf.level = conf.level)
+    attr(interval, "conf.level") <- conf.level
+    coeff <- as.numeric(suppressWarnings(
+      lsa::cosine(var1, var2)
+    ))
+
+    names(coeff) <- "similarity"
+
+
+    result <- list(
+      method = "cosine_similarity", conf.level = conf.level,
+      rep = nrep, data.name = data.name, estimate = coeff,
+      conf.int = interval
+    )
+    class(result) <- "htest"
+    return(result)
+  }
 
 #' .ci
 #'

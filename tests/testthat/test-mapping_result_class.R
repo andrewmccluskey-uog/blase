@@ -117,3 +117,17 @@ test_that("mapping_result_class show() getter(bootstrap_iterations) works", {
 
     expect_equal(bootstrap_iterations(mapping_result), 200)
 })
+
+test_that("mapping_result_class show() getter(metric) works", {
+  mapping_result <- MappingResult(
+    bulk_name = "Test",
+    best_bin = 1,
+    best_correlation = 0.05,
+    top_2_distance = 0.001,
+    confident_mapping = TRUE,
+    history = data.frame(bin = c(1), correlation = c(0.5), lower_bound = c(0.3), upper_bound = c(0.6)),
+    bootstrap_iterations = 200
+  )
+
+  expect_equal(metric(mapping_result), "spearman")
+})

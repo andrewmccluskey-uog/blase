@@ -45,7 +45,8 @@ Imports:
   mgcv,
   stats,
   MatrixGenerics,
-  Seurat (>= 4.0.0)
+  Seurat (>= 4.0.0),
+  lsa
 Suggests: 
     knitr,
     rmarkdown,

@@ -79,7 +79,8 @@ MappingResult <- function(
     top_2_distance,
     confident_mapping,
     history,
-    bootstrap_iterations) {
+    bootstrap_iterations,
+    metric="spearman") {
 
   return(methods::new("MappingResult",
           bulk_name = bulk_name,
@@ -88,7 +89,8 @@ MappingResult <- function(
           top_2_distance = top_2_distance,
           confident_mapping = confident_mapping,
           history = history,
-          bootstrap_iterations = bootstrap_iterations
+          bootstrap_iterations = bootstrap_iterations,
+          metric = metric
   ))
 
 }
@@ -104,7 +106,8 @@ setClass(
         top_2_distance = "numeric",
         confident_mapping = "logical",
         history = "data.frame",
-        bootstrap_iterations = "numeric"
+        bootstrap_iterations = "numeric",
+        metric = "character"
     )
 )
 
@@ -295,4 +298,22 @@ setMethod(
     f = "bootstrap_iterations",
     signature = "MappingResult",
     definition = function(x) x@bootstrap_iterations
+)
+
+#' @title Get the mapping history for a BLASE Mapping Results object.
+#'
+#' @concept mapping-result-object
+#'
+#' @rdname mapping-result-metric-getter
+#' @param x a [MappingResult] object
+#' @returns a String, the metric used to calculate the result.
+#' @export
+#' @inherit MappingResult examples
+setGeneric("metric", function(x) standardGeneric("metric"))
+
+#' @rdname mapping-result-metric-getter
+setMethod(
+  f = "metric",
+  signature = "MappingResult",
+  definition = function(x) x@metric
 )
