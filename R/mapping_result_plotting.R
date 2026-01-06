@@ -189,18 +189,18 @@ plot_mapping_result_heatmap <- function(
 
       if (metric(mapping_result_list[[1]]) == "cosine_similarity") {
         message("Inferred a scale fill limit of 0-1 for cosine similarity.")
-        lims = c(0,1)
+        lims <- c(0,1)
       } else if (metric(mapping_result_list[[1]]) %in% c("euclidean", "manhattan")) {
         message("Inferred an unbound scale fill limit of distance metrics.")
-        lims = NULL
+        lims <- NULL
       } else if (metric(mapping_result_list[[1]]) %in% c("spearman", "pearson", "kendall")) {
         message("Inferred a scale fill limit of -1-1 for correlation.")
-        lims = c(-1,1)
+        lims <- c(-1,1)
       }
 
 
       heatmap_fill_scale = ggplot2::scale_fill_gradientn(
-        colors <- c("blue", "white", "red"), limits = lims
+        colors = c("blue", "white", "red"), limits = lims
       )
     }
 
