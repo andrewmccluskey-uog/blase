@@ -184,21 +184,23 @@ plot_mapping_result_heatmap <- function(
         stop("You must provide a list of MappingResult objects only.")
     }
 
+    if (metric(mapping_result_list[[1]]) == "cosine_similarity") {
+      message("Inferred cosine similarity metric.")
+      lims <- c(0,1)
+      fill_title = "Cosine Similarity"
+    } else if (metric(mapping_result_list[[1]]) %in% c("euclidean", "manhattan")) {
+      message("Inferred distance metric.")
+      lims <- NULL
+      fill_title = "Distance"
+    } else if (metric(mapping_result_list[[1]]) %in% c("spearman", "pearson", "kendall")) {
+      message("Inferred correlation metric.")
+      lims <- c(-1,1)
+      fill_title = "Correlation"
+    } else {
+      stop("Couldn't infer type of metric.")
+    }
+
     if (is.null(heatmap_fill_scale)) {
-      lims = c(-1,1)
-
-      if (metric(mapping_result_list[[1]]) == "cosine_similarity") {
-        message("Inferred a scale fill limit of 0-1 for cosine similarity.")
-        lims <- c(0,1)
-      } else if (metric(mapping_result_list[[1]]) %in% c("euclidean", "manhattan")) {
-        message("Inferred an unbound scale fill limit of distance metrics.")
-        lims <- NULL
-      } else if (metric(mapping_result_list[[1]]) %in% c("spearman", "pearson", "kendall")) {
-        message("Inferred a scale fill limit of -1-1 for correlation.")
-        lims <- c(-1,1)
-      }
-
-
       heatmap_fill_scale = ggplot2::scale_fill_gradientn(
         colors = c("blue", "white", "red"), limits = lims
       )
@@ -233,7 +235,8 @@ plot_mapping_result_heatmap <- function(
     return(PRIVATE_mapping_result_heatmap_plot(
         bulk_results, heatmap_fill_scale,
         annotate_confidence || annotate_correlation,
-        text_background
+        text_background,
+        fill_title
     ))
 }
 
@@ -273,7 +276,7 @@ PRIVATE_get_df_for_this_bulk_to_plot <- function(
 
 #' @keywords internal
 PRIVATE_mapping_result_heatmap_plot <- function(
-    bulk_results, fill_scale, annotate, text_background) {
+    bulk_results, fill_scale, annotate, text_background, fill_title) {
     bulk_name_sym <- ggplot2::sym("bulk_name")
     pseudotime_bin_sym <- ggplot2::sym("pseudotime_bin")
     correlation_sym <- ggplot2::sym("correlation")
@@ -288,7 +291,7 @@ PRIVATE_mapping_result_heatmap_plot <- function(
         color = {{ is_best_bin_sym }}
     )) +
         ggplot2::labs(
-            x = "Pseudotime Bin", y = "Bulk Sample", fill = "Correlation"
+            x = "Pseudotime Bin", y = "Bulk Sample", fill = fill_title
         ) +
         fill_scale +
         ggplot2::guides(color = "none")
