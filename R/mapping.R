@@ -76,6 +76,7 @@ map_all_best_bins <- function(blase_data, bulk_data,
 #' to run.
 #' @param confidence_level Decimal between 0-1. The confidence interval to
 #' calculate for mappings. Defaults to 90%.
+#' @param log_data Boolean. When true, bulk and bin values are log2 transformed
 #'
 #' @return A [MappingResult] object.
 #' @export
@@ -87,7 +88,8 @@ map_best_bin <- function(
     bulk_data,
     bootstrap_iterations = 200,
     confidence_level = 0.90,
-    metric = "spearman") {
+    metric = "spearman",
+    log_data = FALSE) {
 
     PRIVATE_quality_check_blase_object(blase_data, bulk_data, bulk_id)
 
@@ -101,7 +103,8 @@ map_best_bin <- function(
             bulk_id,
             bootstrap_iterations,
             confidence_level,
-            metric
+            metric,
+            log_data
         ))
     }
     # DISTANCE_CALCULATIONS
@@ -177,7 +180,8 @@ PRIVATE_map_bin <- function(
     bulk_id,
     bootstrap_iterations,
     confidence_level,
-    metric) {
+    metric,
+    log_data) {
     genes_present_in_ref <- genes(blase_data)[
         genes(blase_data) %in% rownames(pseudobulk_bins(blase_data)[[i]])
     ]
@@ -202,25 +206,30 @@ PRIVATE_map_bin <- function(
 
     bin_ratios <- pseudobulk_bins(blase_data)[[i]][genes_present_in_both, ]
 
+    var1 = unname(Matrix::rowSums(bin_ratios))
+    var2 = counts_for_top_genes
+
+    if (log_data) {
+      var1 = log(var1, base=2)
+      var2 = log(var2, base=2)
+    }
+
     if (metric %in% c("spearman", "pearson", "kendall")) {
       corr <- PRIVATE_correlation.ci(
-          unname(Matrix::rowSums(bin_ratios)),
-          counts_for_top_genes,
+          var1, var2,
           nrep = bootstrap_iterations,
           conf.level = confidence_level,
           metric=metric
       )
     } else if (metric == "cosine_similarity") {
       corr <- PRIVATE_cosine_similarity.ci(
-        unname(Matrix::rowSums(bin_ratios)),
-        counts_for_top_genes,
+        var1, var2,
         nrep = bootstrap_iterations,
         conf.level = confidence_level
       )
     } else if (metric %in% c("euclidean", "manhattan")) {
       corr <- PRIVATE_distance.ci(
-        unname(Matrix::rowSums(bin_ratios)),
-        counts_for_top_genes,
+        var1, var2,
         nrep = bootstrap_iterations,
         conf.level = confidence_level,
         metric=metric
@@ -260,8 +269,6 @@ PRIVATE_map_bin <- function(
 #'
 PRIVATE_correlation.ci <-
     function(var1, var2, nrep = 1000, conf.level = 0.95, metric="spearman") {
-      var1 = log(var1, base=2)
-      var2 = log(var2, base=2)
         if (length(var1) != length(var2)) {
             stop("'", deparse(substitute(var1)), "' and '",
                 deparse(substitute(var2)), "' lengths differ",
@@ -346,8 +353,6 @@ PRIVATE_correlation.ci <-
 #'
 PRIVATE_distance.ci <-
   function(var1, var2, nrep = 1000, conf.level = 0.95, metric="euclidean") {
-    var1 = log(var1, base=2)
-    var2 = log(var2, base=2)
     if (length(var1) != length(var2)) {
       stop("'", deparse(substitute(var1)), "' and '",
            deparse(substitute(var2)), "' lengths differ",
@@ -428,9 +433,6 @@ PRIVATE_distance.ci <-
 #'
 PRIVATE_cosine_similarity.ci <-
   function(var1, var2, nrep = 1000, conf.level = 0.95) {
-
-    var1 = log(var1, base=2)
-    var2 = log(var2, base=2)
 
     if (length(var1) != length(var2)) {
       stop("'", deparse(substitute(var1)), "' and '",
