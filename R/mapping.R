@@ -382,8 +382,12 @@ PRIVATE_distance.ci <-
     names(coeff) <- "negative distance"
 
     coeff = coeff*-1
-    interval[1] = interval[1]*-1
-    interval[2] = interval[2]*-1
+    interval = interval*-1
+
+    biggest_mag = max(interval)
+
+    coeff = coeff + biggest_mag
+    interval = interval + biggest_mag
 
     result <- list(
       method = metric, conf.level = conf.level,
