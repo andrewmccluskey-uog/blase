@@ -379,12 +379,12 @@ PRIVATE_distance.ci <-
       dist(matrix(c(var1, var2), nrow=2), method = metric)[1]
     ))
 
-    names(coeff) <- "negative distance"
+    names(coeff) <- "similarity"
 
     coeff = coeff*-1
     interval = interval*-1
 
-    biggest_mag = max(interval)
+    biggest_mag = min(interval)
 
     coeff = coeff + biggest_mag
     interval = interval + biggest_mag
