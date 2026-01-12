@@ -381,10 +381,11 @@ PRIVATE_distance.ci <-
 
     names(coeff) <- "similarity"
 
+    # Get this before we make it negative
+    biggest_mag = max(interval)
+
     coeff = coeff*-1
     interval = interval*-1
-
-    biggest_mag = min(interval)
 
     coeff = coeff + biggest_mag
     interval = interval + biggest_mag
