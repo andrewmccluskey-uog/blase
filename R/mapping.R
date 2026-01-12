@@ -387,7 +387,7 @@ PRIVATE_distance.ci <-
 
     result <- list(
       method = metric, conf.level = conf.level,
-      rep = nrep, data.name = data.name, estimate = coeff*-1,
+      rep = nrep, data.name = data.name, estimate = coeff,
       conf.int = interval
     )
     class(result) <- "htest"
