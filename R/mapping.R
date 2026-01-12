@@ -344,6 +344,8 @@ PRIVATE_correlation.ci <-
 #'
 PRIVATE_distance.ci <-
   function(var1, var2, nrep = 1000, conf.level = 0.95, metric="euclidean") {
+    var1 = log(var1, base=2)
+    var2 = log(var2, base=2)
     if (length(var1) != length(var2)) {
       stop("'", deparse(substitute(var1)), "' and '",
            deparse(substitute(var2)), "' lengths differ",
@@ -424,8 +426,6 @@ PRIVATE_distance.ci <-
 #'
 PRIVATE_cosine_similarity.ci <-
   function(var1, var2, nrep = 1000, conf.level = 0.95) {
-    var1 = log(var1, base=2)
-    var2 = log(var2, base=2)
 
     if (length(var1) != length(var2)) {
       stop("'", deparse(substitute(var1)), "' and '",
