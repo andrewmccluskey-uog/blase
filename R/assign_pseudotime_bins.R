@@ -70,7 +70,6 @@ setMethod(
 
         # Based on cell counts per lineage, assign number of bins
         lineage_cell_counts = table(x$original_lineage)
-        message(lineage_cell_counts)
 
         nominal_bin_size = floor(ncol(x[,x$combined_pseudotime!=-1]) / n_bins)
         message(paste("Nominal cells per bin:", nominal_bin_size))
@@ -86,7 +85,6 @@ setMethod(
 
         x$pseudotime_bin = NA
         for (lin in lineages_long_to_short) {
-          print(lin)
           bins_for_lineage = lineage_n_bins[[lin]]
 
           y = x[, x$original_lineage==lin & !is.na(x$original_lineage)]
@@ -97,10 +95,10 @@ setMethod(
 
           # include 0 as an option as for first sample, all are NA, so max()
           # returns -Inf
-          # x[, x$original_lineage==lin & !is.na(x$original_lineage)]$pseudotime_bin <- y$pseudotime_bin + max(x$pseudotime_bin, 0, na.rm = TRUE)
-          x$pseudotime_bin = replace(x$pseudotime_bin, x$original_lineage==lin & !is.na(x$original_lineage), y$pseudotime_bin + max(x$pseudotime_bin, 0, na.rm = TRUE))
-
-          print(table(x$original_lineage, x$pseudotime_bin))
+          x$pseudotime_bin = replace(
+            x$pseudotime_bin,
+            x$original_lineage==lin & !is.na(x$original_lineage),
+            y$pseudotime_bin + max(x$pseudotime_bin, 0, na.rm = TRUE))
         }
 
         return(x)
