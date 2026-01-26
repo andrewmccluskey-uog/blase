@@ -11,9 +11,10 @@ MappingResult(
   best_bin,
   best_correlation,
   top_2_distance,
-  confident_mapping,
+  strong_mapping,
   history,
-  bootstrap_iterations
+  bootstrap_iterations,
+  metric = "spearman"
 )
 }
 \arguments{
@@ -27,7 +28,7 @@ between the winning bin and the bulk.}
 \item{top_2_distance}{Decimal. The absolute difference between the best and
 second best mapping buckets. Higher indicates a less doubtful mapping.}
 
-\item{confident_mapping}{Boolean. TRUE when the mapped bin's lower
+\item{strong_mapping}{Boolean. TRUE when the mapped bin's lower
 bound is higher than the maximum upper bound of the other bins.}
 
 \item{history}{A dataframe of the correlation score (decimal) and
@@ -88,7 +89,7 @@ bulk_name(result)
 best_bin(result)
 best_correlation(result)
 top_2_distance(result)
-confident_mapping(result)
+strong_mapping(result)
 mapping_history(result)
 bootstrap_iterations(result)
 }

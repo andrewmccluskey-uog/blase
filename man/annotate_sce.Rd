@@ -22,7 +22,7 @@ to store the new annotations.}
 
 \item{include_stats}{Boolean. Whether or not to include metadata columns
 containing the correlation of the best matching bin, and whether
-that mapping was confident.}
+that mapping was strong.}
 }
 \value{
 A \link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment::SingleCellExperiment} with annotations

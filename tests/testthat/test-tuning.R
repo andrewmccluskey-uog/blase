@@ -1,5 +1,5 @@
 ## evaluate_parameters
-test_that("evaluate_parameters() generates tuple of minimum and mean specifcity, pct confident mappings for parameters", {
+test_that("evaluate_parameters() generates tuple of minimum and mean specifcity, pct strong mappings for parameters", {
     cells <- 100
     genes <- 20
     counts_matrix <- matrix(seq_len(cells * genes), ncol = cells, nrow = genes)
@@ -66,7 +66,7 @@ test_that("find_best_params() runs without error", {
         gene_count = c(5, 10, 5, 10),
         min_convexity = as.double(c(NA, NA, NA, NA)),
         mean_convexity = as.double(c(NA, NA, NA, NA)),
-        confident_mapping_pct = as.double(c(NA, NA, NA, NA))
+        strong_mapping_pct = as.double(c(NA, NA, NA, NA))
     ))
     rownames(expected) <- seq_len(4)
 
@@ -81,7 +81,7 @@ test_that("plot_find_best_params() runs without error", {
     gene_count = c(5, 10, 5, 10),
     min_convexity = as.double(c(0.1, 0.4, 0.2, 0.6)),
     mean_convexity = as.double(c(0.15, 0.45, 0.25, 0.65)),
-    confident_mapping_pct = as.double(c(0.7, 0.3, 0.4, 0.1))
+    strong_mapping_pct = as.double(c(0.7, 0.3, 0.4, 0.1))
   ))
 
   tmp1 <- function() print(plot_find_best_params_results(find_best_params_result))

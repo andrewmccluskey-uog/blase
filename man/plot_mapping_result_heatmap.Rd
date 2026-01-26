@@ -6,9 +6,8 @@
 \usage{
 plot_mapping_result_heatmap(
   mapping_result_list,
-  heatmap_fill_scale = ggplot2::scale_fill_gradientn(colors = c("blue", "white", "red"),
-    limits = c(-1, 1)),
-  annotate_confidence = TRUE,
+  heatmap_fill_scale = NULL,
+  annotate_strong = TRUE,
   annotate_correlation = FALSE,
   bin_order = NULL,
   text_background = FALSE
@@ -21,7 +20,7 @@ in the heatmap.}
 \item{heatmap_fill_scale}{The ggplot2 compatible fill gradient scale to
 apply to the heatmap.}
 
-\item{annotate_confidence}{Boolan. Whether to annotate the heatmap with
+\item{annotate_strong}{Boolan. Whether to annotate the heatmap with
 significant results or not, defaults to TRUE.}
 
 \item{annotate_correlation}{Boolean. Whether to annotate the heatmap with
@@ -40,7 +39,7 @@ every pseudotime bin.
 }
 \description{
 Plots Spearman's Rho as the fill colour, and adds * if the \link{MappingResult}
-was confidently assigned.
+was strongly assigned.
 }
 \examples{
 counts_matrix <- matrix(
@@ -87,7 +86,7 @@ bulk_name(result)
 best_bin(result)
 best_correlation(result)
 top_2_distance(result)
-confident_mapping(result)
+strong_mapping(result)
 mapping_history(result)
 bootstrap_iterations(result)
 }

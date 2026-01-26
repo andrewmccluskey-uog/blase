@@ -10,7 +10,7 @@
 #' between the winning bin and the bulk.
 #' @param top_2_distance Decimal. The absolute difference between the best and
 #' second best mapping buckets. Higher indicates a less doubtful mapping.
-#' @param confident_mapping Boolean. TRUE when the mapped bin's lower
+#' @param strong_mapping Boolean. TRUE when the mapped bin's lower
 #' bound is higher than the maximum upper bound of the other bins.
 #' @param history A dataframe of the correlation score (decimal) and
 #' confidence bounds (decimal pairs) for each bin.
@@ -69,7 +69,7 @@
 #' best_bin(result)
 #' best_correlation(result)
 #' top_2_distance(result)
-#' confident_mapping(result)
+#' strong_mapping(result)
 #' mapping_history(result)
 #' bootstrap_iterations(result)
 MappingResult <- function(
@@ -77,7 +77,7 @@ MappingResult <- function(
     best_bin,
     best_correlation,
     top_2_distance,
-    confident_mapping,
+    strong_mapping,
     history,
     bootstrap_iterations,
     metric="spearman") {
@@ -87,7 +87,7 @@ MappingResult <- function(
           best_bin = best_bin,
           best_correlation = best_correlation,
           top_2_distance = top_2_distance,
-          confident_mapping = confident_mapping,
+          strong_mapping = strong_mapping,
           history = history,
           bootstrap_iterations = bootstrap_iterations,
           metric = metric
@@ -104,7 +104,7 @@ setClass(
         best_bin = "numeric",
         best_correlation = "numeric",
         top_2_distance = "numeric",
-        confident_mapping = "logical",
+        strong_mapping = "logical",
         history = "data.frame",
         bootstrap_iterations = "numeric",
         metric = "character"
@@ -139,8 +139,8 @@ setMethod(
                 " top_2_distance=", top_2_distance(object)
             ),
             paste(
-                "\t Confident Result:",
-                confident_mapping(object),
+                "\t Strong Result:",
+                strong_mapping(object),
                 "(next max upper ",
                 non_top_mapping_best_upper_bound,
                 ")"
@@ -239,25 +239,25 @@ setMethod(
     definition = function(x) x@top_2_distance
 )
 
-#' @title Get if the result is confident for a BLASE Mapping Results object.
+#' @title Get if the result is strong for a BLASE Mapping Results object.
 #'
 #' @concept mapping-result-object
 #'
-#' @rdname mapping-result-confident-mapping-getter
+#' @rdname mapping-result-strong-mapping-getter
 #' @param x a [MappingResult] object
-#' @returns Boolean. TRUE if the result is confident, otherwise FALSE
+#' @returns Boolean. TRUE if the result is strong, otherwise FALSE
 #' @export
 #' @inherit MappingResult examples
 setGeneric(
-    "confident_mapping",
-    function(x) standardGeneric("confident_mapping")
+    "strong_mapping",
+    function(x) standardGeneric("strong_mapping")
 )
 
-#' @rdname mapping-result-confident-mapping-getter
+#' @rdname mapping-result-strong-mapping-getter
 setMethod(
-    f = "confident_mapping",
+    f = "strong_mapping",
     signature = "MappingResult",
-    definition = function(x) x@confident_mapping
+    definition = function(x) x@strong_mapping
 )
 
 #' @title Get the mapping history for a BLASE Mapping Results object.

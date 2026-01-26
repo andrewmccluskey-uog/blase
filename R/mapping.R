@@ -120,14 +120,14 @@ map_best_bin <- function(
     distance_between_top_2_corrs <- round(top2[1] - top2[2], 4)
     second_best_high_bound <- max(results[results$bin != best_i, ]$upper_bound)
     best_low_bound <- results[results$bin == best_i, ]$lower_bound
-    confident <- second_best_high_bound < best_low_bound && best_low_bound > 0
+    strong_call <- second_best_high_bound < best_low_bound && best_low_bound > 0
 
     return(MappingResult(
         bulk_name = bulk_id,
         best_bin = best_i,
         best_correlation = best_cor,
         top_2_distance = distance_between_top_2_corrs,
-        confident_mapping = confident,
+        strong_mapping = strong_call,
         history = results,
         bootstrap_iterations = bootstrap_iterations,
         metric = metric

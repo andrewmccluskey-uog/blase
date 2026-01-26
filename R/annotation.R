@@ -16,7 +16,7 @@
 #' to store the new annotations.
 #' @param include_stats Boolean. Whether or not to include metadata columns
 #' containing the correlation of the best matching bin, and whether
-#' that mapping was confident.
+#' that mapping was strong.
 #'
 #' @return A [SingleCellExperiment::SingleCellExperiment] with annotations
 #' added to metadata (in a column defined by `annotation_col`), and the

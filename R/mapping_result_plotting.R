@@ -150,7 +150,7 @@ setMethod(
 #'
 #' @description
 #' Plots Spearman's Rho as the fill colour, and adds * if the [MappingResult]
-#'  was confidently assigned.
+#'  was strongly assigned.
 #'
 #' @concept mapping_plots
 #'
@@ -158,7 +158,7 @@ setMethod(
 #' in the heatmap.
 #' @param heatmap_fill_scale The ggplot2 compatible fill gradient scale to
 #' apply to the heatmap.
-#' @param annotate_confidence Boolan. Whether to annotate the heatmap with
+#' @param annotate_strong Boolan. Whether to annotate the heatmap with
 #' significant results or not, defaults to TRUE.
 #' @param annotate_correlation Boolean. Whether to annotate the heatmap with
 #' the correlation of bin to each bulk sample. Defaults to FALSE.
@@ -176,7 +176,7 @@ setMethod(
 plot_mapping_result_heatmap <- function(
     mapping_result_list,
     heatmap_fill_scale = NULL,
-    annotate_confidence = TRUE,
+    annotate_strong = TRUE,
     annotate_correlation = FALSE,
     bin_order = NULL,
     text_background=FALSE) {
@@ -214,7 +214,7 @@ plot_mapping_result_heatmap <- function(
 
     for (mappingResult in mapping_result_list) {
         this_bulk_results <- PRIVATE_get_df_for_this_bulk_to_plot(
-            mappingResult, annotate_confidence, annotate_correlation
+            mappingResult, annotate_strong, annotate_correlation
         )
         bulk_results <- rbind(bulk_results, this_bulk_results)
     }
@@ -234,7 +234,7 @@ plot_mapping_result_heatmap <- function(
 
     return(PRIVATE_mapping_result_heatmap_plot(
         bulk_results, heatmap_fill_scale,
-        annotate_confidence || annotate_correlation,
+        annotate_strong || annotate_correlation,
         text_background,
         fill_title
     ))
@@ -242,15 +242,15 @@ plot_mapping_result_heatmap <- function(
 
 #' @keywords internal
 PRIVATE_get_df_for_this_bulk_to_plot <- function(
-    mappingResult, annotate_confident, annotate_corr) {
+    mappingResult, annotate_strong, annotate_corr) {
     history <- mapping_history(mappingResult)
 
     mapp_corrs <- history[, "correlation"]
 
-    confident_mapping <- ifelse(
+    strong_mapping <- ifelse(
         history[, "bin"] == best_bin(mappingResult) &
             rep(
-                confident_mapping(mappingResult),
+              strong_mapping(mappingResult),
                 length(history[, "bin"])
             ),
         "*",
@@ -261,8 +261,8 @@ PRIVATE_get_df_for_this_bulk_to_plot <- function(
     if (annotate_corr) {
         labels <- paste0(labels, round(mapp_corrs, 2))
     }
-    if (annotate_confident) {
-        labels <- paste0(labels, confident_mapping)
+    if (annotate_strong) {
+        labels <- paste0(labels, strong_mapping)
     }
 
     return(data.frame(

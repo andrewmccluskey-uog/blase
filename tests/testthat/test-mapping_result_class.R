@@ -5,14 +5,14 @@ test_that("mapping_result_class show() prints what we expect", {
         best_bin = 1,
         best_correlation = 0.05,
         top_2_distance = 0.001,
-        confident_mapping = TRUE,
+        strong_mapping = TRUE,
         history = data.frame(bin = c(1), correlation = c(0.5), lower_bound = c(0.3), upper_bound = c(0.6)),
         bootstrap_iterations = 200
     )
 
     expect_output(
         print(mapping_result),
-        "best_bin=1 correlation=0.05 top_2_distance=0.001\n\t Confident Result: TRUE (next max upper  -Inf )\n\t with history for scores against 1  bins\n\t Bootstrapped with 200 iterations",
+        "best_bin=1 correlation=0.05 top_2_distance=0.001\n\t Strong Result: TRUE (next max upper  -Inf )\n\t with history for scores against 1  bins\n\t Bootstrapped with 200 iterations",
         fixed = TRUE
     )
 })
@@ -24,7 +24,7 @@ test_that("mapping_result_class show() getter(bulk_name) works", {
         best_bin = 1,
         best_correlation = 0.05,
         top_2_distance = 0.001,
-        confident_mapping = TRUE,
+        strong_mapping = TRUE,
         history = data.frame(bin = c(1), correlation = c(0.5), lower_bound = c(0.3), upper_bound = c(0.6)),
         bootstrap_iterations = 200
     )
@@ -38,7 +38,7 @@ test_that("mapping_result_class show() getter(best_bin) works", {
         best_bin = 1,
         best_correlation = 0.05,
         top_2_distance = 0.001,
-        confident_mapping = TRUE,
+        strong_mapping = TRUE,
         history = data.frame(bin = c(1), correlation = c(0.5), lower_bound = c(0.3), upper_bound = c(0.6)),
         bootstrap_iterations = 200
     )
@@ -52,7 +52,7 @@ test_that("mapping_result_class show() getter(best_correlation) works", {
         best_bin = 1,
         best_correlation = 0.05,
         top_2_distance = 0.001,
-        confident_mapping = TRUE,
+        strong_mapping = TRUE,
         history = data.frame(bin = c(1), correlation = c(0.5), lower_bound = c(0.3), upper_bound = c(0.6)),
         bootstrap_iterations = 200
     )
@@ -66,7 +66,7 @@ test_that("mapping_result_class show() getter(top_2_distance) works", {
         best_bin = 1,
         best_correlation = 0.05,
         top_2_distance = 0.001,
-        confident_mapping = TRUE,
+        strong_mapping = TRUE,
         history = data.frame(bin = c(1), correlation = c(0.5), lower_bound = c(0.3), upper_bound = c(0.6)),
         bootstrap_iterations = 200
     )
@@ -75,18 +75,18 @@ test_that("mapping_result_class show() getter(top_2_distance) works", {
 })
 
 
-test_that("mapping_result_class show() getter(confident_mapping) works", {
+test_that("mapping_result_class show() getter(strong_mapping) works", {
     mapping_result <- MappingResult(
         bulk_name = "Test",
         best_bin = 1,
         best_correlation = 0.05,
         top_2_distance = 0.001,
-        confident_mapping = TRUE,
+        strong_mapping = TRUE,
         history = data.frame(bin = c(1), correlation = c(0.5), lower_bound = c(0.3), upper_bound = c(0.6)),
         bootstrap_iterations = 200
     )
 
-    expect_equal(confident_mapping(mapping_result), TRUE)
+    expect_equal(strong_mapping(mapping_result), TRUE)
 })
 
 test_that("mapping_result_class show() getter(mapping_history) works", {
@@ -96,7 +96,7 @@ test_that("mapping_result_class show() getter(mapping_history) works", {
         best_bin = 1,
         best_correlation = 0.05,
         top_2_distance = 0.001,
-        confident_mapping = TRUE,
+        strong_mapping = TRUE,
         history = history,
         bootstrap_iterations = 200
     )
@@ -110,7 +110,7 @@ test_that("mapping_result_class show() getter(bootstrap_iterations) works", {
         best_bin = 1,
         best_correlation = 0.05,
         top_2_distance = 0.001,
-        confident_mapping = TRUE,
+        strong_mapping = TRUE,
         history = data.frame(bin = c(1), correlation = c(0.5), lower_bound = c(0.3), upper_bound = c(0.6)),
         bootstrap_iterations = 200
     )
@@ -124,7 +124,7 @@ test_that("mapping_result_class show() getter(metric) works", {
     best_bin = 1,
     best_correlation = 0.05,
     top_2_distance = 0.001,
-    confident_mapping = TRUE,
+    strong_mapping = TRUE,
     history = data.frame(bin = c(1), correlation = c(0.5), lower_bound = c(0.3), upper_bound = c(0.6)),
     bootstrap_iterations = 200
   )

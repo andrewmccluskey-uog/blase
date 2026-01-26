@@ -46,7 +46,7 @@ cells per bin.}
 
 \item{n_bins}{Integer. The number of bins to split the cells into.}
 
-\item{pseudotime_slot}{String. The name of the
+\item{pseudotime_slot}{String or Vector of Strings. The name of the
 \link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment::SingleCellExperiment} slot containing the
 pseudotime values for each cell.}
 
@@ -104,7 +104,7 @@ bulk_name(result)
 best_bin(result)
 best_correlation(result)
 top_2_distance(result)
-confident_mapping(result)
+strong_mapping(result)
 mapping_history(result)
 bootstrap_iterations(result)
 }

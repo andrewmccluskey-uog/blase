@@ -25,7 +25,7 @@ find_best_params(
 \item{gene_count_range}{Integer vector. The n_genes list to try out}
 
 \item{bootstrap_iterations}{Integer. Iterations for bootstrapping
-when calculating confident mappings.}
+when calculating strong mappings.}
 
 \item{BPPARAM}{The \link[BiocParallel:BiocParallelParam-class]{BiocParallel::BiocParallelParam}. Defaults to
 \link[BiocParallel:SerialParam-class]{BiocParallel::SerialParam}}
@@ -39,10 +39,10 @@ A dataframe of the results.
 \item gene_count: Integer. The top n genes to use for this attempt
 \item min_convexity: Decimal. The worst convexity for these parameters
 \item mean_convexity: Decimal. The mean convexity for these parameters
-\item confident_mapping_pct: Decimal. The percent of bins which were
-confidently mapped to themselves for these parameters.
+\item strong_mapping_pct: Decimal. The percent of bins which were
+strongly mapped to themselves for these parameters.
 If this value is low, then it is likely that in real use,
-few or no results will be confidently mapped.
+few or no results will be strongly mapped.
 }
 }
 \description{

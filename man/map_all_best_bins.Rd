@@ -9,7 +9,8 @@ map_all_best_bins(
   bulk_data,
   bootstrap_iterations = 200,
   confidence_level = 0.9,
-  BPPARAM = BiocParallel::SerialParam()
+  BPPARAM = BiocParallel::SerialParam(),
+  metric = "spearman"
 )
 }
 \arguments{
@@ -78,7 +79,7 @@ bulk_name(result)
 best_bin(result)
 best_correlation(result)
 top_2_distance(result)
-confident_mapping(result)
+strong_mapping(result)
 mapping_history(result)
 bootstrap_iterations(result)
 }
