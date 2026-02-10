@@ -75,5 +75,8 @@ top_2_distance(result)
 strong_mapping(result)
 mapping_history(result)
 bootstrap_iterations(result)
+
+# Setters
+bulk_name(result) <- "New Name"
 }
 \concept{mapping_plots}

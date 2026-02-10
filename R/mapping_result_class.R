@@ -72,6 +72,9 @@
 #' strong_mapping(result)
 #' mapping_history(result)
 #' bootstrap_iterations(result)
+#'
+#' # Setters
+#' bulk_name(result) <- "New Name"
 MappingResult <- function(
     bulk_name,
     best_bin,
@@ -177,6 +180,32 @@ setMethod(
     f = "bulk_name",
     signature = "MappingResult",
     definition = function(x) x@bulk_name
+)
+
+#' @title Set name of bulk of a BLASE Mapping Results object.
+#'
+#' @concept mapping-result-object
+#'
+#' @rdname bulk_name-setter
+#' @param x a [MappingResult] object
+#' @param value String. The name of the bulk used to map against.
+#'
+#' @returns Nothing
+#'
+#' @importFrom methods validObject
+#' @export
+#' @inherit BlaseData-class examples
+setGeneric("bulk_name<-", function(x, value) standardGeneric("bulk_name<-"))
+
+#' @rdname bulk_name-setter
+setMethod(
+  f = "bulk_name<-",
+  signature = "MappingResult",
+  definition = function(x, value) {
+    x@bulk_name <- value
+    validObject(x)
+    x
+  }
 )
 
 
