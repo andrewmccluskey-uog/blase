@@ -47,7 +47,7 @@ cells per bin.}
 \item{n_bins}{Integer. The number of bins to split the cells into.}
 
 \item{pseudotime_slot}{String or Vector of Strings. The name of the
-\link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment::SingleCellExperiment} slot containing the
+\link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment::SingleCellExperiment} slot(s) containing the
 pseudotime values for each cell.}
 
 \item{...}{For arguments passed to other functions. Unused.}

@@ -17,8 +17,9 @@ setGeneric(
 )
 
 #' @rdname as.BlaseData
-#' @param pseudotime_slot The [SingleCellExperiment::SingleCellExperiment]
-#' slot containing pseudotime values for each cell to be passed to
+#' @param pseudotime_slot String or vector of strings.
+#' The [SingleCellExperiment::SingleCellExperiment]
+#' slot(s) containing pseudotime values for each cell to be passed to
 #' [assign_pseudotime_bins()].
 #' @param n_bins Integer. The number of bins to create, passed to
 #' [assign_pseudotime_bins()].

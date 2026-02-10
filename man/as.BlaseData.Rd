@@ -19,8 +19,9 @@ as.BlaseData(x, ...)
 
 \item{...}{additional arguments passed to object-specific methods.}
 
-\item{pseudotime_slot}{The \link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment::SingleCellExperiment}
-slot containing pseudotime values for each cell to be passed to
+\item{pseudotime_slot}{String or vector of strings.
+The \link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment::SingleCellExperiment}
+slot(s) containing pseudotime values for each cell to be passed to
 \code{\link[=assign_pseudotime_bins]{assign_pseudotime_bins()}}.}
 
 \item{n_bins}{Integer. The number of bins to create, passed to

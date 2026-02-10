@@ -10,7 +10,7 @@
 #' cells per bin.
 #' @param n_bins Integer. The number of bins to split the cells into.
 #' @param pseudotime_slot String or Vector of Strings. The name of the
-#' [SingleCellExperiment::SingleCellExperiment] slot containing the
+#' [SingleCellExperiment::SingleCellExperiment] slot(s) containing the
 #' pseudotime values for each cell.
 #' @param ... For arguments passed to other functions. Unused.
 #'
