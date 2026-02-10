@@ -219,10 +219,12 @@ plot_mapping_result_heatmap <- function(
         bulk_results <- rbind(bulk_results, this_bulk_results)
     }
 
-    bulk_results$bulk_name <- factor(
+    if (!is.numeric(bulk_results$bulk_name)) {
+      bulk_results$bulk_name <- factor(
         bulk_results$bulk_name,
         levels = as.character(unique(bulk_results$bulk_name))
-    )
+      )
+    }
 
     if (is.null(bin_order)) {
         bin_order <- bulk_results$pseudotime_bin
