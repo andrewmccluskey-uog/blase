@@ -67,7 +67,6 @@ setMethod(
         }
 
         # remove cells with no lineage
-
         # Based on cell counts per lineage, assign number of bins
         lineage_cell_counts = table(x$original_lineage)
 
@@ -263,9 +262,6 @@ PRIVATE_assign_pseudotime_bins_for_one_lineage <- function(
       cells_for_bin <- pseudotime_ordered_cells[
         (i * cells_per_bin - cells_per_bin + 1):(i * cells_per_bin)
       ]
-      # pseudotime_sce[, cells_for_bin]$pseudotime_bin <- i
-
-      print(i)
       pseudotime_sce$pseudotime_bin = replace(pseudotime_sce$pseudotime_bin, colnames(pseudotime_sce) %in% cells_for_bin, i)
     }
   }
