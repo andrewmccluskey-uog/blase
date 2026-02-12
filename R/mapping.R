@@ -99,7 +99,6 @@ map_best_bin <- function(
 
     PRIVATE_quality_check_blase_object(blase_data, bulk_data, bulk_id)
 
-    # DISTANCE_CALCULATIONS
     results <- data.frame()
     for (i in bins(blase_data)) {
         results <- rbind(results, PRIVATE_map_bin(
@@ -113,7 +112,6 @@ map_best_bin <- function(
             log_data
         ))
     }
-    # DISTANCE_CALCULATIONS
     colnames(results) <- c("bin", "correlation", "lower_bound", "upper_bound")
 
     best_cor <- max(results$correlation)
@@ -188,65 +186,40 @@ PRIVATE_map_bin <- function(
     confidence_level,
     metric,
     log_data) {
-    genes_present_in_ref <- genes(blase_data)[
-        genes(blase_data) %in% rownames(pseudobulk_bins(blase_data)[[i]])
-    ]
+    genes_in_ref <- genes(blase_data)[
+        genes(blase_data) %in% rownames(pseudobulk_bins(blase_data)[[i]])]
+    genes_in_both <- genes_in_ref[genes_in_ref %in% rownames(bulk_data)]
 
-    genes_present_in_both <- genes_present_in_ref[
-        genes_present_in_ref %in% rownames(bulk_data)
-    ]
-
-    if (length(genes(blase_data)) != length(genes_present_in_both)) {
-        warning(
-            "Genes for mapping not all in bulk, using ",
-            length(genes_present_in_both),
-            " genes available in both reference and bulk."
-        )
+    if (length(genes(blase_data)) != length(genes_in_both)) {
+        warning("Genes for mapping not all in bulk, using ",
+            length(genes_in_both),
+            " genes available in both reference and bulk.")
     }
-
-    PRIVATE_quality_check_bin(blase_data, i, genes_present_in_both)
-
-    counts_for_top_genes <- bulk_data[
-        genes_present_in_both, as.character(bulk_id)
-    ]
-
-    bin_ratios <- pseudobulk_bins(blase_data)[[i]][genes_present_in_both, ]
-
-    var1 = unname(Matrix::rowSums(bin_ratios))
-    var2 = counts_for_top_genes
-
+    PRIVATE_quality_check_bin(blase_data, i, genes_in_both)
+    counts_for_top_genes <- bulk_data[genes_in_both, as.character(bulk_id)]
+    bin_ratios <- pseudobulk_bins(blase_data)[[i]][genes_in_both, ]
+    var1 <- unname(Matrix::rowSums(bin_ratios))
+    var2 <- counts_for_top_genes
     if (log_data) {
-      var1 = log(var1, base=2)
-      var2 = log(var2, base=2)
+      var1 <- log(var1, base=2)
+      var2 <- log(var2, base=2)
     }
-
     if (metric %in% c("spearman", "pearson", "kendall")) {
-      corr <- PRIVATE_correlation.ci(
-          var1, var2,
-          nrep = bootstrap_iterations,
-          conf.level = confidence_level,
-          metric=metric
-      )
+      res <- PRIVATE_correlation.ci(
+          var1, var2, nrep = bootstrap_iterations,
+          conf.level = confidence_level, metric=metric)
     } else if (metric == "cosine_similarity") {
-      corr <- PRIVATE_cosine_similarity.ci(
-        var1, var2,
-        nrep = bootstrap_iterations,
-        conf.level = confidence_level
-      )
+      res <- PRIVATE_cosine_similarity.ci(
+        var1, var2, nrep = bootstrap_iterations, conf.level = confidence_level)
     } else if (metric %in% c("euclidean", "manhattan")) {
-      corr <- PRIVATE_distance.ci(
-        var1, var2,
-        nrep = bootstrap_iterations,
-        conf.level = confidence_level,
-        metric=metric
-      )
+      res <- PRIVATE_distance.ci(
+        var1, var2, nrep = bootstrap_iterations, conf.level = confidence_level,
+        metric=metric)
     } else {
       stop("Metric not recognised. Please see documentation for valid options.")
     }
-
     return(c(
-        i, corr$estimate, unname(corr$conf.int[1]), unname(corr$conf.int[2])
-    ))
+        i, res$estimate, unname(res$conf.int[1]), unname(res$conf.int[2])))
 }
 
 #' Confidence interval of a correlation coefficient
@@ -278,16 +251,12 @@ PRIVATE_correlation.ci <-
         if (length(var1) != length(var2)) {
             stop("'", deparse(substitute(var1)), "' and '",
                 deparse(substitute(var2)), "' lengths differ",
-                sep = ""
-            )
+                sep = "")
         }
         data.name <- paste(deparse(substitute(var1)), " and ",
-            deparse(substitute(var2)), "\n", nrep, " replicates",
-            sep = ""
-        )
+            deparse(substitute(var2)), "\n", nrep, " replicates", sep = "")
         nul <- as.numeric(
-            row.names(table(c(which(is.na(var1)), which(is.na(var2)))))
-        )
+            row.names(table(c(which(is.na(var1)), which(is.na(var2))))))
         var1.2 <- if (length(nul) > 0) {
             var1[-nul]
         } else {
@@ -304,15 +273,13 @@ PRIVATE_correlation.ci <-
                     data[ind, 1],
                     data[ind, 2],
                     method = metric
-                )$estimate
-            ))
+                )$estimate))
         }
         simul <- boot::boot(data.frame(var1.2, var2.2), cor.fun, R = nrep)
         interval <- PRIVATE_.ci(simul$t, conf.level = conf.level)
         attr(interval, "conf.level") <- conf.level
         coeff <- as.numeric(suppressWarnings(
-            stats::cor.test(var1, var2, method = metric)$estimate
-        ))
+            stats::cor.test(var1, var2, method = metric)$estimate))
 
         if (metric == "spearman") {
           names(coeff) <- "rho"
@@ -323,10 +290,8 @@ PRIVATE_correlation.ci <-
         }
 
         result <- list(
-            method = metric, conf.level = conf.level,
-            rep = nrep, data.name = data.name, estimate = coeff,
-            conf.int = interval
-        )
+            method = metric, conf.level = conf.level, rep = nrep,
+            data.name = data.name, estimate = coeff, conf.int = interval)
         class(result) <- "htest"
         return(result)
     }
@@ -363,16 +328,15 @@ PRIVATE_distance.ci <-
     if (length(var1) != length(var2)) {
       stop("'", deparse(substitute(var1)), "' and '",
            deparse(substitute(var2)), "' lengths differ",
-           sep = ""
-      )
+           sep = "")
     }
     data.name <- paste(deparse(substitute(var1)), " and ",
                        deparse(substitute(var2)), "\n", nrep, " replicates",
                        sep = ""
     )
     nul <- as.numeric(
-      row.names(table(c(which(is.na(var1)), which(is.na(var2)))))
-    )
+      row.names(table(c(which(is.na(var1)), which(is.na(var2))))))
+
     var1.2 <- if (length(nul) > 0) {
       var1[-nul]
     } else {
@@ -385,32 +349,23 @@ PRIVATE_distance.ci <-
     }
     dist.fun <- function(data, ind) {
       as.numeric(suppressWarnings(
-        stats::dist(matrix(c(data[ind, 1], data[ind, 2]), nrow=2), method = metric)[1]
-      ))
+        stats::dist(
+          matrix(c(data[ind, 1], data[ind, 2]), nrow=2), method = metric)[1]))
     }
     simul <- boot::boot(data.frame(var1.2, var2.2), dist.fun, R = nrep)
     interval <- PRIVATE_.ci(simul$t, conf.level = conf.level)
     attr(interval, "conf.level") <- conf.level
     coeff <- as.numeric(suppressWarnings(
-      dist(matrix(c(var1, var2), nrow=2), method = metric)[1]
-    ))
+      dist(matrix(c(var1, var2), nrow=2), method = metric)[1]))
 
     names(coeff) <- "similarity"
 
-    # # Get this before we make it negative
-    # biggest_mag = max(interval)
-
-    coeff = coeff*-1
-    interval = interval*-1
-
-    # coeff = coeff + biggest_mag
-    # interval = interval + biggest_mag
+    coeff <- coeff*-1
+    interval <- interval*-1
 
     result <- list(
-      method = metric, conf.level = conf.level,
-      rep = nrep, data.name = data.name, estimate = coeff,
-      conf.int = interval
-    )
+      method = metric, conf.level = conf.level, rep = nrep,
+      data.name = data.name, estimate = coeff, conf.int = interval)
     class(result) <- "htest"
     return(result)
   }

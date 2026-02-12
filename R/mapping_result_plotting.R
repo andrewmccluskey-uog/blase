@@ -187,59 +187,41 @@ plot_mapping_result_heatmap <- function(
     if (metric(mapping_result_list[[1]]) == "cosine_similarity") {
       message("Inferred cosine similarity metric.")
       lims <- c(0,1)
-      fill_title = "Cosine Similarity"
-    } else if (metric(mapping_result_list[[1]]) %in% c("euclidean", "manhattan")) {
+      fill_title <- "Cosine Similarity"
+    } else if (metric(mapping_result_list[[1]]) %in% c(
+      "euclidean", "manhattan")) {
       message("Inferred distance metric.")
       lims <- NULL
-      fill_title = "Distance"
-    } else if (metric(mapping_result_list[[1]]) %in% c("spearman", "pearson", "kendall")) {
+      fill_title <- "Distance"
+    } else if (metric(mapping_result_list[[1]]) %in% c(
+      "spearman", "pearson", "kendall")) {
       message("Inferred correlation metric.")
       lims <- c(-1,1)
-      fill_title = "Correlation"
+      fill_title <- "Correlation"
     } else {
       stop("Couldn't infer type of metric.")
     }
-
     if (is.null(heatmap_fill_scale)) {
-      heatmap_fill_scale = ggplot2::scale_fill_gradientn(
-        colors = c("blue", "white", "red"), limits = lims
-      )
+      heatmap_fill_scale <- ggplot2::scale_fill_gradientn(
+        colors = c("blue", "white", "red"), limits = lims)
     }
-
-    bulk_results <- data.frame(
-        bulk_name = c(),
-        pseudotime_bin = c(),
-        correlation = c()
-    )
-
+    b_res <- data.frame(
+      bulk_name = c(), pseudotime_bin = c(), correlation = c())
     for (mappingResult in mapping_result_list) {
-        this_bulk_results <- PRIVATE_get_df_for_this_bulk_to_plot(
-            mappingResult, annotate_strong, annotate_correlation
-        )
-        bulk_results <- rbind(bulk_results, this_bulk_results)
+        b_res <- rbind(b_res, PRIVATE_get_df_for_this_bulk_to_plot(
+          mappingResult, annotate_strong, annotate_correlation))
     }
-
-    if (!is.numeric(bulk_results$bulk_name)) {
-      bulk_results$bulk_name <- factor(
-        bulk_results$bulk_name,
-        levels = as.character(unique(bulk_results$bulk_name))
-      )
+    if (!is.numeric(b_res$bulk_name)) {
+      b_res$bulk_name <- factor(b_res$bulk_name,
+        levels = as.character(unique(b_res$bulk_name)))
     }
-
     if (is.null(bin_order)) {
-        bin_order <- bulk_results$pseudotime_bin
+        bin_order <- b_res$pseudotime_bin
     }
-    bulk_results$pseudotime_bin <- factor(
-        bulk_results$pseudotime_bin,
-        levels = as.character(unique(bin_order))
-    )
-
-    return(PRIVATE_mapping_result_heatmap_plot(
-        bulk_results, heatmap_fill_scale,
-        annotate_strong || annotate_correlation,
-        text_background,
-        fill_title
-    ))
+    b_res$pseudotime_bin <- factor(
+      b_res$pseudotime_bin, levels = as.character(unique(bin_order)))
+    return(PRIVATE_mapping_result_heatmap_plot( b_res, heatmap_fill_scale,
+        annotate_strong || annotate_correlation, text_background, fill_title))
 }
 
 #' @keywords internal

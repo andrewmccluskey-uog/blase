@@ -10,7 +10,7 @@ editor_options:
     wrap: 72
 ---
 
-```{r, include = FALSE}
+```{r, knitr, include = FALSE}
 knitr::opts_chunk$set(
     collapse = TRUE,
     comment = "#>"
@@ -189,11 +189,13 @@ plotUMAP(MCA_PF_SCE, colour_by = "pseudotime_bin")
 
 ```{r, transfer_mappings_to_sc}
 annotated_sce <- annotate_sce(MCA_PF_SCE, mapping_results, include_stats = TRUE)
-annotated_sce$BLASE_Annotation <- gsub(" hpi", "", annotated_sce$BLASE_Annotation)
+annotated_sce$BLASE_Annotation <- gsub(
+  " hpi", "", annotated_sce$BLASE_Annotation)
 annotated_sce$BLASE_Annotation <- as.numeric(annotated_sce$BLASE_Annotation)
 
 annotation_plot <- plotUMAP(annotated_sce, colour_by = "BLASE_Annotation")
-corr_plot <- plotUMAP(annotated_sce, colour_by = "BLASE_Annotation_Correlation") +
+corr_plot <- plotUMAP(
+  annotated_sce, colour_by = "BLASE_Annotation_Correlation") +
     labs(color = "Correlation")
 ```
 

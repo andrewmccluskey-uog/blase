@@ -34,20 +34,20 @@ setMethod(
     signature = c(x = "SingleCellExperiment"),
     definition = function(x, pseudotime_slot = "slingPseudotime_1",
                           n_bins = 20, split_by = "pseudotime_range") {
-        pseudotime_sce <- assign_pseudotime_bins(
+        pdt_sce <- assign_pseudotime_bins(
             x,
             split_by,
             n_bins = n_bins,
             pseudotime_slot = pseudotime_slot
         )
-        pseudotime_sce = pseudotime_sce[, !is.na(pseudotime_sce$pseudotime_bin)]
+        pdt_sce <- pdt_sce[, !is.na(pdt_sce$pseudotime_bin)]
 
-        bin_ids <- sort(unique(pseudotime_sce@colData[["pseudotime_bin"]]))
+        bin_ids <- sort(unique(pdt_sce@colData[["pseudotime_bin"]]))
         pseudobulks <- list()
 
         for (i in bin_ids) {
-            bin_subset_sce <- pseudotime_sce[
-                , SummarizedExperiment::colData(pseudotime_sce)[[
+            bin_subset_sce <- pdt_sce[
+                , SummarizedExperiment::colData(pdt_sce)[[
                     "pseudotime_bin"
                 ]] == i
             ]

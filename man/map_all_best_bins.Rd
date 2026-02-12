@@ -27,6 +27,10 @@ to calculate for mappings. Defaults to 0.9, or 90\%.}
 
 \item{BPPARAM}{The \link[BiocParallel:BiocParallelParam-class]{BiocParallel::BiocParallelParam} for
 multithreading if desired. Defaults to \code{\link[BiocParallel:SerialParam-class]{BiocParallel::SerialParam()}}}
+
+\item{metric}{Character. The metric to use to compare mappings. One of:
+'spearman', 'pearson', 'kendall', 'cosine_similarity', 'euclidean',
+'manhattan.'}
 }
 \value{
 A vector of \link{MappingResult} objects.

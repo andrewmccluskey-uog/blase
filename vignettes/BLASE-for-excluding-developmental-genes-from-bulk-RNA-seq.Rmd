@@ -7,7 +7,7 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
 ---
 
-```{r, include = FALSE}
+```{r, knitr, include = FALSE}
 knitr::opts_chunk$set(
     collapse = TRUE,
     comment = "#>"
@@ -188,8 +188,11 @@ efit <- eBayes(vfit)
 summary(decideTests(efit))
 
 PB31_normal_v_HS_BULK_DE <- topTable(efit, n = Inf, coef = 2)
-PB31_normal_v_HS_BULK_DE <- PB31_normal_v_HS_BULK_DE[PB31_normal_v_HS_BULK_DE$adj.P.Val < 0.05 & PB31_normal_v_HS_BULK_DE$logFC > 0, ]
-PB31_normal_v_HS_BULK_DE <- PB31_normal_v_HS_BULK_DE[order(-PB31_normal_v_HS_BULK_DE$logFC), ]
+PB31_normal_v_HS_BULK_DE <- PB31_normal_v_HS_BULK_DE[
+  PB31_normal_v_HS_BULK_DE$adj.P.Val < 0.05 & 
+    PB31_normal_v_HS_BULK_DE$logFC > 0, ]
+PB31_normal_v_HS_BULK_DE <- PB31_normal_v_HS_BULK_DE[
+  order(-PB31_normal_v_HS_BULK_DE$logFC), ]
 ```
 
 ### Development (SC DE)
@@ -197,7 +200,8 @@ First, let's pseudobulk based on the pseudotime bins
 ```{r, pseudobulk}
 pseudobulked_MCA_PF_SCE <- data.frame(row.names = rownames(MCA_PF_SCE))
 for (r in mapping_results) {
-    pseudobulked_MCA_PF_SCE[bulk_name(r)] <- rowSums(counts(MCA_PF_SCE[, MCA_PF_SCE$pseudotime_bin == best_bin(r)]))
+    pseudobulked_MCA_PF_SCE[bulk_name(r)] <- rowSums(
+      counts(MCA_PF_SCE[, MCA_PF_SCE$pseudotime_bin == best_bin(r)]))
 }
 pseudobulked_MCA_PF_SCE <- as.matrix(pseudobulked_MCA_PF_SCE)
 ```
@@ -217,8 +221,10 @@ summary(decideTests(efit_sc))
 
 ```{r}
 PB31_normal_v_HS_SC_DE <- topTable(efit_sc, n = Inf, coef = 2)
-PB31_normal_v_HS_SC_DE <- PB31_normal_v_HS_SC_DE[PB31_normal_v_HS_SC_DE$adj.P.Val < 0.05 & PB31_normal_v_HS_SC_DE$logFC > 0, ]
-PB31_normal_v_HS_SC_DE <- PB31_normal_v_HS_SC_DE[order(-PB31_normal_v_HS_SC_DE$logFC), ]
+PB31_normal_v_HS_SC_DE <- PB31_normal_v_HS_SC_DE[
+  PB31_normal_v_HS_SC_DE$adj.P.Val < 0.05 & PB31_normal_v_HS_SC_DE$logFC > 0, ]
+PB31_normal_v_HS_SC_DE <- PB31_normal_v_HS_SC_DE[
+  order(-PB31_normal_v_HS_SC_DE$logFC), ]
 ```
 
 ## Remove Developmental Genes
@@ -239,7 +245,8 @@ original DE genes list.
 NB: This is a primitive approach, and there are likely many other and better
 ways to calculate which genes should be kept or removed.
 ```{r}
-PB31_normal_v_HS_corrected_DE <- rownames(PB31_normal_v_HS_BULK_DE[!(rownames(PB31_normal_v_HS_BULK_DE) %in% rownames(PB31_normal_v_HS_SC_DE)), ])
+PB31_normal_v_HS_corrected_DE <- rownames(PB31_normal_v_HS_BULK_DE[
+  !(rownames(PB31_normal_v_HS_BULK_DE) %in% rownames(PB31_normal_v_HS_SC_DE)),])
 head(PB31_normal_v_HS_corrected_DE)
 ```
 
