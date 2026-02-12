@@ -82,6 +82,7 @@ top_2_distance(result)
 strong_mapping(result)
 mapping_history(result)
 bootstrap_iterations(result)
+metric(result)
 
 # Setters
 bulk_name(result) <- "New Name"

@@ -17,6 +17,7 @@
 #' Access with `mapping_history()`
 #' @param bootstrap_iterations Integer. The number of iterations used during
 #' the bootstrap.
+#' @param metric Character. The metric used to evaluate mappings.
 #'
 #' @return A MappingResult object
 #'
@@ -72,6 +73,7 @@
 #' strong_mapping(result)
 #' mapping_history(result)
 #' bootstrap_iterations(result)
+#' metric(result)
 #'
 #' # Setters
 #' bulk_name(result) <- "New Name"

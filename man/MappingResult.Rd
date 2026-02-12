@@ -37,6 +37,8 @@ Access with \code{mapping_history()}}
 
 \item{bootstrap_iterations}{Integer. The number of iterations used during
 the bootstrap.}
+
+\item{metric}{Character. The metric used to evaluate mappings.}
 }
 \value{
 A MappingResult object
@@ -92,6 +94,7 @@ top_2_distance(result)
 strong_mapping(result)
 mapping_history(result)
 bootstrap_iterations(result)
+metric(result)
 
 # Setters
 bulk_name(result) <- "New Name"

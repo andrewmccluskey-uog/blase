@@ -21,7 +21,7 @@ in the heatmap.}
 apply to the heatmap.}
 
 \item{annotate_strong}{Boolan. Whether to annotate the heatmap with
-significant results or not, defaults to TRUE.}
+strong results or not, defaults to TRUE.}
 
 \item{annotate_correlation}{Boolean. Whether to annotate the heatmap with
 the correlation of bin to each bulk sample. Defaults to FALSE.}
@@ -89,6 +89,7 @@ top_2_distance(result)
 strong_mapping(result)
 mapping_history(result)
 bootstrap_iterations(result)
+metric(result)
 
 # Setters
 bulk_name(result) <- "New Name"

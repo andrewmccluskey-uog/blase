@@ -159,7 +159,7 @@ setMethod(
 #' @param heatmap_fill_scale The ggplot2 compatible fill gradient scale to
 #' apply to the heatmap.
 #' @param annotate_strong Boolan. Whether to annotate the heatmap with
-#' significant results or not, defaults to TRUE.
+#' strong results or not, defaults to TRUE.
 #' @param annotate_correlation Boolean. Whether to annotate the heatmap with
 #' the correlation of bin to each bulk sample. Defaults to FALSE.
 #' @param bin_order Vector of integers. A vector of the bin ids in which to

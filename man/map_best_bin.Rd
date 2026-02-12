@@ -28,6 +28,10 @@ to run.}
 \item{confidence_level}{Decimal between 0-1. The confidence interval to
 calculate for mappings. Defaults to 90\%.}
 
+\item{metric}{Character. The metric to use to compare mappings. One of:
+'spearman', 'pearson', 'kendall', 'cosine_similarity', 'euclidean',
+'manhattan.'}
+
 \item{log_data}{Boolean. When true, bulk and bin values are log2 transformed}
 }
 \value{
@@ -84,6 +88,7 @@ top_2_distance(result)
 strong_mapping(result)
 mapping_history(result)
 bootstrap_iterations(result)
+metric(result)
 
 # Setters
 bulk_name(result) <- "New Name"

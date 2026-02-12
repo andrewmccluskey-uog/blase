@@ -109,43 +109,6 @@ setMethod(
     }
 )
 
-backup = function() {
-  # I think we may want to do this slightly differently so that we can
-  # enforce a hard cutoff between lineage end/starts.
-
-  # Check if more than one slot given.
-  if (length(pseudotime_slot) > 1) {
-    # Order lineages by length (largest to smallest max value)
-    get_linage_max = function(lineage) {
-      maxval <- max(SummarizedExperiment::colData(x)[[lineage]], na.rm = TRUE)
-      return(maxval)
-    }
-    lineage_lengths = vapply(pseudotime_slot, get_linage_max, double(1), USE.NAMES = FALSE)
-    x$combined_bin_pseudotime <- -1
-    x$original_lineage <- "?"
-
-    # for each lineage
-    #   Cells without a combined_bin_pseudotime value are given one
-    #   of their order.
-
-    for (lin in pseudotime_slot[sort.list(lineage_lengths, decreasing=TRUE)]) {
-      pseudotime <- (
-        SummarizedExperiment::colData(x)[[lin]]
-      )
-      cell_mask = x$combined_bin_pseudotime==-1 & !is.na(pseudotime)
-      cell_order = rank(pseudotime[cell_mask])
-      previous_max = max(0, max(x$combined_bin_pseudotime))
-
-      x$combined_bin_pseudotime[cell_mask] <- previous_max + cell_order
-      x$original_lineage[cell_mask] <- lin
-    }
-    x$combined_bin_pseudotime = x$combined_bin_pseudotime - 1
-
-    pseudotime_slot = "combined_bin_pseudotime"
-  }
-  return(PRIVATE_assign_pseudotime_bins_for_one_lineage(x, split_by, n_bins, pseudotime_slot))
-}
-
 #' @rdname assign_pseudotime_bins
 #'
 #' @export

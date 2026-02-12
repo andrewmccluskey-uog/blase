@@ -51,7 +51,7 @@ test_that("plot_mapping_result_heatmap annotates best match boxes when annotate 
 test_that("plot_mapping_result_heatmap runs for list of MappingResults only", {
   mapping_result <- generate_test_mapping_result()
 
-  p = plot_mapping_result_heatmap(list(mapping_result), annotate_confidence = FALSE)
+  p = plot_mapping_result_heatmap(list(mapping_result), annotate_strong = FALSE)
   expect_s3_class(p, "ggplot")
   expect_equal(p$scales$scales[[2]]$breaks, c(FALSE, TRUE))
 

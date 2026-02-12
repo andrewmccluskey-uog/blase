@@ -11,6 +11,9 @@
 #' to calculate for mappings. Defaults to 0.9, or 90%.
 #' @param BPPARAM The [BiocParallel::BiocParallelParam] for
 #' multithreading if desired. Defaults to [BiocParallel::SerialParam()]
+#' @param metric Character. The metric to use to compare mappings. One of:
+#' 'spearman', 'pearson', 'kendall', 'cosine_similarity', 'euclidean',
+#' 'manhattan.'
 #'
 #' @importFrom methods new
 #' @importFrom BiocParallel SerialParam
@@ -76,6 +79,9 @@ map_all_best_bins <- function(blase_data, bulk_data,
 #' to run.
 #' @param confidence_level Decimal between 0-1. The confidence interval to
 #' calculate for mappings. Defaults to 90%.
+#' @param metric Character. The metric to use to compare mappings. One of:
+#' 'spearman', 'pearson', 'kendall', 'cosine_similarity', 'euclidean',
+#' 'manhattan.'
 #' @param log_data Boolean. When true, bulk and bin values are log2 transformed
 #'
 #' @return A [MappingResult] object.
@@ -349,6 +355,7 @@ PRIVATE_correlation.ci <-
 #' @returns conf.int confidence interval.
 #'
 #' @importFrom boot boot
+#' @importFrom stats dist
 #' @keywords internal
 #'
 PRIVATE_distance.ci <-
@@ -378,7 +385,7 @@ PRIVATE_distance.ci <-
     }
     dist.fun <- function(data, ind) {
       as.numeric(suppressWarnings(
-        dist(matrix(c(data[ind, 1], data[ind, 2]), nrow=2), method = metric)[1]
+        stats::dist(matrix(c(data[ind, 1], data[ind, 2]), nrow=2), method = metric)[1]
       ))
     }
     simul <- boot::boot(data.frame(var1.2, var2.2), dist.fun, R = nrep)
