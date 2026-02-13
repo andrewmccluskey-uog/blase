@@ -10,7 +10,7 @@
 
 * 
 
-# blase 2.0.0
+# blase 1.2.0
 
 ## Major changes
 
