@@ -46,8 +46,8 @@ cells per bin.}
 
 \item{n_bins}{Integer. The number of bins to split the cells into.}
 
-\item{pseudotime_slot}{String. The name of the
-\link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment::SingleCellExperiment} slot containing the
+\item{pseudotime_slot}{String or Vector of Strings. The name of the
+\link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment::SingleCellExperiment} slot(s) containing the
 pseudotime values for each cell.}
 
 \item{...}{For arguments passed to other functions. Unused.}
@@ -104,8 +104,12 @@ bulk_name(result)
 best_bin(result)
 best_correlation(result)
 top_2_distance(result)
-confident_mapping(result)
+strong_mapping(result)
 mapping_history(result)
 bootstrap_iterations(result)
+metric(result)
+
+# Setters
+bulk_name(result) <- "New Name"
 }
 \concept{blase-object}

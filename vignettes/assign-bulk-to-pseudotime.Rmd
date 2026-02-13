@@ -10,7 +10,7 @@ editor_options:
     wrap: 72
 ---
 
-```{r, include = FALSE}
+```{r, knitr, include = FALSE}
 knitr::opts_chunk$set(
     collapse = TRUE,
     comment = "#>"
@@ -188,7 +188,7 @@ res <- blase::find_best_params(
 
 ```{r findBestParamsPlot}
 #| fig.alt: >
-#|   Figures showing the minimum and mean convexity, as well as % confident
+#|   Figures showing the minimum and mean convexity, as well as % strong
 #|   mappings different numbers of genes and bins calculated.
 blase::plot_find_best_params_results(res)
 ```
@@ -272,13 +272,13 @@ map_all_best_bins(blase_data, bulks_df)
 
 To see how well we plotted the differences between these cell types, we
 can plot a heatmap of all these results. The neutrophils and
-Erythrocytes are confidently mapped, but the GMP population doesn't map
+Erythrocytes are strongly mapped, but the GMP population doesn't map
 as well.
 
 ```{r plotMappingResults}
 #| fig.alt: >
 #|   A heatmap showing the correlations BLASE found for a subset
-#|   of cell types in this data. Confident mappings are indicated
+#|   of cell types in this data. Strong mappings are indicated
 #|   with asterisks over the mapped tile. This information is also
 #|   available as text from the results of the previous code block.
 plot_mapping_result_heatmap(list(
@@ -293,7 +293,7 @@ plot_mapping_result_heatmap(list(
 To look into the Basophils mapping, we can plot the correlation over
 each bin. Because the the lower boundary of the best selection (bin 3)
 is higher than the higher bounds of the next-best bin (bin 4), BLASE
-makes a confident call.
+makes a strong call.
 
 ```{r plotMappingResultCorr}
 #| fig.alt: >

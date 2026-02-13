@@ -8,7 +8,7 @@
 #'
 #' @param blase_data The [BlaseData] object to use.
 #' @param bootstrap_iterations Integer. Iterations for
-#' bootstrapping when calculating confident mappings.
+#' bootstrapping when calculating strong mappings.
 #' @param BPPARAM The [BiocParallel::BiocParallelParam] configuration.
 #' Defaults to [BiocParallel::SerialParam]
 #' @param make_plot Boolean. Whether or not to render the plot
@@ -24,8 +24,8 @@
 #' * "mean top 2 distance" decimal containing the mean top 2 distance across the
 #'  entire set of genes and bins. Higher is better for differentiation,
 #'  but it should matter less than the worst value.
-#' * "confident_mapping_pct" decimal from 0-1. The percent of
-#'  mappings for this setup which were annotated as confident by BLASE.
+#' * "strong_mapping_pct" decimal from 0-1. The percent of
+#'  mappings for this setup which were annotated as strong by BLASE.
 #'
 #' @importFrom BiocParallel SerialParam
 #'
@@ -66,7 +66,7 @@ evaluate_parameters <- function(
     results.best_corr <- c()
     results.history <- c()
     results.convexity <- c()
-    results.confident_mapping <- c()
+    results.strong_mapping <- c()
 
     data <- PRIVATE_test_train_split(blase_data)
 
@@ -81,9 +81,9 @@ evaluate_parameters <- function(
         results.best_corr <- append(results.best_corr, c(best_correlation(res)))
         results.convexity <- append(results.convexity, c(top_2_distance(res)))
         results.history <- append(results.history, c(mapping_history(res)))
-        results.confident_mapping <- append(
-            results.confident_mapping,
-            c(confident_mapping(res))
+        results.strong_mapping <- append(
+          results.strong_mapping,
+            c(strong_mapping(res))
         )
     }
 
@@ -91,8 +91,8 @@ evaluate_parameters <- function(
     mean_convexity <- mean(results.convexity)
 
     # TRUE evaluated as 1
-    confident_mapping_pct <- (
-        sum(results.confident_mapping) / length(bins(blase_data))) * 100
+    strong_mapping_pct <- (
+        sum(results.strong_mapping) / length(bins(blase_data))) * 100
 
     if (make_plot == TRUE) {
         print(PRIVATE_evaluate_parameters_plots(
@@ -101,7 +101,7 @@ evaluate_parameters <- function(
         ))
     }
 
-    return(c(min_convexity, mean_convexity, confident_mapping_pct))
+    return(c(min_convexity, mean_convexity, strong_mapping_pct))
 }
 
 #' @keywords internal
@@ -169,7 +169,7 @@ PRIVATE_evaluate_parameters_plots <- function(
 #' @param bins_count_range Integer vector. The n_bins list to try out
 #' @param gene_count_range Integer vector. The n_genes list to try out
 #' @param bootstrap_iterations Integer. Iterations for bootstrapping
-#' when calculating confident mappings.
+#' when calculating strong mappings.
 #' @param BPPARAM The [BiocParallel::BiocParallelParam]. Defaults to
 #' [BiocParallel::SerialParam]
 #' @param ... params to be passed to child functions, see [as.BlaseData()]
@@ -179,10 +179,10 @@ PRIVATE_evaluate_parameters_plots <- function(
 #' * gene_count: Integer. The top n genes to use for this attempt
 #' * min_convexity: Decimal. The worst convexity for these parameters
 #' * mean_convexity: Decimal. The mean convexity for these parameters
-#' * confident_mapping_pct: Decimal. The percent of bins which were
-#'   confidently mapped to themselves for these parameters.
+#' * strong_mapping_pct: Decimal. The percent of bins which were
+#'   strongly mapped to themselves for these parameters.
 #'   If this value is low, then it is likely that in real use,
-#'   few or no results will be confidently mapped.
+#'   few or no results will be strongly mapped.
 #'
 #' @seealso [plot_find_best_params_results()] for plotting the
 #' results of this function.
@@ -240,7 +240,7 @@ find_best_params <- function(
 
     results <- data.frame(
         gene_count = c(), bin_count = c(),
-        min_convexity = c(), mean_convexity = c(), confident_mapping_pct = c()
+        min_convexity = c(), mean_convexity = c(), strong_mapping_pct = c()
     )
 
     for (bin_count in bins_count_range) {
@@ -262,7 +262,7 @@ find_best_params <- function(
                     gene_count = c(genes_count),
                     min_convexity = c(res[1]),
                     mean_convexity = c(res[2]),
-                    confident_mapping_pct = c(res[3])
+                    strong_mapping_pct = c(res[3])
                 ))
             }
         )
@@ -313,11 +313,11 @@ plot_find_best_params_results <- function(
         PRIVATE_plot_mean_convexity_by_bins(
             find_best_params_results, gene_count_colors
         ) +
-        # Confident mappings pct
-        PRIVATE_plot_confident_mapping_by_genes(
+        # Strong mappings pct
+        PRIVATE_plot_strong_mapping_by_genes(
             find_best_params_results, bin_count_colors
         ) +
-        PRIVATE_plot_confident_mapping_by_bins(
+        PRIVATE_plot_strong_mapping_by_bins(
             find_best_params_results, gene_count_colors
         ) +
         patchwork::plot_layout(ncol = 2, axis_title = "collect") &
@@ -414,14 +414,14 @@ PRIVATE_plot_mean_convexity_by_bins <- function(results, gene_colors) {
 }
 
 #' @keywords internal
-PRIVATE_plot_confident_mapping_by_genes <- function(results, bin_colors) {
+PRIVATE_plot_strong_mapping_by_genes <- function(results, bin_colors) {
     gene_count <- ggplot2::sym("gene_count")
     bin_count <- ggplot2::sym("bin_count")
-    confident_mapping_pct <- ggplot2::sym("confident_mapping_pct")
+    strong_mapping_pct <- ggplot2::sym("strong_mapping_pct")
 
     plot <- ggplot2::ggplot(results, ggplot2::aes(
         x = {{ gene_count }},
-        y = {{ confident_mapping_pct }},
+        y = {{ strong_mapping_pct }},
         color = {{ bin_count }}
     )) +
         ggplot2::geom_point() +
@@ -429,19 +429,19 @@ PRIVATE_plot_confident_mapping_by_genes <- function(results, bin_colors) {
         ggplot2::labs(
             color = "Bin Count",
             x = "Gene Count",
-            y = "Confident Mapping %"
+            y = "Strong Mapping %"
         )
 }
 
 #' @keywords internal
-PRIVATE_plot_confident_mapping_by_bins <- function(results, gene_colors) {
+PRIVATE_plot_strong_mapping_by_bins <- function(results, gene_colors) {
     gene_count <- ggplot2::sym("gene_count")
     bin_count <- ggplot2::sym("bin_count")
-    confident_mapping_pct <- ggplot2::sym("confident_mapping_pct")
+    strong_mapping_pct <- ggplot2::sym("strong_mapping_pct")
 
     plot <- ggplot2::ggplot(results, ggplot2::aes(
         x = {{ bin_count }},
-        y = {{ confident_mapping_pct }},
+        y = {{ strong_mapping_pct }},
         color = {{ gene_count }}
     )) +
         ggplot2::geom_point() +
@@ -449,7 +449,7 @@ PRIVATE_plot_confident_mapping_by_bins <- function(results, gene_colors) {
         ggplot2::labs(
             color = "Gene Count",
             x = "Bin Count",
-            y = "Confident Mapping %"
+            y = "Strong Mapping %"
         )
     return(plot)
 }

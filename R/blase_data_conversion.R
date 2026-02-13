@@ -17,8 +17,9 @@ setGeneric(
 )
 
 #' @rdname as.BlaseData
-#' @param pseudotime_slot The [SingleCellExperiment::SingleCellExperiment]
-#' slot containing pseudotime values for each cell to be passed to
+#' @param pseudotime_slot String or vector of strings.
+#' The [SingleCellExperiment::SingleCellExperiment]
+#' slot(s) containing pseudotime values for each cell to be passed to
 #' [assign_pseudotime_bins()].
 #' @param n_bins Integer. The number of bins to create, passed to
 #' [assign_pseudotime_bins()].
@@ -33,19 +34,20 @@ setMethod(
     signature = c(x = "SingleCellExperiment"),
     definition = function(x, pseudotime_slot = "slingPseudotime_1",
                           n_bins = 20, split_by = "pseudotime_range") {
-        pseudotime_sce <- assign_pseudotime_bins(
+        pdt_sce <- assign_pseudotime_bins(
             x,
             split_by,
             n_bins = n_bins,
             pseudotime_slot = pseudotime_slot
         )
+        pdt_sce <- pdt_sce[, !is.na(pdt_sce$pseudotime_bin)]
 
-        bin_ids <- sort(unique(pseudotime_sce@colData[["pseudotime_bin"]]))
+        bin_ids <- sort(unique(pdt_sce@colData[["pseudotime_bin"]]))
         pseudobulks <- list()
 
         for (i in bin_ids) {
-            bin_subset_sce <- pseudotime_sce[
-                , SummarizedExperiment::colData(pseudotime_sce)[[
+            bin_subset_sce <- pdt_sce[
+                , SummarizedExperiment::colData(pdt_sce)[[
                     "pseudotime_bin"
                 ]] == i
             ]

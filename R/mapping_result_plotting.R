@@ -150,7 +150,7 @@ setMethod(
 #'
 #' @description
 #' Plots Spearman's Rho as the fill colour, and adds * if the [MappingResult]
-#'  was confidently assigned.
+#'  was strongly assigned.
 #'
 #' @concept mapping_plots
 #'
@@ -158,8 +158,8 @@ setMethod(
 #' in the heatmap.
 #' @param heatmap_fill_scale The ggplot2 compatible fill gradient scale to
 #' apply to the heatmap.
-#' @param annotate_confidence Boolan. Whether to annotate the heatmap with
-#' significant results or not, defaults to TRUE.
+#' @param annotate_strong Boolan. Whether to annotate the heatmap with
+#' strong results or not, defaults to TRUE.
 #' @param annotate_correlation Boolean. Whether to annotate the heatmap with
 #' the correlation of bin to each bulk sample. Defaults to FALSE.
 #' @param bin_order Vector of integers. A vector of the bin ids in which to
@@ -175,10 +175,8 @@ setMethod(
 #' @inherit MappingResult examples
 plot_mapping_result_heatmap <- function(
     mapping_result_list,
-    heatmap_fill_scale = ggplot2::scale_fill_gradientn(
-        colors = c("blue", "white", "red"), limits = c(-1, 1)
-    ),
-    annotate_confidence = TRUE,
+    heatmap_fill_scale = NULL,
+    annotate_strong = TRUE,
     annotate_correlation = FALSE,
     bin_order = NULL,
     text_background=FALSE) {
@@ -186,50 +184,57 @@ plot_mapping_result_heatmap <- function(
         stop("You must provide a list of MappingResult objects only.")
     }
 
-    bulk_results <- data.frame(
-        bulk_name = c(),
-        pseudotime_bin = c(),
-        correlation = c()
-    )
-
+    if (metric(mapping_result_list[[1]]) == "cosine_similarity") {
+      message("Inferred cosine similarity metric.")
+      lims <- c(0,1)
+      fill_title <- "Cosine Similarity"
+    } else if (metric(mapping_result_list[[1]]) %in% c(
+      "euclidean", "manhattan")) {
+      message("Inferred distance metric.")
+      lims <- NULL
+      fill_title <- "Distance"
+    } else if (metric(mapping_result_list[[1]]) %in% c(
+      "spearman", "pearson", "kendall")) {
+      message("Inferred correlation metric.")
+      lims <- c(-1,1)
+      fill_title <- "Correlation"
+    } else {
+      stop("Couldn't infer type of metric.")
+    }
+    if (is.null(heatmap_fill_scale)) {
+      heatmap_fill_scale <- ggplot2::scale_fill_gradientn(
+        colors = c("blue", "white", "red"), limits = lims)
+    }
+    b_res <- data.frame(
+      bulk_name = c(), pseudotime_bin = c(), correlation = c())
     for (mappingResult in mapping_result_list) {
-        this_bulk_results <- PRIVATE_get_df_for_this_bulk_to_plot(
-            mappingResult, annotate_confidence, annotate_correlation
-        )
-        bulk_results <- rbind(bulk_results, this_bulk_results)
+        b_res <- rbind(b_res, PRIVATE_get_df_for_this_bulk_to_plot(
+          mappingResult, annotate_strong, annotate_correlation))
     }
-
-    bulk_results$bulk_name <- factor(
-        bulk_results$bulk_name,
-        levels = as.character(unique(bulk_results$bulk_name))
-    )
-
+    if (!is.numeric(b_res$bulk_name)) {
+      b_res$bulk_name <- factor(b_res$bulk_name,
+        levels = as.character(unique(b_res$bulk_name)))
+    }
     if (is.null(bin_order)) {
-        bin_order <- bulk_results$pseudotime_bin
+        bin_order <- b_res$pseudotime_bin
     }
-    bulk_results$pseudotime_bin <- factor(
-        bulk_results$pseudotime_bin,
-        levels = as.character(unique(bin_order))
-    )
-
-    return(PRIVATE_mapping_result_heatmap_plot(
-        bulk_results, heatmap_fill_scale,
-        annotate_confidence || annotate_correlation,
-        text_background
-    ))
+    b_res$pseudotime_bin <- factor(
+      b_res$pseudotime_bin, levels = as.character(unique(bin_order)))
+    return(PRIVATE_mapping_result_heatmap_plot( b_res, heatmap_fill_scale,
+        annotate_strong || annotate_correlation, text_background, fill_title))
 }
 
 #' @keywords internal
 PRIVATE_get_df_for_this_bulk_to_plot <- function(
-    mappingResult, annotate_confident, annotate_corr) {
+    mappingResult, annotate_strong, annotate_corr) {
     history <- mapping_history(mappingResult)
 
     mapp_corrs <- history[, "correlation"]
 
-    confident_mapping <- ifelse(
+    strong_mapping <- ifelse(
         history[, "bin"] == best_bin(mappingResult) &
             rep(
-                confident_mapping(mappingResult),
+              strong_mapping(mappingResult),
                 length(history[, "bin"])
             ),
         "*",
@@ -240,8 +245,8 @@ PRIVATE_get_df_for_this_bulk_to_plot <- function(
     if (annotate_corr) {
         labels <- paste0(labels, round(mapp_corrs, 2))
     }
-    if (annotate_confident) {
-        labels <- paste0(labels, confident_mapping)
+    if (annotate_strong) {
+        labels <- paste0(labels, strong_mapping)
     }
 
     return(data.frame(
@@ -255,7 +260,7 @@ PRIVATE_get_df_for_this_bulk_to_plot <- function(
 
 #' @keywords internal
 PRIVATE_mapping_result_heatmap_plot <- function(
-    bulk_results, fill_scale, annotate, text_background) {
+    bulk_results, fill_scale, annotate, text_background, fill_title) {
     bulk_name_sym <- ggplot2::sym("bulk_name")
     pseudotime_bin_sym <- ggplot2::sym("pseudotime_bin")
     correlation_sym <- ggplot2::sym("correlation")
@@ -270,7 +275,7 @@ PRIVATE_mapping_result_heatmap_plot <- function(
         color = {{ is_best_bin_sym }}
     )) +
         ggplot2::labs(
-            x = "Pseudotime Bin", y = "Bulk Sample", fill = "Correlation"
+            x = "Pseudotime Bin", y = "Bulk Sample", fill = fill_title
         ) +
         fill_scale +
         ggplot2::guides(color = "none")

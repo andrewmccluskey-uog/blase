@@ -16,7 +16,7 @@ evaluate_parameters(
 \item{blase_data}{The \link{BlaseData} object to use.}
 
 \item{bootstrap_iterations}{Integer. Iterations for
-bootstrapping when calculating confident mappings.}
+bootstrapping when calculating strong mappings.}
 
 \item{BPPARAM}{The \link[BiocParallel:BiocParallelParam-class]{BiocParallel::BiocParallelParam} configuration.
 Defaults to \link[BiocParallel:SerialParam-class]{BiocParallel::SerialParam}}
@@ -36,8 +36,8 @@ Higher is better for differentiating.
 \item "mean top 2 distance" decimal containing the mean top 2 distance across the
 entire set of genes and bins. Higher is better for differentiation,
 but it should matter less than the worst value.
-\item "confident_mapping_pct" decimal from 0-1. The percent of
-mappings for this setup which were annotated as confident by BLASE.
+\item "strong_mapping_pct" decimal from 0-1. The percent of
+mappings for this setup which were annotated as strong by BLASE.
 }
 }
 \description{

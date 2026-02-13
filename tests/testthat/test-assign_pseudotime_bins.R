@@ -41,9 +41,55 @@ test_that("(pdt_range) adds correct number of bins when max pseudotime < 1", {
 test_that("(pdt_range) throws error if pseudotime starts above 0", {
   sce <- generate_test_sce()
   sce$pseudotime <- seq_len(ncol(sce)) / (ncol(sce) * 2)
+  sce$pseudotime[1] <- 1
 
   tmp1 <- function() assign_pseudotime_bins(sce, "pseudotime_range", 10, pseudotime_slot = "pseudotime")
   expect_error(tmp1(), "pseudotime must start at 0", fixed = TRUE)
+})
+
+test_that("(pdt_range) throws error if pseudotime slot not present", {
+  sce <- generate_test_sce()
+  sce$pseudotime <- seq_len(ncol(sce)) / (ncol(sce) * 2)
+  sce$pseudotime[1] <- 0
+
+  tmp1 <- function() assign_pseudotime_bins(sce, "pseudotime_range", 10, pseudotime_slot = "pseudotime2")
+  expect_error(tmp1(), "Pseudotime slot 'pseudotime2' does not exist", fixed = TRUE)
+})
+
+test_that("(cells) throws error if not all pseudotime slots present", {
+  sce <- generate_test_sce()
+  sce$pseudotime <- seq_len(ncol(sce)) / (ncol(sce) * 2)
+  sce$pseudotime[1] <- 0
+
+  tmp1 <- function() assign_pseudotime_bins(sce, "cells", 10, pseudotime_slot = c("pseudotime", "something else"))
+  expect_error(tmp1(), "Pseudotime slot 'something else' does not exist", fixed = TRUE)
+})
+
+test_that("(pdt_range) throws error if nbins is 0", {
+  sce <- generate_test_sce()
+  sce$pseudotime <- seq_len(ncol(sce)) / (ncol(sce) * 2)
+  sce$pseudotime[1] <- 0
+
+  tmp1 <- function() assign_pseudotime_bins(sce, "pseudotime_range", 0, pseudotime_slot = "pseudotime")
+  expect_error(tmp1(), "Number of bins must be greater than 0", fixed = TRUE)
+})
+
+test_that("(pdt_range) throws error if nbins is more than number of cells", {
+  sce <- generate_test_sce()
+  sce$pseudotime <- seq_len(ncol(sce)) / (ncol(sce) * 2)
+  sce$pseudotime[1] <- 0
+
+  tmp1 <- function() assign_pseudotime_bins(sce, "pseudotime_range", ncol(sce)+10, pseudotime_slot = "pseudotime")
+  expect_error(tmp1(), "Number of bins must be less than cells in object", fixed = TRUE)
+})
+
+test_that("(pdt_range) throws error if multiple lineages", {
+  sce <- generate_test_sce()
+  sce$pseudotime <- seq_len(ncol(sce)) / (ncol(sce) * 2)
+  sce$pseudotime[1] <- 0
+
+  tmp1 <- function() assign_pseudotime_bins(sce, "pseudotime_range", ncol(sce)+10, pseudotime_slot = c("pseudotime"))
+  expect_error(tmp1(), "Number of bins must be less than cells in object", fixed = TRUE)
 })
 
 test_that("(cell) adds pseudotime bins to a sce object", {

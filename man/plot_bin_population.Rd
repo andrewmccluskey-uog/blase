@@ -72,8 +72,12 @@ bulk_name(result)
 best_bin(result)
 best_correlation(result)
 top_2_distance(result)
-confident_mapping(result)
+strong_mapping(result)
 mapping_history(result)
 bootstrap_iterations(result)
+metric(result)
+
+# Setters
+bulk_name(result) <- "New Name"
 }
 \concept{mapping_plots}

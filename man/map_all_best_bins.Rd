@@ -9,7 +9,8 @@ map_all_best_bins(
   bulk_data,
   bootstrap_iterations = 200,
   confidence_level = 0.9,
-  BPPARAM = BiocParallel::SerialParam()
+  BPPARAM = BiocParallel::SerialParam(),
+  metric = "spearman"
 )
 }
 \arguments{
@@ -26,6 +27,10 @@ to calculate for mappings. Defaults to 0.9, or 90\%.}
 
 \item{BPPARAM}{The \link[BiocParallel:BiocParallelParam-class]{BiocParallel::BiocParallelParam} for
 multithreading if desired. Defaults to \code{\link[BiocParallel:SerialParam-class]{BiocParallel::SerialParam()}}}
+
+\item{metric}{Character. The metric to use to compare mappings. One of:
+'spearman', 'pearson', 'kendall', 'cosine_similarity', 'euclidean',
+'manhattan.'}
 }
 \value{
 A vector of \link{MappingResult} objects.
@@ -78,9 +83,13 @@ bulk_name(result)
 best_bin(result)
 best_correlation(result)
 top_2_distance(result)
-confident_mapping(result)
+strong_mapping(result)
 mapping_history(result)
 bootstrap_iterations(result)
+metric(result)
+
+# Setters
+bulk_name(result) <- "New Name"
 }
 \seealso{
 \code{\link[=map_best_bin]{map_best_bin()}}

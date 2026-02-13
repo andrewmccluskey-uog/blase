@@ -9,7 +9,9 @@ map_best_bin(
   bulk_id,
   bulk_data,
   bootstrap_iterations = 200,
-  confidence_level = 0.9
+  confidence_level = 0.9,
+  metric = "spearman",
+  log_data = FALSE
 )
 }
 \arguments{
@@ -25,6 +27,12 @@ to run.}
 
 \item{confidence_level}{Decimal between 0-1. The confidence interval to
 calculate for mappings. Defaults to 90\%.}
+
+\item{metric}{Character. The metric to use to compare mappings. One of:
+'spearman', 'pearson', 'kendall', 'cosine_similarity', 'euclidean',
+'manhattan.'}
+
+\item{log_data}{Boolean. When true, bulk and bin values are log2 transformed}
 }
 \value{
 A \link{MappingResult} object.
@@ -77,8 +85,12 @@ bulk_name(result)
 best_bin(result)
 best_correlation(result)
 top_2_distance(result)
-confident_mapping(result)
+strong_mapping(result)
 mapping_history(result)
 bootstrap_iterations(result)
+metric(result)
+
+# Setters
+bulk_name(result) <- "New Name"
 }
 \concept{mapping}
