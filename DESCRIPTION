@@ -71,5 +71,5 @@ VignetteBuilder: knitr
 URL: https://andrewmccluskey-uog.github.io/blase/
 BugReports: https://andrewmccluskey-uog.github.io/blase/issues
 Depends: 
-    R (>= 4.5.0)
+    R (>= 4.4.0)
 LazyData: false
