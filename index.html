@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Bulk Linking Analysis for Single-cell Experiments • blase</title>
+<title>Bulk Linkage Analysis for Single-cell Experiments • blase</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
 <link rel="icon" type="”image/svg+xml”" href="favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -15,10 +15,10 @@
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Bulk Linking Analysis for Single-cell Experiments">
-<meta name="description" content="Find where bulk RNA-seq data lies on a single-cell pseudotime trajectory. Uses a fast, understandable correlation based approach. Can be used to improve bulk DE, or understand real timepoints in SC from timeseries bulk data.">
-<meta property="og:description" content="Find where bulk RNA-seq data lies on a single-cell pseudotime trajectory. Uses a fast, understandable correlation based approach. Can be used to improve bulk DE, or understand real timepoints in SC from timeseries bulk data.">
-<meta property="og:image" content="https://andrewmccluskey-uog.github.io/BLASE/logo.png">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Bulk Linkage Analysis for Single-cell Experiments">
+<meta name="description" content='BLASE is a method for finding where bulk RNA-seq data lies on a single-cell pseudotime trajectory. It uses a fast and understandable approach based on Spearman correlation, with bootstrapping to provide confidence. BLASE can be used to "date" bulk RNA-seq data, annotate cell types in scRNA-seq, and help correct for developmental phenotype differences in bulk RNA-seq experiments.'>
+<meta property="og:description" content='BLASE is a method for finding where bulk RNA-seq data lies on a single-cell pseudotime trajectory. It uses a fast and understandable approach based on Spearman correlation, with bootstrapping to provide confidence. BLASE can be used to "date" bulk RNA-seq data, annotate cell types in scRNA-seq, and help correct for developmental phenotype differences in bulk RNA-seq experiments.'>
+<meta property="og:image" content="https://andrewmccluskey-uog.github.io/blase/logo.png">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -28,7 +28,7 @@
 
     <a class="navbar-brand me-2" href="index.html">blase</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,17 +39,13 @@
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><h6 class="dropdown-header" data-toc-skip>Vignettes</h6></li>
-    <li><a class="dropdown-item" href="articles/How-Blase-Works.html">How BLASE Works</a></li>
-    <li><a class="dropdown-item" href="articles/assign-bulk-to-pseudotime.html">Assigning Bulk to Pseudotime</a></li>
-    <li><h6 class="dropdown-header" data-toc-skip>Articles</h6></li>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-vignettes" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Vignettes</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-vignettes">
+<li><a class="dropdown-item" href="articles/assign-bulk-to-pseudotime.html">Assigning Bulk to Pseudotime</a></li>
     <li><a class="dropdown-item" href="articles/BLASE-for-annotating-scRNA-seq.html">BLASE for annotating scRNA-seq</a></li>
     <li><a class="dropdown-item" href="articles/BLASE-for-excluding-developmental-genes-from-bulk-RNA-seq.html">BLASE for excluding developmental genes from bulk RNA-seq</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
@@ -86,10 +82,23 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
+<div class="section level3">
+<h3 id="bioconductor">Bioconductor<a class="anchor" aria-label="anchor" href="#bioconductor"></a>
+</h3>
+<p>Package has been submitted to Bioconductor.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(<span class="st">"BiocManager"</span>, <span class="at">quietly =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>    <span class="fu">install.packages</span>(<span class="st">"BiocManager"</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="st">"blase"</span>)</span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="github">Github<a class="anchor" aria-label="anchor" href="#github"></a>
+</h3>
 <p>You can install the development version of BLASE from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"andrewmccluskey-uog/BLASE"</span><span class="op">)</span></span></code></pre></div>
+</div>
 </div>
 <div class="section level2">
 <h2 id="getting-started--usage-notes">Getting Started &amp; Usage Notes<a class="anchor" aria-label="anchor" href="#getting-started--usage-notes"></a>
@@ -109,22 +118,23 @@
 <div class="section level3">
 <h3 id="automatic-style-corrections">Automatic Style Corrections<a class="anchor" aria-label="anchor" href="#automatic-style-corrections"></a>
 </h3>
-<div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>styler<span class="sc">::</span><span class="fu">style_pkg</span>(<span class="at">transformers =</span> styler<span class="sc">::</span><span class="fu">tidyverse_style</span>(<span class="at">indent_by =</span> <span class="dv">4</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>styler<span class="sc">::</span><span class="fu">style_pkg</span>(<span class="at">transformers =</span> styler<span class="sc">::</span><span class="fu">tidyverse_style</span>(<span class="at">indent_by =</span> <span class="dv">4</span>))</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="quality-checks">Quality Checks<a class="anchor" aria-label="anchor" href="#quality-checks"></a>
 </h3>
 <p>We subscribe to the <code>R cmd check</code> and <code>BiocCheck</code> guides:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">check</span>()</span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="fu">BiocCheck</span>(<span class="st">`</span><span class="at">no-check-deprecated</span><span class="st">`</span><span class="ot">=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">check</span>()</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="fu">BiocCheck</span>(<span class="st">`</span><span class="at">no-check-deprecated</span><span class="st">`</span><span class="ot">=</span><span class="cn">TRUE</span>)</span></code></pre></div>
 </div>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li><a href="https://andrewmccluskey-uog.github.io/blase/issues" class="external-link">Report a bug</a></li>
+<li><a href="https://www.bioconductor.org/packages/blase" class="external-link">View on Bioconductor</a></li>
+<li><a href="https://andrewmccluskey-uog.github.io/blase/issues">Report a bug</a></li>
 </ul>
 </div>
 
@@ -150,7 +160,7 @@
 <li>Andrew McCluskey <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0009-0004-4187-799X" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 <li>Toby Kettlewell <br><small class="roles"> Author </small> <a href="https://orcid.org/0009-0001-1225-3318" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 <li>Adrian M. Smith <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0001-8833-2330" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
-<li>Rhiannon Khundu <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0003-3970-5860" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
+<li>Rhiannon Kundu <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0003-3970-5860" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 <li>David A. Gunn <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0001-9866-3221" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 <li>Thomas D. Otto <br><small class="roles"> Author, thesis advisor </small> <a href="https://orcid.org/0000-0002-1246-7404" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 </ul>
@@ -168,11 +178,11 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Andrew McCluskey, Toby Kettlewell, Adrian M. Smith, Rhiannon Khundu, David A. Gunn, Thomas D. Otto.</p>
+  <p>Developed by Andrew McCluskey, Toby Kettlewell, Adrian M. Smith, Rhiannon Kundu, David A. Gunn, Thomas D. Otto.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>
