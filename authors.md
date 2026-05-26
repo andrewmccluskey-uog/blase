@@ -18,18 +18,18 @@
 
 ## Citation
 
-McCluskey, Andrew, Kettlewell, Toby, Smith, M. A, Kundu, Rhiannon, Gunn,
-A. D, Otto, D. T (2025). “BLASE: Bulk Linkage Analysis for Single Cell
-Experiments - Teasing Out the Secrets of Bulk Transcriptomics with
-Trajectory Analysis.” *bioRxiv*.
-[doi:10.1101/2025.09.03.673925](https://doi.org/10.1101/2025.09.03.673925),
-<https://www.biorxiv.org/content/early/2025/09/07/2025.09.03.673925>.
+McCluskey A, Kettlewell T, Smith AM, Kundu R, Gunn DA, Otto TD (2025).
+“BLASE: Bulk Linkage Analysis for Single Cell Experiments - Teasing Out
+the Secrets of Bulk Transcriptomics with Trajectory Analysis.”
+*bioRxiv*.
+[doi:10.1101/2025.09.03.673925](https://doi.org/10.1101/2025.09.03.673925).
+<https://www.biorxiv.org/content/10.1101/2025.09.03.673925v1>.
 
     @Article{,
       title = {BLASE: Bulk Linkage Analysis for Single Cell Experiments - Teasing Out the Secrets of Bulk Transcriptomics with Trajectory Analysis},
-      author = {{McCluskey} and {Andrew} and {Kettlewell} and {Toby} and {Smith} and Adrian M. and {Kundu} and {Rhiannon} and {Gunn} and David A. and {Otto} and Thomas D.},
+      author = {Andrew McCluskey and Toby Kettlewell and Adrian M. Smith and Rhiannon Kundu and David A. Gunn and Thomas D. Otto},
       journal = {bioRxiv},
       year = {2025},
       doi = {10.1101/2025.09.03.673925},
-      url = {https://www.biorxiv.org/content/early/2025/09/07/2025.09.03.673925},
+      url = {https://www.biorxiv.org/content/10.1101/2025.09.03.673925v1},
     }

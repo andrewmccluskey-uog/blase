@@ -72,7 +72,7 @@ gene_peakedness <- calculate_gene_peakedness(
 )
 #> Warning: Iteration limit reached without full convergence - check carefully
 #> Warning: Iteration limit reached without full convergence - check carefully
-#> Warning: Iteration limit reached without full convergence - check carefully
+#> Warning: Fitting terminated with step failure - check results carefully
 #> Warning: Fitting terminated with step failure - check results carefully
 #> Warning: Iteration limit reached without full convergence - check carefully
 #> Warning: Iteration limit reached without full convergence - check carefully

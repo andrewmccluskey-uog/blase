@@ -1,6 +1,7 @@
 # Assigning bulk RNA-seq to pseudotime
 
 ``` r
+
 library(blase)
 library(SingleCellExperiment)
 library(tradeSeq)
@@ -14,6 +15,7 @@ library(reshape2)
 ```
 
 ``` r
+
 RNGversion("3.5.0")
 #> Warning in RNGkind("Mersenne-Twister", "Inversion", "Rounding"): non-uniform
 #> 'Rounding' sampler used
@@ -22,6 +24,7 @@ set.seed(SEED)
 ```
 
 ``` r
+
 N_CORES <- 4
 if (ami::using_ci()) {
     N_CORES <- 2
@@ -54,6 +57,7 @@ course a constructed example and unlikely to be exactly repeated in real
 life, but hopefully demonstrates the principle BLASE works on.
 
 ``` r
+
 # Adapted from
 # https://codepal.ai/code-generator/query/n4dEA6I9/plot-sine-wave-ggplot2-r
 x <- seq(0, 2 * pi, length.out = 500)
@@ -67,6 +71,7 @@ genes_melt$x <- as.numeric(genes_melt$x)
 ```
 
 ``` r
+
 ggplot(genes_melt, aes = aes()) +
     geom_line(aes(x = x, y = value, color = gene)) +
     geom_vline(xintercept = 0, linetype = "dashed") +
@@ -105,6 +110,7 @@ have the following to use Blase in this case:
 To install BLASE from Bioconductor:
 
 ``` r
+
 if (!require("BiocManager", quietly = TRUE)) install.packages("BiocManager")
 
 BiocManager::install("blase")
@@ -119,11 +125,13 @@ We have added pseudotime to the object, and used tradeSeq as shown in
 their vignette.
 
 ``` r
+
 data(tradeSeq_BLASE_example_sce, package = "blase")
 sce <- tradeSeq_BLASE_example_sce
 ```
 
 ``` r
+
 plotUMAP(sce, text_by = "celltype", colour_by = "celltype") +
     plotUMAP(sce, colour_by = "pseudotime") +
     patchwork::plot_layout(ncol = 1, axis_title = "collect")
@@ -140,6 +148,7 @@ Now we’ll find the genes we want to use. We select the top 200 so that
 we can do some parameter tuning below.
 
 ``` r
+
 # Use consecutive for genes that change over time
 assoRes <- associationTest(
     sce,
@@ -168,6 +177,7 @@ bins used.
 We can do this using the following commands, provided by BLASE:
 
 ``` r
+
 res <- blase::find_best_params(
     sce,
     genelist,
@@ -179,6 +189,7 @@ res <- blase::find_best_params(
 ```
 
 ``` r
+
 blase::plot_find_best_params_results(res)
 ```
 
@@ -201,11 +212,13 @@ the SC dataset map using these genes. Ideally, each bin is very
 specific, with a high “worst specificity”.
 
 ``` r
+
 blase_data <- as.BlaseData(sce, pseudotime_slot = "pseudotime", n_bins = 10)
 genes(blase_data) <- genelist[1:80]
 ```
 
 ``` r
+
 evaluate_parameters(blase_data, make_plot = TRUE)
 ```
 
@@ -222,6 +235,7 @@ We can also see how the genes change over pseudotime, by plotting
 expression of the top genes changing over each pseudotime bin.
 
 ``` r
+
 evaluate_top_n_genes(blase_data)
 ```
 
@@ -239,6 +253,7 @@ SingleCellExperiment but in reality you should use a real bulk dataset.
 See some of our other articles for examples.
 
 ``` r
+
 bulks_df <- DataFrame(row.names = rownames(counts(sce)))
 for (type in unique(sce$celltype)) {
     bulks_df <- cbind(
@@ -276,40 +291,41 @@ also allow for parallelisation of the process for large numbers of
 bulks:
 
 ``` r
+
 map_all_best_bins(blase_data, bulks_df)
 #> [[1]]
 #> MappingResult for 'Multipotent progenitors': best_bin=1 correlation=0.993975621190811 top_2_distance=0.07
-#>   Strong Result: TRUE (next max upper  0.948966908229555 )
+#>   Strong Result: TRUE (next max upper  0.947814053851206 )
 #>   with history for scores against 10  bins
 #>   Bootstrapped with 200 iterations
 #> 
 #> [[2]]
 #> MappingResult for 'Monocytes': best_bin=9 correlation=0.984481950304735 top_2_distance=0.0245
-#>   Strong Result: FALSE (next max upper  0.976359393505869 )
+#>   Strong Result: FALSE (next max upper  0.979289316289433 )
 #>   with history for scores against 10  bins
 #>   Bootstrapped with 200 iterations
 #> 
 #> [[3]]
 #> MappingResult for 'Neutrophils': best_bin=10 correlation=0.990412564463197 top_2_distance=0.0676
-#>   Strong Result: TRUE (next max upper  0.952717123625021 )
+#>   Strong Result: TRUE (next max upper  0.949364416717482 )
 #>   with history for scores against 10  bins
 #>   Bootstrapped with 200 iterations
 #> 
 #> [[4]]
 #> MappingResult for 'Basophils': best_bin=6 correlation=0.965002344116268 top_2_distance=4e-04
-#>   Strong Result: FALSE (next max upper  0.979800586510264 )
+#>   Strong Result: FALSE (next max upper  0.982104324983582 )
 #>   with history for scores against 10  bins
 #>   Bootstrapped with 200 iterations
 #> 
 #> [[5]]
 #> MappingResult for 'Megakaryocytes': best_bin=3 correlation=0.833380215658697 top_2_distance=0.0102
-#>   Strong Result: FALSE (next max upper  0.903307529908515 )
+#>   Strong Result: FALSE (next max upper  0.900887695392662 )
 #>   with history for scores against 10  bins
 #>   Bootstrapped with 200 iterations
 #> 
 #> [[6]]
 #> MappingResult for 'GMP': best_bin=4 correlation=0.984857008907642 top_2_distance=0.0398
-#>   Strong Result: FALSE (next max upper  0.979328953542938 )
+#>   Strong Result: FALSE (next max upper  0.977275392228138 )
 #>   with history for scores against 10  bins
 #>   Bootstrapped with 200 iterations
 ```
@@ -322,6 +338,7 @@ Erythrocytes are strongly mapped, but the GMP population doesn’t map as
 well.
 
 ``` r
+
 plot_mapping_result_heatmap(list(
     multipotent_progenitors_result,
     basophils_result,
@@ -344,6 +361,7 @@ is higher than the higher bounds of the next-best bin (bin 4), BLASE
 makes a strong call.
 
 ``` r
+
 plot_mapping_result_corr(basophils_result)
 ```
 
@@ -361,6 +379,7 @@ see that the true proportions of cell types in the mapped bin do indeed
 map to the cell type we expect.
 
 ``` r
+
 binned_sce <- assign_pseudotime_bins(
     sce,
     split_by = "pseudotime_range",
@@ -370,6 +389,7 @@ binned_sce <- assign_pseudotime_bins(
 ```
 
 ``` r
+
 plot_mapping_result(
     binned_sce,
     multipotent_progenitors_result,
@@ -388,6 +408,7 @@ cells.](assign-bulk-to-pseudotime_files/figure-html/assignPseudotimeBinsPlot-1.p
 To view the bin population chart in full, use:
 
 ``` r
+
 plot_bin_population(binned_sce, 1, group_by_slot = "celltype")
 ```
 
@@ -397,8 +418,9 @@ plot_bin_population(binned_sce, 1, group_by_slot = "celltype")
 ## Session Info
 
 ``` r
+
 sessionInfo()
-#> R version 4.5.3 (2026-03-11)
+#> R version 4.6.0 (2026-04-24)
 #> Platform: x86_64-pc-linux-gnu
 #> Running under: Ubuntu 24.04.4 LTS
 #> 
@@ -426,66 +448,66 @@ sessionInfo()
 #> 
 #> other attached packages:
 #>  [1] reshape2_1.4.5              patchwork_1.3.2            
-#>  [3] ami_0.2.1                   BiocParallel_1.44.0        
-#>  [5] scater_1.38.1               ggplot2_4.0.2              
-#>  [7] scran_1.38.1                scuttle_1.20.0             
-#>  [9] slingshot_2.18.0            TrajectoryUtils_1.18.0     
-#> [11] princurve_2.1.6             tradeSeq_1.24.0            
-#> [13] SingleCellExperiment_1.32.0 SummarizedExperiment_1.40.0
-#> [15] Biobase_2.70.0              GenomicRanges_1.62.1       
-#> [17] Seqinfo_1.0.0               IRanges_2.44.0             
-#> [19] S4Vectors_0.48.0            BiocGenerics_0.56.0        
-#> [21] generics_0.1.4              MatrixGenerics_1.22.0      
-#> [23] matrixStats_1.5.0           blase_1.1.3                
-#> [25] BiocStyle_2.38.0           
+#>  [3] ami_0.2.1                   BiocParallel_1.46.0        
+#>  [5] scater_1.40.1               ggplot2_4.0.3              
+#>  [7] scran_1.40.0                scuttle_1.22.0             
+#>  [9] slingshot_2.20.0            TrajectoryUtils_1.20.0     
+#> [11] princurve_2.1.6             tradeSeq_1.26.0            
+#> [13] SingleCellExperiment_1.34.0 SummarizedExperiment_1.42.0
+#> [15] Biobase_2.72.0              GenomicRanges_1.64.0       
+#> [17] Seqinfo_1.2.0               IRanges_2.46.0             
+#> [19] S4Vectors_0.50.1            BiocGenerics_0.58.1        
+#> [21] generics_0.1.4              MatrixGenerics_1.24.0      
+#> [23] matrixStats_1.5.0           blase_1.3.0                
+#> [25] BiocStyle_2.40.0           
 #> 
 #> loaded via a namespace (and not attached):
-#>   [1] RcppAnnoy_0.0.23       splines_4.5.3          later_1.4.8           
-#>   [4] tibble_3.3.1           polyclip_1.10-7        fastDummies_1.7.5     
-#>   [7] lifecycle_1.0.5        edgeR_4.8.2            globals_0.19.1        
+#>   [1] RcppAnnoy_0.0.23       splines_4.6.0          later_1.4.8           
+#>   [4] tibble_3.3.1           polyclip_1.10-7        fastDummies_1.7.6     
+#>   [7] lifecycle_1.0.5        edgeR_4.10.1           globals_0.19.1        
 #>  [10] lattice_0.22-9         MASS_7.3-65            SnowballC_0.7.1       
-#>  [13] magrittr_2.0.5         limma_3.66.0           plotly_4.12.0         
+#>  [13] magrittr_2.0.5         limma_3.68.3           plotly_4.12.0         
 #>  [16] sass_0.4.10            rmarkdown_2.31         jquerylib_0.1.4       
-#>  [19] yaml_2.3.12            metapod_1.18.0         httpuv_1.6.17         
-#>  [22] otel_0.2.0             Seurat_5.4.0           sctransform_0.4.3     
-#>  [25] spam_2.11-3            sp_2.2-1               spatstat.sparse_3.1-0 
-#>  [28] reticulate_1.45.0      cowplot_1.2.0          pbapply_1.7-4         
+#>  [19] yaml_2.3.12            metapod_1.20.0         httpuv_1.6.17         
+#>  [22] otel_0.2.0             Seurat_5.5.0           sctransform_0.4.3     
+#>  [25] spam_2.11-3            sp_2.2-1               spatstat.sparse_3.2-0 
+#>  [28] reticulate_1.46.0      cowplot_1.2.0          pbapply_1.7-4         
 #>  [31] RColorBrewer_1.1-3     abind_1.4-8            Rtsne_0.17            
-#>  [34] purrr_1.2.1            ggrepel_0.9.8          irlba_2.3.7           
-#>  [37] listenv_0.10.1         spatstat.utils_3.2-2   goftest_1.2-3         
-#>  [40] RSpectra_0.16-2        dqrng_0.4.1            spatstat.random_3.4-5 
-#>  [43] fitdistrplus_1.2-6     parallelly_1.46.1      pkgdown_2.2.0         
-#>  [46] codetools_0.2-20       DelayedArray_0.36.1    tidyselect_1.2.1      
-#>  [49] farver_2.1.2           ScaledMatrix_1.18.0    viridis_0.6.5         
-#>  [52] spatstat.explore_3.8-0 jsonlite_2.0.0         BiocNeighbors_2.4.0   
+#>  [34] purrr_1.2.2            ggrepel_0.9.8          irlba_2.3.7           
+#>  [37] listenv_0.10.1         spatstat.utils_3.2-3   goftest_1.2-3         
+#>  [40] RSpectra_0.16-2        dqrng_0.4.1            spatstat.random_3.5-0 
+#>  [43] fitdistrplus_1.2-6     parallelly_1.47.0      pkgdown_2.2.0         
+#>  [46] codetools_0.2-20       DelayedArray_0.38.1    tidyselect_1.2.1      
+#>  [49] farver_2.1.2           ScaledMatrix_1.20.0    viridis_0.6.5         
+#>  [52] spatstat.explore_3.8-1 jsonlite_2.0.0         BiocNeighbors_2.6.0   
 #>  [55] progressr_0.19.0       ggridges_0.5.7         survival_3.8-6        
-#>  [58] systemfonts_1.3.2      tools_4.5.3            ragg_1.5.2            
-#>  [61] ica_1.0-3              Rcpp_1.1.1             glue_1.8.0            
-#>  [64] gridExtra_2.3          SparseArray_1.10.10    xfun_0.57             
+#>  [58] systemfonts_1.3.2      tools_4.6.0            ragg_1.5.2            
+#>  [61] ica_1.0-3              Rcpp_1.1.1-1.1         glue_1.8.1            
+#>  [64] gridExtra_2.3          SparseArray_1.12.2     xfun_0.57             
 #>  [67] mgcv_1.9-4             dplyr_1.2.1            withr_3.0.2           
-#>  [70] BiocManager_1.30.27    fastmap_1.2.0          bluster_1.20.0        
+#>  [70] BiocManager_1.30.27    fastmap_1.2.0          bluster_1.22.0        
 #>  [73] boot_1.3-32            digest_0.6.39          rsvd_1.0.5            
 #>  [76] R6_2.6.1               mime_0.13              textshaping_1.0.5     
 #>  [79] scattermore_1.2        tensor_1.5.1           spatstat.data_3.1-9   
-#>  [82] tidyr_1.3.2            data.table_1.18.2.1    httr_1.4.8            
-#>  [85] htmlwidgets_1.6.4      S4Arrays_1.10.1        uwot_0.2.4            
+#>  [82] tidyr_1.3.2            data.table_1.18.4      httr_1.4.8            
+#>  [85] htmlwidgets_1.6.4      S4Arrays_1.12.0        uwot_0.2.4            
 #>  [88] pkgconfig_2.0.3        gtable_0.3.6           lmtest_0.9-40         
-#>  [91] S7_0.2.1               XVector_0.50.0         htmltools_0.5.9       
-#>  [94] dotCall64_1.2          bookdown_0.46          SeuratObject_5.3.0    
-#>  [97] scales_1.4.0           png_0.1-9              spatstat.univar_3.1-7 
-#> [100] knitr_1.51             nlme_3.1-168           cachem_1.1.0          
+#>  [91] S7_0.2.2               XVector_0.52.0         htmltools_0.5.9       
+#>  [94] dotCall64_1.2          bookdown_0.46          SeuratObject_5.4.0    
+#>  [97] scales_1.4.0           png_0.1-9              spatstat.univar_3.2-0 
+#> [100] knitr_1.51             nlme_3.1-169           cachem_1.1.0          
 #> [103] zoo_1.8-15             stringr_1.6.0          KernSmooth_2.23-26    
-#> [106] parallel_4.5.3         miniUI_0.1.2           vipor_0.4.7           
-#> [109] desc_1.4.3             pillar_1.11.1          grid_4.5.3            
-#> [112] vctrs_0.7.2            RANN_2.6.2             lsa_0.73.4            
-#> [115] promises_1.5.0         BiocSingular_1.26.1    beachmat_2.26.0       
+#> [106] parallel_4.6.0         miniUI_0.1.2           vipor_0.4.7           
+#> [109] desc_1.4.3             pillar_1.11.1          grid_4.6.0            
+#> [112] vctrs_0.7.3            RANN_2.6.2             lsa_0.73.4            
+#> [115] promises_1.5.0         BiocSingular_1.28.0    beachmat_2.28.0       
 #> [118] xtable_1.8-8           cluster_2.1.8.2        beeswarm_0.4.0        
-#> [121] evaluate_1.0.5         locfit_1.5-9.12        cli_3.6.5             
-#> [124] compiler_4.5.3         rlang_1.1.7            future.apply_1.20.2   
-#> [127] labeling_0.4.3         plyr_1.8.9             fs_2.0.1              
+#> [121] evaluate_1.0.5         locfit_1.5-9.12        cli_3.6.6             
+#> [124] compiler_4.6.0         rlang_1.2.0            future.apply_1.20.2   
+#> [127] labeling_0.4.3         plyr_1.8.9             fs_2.1.0              
 #> [130] ggbeeswarm_0.7.3       stringi_1.8.7          viridisLite_0.4.3     
-#> [133] deldir_2.0-4           lazyeval_0.2.3         spatstat.geom_3.7-3   
-#> [136] Matrix_1.7-4           RcppHNSW_0.6.0         future_1.70.0         
-#> [139] statmod_1.5.1          shiny_1.13.0           ROCR_1.0-12           
-#> [142] igraph_2.2.2           bslib_0.10.0
+#> [133] deldir_2.0-4           lazyeval_0.2.3         spatstat.geom_3.8-1   
+#> [136] Matrix_1.7-5           RcppHNSW_0.6.0         future_1.70.0         
+#> [139] statmod_1.5.2          shiny_1.13.0           ROCR_1.0-12           
+#> [142] igraph_2.3.1           bslib_0.11.0
 ```
