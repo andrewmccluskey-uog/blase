@@ -1,9 +1,9 @@
 bibentry(
   bibtype = "Article",
   title = "BLASE: Bulk Linkage Analysis for Single Cell Experiments - Teasing Out the Secrets of Bulk Transcriptomics with Trajectory Analysis",
-  author = "McCluskey, Andrew and Kettlewell, Toby and Smith, Adrian M. and Kundu, Rhiannon and Gunn, David A. and Otto, Thomas D.",
+  author = "Andrew McCluskey and Toby Kettlewell and Adrian M. Smith and Rhiannon Kundu and David A. Gunn and Thomas D. Otto",
   journal = "bioRxiv",
   year = "2025",
   doi = "10.1101/2025.09.03.673925",
-  URL = "https://www.biorxiv.org/content/early/2025/09/07/2025.09.03.673925"
+  URL = "https://www.biorxiv.org/content/10.1101/2025.09.03.673925v1"
 )
