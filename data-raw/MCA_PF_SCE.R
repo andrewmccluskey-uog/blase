@@ -7,7 +7,6 @@ library(fs)
 library(patchwork)
 library(scater)
 library(utils)
-library(ami)
 library(blase)
 
 RNGversion("3.5.0")
