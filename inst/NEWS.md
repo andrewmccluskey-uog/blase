@@ -8,7 +8,7 @@
 
 ## Minor improvements and bug fixes
 
-* 
+* removes dependency on ami package following its removal from CRAN. 
 
 # blase 1.2.0
 
