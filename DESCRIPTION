@@ -56,7 +56,6 @@ Suggests:
     scran,
     slingshot,
     tools,
-    ami,
     reshape2,
     plyr,
     fs,

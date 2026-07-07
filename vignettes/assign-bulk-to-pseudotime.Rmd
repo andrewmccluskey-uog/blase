@@ -25,7 +25,6 @@ library(slingshot)
 library(scran)
 library(scater)
 library(BiocParallel)
-library(ami)
 library(patchwork)
 library(reshape2)
 ```
@@ -37,10 +36,7 @@ set.seed(SEED)
 ```
 
 ```{r concurrency}
-N_CORES <- 4
-if (ami::using_ci()) {
-    N_CORES <- 2
-}
+N_CORES <- 2
 ```
 
 ## Introduction
